@@ -149,11 +149,14 @@ Three things must be reproduced **byte-for-byte**:
 - [x] Swipe input (arrow keys + touch/mouse drag → direction enum) → `MbEngine.step`.
 - [x] Verified live via godot-ai MCP: board+HUD render; injected swipes slide tiles, merge 2→4, update score/shards (screenshot confirmed). `tools/smoke_match.gd` headless smoke PASS.
 
-**Remaining for Phase 2:**
-- [ ] Hand UI (card row) + card targeting (tap tile) + totem tray + totem activation.
-- [ ] State-reconcile renderer with **tweens** (slide/merge-pop/spawn-fade) instead of instant redraw.
-- [ ] FX: particle bursts on merge/spawn/destroy; effect overlays/shaders; glitch full-screen.
-- [ ] Scenario picker / debug controls (wire `MbScenarios` to load tutorial/challenge boards).
+**Phase 2 ✅ feature-complete (2026-06-03):**
+- [x] Hand UI (`scenes/main.gd` card row) + card selection + tap-to-target play (single tile / column / quadrant / two-tile / no-target / totem-spawn) via a targeting state machine; card consumed + HUD/board update verified live (bomb cleared a tile).
+- [x] Totem tray (active totems) + totem-spawn from totem cards (`spawn_totem`).
+- [x] `scenes/board_view.gd` (`MbBoardView`): rendering + **spawn/merge pop tweens** + effect-colored borders (freeze=blue, amplify=yellow, black-hole=indigo, …) + pointer→swipe/tap.
+- [x] Scenario picker: keys `0–7` load `MbScenarios` configs (startingCards + spawnConfigs + eventRules) via `new_game_scenario`; verified live (scenario 1 dealt bomb+swap, effects spawned during play).
+- [ ] *Optional polish:* true **slide** animations (tiles glide between cells — currently pop/fade only; needs per-tile move tracking) and **particle/shader FX** (merge/spawn/destroy bursts, glitch full-screen).
+
+➡️ **Phase 2 is a complete, playable single-player game** (swipe + cards + totems + effects + scenarios), no backend, driven by the byte-exact engine. Next: **Phase 3 — networking** (or the optional Phase 2 FX polish).
 
 ### Phase 3 — Networking (gated on §5 decision)
 - [ ] `NetClient` optimistic core: OperationTracker (queue cap 10 + backpressure modal), OperationSender (opId), StateReconciler (rollback+replay), OperationReplayer.
