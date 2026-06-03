@@ -1,0 +1,352 @@
+{
+  "initial": {
+    "board": {
+      "tiles": [
+        {
+          "isEmpty": false,
+          "value": 8,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "amplify",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 2,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                "backgroundWidth": 78,
+                "backgroundHeight": 78,
+                "spawnEmitter": "amplify-spawn",
+                "activeEmitter": "amplify-run",
+                "removalEmitter": "amplify-removal",
+                "showMultiplier": true
+              },
+              "mergeConfig": {
+                "valueMultiplier": 2,
+                "consumedOnMerge": true,
+                "consumptionEmitter": "amplify",
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        {
+          "isEmpty": false,
+          "value": 8,
+          "row": 0,
+          "col": 1,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": false,
+          "value": 4,
+          "row": 0,
+          "col": 2,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": false,
+          "value": 4,
+          "row": 0,
+          "col": 3,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": false,
+          "value": 4,
+          "row": 1,
+          "col": 0,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 1,
+          "col": 1,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 1,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 1,
+          "col": 3,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 0,
+          "status": "normal",
+          "effect": {
+            "type": "black_hole",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 7,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 7,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "black-hole-spawn",
+                "activeEmitter": "black-hole-run",
+                "removalEmitter": "black-hole-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 2,
+          "col": 1,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 2,
+          "col": 2,
+          "status": "normal",
+          "meta": {}
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 3,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 16,
+          "row": 3,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "lock",
+            "active": true,
+            "config": {
+              "remainingTriggers": 1,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+                "overlayWidth": 70,
+                "overlayHeight": 70,
+                "spawnEmitter": "lock-spawn",
+                "removalEmitter": "lock-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 1,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 16,
+          "row": 3,
+          "col": 3,
+          "status": "normal",
+          "meta": {}
+        }
+      ],
+      "size": 4
+    },
+    "hand": {
+      "cards": [
+        {
+          "type": "combo_guardian",
+          "name": "Combo Guardian",
+          "description": "Spawn Combo Saver totem",
+          "texture": "/assets/hand/images/combo_guardian.png",
+          "spawnsTotem": {
+            "id": "combo_saver",
+            "name": "Combo Saver",
+            "description": "Prevents combo from breaking",
+            "maxTallyMarks": 3,
+            "icon": {
+              "src": "/assets/totems/combo-saver.png"
+            }
+          },
+          "isTotemCard": true,
+          "id": "h0"
+        },
+        {
+          "type": "double",
+          "name": "Amplify",
+          "description": "Double the value of a tile",
+          "texture": "/assets/hand/images/double.png",
+          "id": "h1"
+        }
+      ]
+    },
+    "deck": {
+      "remainingCards": 10,
+      "nextCardIndex": 2
+    },
+    "score": 500,
+    "shards": 3,
+    "combo": 0,
+    "comboMultiplier": 2,
+    "totems": {
+      "active": [
+        {
+          "id": "tm0",
+          "type": "momentum_idol",
+          "config": {
+            "movesRemaining": 10
+          },
+          "name": "momentum_idol",
+          "description": "momentum_idol",
+          "active": true
+        },
+        {
+          "id": "ts0",
+          "type": "scavenger",
+          "config": {
+            "mergesRemaining": 4
+          },
+          "name": "scavenger",
+          "description": "scavenger",
+          "active": true
+        }
+      ]
+    },
+    "moveIndex": 7,
+    "randomSeeds": {
+      "tile-gen": 4242,
+      "shuffle": 4243,
+      "effect-spawn": 4244,
+      "totem-spawn": 4245,
+      "card-draw": 4246
+    },
+    "rngIndices": {
+      "tile-gen": 3,
+      "shuffle": 1,
+      "effect-spawn": 0,
+      "totem-spawn": 2,
+      "card-draw": 0
+    }
+  },
+  "steps": [
+    {
+      "kind": "card",
+      "action": "double",
+      "params": {
+        "tile": {
+          "row": 1,
+          "col": 0
+        }
+      },
+      "cardIndex": 1,
+      "success": true,
+      "scoreAdded": 8,
+      "hash": "338a7d2d9689144fbc02f1623ee4a79a6b0daa55abf29448b57c2329a41f2fbb"
+    },
+    {
+      "kind": "totem",
+      "totemType": "combo_saver",
+      "cardIndex": 0,
+      "success": true,
+      "hash": "fb2daf93814f2b952d0ce828956286602827a91b5aca930e7ffc21efc41f2e81"
+    },
+    {
+      "kind": "swipe",
+      "dir": "left",
+      "scoreAdded": 408,
+      "cardDrawn": true,
+      "moved": true,
+      "hash": "36aed606741b11c41846ef31bb6fd8f91c8c563e5efd6c4b7f03dd6a3be0d0d8"
+    },
+    {
+      "kind": "swipe",
+      "dir": "down",
+      "scoreAdded": -40,
+      "cardDrawn": false,
+      "moved": true,
+      "hash": "18d7a324f8c3192692fdfbb9bcbcc9f14f87acacf4ba969f5bfc2580441f3212"
+    },
+    {
+      "kind": "swipe",
+      "dir": "up",
+      "scoreAdded": -32,
+      "cardDrawn": false,
+      "moved": true,
+      "hash": "8b2aec96d768187407084861fa953a29a022576e7a556d7b2483de9a9be0d208"
+    },
+    {
+      "kind": "swipe",
+      "dir": "right",
+      "scoreAdded": 0,
+      "cardDrawn": false,
+      "moved": true,
+      "hash": "727b85a28a6117c4fbe06ad78b2c710f745db3ca49029dbd757c2c9e241f3930"
+    }
+  ]
+}

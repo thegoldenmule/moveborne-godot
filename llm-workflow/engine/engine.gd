@@ -2,20 +2,21 @@
 class_name MbEngine
 extends RefCounted
 
-## Deterministic swipe engine — GDScript port of the Moveborne rules spine
-## (moveborne/src/logic/src: merge.ts, actionExecutor.ts, shards.ts, cardDraw.ts).
+## Deterministic engine — GDScript port of the Moveborne rules core
+## (moveborne/src/logic/src: merge.ts, actionExecutor.ts, shards.ts, cardDraw.ts),
+## wiring the verified subsystem modules (tile effects, totems, events, power cards).
 ##
-## SCOPE (Phase 1 spine): swipe / merge / spawn / combo / score / shards / auto-draw,
-## with tile-effects, totems, events and global-effects as faithful no-op stubs
-## (they consume no RNG and add no state when inactive — verified against the TS
-## oracle). The breadth workflow fills the stubs in. State is a Dictionary mirror
-## of SynchronizedGameState; reference semantics match JS (Dictionary/Array are
-## reference types), so the exact merge.ts mutation behavior is reproduced.
+## State is a Dictionary mirror of SynchronizedGameState; tiles = flat row-major
+## Array of tile Dicts. GDScript Dictionary/Array are reference types, so JS [...]/
+## {...}/in-place-mutation semantics from merge.ts are reproduced exactly.
 
 const C := preload("res://engine/constants.gd")
 const Hasher := preload("res://engine/hasher.gd")
 const MbRandomS := preload("res://engine/random_generator.gd")
 const PC := preload("res://engine/powercards.gd")
+const TE := preload("res://engine/tile_effects.gd")
+const TT := preload("res://engine/totems.gd")
+const EV := preload("res://engine/events.gd")
 
 # ----------------------------------------------------------------------------
 # board helpers (board.ts / factories.ts)
@@ -25,161 +26,196 @@ static func create_empty_tile(row: int, col: int) -> Dictionary:
 	return {"isEmpty": true, "value": 0, "row": row, "col": col, "status": "normal"}
 
 
+static func _event_rules(state: Dictionary):
+	if state.has("scenarioConfig") and state["scenarioConfig"] != null:
+		var sc: Dictionary = state["scenarioConfig"]
+		if sc.has("eventRules") and sc["eventRules"] != null:
+			return sc["eventRules"]
+	return null
+
+
 # ----------------------------------------------------------------------------
-# swipe (merge.ts swipeLeft/Right/Up/Down — no-effect spine fast path)
-# Each returns {moved, score, count}. `t` is mutated in place (shared dict refs).
+# swipe (merge.ts swipeLeft/Right/Up/Down + performSwipe) — full effect handling
 # ----------------------------------------------------------------------------
 
-static func _swipe_left(t: Array, merged: Dictionary, size: int) -> Dictionary:
-	var moved := false
-	var score := 0
-	var count := 0
-	for row in range(size):
-		for col in range(1, size):
-			var tile = t[row * size + col]
-			if tile == null or tile["isEmpty"]:
-				continue
-			var target := col
-			for check in range(col - 1, -1, -1):
-				var ct = t[row * size + check]
-				if ct["isEmpty"]:
-					target = check
-				elif int(ct["value"]) == int(tile["value"]) and not merged.has(row * size + check):
-					target = check
-					break
-				else:
-					break
-			if target != col:
-				moved = true
-				var r := _apply(t, merged, size, row * size + col, row * size + target, tile, row, col, row, target)
-				if r >= 0:
-					score += r
-					count += 1
-	return {"moved": moved, "score": score, "count": count}
+static func _iter_order(size: int, direction: String) -> Array:
+	var out := []
+	match direction:
+		"left":
+			for row in range(size):
+				for col in range(1, size):
+					out.append([row, col])
+		"right":
+			for row in range(size):
+				for col in range(size - 2, -1, -1):
+					out.append([row, col])
+		"up":
+			for col in range(size):
+				for row in range(1, size):
+					out.append([row, col])
+		"down":
+			for col in range(size):
+				for row in range(size - 2, -1, -1):
+					out.append([row, col])
+	return out
 
 
-static func _swipe_right(t: Array, merged: Dictionary, size: int) -> Dictionary:
-	var moved := false
-	var score := 0
-	var count := 0
-	for row in range(size):
-		for col in range(size - 2, -1, -1):
-			var tile = t[row * size + col]
-			if tile == null or tile["isEmpty"]:
-				continue
-			var target := col
-			for check in range(col + 1, size):
-				var ct = t[row * size + check]
-				if ct["isEmpty"]:
-					target = check
-				elif int(ct["value"]) == int(tile["value"]) and not merged.has(row * size + check):
-					target = check
-					break
-				else:
-					break
-			if target != col:
-				moved = true
-				var r := _apply(t, merged, size, row * size + col, row * size + target, tile, row, col, row, target)
-				if r >= 0:
-					score += r
-					count += 1
-	return {"moved": moved, "score": score, "count": count}
+static func _scan_cells(size: int, row: int, col: int, direction: String) -> Array:
+	var out := []
+	match direction:
+		"left":
+			for c in range(col - 1, -1, -1):
+				out.append([row, c])
+		"right":
+			for c in range(col + 1, size):
+				out.append([row, c])
+		"up":
+			for r in range(row - 1, -1, -1):
+				out.append([r, col])
+		"down":
+			for r in range(row + 1, size):
+				out.append([r, col])
+	return out
 
 
-static func _swipe_up(t: Array, merged: Dictionary, size: int) -> Dictionary:
-	var moved := false
-	var score := 0
-	var count := 0
-	for col in range(size):
-		for row in range(1, size):
-			var tile = t[row * size + col]
-			if tile == null or tile["isEmpty"]:
-				continue
-			var target := row
-			for check in range(row - 1, -1, -1):
-				var ct = t[check * size + col]
-				if ct["isEmpty"]:
-					target = check
-				elif int(ct["value"]) == int(tile["value"]) and not merged.has(check * size + col):
-					target = check
-					break
-				else:
-					break
-			if target != row:
-				moved = true
-				var r := _apply(t, merged, size, row * size + col, target * size + col, tile, row, col, target, col)
-				if r >= 0:
-					score += r
-					count += 1
-	return {"moved": moved, "score": score, "count": count}
+static func _resolve(t: Array, merged: Dictionary, size: int, row: int, col: int, tr: int, tc: int, destroyed: Array, removed_locks: Array) -> Dictionary:
+	var src := row * size + col
+	var tgt := tr * size + tc
+	var tile: Dictionary = t[src]
+	var target_tile: Dictionary = t[tgt]
 
+	var target_is_barrier := TE.is_black_hole_tile(target_tile)
+	var bh_pos = null
+	if not target_is_barrier:
+		bh_pos = TE.find_black_hole_in_path(t, size, {"row": row, "col": col}, {"row": tr, "col": tc})
 
-static func _swipe_down(t: Array, merged: Dictionary, size: int) -> Dictionary:
-	var moved := false
-	var score := 0
-	var count := 0
-	for col in range(size):
-		for row in range(size - 2, -1, -1):
-			var tile = t[row * size + col]
-			if tile == null or tile["isEmpty"]:
-				continue
-			var target := row
-			for check in range(row + 1, size):
-				var ct = t[check * size + col]
-				if ct["isEmpty"]:
-					target = check
-				elif int(ct["value"]) == int(tile["value"]) and not merged.has(check * size + col):
-					target = check
-					break
-				else:
-					break
-			if target != row:
-				moved = true
-				var r := _apply(t, merged, size, row * size + col, target * size + col, tile, row, col, target, col)
-				if r >= 0:
-					score += r
-					count += 1
-	return {"moved": moved, "score": score, "count": count}
+	if target_is_barrier or bh_pos != null:
+		var bh_position: Dictionary = ({"row": tr, "col": tc} if target_is_barrier else bh_pos)
+		var bh_tile: Dictionary = t[int(bh_position["row"]) * size + int(bh_position["col"])]
+		var dr := TE.process_black_hole_destruction(tile, bh_tile)
+		destroyed.append({"position": {"row": row, "col": col}, "value": int(dr["scoreLoss"]), "destroyedBy": {"type": "black_hole", "position": bh_position}})
+		if bool(dr["shouldImplode"]) and bh_tile.has("effect") and bh_tile["effect"] != null:
+			(bh_tile["effect"] as Dictionary)["active"] = false
+		t[src] = create_empty_tile(row, col)
+		return {"score": 0, "scoreLoss": int(dr["scoreLoss"]), "count": 0}
 
-
-static func _apply(t: Array, merged: Dictionary, size: int, src_idx: int, tgt_idx: int, tile: Dictionary, row: int, col: int, tgt_row: int, tgt_col: int) -> int:
-	# Returns the merged tile's value on a merge, or -1 on a plain move.
-	var tgt: Dictionary = t[tgt_idx]
-	if not tgt["isEmpty"] and int(tgt["value"]) == int(tile["value"]):
-		var fv := int(tile["value"]) * 2
-		t[tgt_idx] = {"isEmpty": false, "value": fv, "status": "merged", "meta": {}, "row": tgt_row, "col": tgt_col}
-		t[src_idx] = create_empty_tile(row, col)
-		merged[tgt_idx] = true
-		return fv
+	if not bool(target_tile["isEmpty"]) and int(target_tile["value"]) == int(tile["value"]) and TE.can_tiles_merge_together(tile, target_tile):
+		var base_value := int(tile["value"]) * 2
+		var mr := TE.process_tile_effects_on_merge(target_tile, base_value)
+		var lock_removed = TE.process_lock_trigger_on_merge(target_tile)
+		if lock_removed != null:
+			removed_locks.append(lock_removed)
+		var merged_tile := {"isEmpty": false, "value": int(mr["finalValue"]), "status": "merged", "meta": {}, "row": tr, "col": tc}
+		if target_tile.has("effect") and target_tile["effect"] != null and bool((target_tile["effect"] as Dictionary).get("active", false)):
+			merged_tile["effect"] = target_tile["effect"]
+		t[tgt] = merged_tile
+		var src_pres = TE.get_effect_to_preserve_at_source(tile)
+		var empty := create_empty_tile(row, col)
+		if src_pres != null:
+			empty["effect"] = src_pres
+		t[src] = empty
+		merged[tgt] = true
+		return {"score": int(mr["finalValue"]), "scoreLoss": 0, "count": 1}
 	else:
-		tile["row"] = tgt_row
-		tile["col"] = tgt_col
-		t[tgt_idx] = tile
-		t[src_idx] = create_empty_tile(row, col)
-		return -1
+		var src_pres = TE.get_effect_to_preserve_at_source(tile)
+		var tgt_transfer = TE.get_effect_to_preserve_at_source(target_tile)
+		tile["row"] = tr
+		tile["col"] = tc
+		if src_pres != null:
+			tile.erase("effect")
+		if tgt_transfer != null:
+			tile["effect"] = tgt_transfer
+		t[tgt] = tile
+		var empty := create_empty_tile(row, col)
+		if src_pres != null:
+			empty["effect"] = src_pres
+		t[src] = empty
+		return {"score": 0, "scoreLoss": 0, "count": 0}
 
 
-static func perform_swipe(state: Dictionary, direction: String, _rng) -> Dictionary:
-	# process_totem_effects(PRE_SWIPE) — no-op for the spine.
-	var board: Dictionary = state["board"]
+static func _swipe(t: Array, merged: Dictionary, size: int, direction: String, destroyed: Array, removed_locks: Array) -> Dictionary:
+	var moved := false
+	var score := 0
+	var score_loss := 0
+	var count := 0
+	for cell in _iter_order(size, direction):
+		var row: int = cell[0]
+		var col: int = cell[1]
+		var tile = t[row * size + col]
+		if tile == null or bool(tile["isEmpty"]):
+			continue
+		if not TE.can_value_move(tile):
+			continue
+		var tr := row
+		var tc := col
+		for scell in _scan_cells(size, row, col, direction):
+			var cr: int = scell[0]
+			var cc: int = scell[1]
+			var ct: Dictionary = t[cr * size + cc]
+			if TE.is_black_hole_tile(ct):
+				tr = cr
+				tc = cc
+				continue
+			if bool(ct["isEmpty"]):
+				tr = cr
+				tc = cc
+			elif int(ct["value"]) == int(tile["value"]) and not merged.has(cr * size + cc) and TE.can_tiles_merge_together(tile, ct):
+				tr = cr
+				tc = cc
+				break
+			else:
+				break
+		if tr == row and tc == col:
+			continue
+		moved = true
+		var rr := _resolve(t, merged, size, row, col, tr, tc, destroyed, removed_locks)
+		score += int(rr["score"])
+		score_loss += int(rr["scoreLoss"])
+		count += int(rr["count"])
+	return {"moved": moved, "score": score, "scoreLoss": score_loss, "count": count}
+
+
+static func perform_swipe(state: Dictionary, direction: String, rng) -> Dictionary:
+	var result := TT.process_totem_effects(state, {"type": "PRE_SWIPE", "direction": direction}, rng)
+	var board: Dictionary = result["board"]
 	var size: int = int(board["size"])
-	var new_tiles: Array = (board["tiles"] as Array).duplicate()  # shallow: shares tile dict refs
+	var new_tiles: Array = (board["tiles"] as Array).duplicate()
 	for tile in new_tiles:
 		if tile != null:
 			tile["status"] = "normal"
 	var merged := {}
+	var destroyed := []
+	var removed_locks := []
 	var sr: Dictionary
-	match direction:
-		"left": sr = _swipe_left(new_tiles, merged, size)
-		"right": sr = _swipe_right(new_tiles, merged, size)
-		"up": sr = _swipe_up(new_tiles, merged, size)
-		"down": sr = _swipe_down(new_tiles, merged, size)
-		_: sr = {"moved": false, "score": 0, "count": 0}
-	var result := state.duplicate()
+	if direction in ["left", "right", "up", "down"]:
+		sr = _swipe(new_tiles, merged, size, direction, destroyed, removed_locks)
+	else:
+		sr = {"moved": false, "score": 0, "scoreLoss": 0, "count": 0}
+	var net_score: int = int(sr["score"]) - int(sr["scoreLoss"])
+
+	result = result.duplicate()
 	result["board"] = board.duplicate()
 	result["board"]["tiles"] = new_tiles
-	# POST_SWIPE / MOVE_COMPLETED / SWIPE_COMPLETED totems + event spawn — no-op spine.
-	return {"gameState": result, "moved": sr["moved"], "score": sr["score"], "mergedTilesCount": sr["count"]}
+
+	var removed_effect_positions: Array = removed_locks.duplicate()
+	if int(sr["count"]) > 0:
+		for i in range(new_tiles.size()):
+			var tl: Dictionary = new_tiles[i]
+			if str(tl.get("status", "")) == "merged":
+				var fr := TE.process_freeze_removal_from_adjacent_merge(result, {"row": int(i / size), "col": i % size})
+				for p in fr:
+					removed_effect_positions.append(p)
+
+	result = TT.process_totem_effects(result, {"type": "POST_SWIPE", "mergeOccurred": int(sr["count"]) > 0, "tilesSpawned": 0, "direction": direction}, rng)
+	result = TT.process_totem_effects(result, {"type": "MOVE_COMPLETED"}, rng)
+	result = TT.process_totem_effects(result, {"type": "SWIPE_COMPLETED", "direction": direction}, rng)
+
+	if net_score > 0:
+		var rules = _event_rules(result)
+		if rules != null and (rules as Array).size() > 0:
+			result = EV.process_event_spawn_rules(result, {"type": "SCORE_UPDATE", "value": net_score}, rules, rng, removed_effect_positions)
+
+	return {"gameState": result, "moved": sr["moved"], "score": net_score, "mergedTilesCount": sr["count"]}
 
 
 # ----------------------------------------------------------------------------
@@ -193,32 +229,53 @@ static func add_random_tile_with_effects(state: Dictionary, rng) -> Dictionary:
 	var empties := []
 	for i in range(tiles.size()):
 		var tl: Dictionary = tiles[i]
-		var has_effect := tl.has("effect") and tl["effect"] != null and bool(tl["effect"].get("active", false)) and str(tl["effect"].get("type", "")) != "none"
-		if tl["isEmpty"] and not has_effect:
+		var has_effect := tl.has("effect") and tl["effect"] != null and bool((tl["effect"] as Dictionary).get("active", false)) and str((tl["effect"] as Dictionary).get("type", "")) != "none"
+		if bool(tl["isEmpty"]) and not has_effect:
 			empties.append(i)
 	if empties.is_empty():
 		return {"gameState": state}
 	var ri: int = empties[int(floor(rng.get_random(C.NS_TILE_GEN) * empties.size()))]
 	var value: int = 2 if rng.get_random(C.NS_TILE_GEN) < 0.9 else 4
-	# process_totem_effects(TILE_SPAWN) — no-op; value unchanged.
-	var new_tiles: Array = tiles.duplicate()
-	new_tiles[ri] = {"isEmpty": false, "value": value, "status": "new", "meta": {}, "row": int(ri / size), "col": ri % size}
-	var result := state.duplicate()
-	result["board"] = board.duplicate()
-	result["board"]["tiles"] = new_tiles
-	# POST_SPAWN totem + attemptSpawnEffectOnTile — no-op (no scenario spawn configs, no RNG).
-	return {"gameState": result}
+
+	var spawn_event := {"type": "TILE_SPAWN", "tileValue": value, "position": {"row": int(ri / size), "col": ri % size}}
+	var modified := TT.process_totem_effects(state, spawn_event, rng)
+	var final_value: int = int(spawn_event.get("tileValue", 0))
+
+	var new_tiles: Array = (modified["board"]["tiles"] as Array).duplicate()
+	new_tiles[ri] = {"isEmpty": false, "value": final_value, "status": "new", "meta": {}, "row": int(ri / size), "col": ri % size}
+	modified = modified.duplicate()
+	modified["board"] = (modified["board"] as Dictionary).duplicate()
+	modified["board"]["tiles"] = new_tiles
+
+	modified = TT.process_totem_effects(modified, {"type": "POST_SPAWN", "spawnedPosition": ri, "spawnedValue": final_value}, rng)
+
+	var spawn_result := TE.attempt_spawn_effect_on_tile(modified, ri, rng)
+	if bool(spawn_result.get("success", false)) and spawn_result.get("effectSpawned", null) != null:
+		var es: Dictionary = spawn_result["effectSpawned"]
+		modified = TT.process_totem_effects(spawn_result["gameState"], {"type": "TILE_EFFECT_APPLIED", "effectApplied": {"type": es["type"], "position": es.get("position", null), "config": es.get("config", null)}}, rng)
+		return {"gameState": modified}
+	return {"gameState": spawn_result["gameState"]}
 
 
-static func update_combo_multiplier(state: Dictionary, merged_count: int, _rng) -> Dictionary:
-	var s := state.duplicate()
+static func update_combo_multiplier(state: Dictionary, merged_count: int, rng) -> Dictionary:
 	if merged_count == 0:
-		# Combo break; no Combo Saver totem -> reset to 0. (No eventRules -> no spawn.)
-		s["comboMultiplier"] = 0
-	else:
-		# No Momentum Idol -> increment equals merged_count.
-		s["comboMultiplier"] = int(state["comboMultiplier"]) + merged_count
-	return s
+		var previous_combo := int(state["comboMultiplier"])
+		var reset_state := state.duplicate()
+		reset_state["comboMultiplier"] = 0
+		var modified := TT.process_totem_effects(reset_state, {"type": "COMBO_BREAK_ATTEMPTED", "previousCombo": previous_combo}, rng)
+		modified = EV.update_trigger_states(modified)
+		if int(modified["comboMultiplier"]) == 0 and previous_combo > 0:
+			var rules = _event_rules(state)
+			if rules != null and (rules as Array).size() > 0:
+				modified = EV.process_event_spawn_rules(modified, {"type": "COMBO_BREAK", "previousCombo": previous_combo}, rules, rng)
+		return modified
+	var increment_event := {"type": "COMBO_INCREMENT", "incrementAmount": merged_count}
+	var modified := TT.process_totem_effects(state, increment_event, rng)
+	var final_increment := int(increment_event.get("incrementAmount", merged_count))
+	modified = modified.duplicate()
+	modified["comboMultiplier"] = int(state["comboMultiplier"]) + final_increment
+	modified = EV.update_trigger_states(modified)
+	return modified
 
 
 static func calculate_combo_score(base_score: int, combo_multiplier: int) -> int:
@@ -229,6 +286,14 @@ static func calculate_combo_score(base_score: int, combo_multiplier: int) -> int
 
 static func calculate_shards(current: int, to_add: int) -> int:
 	return min(current + to_add, C.SHARDS_PER_CARD)
+
+
+# globalEffects.ts processGlobalEffects(MOVE_COMPLETED): no-op until a scenario
+# event rule spawns a global (Glitch) effect; ticks/reseeds will be ported then.
+static func _process_global_effects(state: Dictionary, _rng) -> Dictionary:
+	if not state.has("globalEffects") or state["globalEffects"] == null or (state["globalEffects"] as Array).is_empty():
+		return state
+	return state
 
 
 # ----------------------------------------------------------------------------
@@ -250,12 +315,12 @@ static func draw_card_from_deck(rng, draw_index: int) -> Dictionary:
 
 
 # ----------------------------------------------------------------------------
-# action executor (actionExecutor.ts executeSwipeAction)
+# action executor (actionExecutor.ts)
 # ----------------------------------------------------------------------------
 
 static func execute_swipe_action(state: Dictionary, direction: String, rng) -> Dictionary:
-	# reset_triggered_states — no-op spine.
-	var result := perform_swipe(state, direction, rng)
+	var working := EV.reset_triggered_states(state)
+	var result := perform_swipe(working, direction, rng)
 	if result["moved"]:
 		var ns: Dictionary = result["gameState"]
 		ns = update_combo_multiplier(ns, int(result["mergedTilesCount"]), rng)
@@ -264,11 +329,14 @@ static func execute_swipe_action(state: Dictionary, direction: String, rng) -> D
 			total_score = calculate_combo_score(int(result["score"]), int(ns["comboMultiplier"]))
 		else:
 			total_score = int(result["score"])
-		# mergedTilesCount>0: POST_SWIPE totem (shard multiplier) — no-op, multiplier stays 1.
 		var shards_to_add: int = int(result["mergedTilesCount"])
+		if int(result["mergedTilesCount"]) > 0:
+			var shard_event := {"type": "POST_SWIPE", "mergedTilesCount": int(result["mergedTilesCount"]), "mergeOccurred": true, "shardsMultiplier": 1, "direction": direction}
+			ns = TT.process_totem_effects(ns, shard_event, rng)
+			shards_to_add = int(result["mergedTilesCount"]) * int(shard_event.get("shardsMultiplier", 1))
 		var add_res := add_random_tile_with_effects(ns, rng)
 		ns = add_res["gameState"]
-		# update_trigger_states — no-op.
+		ns = EV.update_trigger_states(ns)
 		ns = ns.duplicate()
 		ns["shards"] = calculate_shards(int(ns["shards"]), shards_to_add)
 		var card_drawn := false
@@ -283,40 +351,17 @@ static func execute_swipe_action(state: Dictionary, direction: String, rng) -> D
 			deck["remainingCards"] = int(ns["deck"]["remainingCards"]) - 1
 			ns["deck"] = deck
 			card_drawn = true
-		# process_global_effects(MOVE_COMPLETED) — no-op spine.
+		ns = _process_global_effects(ns, rng)
 		return {"newState": ns, "scoreAdded": total_score, "shardsAdded": shards_to_add, "moved": true, "cardDrawn": card_drawn, "drawnCard": drawn_card}
 	else:
 		var ns: Dictionary = result["gameState"]
 		ns = update_combo_multiplier(ns, 0, rng)
-		# FAILED_SWIPE totem — no-op.
+		ns = TT.process_totem_effects(ns, {"type": "FAILED_SWIPE", "direction": direction}, rng)
 		var add_res := add_random_tile_with_effects(ns, rng)
 		ns = add_res["gameState"]
-		# process_global_effects — no-op.
+		ns = _process_global_effects(ns, rng)
 		return {"newState": ns, "scoreAdded": 0, "shardsAdded": 0, "moved": false, "cardDrawn": false, "drawnCard": null}
 
-
-# ----------------------------------------------------------------------------
-# step convenience: construct rng, execute, apply the validator/client caller
-# overrides (accumulated score, rngIndices, moveIndex+2-on-draw), return next + hash.
-# ----------------------------------------------------------------------------
-
-static func step(state: Dictionary, direction: String) -> Dictionary:
-	var rng := MbRandomS.new(state["randomSeeds"], state["rngIndices"])
-	var res := execute_swipe_action(state, direction, rng)
-	var ns: Dictionary = res["newState"]
-	var next := ns.duplicate()
-	next["score"] = int(ns["score"]) + int(res["scoreAdded"])
-	next["rngIndices"] = rng.get_indices()
-	next["moveIndex"] = int(state["moveIndex"]) + (2 if res["cardDrawn"] else 1)
-	return {"state": next, "hash": Hasher.hash_value(next), "scoreAdded": res["scoreAdded"], "cardDrawn": res["cardDrawn"], "moved": res["moved"]}
-
-
-# ----------------------------------------------------------------------------
-# play card (actionExecutor.ts executePlayCardAction)
-# Dispatches to MbPowerCards; resets combo for all cards EXCEPT shuffle/vortex/
-# teleport; splices the played card from hand; shuffle/transform consume the
-# "shuffle" RNG namespace, the other 12 cards consume none.
-# ----------------------------------------------------------------------------
 
 static func execute_play_card_action(state: Dictionary, action: String, action_data: Dictionary, card_index: int, rng) -> Dictionary:
 	var ns := state.duplicate()
@@ -365,8 +410,38 @@ static func execute_play_card_action(state: Dictionary, action: String, action_d
 		var nc := cards.duplicate()
 		nc.remove_at(card_index)
 		ns["hand"] = {"cards": nc}
-	# update_trigger_states — no-op spine.
+	ns = EV.update_trigger_states(ns)
 	return {"success": true, "newState": ns, "scoreAdded": int(r["score"]), "error": null}
+
+
+static func execute_spawn_totem_action(state: Dictionary, totem_type: String, card_index: int) -> Dictionary:
+	var ns := state.duplicate()
+	var cards := (ns["hand"]["cards"] as Array)
+	if card_index < 0 or card_index >= cards.size():
+		return {"success": false, "newState": state, "scoreAdded": 0, "error": "Invalid card index: %d" % card_index}
+	var totem_id := "totem_%d_%s" % [int(ns["moveIndex"]) + 1, totem_type]
+	var new_totem := {"id": totem_id, "type": totem_type, "config": TT.initialize_totem_config(totem_type), "name": totem_type, "description": totem_type, "active": true}
+	ns["totems"] = {"active": (ns["totems"]["active"] as Array) + [new_totem]}
+	var nc := cards.duplicate()
+	nc.remove_at(card_index)
+	ns["hand"] = {"cards": nc}
+	return {"success": true, "newState": ns, "scoreAdded": 0}
+
+
+# ----------------------------------------------------------------------------
+# step convenience: construct rng, execute, apply the validator/client caller
+# overrides (accumulated score, rngIndices, moveIndex), return next + hash.
+# ----------------------------------------------------------------------------
+
+static func step(state: Dictionary, direction: String) -> Dictionary:
+	var rng := MbRandomS.new(state["randomSeeds"], state["rngIndices"])
+	var res := execute_swipe_action(state, direction, rng)
+	var ns: Dictionary = res["newState"]
+	var next := ns.duplicate()
+	next["score"] = int(ns["score"]) + int(res["scoreAdded"])
+	next["rngIndices"] = rng.get_indices()
+	next["moveIndex"] = int(state["moveIndex"]) + (2 if res["cardDrawn"] else 1)
+	return {"state": next, "hash": Hasher.hash_value(next), "scoreAdded": res["scoreAdded"], "cardDrawn": res["cardDrawn"], "moved": res["moved"]}
 
 
 static func step_card(state: Dictionary, action: String, action_data: Dictionary, card_index: int) -> Dictionary:
@@ -378,3 +453,12 @@ static func step_card(state: Dictionary, action: String, action_data: Dictionary
 	next["rngIndices"] = rng.get_indices()
 	next["moveIndex"] = int(state["moveIndex"]) + 1
 	return {"state": next, "hash": Hasher.hash_value(next), "success": res["success"], "scoreAdded": res["scoreAdded"]}
+
+
+static func step_totem(state: Dictionary, totem_type: String, card_index: int) -> Dictionary:
+	var res := execute_spawn_totem_action(state, totem_type, card_index)
+	var ns: Dictionary = res["newState"]
+	var next := ns.duplicate()
+	next["rngIndices"] = (state["rngIndices"] as Dictionary).duplicate()
+	next["moveIndex"] = int(state["moveIndex"]) + 1
+	return {"state": next, "hash": Hasher.hash_value(next), "success": res["success"]}
