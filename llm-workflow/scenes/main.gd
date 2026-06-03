@@ -20,7 +20,7 @@ const TARGET := {
 	"shuffle": "none", "transform": "none",
 }
 
-var _match: MbMatch
+var _match  # MbMatch (untyped to avoid class_name registration flakiness)
 var _board
 var _net
 var _hud: Label
@@ -41,6 +41,23 @@ func _ready() -> void:
 	_build_ui()
 	_match.changed.connect(_on_changed)
 	_match.new_game()
+	_add_size_debug()  # TEMP — shows the real window size on screen
+
+
+func _add_size_debug() -> void:
+	var dbg := Label.new()
+	dbg.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	dbg.offset_top = 2
+	dbg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dbg.add_theme_font_size_override("font_size", 14)
+	dbg.add_theme_color_override("font_color", Color.YELLOW)
+	dbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ws := DisplayServer.window_get_size()
+	var ss := DisplayServer.screen_get_size()
+	var scale := DisplayServer.screen_get_scale()
+	dbg.text = "DBG  window=%dx%d   screen=%dx%d   scale=%.2f" % [ws.x, ws.y, ss.x, ss.y, scale]
+	add_child(dbg)
+	print("[size] window=", ws, " screen=", ss, " scale=", scale)
 
 
 func _build_ui() -> void:
@@ -179,7 +196,7 @@ func _select_card(index: int) -> void:
 	var type := str(card["type"])
 	if bool(card.get("isTotemCard", false)):
 		var tt := str((card["spawnsTotem"] as Dictionary)["id"])
-		var ok := _match.spawn_totem(tt, index)
+		var ok: bool = _match.spawn_totem(tt, index)
 		_toast.text = ("Spawned totem: %s" % tt) if ok else "Totem spawn failed"
 		_cancel_target()
 		return
@@ -188,7 +205,7 @@ func _select_card(index: int) -> void:
 		return
 	var kind := str(TARGET[type])
 	if kind == "none":
-		var ok := _match.play_card(type, {}, index)
+		var ok: bool = _match.play_card(type, {}, index)
 		_toast.text = ("Played %s" % type) if ok else "%s: no valid targets" % type
 		_cancel_target()
 		return
@@ -201,7 +218,7 @@ func _select_card(index: int) -> void:
 
 
 func _play(params: Dictionary) -> void:
-	var ok := _match.play_card(_sel_type, params, _sel_index)
+	var ok: bool = _match.play_card(_sel_type, params, _sel_index)
 	_toast.text = ("Played %s" % _sel_type) if ok else "%s: invalid target" % _sel_type
 	_cancel_target()
 
