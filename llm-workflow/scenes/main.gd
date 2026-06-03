@@ -6,6 +6,9 @@ extends Control
 
 const MbMatchS := preload("res://game/match_controller.gd")
 const BoardViewS := preload("res://scenes/board_view.gd")
+const MbValidatorClientS := preload("res://net/validator_client.gd")
+
+const VALIDATOR_URL := "http://localhost:5055"
 
 # Card -> targeting kind. Totem cards are detected via isTotemCard; time/magnet
 # have no engine action (shown as unsupported).
@@ -18,8 +21,10 @@ const TARGET := {
 
 var _match: MbMatch
 var _board
+var _net
 var _hud: Label
 var _scen_label: Label
+var _net_label: Label
 var _toast: Label
 var _hand_box: HBoxContainer
 var _totem_box: HBoxContainer
@@ -63,6 +68,24 @@ func _build_ui() -> void:
 	_scen_label.add_theme_color_override("font_color", Color("bbada0"))
 	_scen_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_scen_label)
+
+	_net_label = Label.new()
+	_net_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_net_label.position = Vector2(-260, 16)
+	_net_label.size = Vector2(240, 40)
+	_net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_net_label.add_theme_font_size_override("font_size", 15)
+	_net_label.add_theme_color_override("font_color", Color("bbada0"))
+	_net_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_net_label.text = "validator: offline\nV to connect"
+	add_child(_net_label)
+
+	_net = MbValidatorClientS.new()
+	add_child(_net)
+	_match.validator = _net
+	_net.ready_received.connect(_on_net_ready)
+	_net.action_validated.connect(_on_net_validated)
+	_net.validator_error.connect(_on_net_error)
 
 	_totem_box = HBoxContainer.new()
 	_totem_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -258,6 +281,44 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_5: _load_scenario(5)
 			KEY_6: _load_scenario(6)
 			KEY_7: _load_scenario(7)
+			KEY_V: _connect_validator()
+
+
+func _connect_validator() -> void:
+	_cancel_target()
+	_match.online = false
+	_match.new_game()
+	var match_id := "gd_%d" % (randi() % 1000000)
+	var player_id := "player_%d" % (randi() % 1000000)
+	_net.init_and_connect(VALIDATOR_URL, match_id, _match.state, player_id)
+	_net_label.text = "validator: connecting…"
+	_toast.text = "Connecting to validator at %s …" % VALIDATOR_URL
+
+
+func _on_net_ready(_current_state: Dictionary) -> void:
+	_match.online = true
+	_net_label.text = "validator: connected ✓\nmoves validated"
+	_net_label.add_theme_color_override("font_color", Color("2e9e5b"))
+	_toast.text = "Connected — every move is now validated by the server"
+
+
+func _on_net_validated(index: int, matched: bool, corrected_state) -> void:
+	if matched:
+		_net_label.text = "validator: ✓ move %d ok" % index
+		_net_label.add_theme_color_override("font_color", Color("2e9e5b"))
+	else:
+		if corrected_state is Dictionary:
+			_match.adopt_server_state(corrected_state)
+		_net_label.text = "validator: ✗ move %d corrected" % index
+		_net_label.add_theme_color_override("font_color", Color("c0392b"))
+		_toast.text = "Desync at move %d — snapped to validator state" % index
+
+
+func _on_net_error(message: String) -> void:
+	_match.online = false
+	_net_label.text = "validator: error"
+	_net_label.add_theme_color_override("font_color", Color("c0392b"))
+	_toast.text = "Validator: %s" % message
 
 
 func _key_swipe(direction: String) -> void:

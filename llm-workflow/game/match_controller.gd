@@ -16,6 +16,22 @@ signal changed
 var state: Dictionary = {}
 var scenario_name: String = "Endless"
 
+# Optional online validation: when `online` and `validator` (an MbValidatorClient
+# Node) are set, each committed move is sent to the validator for confirmation.
+var validator = null
+var online: bool = false
+
+
+func _send_validate(index: int, action: Dictionary, hash: String) -> void:
+	if online and validator != null:
+		validator.validate_action(index, action, hash)
+
+
+## Replace local state with the validator's authoritative state (on hash mismatch).
+func adopt_server_state(s: Dictionary) -> void:
+	state = s
+	changed.emit()
+
 
 func _base_state(size: int, seed_value: int) -> Dictionary:
 	var tiles := []
@@ -97,21 +113,34 @@ func new_game_scenario(scenario_id: int, seed_value: int = -1) -> void:
 ## Apply a swipe. Returns whether any tile moved. The engine still produces a new
 ## state (and spawns a tile) on a non-moving swipe, matching Moveborne behavior.
 func swipe(direction: String) -> bool:
+	var pre := int(state["moveIndex"])
 	var res := MbEngineS.step(state, direction)
 	state = res["state"]
+	_send_validate(pre, {"type": "SWIPE", "payload": {"direction": direction}}, res["hash"])
 	changed.emit()
 	return res["moved"]
 
 
 func play_card(action: String, params: Dictionary, card_index: int) -> bool:
+	var pre := int(state["moveIndex"])
 	var res := MbEngineS.step_card(state, action, params, card_index)
+	if not res["success"]:
+		return false  # invalid play: don't commit, don't validate
 	state = res["state"]
+	var payload := params.duplicate()
+	payload["action"] = action
+	payload["cardIndex"] = card_index
+	_send_validate(pre, {"type": "PLAY_CARD", "payload": payload}, res["hash"])
 	changed.emit()
-	return res["success"]
+	return true
 
 
 func spawn_totem(totem_type: String, card_index: int) -> bool:
+	var pre := int(state["moveIndex"])
 	var res := MbEngineS.step_totem(state, totem_type, card_index)
+	if not res["success"]:
+		return false
 	state = res["state"]
+	_send_validate(pre, {"type": "SPAWN_TOTEM", "payload": {"totemType": totem_type, "cardIndex": card_index}}, res["hash"])
 	changed.emit()
-	return res["success"]
+	return true
