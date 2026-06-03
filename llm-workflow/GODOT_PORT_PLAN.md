@@ -133,11 +133,14 @@ Three things must be reproduced **byte-for-byte**:
 - [x] `engine/scenarios.gd` (`MbScenarios`) — `buildInitialBoard` + scenario table + factories (45 cases).
 - [x] `MbHasher` float formatting upgraded to JS shortest-round-trip (globalEffects `filterConfig.seed` now hashes correctly).
 
-**Integration (into `engine.gd` pipeline):**
-- [x] **PLAY_CARD** — `execute_play_card_action` + `step_card` wired (8-case oracle green; combo-reset rules, card splice, shuffle RNG). 
-- [ ] **Swipe-pipeline integration** (the interlocking remainder): rewrite `perform_swipe` to call `MbTileEffects` (merge/move gating, black-hole path destruction, effect preserve/transfer, on-merge consumption, freeze removal) instead of the no-effect fast path; replace the `processTotemEffects` no-op stubs at all call sites with `MbTotems`; wire `MbEvents` (reset/updateTriggerStates + COMBO_BREAK/SCORE_UPDATE spawn) and `attemptSpawnEffectOnTile`; tick global effects.
-- [ ] **SPAWN_TOTEM** — `execute_spawn_totem_action` (deterministic totem id `totem_{moveIndex+1}_{type}`).
-- [ ] **Combined parity gate**: oracle with a scenario that has effect spawn configs + active totems + eventRules; run swipes+cards+totems and assert hashes. Then replay any usable `src/game/fixtures/history/*.json`.
+**Integration ✅ — engine functionally complete (2026-06-03):**
+- [x] **PLAY_CARD** — `execute_play_card_action` + `step_card` (8-case oracle green; combo-reset rules, card splice, shuffle RNG).
+- [x] **Swipe-pipeline integration** — `perform_swipe` rewritten to the full `merge.ts` logic calling `MbTileEffects` (black-hole path destruction, merge/move gating, on-merge amplify/lock consumption, effect preserve/transfer, freeze removal); all `processTotemEffects` hooks → `MbTotems`; `MbEvents` (reset/updateTriggerStates + COMBO_BREAK/SCORE_UPDATE spawn) + `attempt_spawn_effect_on_tile` wired.
+- [x] **SPAWN_TOTEM** — `execute_spawn_totem_action` + `step_totem` (deterministic id `totem_{moveIndex+1}_{type}`).
+- [x] **Combined parity gate** — oracle with active amplify/black-hole/lock effects + momentum-idol/scavenger/combo-saver totems + card play + totem spawn → every hash matches. **Editor suite: 10 tests / 4 suites green** (combined, determinism, engine_swipe, playcard); 7 headless module verifiers green.
+- [ ] *Deferred (minor):* `globalEffects.ts` tick (no-op stub until a scenario spawns Glitch full-screen effects); wire `MbScenarios.build_initial_board` for local match start; replay `src/game/fixtures/history/*.json` as extra validation.
+
+➡️ **Phase 1 (deterministic engine) is done.** SWIPE + PLAY_CARD + SPAWN_TOTEM with all subsystems active, byte-exact vs the TS engine/validator. Next: **Phase 2 — the playable Godot scene.**
 
 ### Phase 2 — Playable single-player (local-authoritative)  *(major milestone)*
 - [ ] `Tile.tscn`, `Board`, HUD, `Hand`, totem tray; Main scene; set as main scene.
