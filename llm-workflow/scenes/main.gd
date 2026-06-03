@@ -45,7 +45,13 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var vp := get_viewport_rect().size
-	var board_px: float = clampf(minf(vp.x * 0.92, vp.y - 470.0), 300.0, 720.0)
+	var board_px: float = clampf(minf(vp.x * 0.92, vp.y * 0.62), 300.0, 720.0)
+	# Vertically center the board + hand block in the space below the top bar.
+	var top_bar := 120.0
+	var hand_h := 150.0
+	var gap := 24.0
+	var board_y := top_bar + maxf(20.0, (vp.y - top_bar - (board_px + gap + hand_h) - 40.0) / 2.0)
+	var hand_top := board_y + board_px + gap
 
 	var th := Theme.new()
 	th.default_font = load(Style.FONT_PATH)
@@ -106,14 +112,14 @@ func _build_ui() -> void:
 	_board = BoardViewS.new()
 	add_child(_board)
 	_board.setup(4, board_px)
-	_board.position = Vector2((vp.x - board_px) / 2.0, 138.0)
+	_board.position = Vector2((vp.x - board_px) / 2.0, board_y)
 	_board.swiped.connect(_on_swiped)
 	_board.cell_tapped.connect(_on_cell_tapped)
 
 	_toast = Label.new()
-	_toast.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_toast.offset_top = -176
-	_toast.offset_bottom = -156
+	_toast.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_toast.offset_top = hand_top + hand_h + 12.0
+	_toast.offset_bottom = hand_top + hand_h + 40.0
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_font_size_override("font_size", 18)
 	_toast.add_theme_color_override("font_color", Style.DIM)
@@ -121,11 +127,11 @@ func _build_ui() -> void:
 	add_child(_toast)
 
 	_hand_box = HBoxContainer.new()
-	_hand_box.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_hand_box.offset_left = 20
-	_hand_box.offset_right = -20
-	_hand_box.offset_top = -148
-	_hand_box.offset_bottom = -12
+	_hand_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_hand_box.offset_left = 16
+	_hand_box.offset_right = -16
+	_hand_box.offset_top = hand_top
+	_hand_box.offset_bottom = hand_top + hand_h
 	_hand_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_hand_box.add_theme_constant_override("separation", 10)
 	add_child(_hand_box)
