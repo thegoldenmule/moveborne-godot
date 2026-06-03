@@ -44,7 +44,7 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var vp := get_viewport_rect().size
-	var board_px: float = clampf(minf(vp.x * 0.62, vp.y - 230.0), 320.0, 540.0)
+	var board_px: float = clampf(minf(vp.x * 0.92, vp.y - 470.0), 300.0, 720.0)
 
 	var bg := ColorRect.new()
 	bg.color = Color("faf8ef")
@@ -54,9 +54,9 @@ func _build_ui() -> void:
 
 	_hud = Label.new()
 	_hud.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_hud.offset_top = 16
+	_hud.offset_top = 60
 	_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hud.add_theme_font_size_override("font_size", 26)
+	_hud.add_theme_font_size_override("font_size", 22)
 	_hud.add_theme_color_override("font_color", Color("776e65"))
 	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hud)
@@ -89,7 +89,7 @@ func _build_ui() -> void:
 
 	_totem_box = HBoxContainer.new()
 	_totem_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_totem_box.offset_top = 50
+	_totem_box.offset_top = 96
 	_totem_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_totem_box.add_theme_constant_override("separation", 14)
 	_totem_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -98,7 +98,7 @@ func _build_ui() -> void:
 	_board = BoardViewS.new()
 	add_child(_board)
 	_board.setup(4, board_px)
-	_board.position = Vector2((vp.x - board_px) / 2.0, 86.0)
+	_board.position = Vector2((vp.x - board_px) / 2.0, 138.0)
 	_board.swiped.connect(_on_swiped)
 	_board.cell_tapped.connect(_on_cell_tapped)
 
@@ -248,7 +248,7 @@ func _rebuild_totems() -> void:
 
 func _update_hud() -> void:
 	var st: Dictionary = _match.state
-	_hud.text = "Score  %d        Combo  x%d        Shards  %d/8        Moves  %d" % [
+	_hud.text = "Score %d    Combo x%d    Shards %d/8    Moves %d" % [
 		int(st["score"]), int(st["comboMultiplier"]), int(st["shards"]), int(st["moveIndex"])
 	]
 	_scen_label.text = "Scenario: %s\n0–7 load · R restart" % _match.scenario_name
