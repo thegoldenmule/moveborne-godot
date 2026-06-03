@@ -158,11 +158,15 @@ Three things must be reproduced **byte-for-byte**:
 
 ➡️ **Phase 2 is a complete, playable single-player game** (swipe + cards + totems + effects + scenarios), no backend, driven by the byte-exact engine. Next: **Phase 3 — networking** (or the optional Phase 2 FX polish).
 
-### Phase 3 — Networking (gated on §5 decision)
-- [ ] `NetClient` optimistic core: OperationTracker (queue cap 10 + backpressure modal), OperationSender (opId), StateReconciler (rollback+replay), OperationReplayer.
-- [ ] Nakama client: device auth (`/v2/account/authenticate/device`), RPCs (`init`, `matchmaking/get-brackets|find|accept`), realtime socket join, clock-sync, heartbeat.
-- [ ] Validator client: HTTP `POST /api/match/init` → Socket.IO `validate_action` loop (**hand-rolled Socket.IO/Engine.IO over `WebSocketPeer`**) → reconcile on hash match/mismatch.
-- [ ] Live parity: confirm GDScript hashes match validator on every move (optimistic fast-path), correction path as safety net.
+### Phase 3 — Networking
+**Validator integration ✅ (2026-06-03) — Nakama omitted per owner.**
+- [x] **Validator client** — `net/validator_client.gd` (`MbValidatorClient`): hand-rolled **Engine.IO v4 / Socket.IO v5 over `WebSocketPeer`** + `HTTPRequest`. HTTP `POST /api/match/init` → Socket.IO CONNECT (auth `{connection_id, player_id}`) → `ready` → `validate_action` emits with ack; match → keep optimistic, mismatch → adopt corrected state.
+- [x] **Wired into the game** — `match_controller.gd` sends a `validate_action` per committed swipe/card/totem; `main.gd` `V` connects, status label shows ✓/✗ per move.
+- [x] **Run the validator unchanged** in DEV_MODE (skips Nakama signature check): `tools/run_validator.sh` (idempotent; deps persisted in `~/.cache/moveborne-validator-deps`; the `workspace:*` logic dep satisfied via the prebuilt dist). Health on `:5055`.
+- [x] **Live parity verified**: the validator confirmed the running Godot game's moves with `hash_match=true` (moves 0/1/2); UI shows "validator: ✓ move N ok". The byte-exact engine means the optimistic fast-path hits every move.
+- [ ] *Deferred:* Nakama client (auth/matchmaking) — omitted by choice; full `NetClient` optimistic core (op queue cap 10 + backpressure, rollback/replay) — current path adopts server state directly on mismatch, sufficient for single-player-vs-validator.
+
+➡️ **The Godot client now plays against the real validator service, no Nakama.**
 
 ### Phase 4 — Polish & parity
 - [ ] Quality settings (low/med/high glow), remaining FX, full-screen-effects polish.
