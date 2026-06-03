@@ -124,17 +124,20 @@ Three things must be reproduced **byte-for-byte**:
 - `tests/test_engine_swipe.gd`: threads a 20-move golden (with 2 card draws) → **every per-move state hash matches** (`tests/golden/engine_swipe_golden.json`, via `generate_engine_golden.mjs`). Full suite: **7 tests / 2 suites green**.
 - Key finding: real board states are **clean row-major**; reference-semantics (`Dictionary`/`Array` are GDScript reference types) reproduce the JS `merge.ts` mutation behavior for free.
 
-**Remaining (breadth workflow):**
-- [ ] Core data model: full tile / effect / card / totem dict coverage (spine has the swipe subset).
-- [ ] Board + movement + merge — spine done; add black-hole pass-through destruction + effect gating.
-- [ ] Tile effects (config-flag driven: `allowsValueMerge/Movement`, `mergeConfig`, per-effect counters). *Note: spec's decay value-reduction is **not implemented** in code — match the code.*
-- [ ] Power cards (26 `performPowerCard*` + targeting predicates in `validation.ts`) + draw (`cardDraw.ts`, auto-draw every 8 shards).
-- [ ] Totems (`processTotemEffects` on game events; durations via `movesRemaining/mergesRemaining/tallyMarks`). *Note: spec's swipe-durations **not implemented**.*
-- [ ] Scoring/combos/shards; events (`eventTriggerState` 3-state machine; only `COMBO_BREAK` + `SCORE_UPDATE` actually routed today).
-- [ ] Global effects (Glitch) tick + reseed.
-- [ ] `actionExecutor` pipeline (SWIPE / PLAY_CARD / SPAWN_TOTEM) with exact step + RNG-draw ordering.
-- [ ] Scenarios + `buildInitialBoard` + factories (port `src/game/engine/scenarios.ts`).
-- [ ] **Parity gate**: replay `fixtures/history/*.json`; assert identical state hash at every move.
+**Breadth modules ✅ PORTED + VERIFIED (2026-06-03)** — 6-agent parallel workflow, each self-verified headlessly against dist-generated goldens (~5,470 parity cases):
+- [x] `engine/powercards.gd` (`MbPowerCards`) — 14 `performPowerCard*` (46 cases). *transform/shuffle consume the `shuffle` namespace, not effect-spawn.*
+- [x] `engine/validation.gd` (`MbValidation`) — 28 target/playability predicates (5244 cases).
+- [x] `engine/tile_effects.gd` (`MbTileEffects`) — merge/move gating, black hole, on-merge, effect spawn (64 cases).
+- [x] `engine/totems.gd` (`MbTotems`) — `processTotemEffects` + 11 totem handlers (57 cases). *swipe-durations not implemented in code; uses moves/merges/tallyMarks.*
+- [x] `engine/events.gd` (`MbEvents`) — trigger machine + event spawn (17 cases). *only `COMBO_BREAK` + `SCORE_UPDATE` routed.*
+- [x] `engine/scenarios.gd` (`MbScenarios`) — `buildInitialBoard` + scenario table + factories (45 cases).
+- [x] `MbHasher` float formatting upgraded to JS shortest-round-trip (globalEffects `filterConfig.seed` now hashes correctly).
+
+**Integration (into `engine.gd` pipeline):**
+- [x] **PLAY_CARD** — `execute_play_card_action` + `step_card` wired (8-case oracle green; combo-reset rules, card splice, shuffle RNG). 
+- [ ] **Swipe-pipeline integration** (the interlocking remainder): rewrite `perform_swipe` to call `MbTileEffects` (merge/move gating, black-hole path destruction, effect preserve/transfer, on-merge consumption, freeze removal) instead of the no-effect fast path; replace the `processTotemEffects` no-op stubs at all call sites with `MbTotems`; wire `MbEvents` (reset/updateTriggerStates + COMBO_BREAK/SCORE_UPDATE spawn) and `attemptSpawnEffectOnTile`; tick global effects.
+- [ ] **SPAWN_TOTEM** — `execute_spawn_totem_action` (deterministic totem id `totem_{moveIndex+1}_{type}`).
+- [ ] **Combined parity gate**: oracle with a scenario that has effect spawn configs + active totems + eventRules; run swipes+cards+totems and assert hashes. Then replay any usable `src/game/fixtures/history/*.json`.
 
 ### Phase 2 — Playable single-player (local-authoritative)  *(major milestone)*
 - [ ] `Tile.tscn`, `Board`, HUD, `Hand`, totem tray; Main scene; set as main scene.
