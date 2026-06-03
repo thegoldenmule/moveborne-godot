@@ -80,3 +80,24 @@ func test_null_key_omitted() -> void:
 func test_empty_array_format() -> void:
 	var s := MbHasherS.canonical_stringify({"arr": []})
 	assert_eq(s, "{\n  \"arr\": [\n  ]\n}", "empty array format")
+
+
+func _double_from_be_hex(h: String) -> float:
+	var bytes := PackedByteArray()
+	bytes.resize(8)
+	for k in range(8):
+		bytes[7 - k] = ("0x" + h.substr(k * 2, 2)).hex_to_int()  # big-endian hex -> little-endian buffer
+	return bytes.decode_double(0)
+
+
+func test_float_formatting() -> void:
+	# JS Number->String parity for non-integer floats (e.g. globalEffects filterConfig.seed).
+	var path := "res://tests/golden/float_format_golden.json"
+	if not FileAccess.file_exists(path):
+		fail_setup("missing float golden: " + path)
+		return
+	var arr: Array = JSON.parse_string(FileAccess.get_file_as_string(path))
+	for entry in arr:
+		var f := _double_from_be_hex(entry["f64be"])
+		var got := MbHasherS._num_float(f)
+		assert_eq(got, entry["js"], "float %s: got %s want %s" % [entry["f64be"], got, entry["js"]])

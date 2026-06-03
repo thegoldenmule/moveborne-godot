@@ -93,15 +93,21 @@ static func _leaf(node) -> String:
 	return _quote(str(node))
 
 
-## Format a float like JS JSON.stringify: integer-valued floats print without a
-## decimal point; otherwise shortest round-trip. (Deeper float-format parity with
-## JS String(n) is a Phase 1 hardening item once more golden vectors exist.)
+## Format a float like JS JSON.stringify / String(n): integer-valued floats print
+## without a decimal point; otherwise the SHORTEST decimal string that round-trips
+## to the same IEEE-754 double (matching JS fixed notation for |f| in [1e-6, 1e21)).
+## str(float) is insufficient — Godot caps at ~14 significant digits and would not
+## round-trip a value like 4528.410562653503.
 static func _num_float(f: float) -> String:
 	if not is_finite(f):
 		return "null"
-	if f == floor(f) and abs(f) < 1e15:
+	if f == floor(f) and absf(f) < 1e15:
 		return str(int(f))
-	return str(f)
+	for p in range(1, 18):
+		var s := String.num(f, p)
+		if s.to_float() == f:
+			return s
+	return String.num(f, 17)
 
 
 ## JSON string quoting matching JSON.stringify for our (ASCII) data.
