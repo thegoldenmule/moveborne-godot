@@ -15,6 +15,7 @@ extends RefCounted
 const C := preload("res://engine/constants.gd")
 const Hasher := preload("res://engine/hasher.gd")
 const MbRandomS := preload("res://engine/random_generator.gd")
+const PC := preload("res://engine/powercards.gd")
 
 # ----------------------------------------------------------------------------
 # board helpers (board.ts / factories.ts)
@@ -308,3 +309,72 @@ static func step(state: Dictionary, direction: String) -> Dictionary:
 	next["rngIndices"] = rng.get_indices()
 	next["moveIndex"] = int(state["moveIndex"]) + (2 if res["cardDrawn"] else 1)
 	return {"state": next, "hash": Hasher.hash_value(next), "scoreAdded": res["scoreAdded"], "cardDrawn": res["cardDrawn"], "moved": res["moved"]}
+
+
+# ----------------------------------------------------------------------------
+# play card (actionExecutor.ts executePlayCardAction)
+# Dispatches to MbPowerCards; resets combo for all cards EXCEPT shuffle/vortex/
+# teleport; splices the played card from hand; shuffle/transform consume the
+# "shuffle" RNG namespace, the other 12 cards consume none.
+# ----------------------------------------------------------------------------
+
+static func execute_play_card_action(state: Dictionary, action: String, action_data: Dictionary, card_index: int, rng) -> Dictionary:
+	var ns := state.duplicate()
+	var tiles: Array = ns["board"]["tiles"]
+	var size: int = int(ns["board"]["size"])
+	var reset_combo := true
+	var r: Dictionary = {"success": false, "tiles": tiles, "score": 0}
+	match action:
+		"split": r = PC.perform_power_card_split(tiles, action_data.get("tile"), size)
+		"multiply": r = PC.perform_power_card_multiply(tiles, action_data.get("tile"), size)
+		"shuffle":
+			r = PC.perform_power_card_shuffle(tiles, rng, size)
+			reset_combo = false
+		"lightning": r = PC.perform_power_card_lightning(tiles, action_data.get("column"), size)
+		"radiate": r = PC.perform_power_card_radiate(tiles, action_data.get("tile"), size)
+		"clone": r = PC.perform_power_card_clone(tiles, action_data.get("sourceTile"), action_data.get("targetTile"), size)
+		"swap": r = PC.perform_power_card_swap(tiles, action_data.get("tile1"), action_data.get("tile2"), size)
+		"vortex":
+			r = PC.perform_power_card_vortex(tiles, {"row": action_data.get("row"), "col": action_data.get("column")}, size)
+			reset_combo = false
+		"teleport":
+			r = PC.perform_power_card_teleport(tiles, action_data.get("sourceTile"), action_data.get("targetTile"), size)
+			reset_combo = false
+		"bomb": r = PC.perform_power_card_bomb(tiles, action_data.get("tile"), size)
+		"destroy": r = PC.perform_power_card_destroy(tiles, action_data.get("tile"), size)
+		"clear": r = PC.perform_power_card_clear(tiles, action_data.get("column"), size)
+		"double": r = PC.perform_power_card_double(tiles, action_data.get("tile"), size)
+		"transform":
+			var num_effects := 1
+			for c in (ns["hand"]["cards"] as Array):
+				if c.get("type") == "transform":
+					num_effects = int(c.get("value", 1))
+					break
+			r = PC.perform_power_card_transform(tiles, num_effects, rng, size)
+		_:
+			return {"success": false, "newState": state, "scoreAdded": 0, "error": "unknown_card_action"}
+	if not bool(r.get("success", false)):
+		return {"success": false, "newState": ns, "scoreAdded": 0, "error": "invalid_" + action}
+	var board := (ns["board"] as Dictionary).duplicate()
+	board["tiles"] = r["tiles"]
+	ns["board"] = board
+	if reset_combo:
+		ns["combo"] = 0
+	var cards := (ns["hand"]["cards"] as Array)
+	if card_index >= 0 and card_index < cards.size():
+		var nc := cards.duplicate()
+		nc.remove_at(card_index)
+		ns["hand"] = {"cards": nc}
+	# update_trigger_states — no-op spine.
+	return {"success": true, "newState": ns, "scoreAdded": int(r["score"]), "error": null}
+
+
+static func step_card(state: Dictionary, action: String, action_data: Dictionary, card_index: int) -> Dictionary:
+	var rng := MbRandomS.new(state["randomSeeds"], state["rngIndices"])
+	var res := execute_play_card_action(state, action, action_data, card_index, rng)
+	var ns: Dictionary = res["newState"]
+	var next := ns.duplicate()
+	next["score"] = int(ns["score"]) + int(res["scoreAdded"])
+	next["rngIndices"] = rng.get_indices()
+	next["moveIndex"] = int(state["moveIndex"]) + 1
+	return {"state": next, "hash": Hasher.hash_value(next), "success": res["success"], "scoreAdded": res["scoreAdded"]}
