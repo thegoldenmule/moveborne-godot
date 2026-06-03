@@ -143,12 +143,17 @@ Three things must be reproduced **byte-for-byte**:
 ➡️ **Phase 1 (deterministic engine) is done.** SWIPE + PLAY_CARD + SPAWN_TOTEM with all subsystems active, byte-exact vs the TS engine/validator. Next: **Phase 2 — the playable Godot scene.**
 
 ### Phase 2 — Playable single-player (local-authoritative)  *(major milestone)*
-- [ ] `Tile.tscn`, `Board`, HUD, `Hand`, totem tray; Main scene; set as main scene.
-- [ ] Swipe input (touch/drag → direction enum) + card targeting + totem activation.
-- [ ] State-reconcile renderer: tween tiles to grid cells, merge pops, spawn fade-ins.
-- [ ] FX: particle bursts, effect overlays/shaders, glitch full-screen.
-- [ ] Local "mock server" path (mirrors `mockServer.ts`) → full game playable with **no backend**.
-- [ ] Scenario picker / debug controls; smoke-test via `project_run` + `editor_screenshot` + MCP input injection.
+**Playable slice ✅ (2026-06-03)** — renders + responds, driven by the byte-exact engine, no backend:
+- [x] `game/match_controller.gd` (`MbMatch`): local "mock server" — `new_game` (4×4 + 2 spawned tiles), `swipe`/`play_card` through `MbEngine`.
+- [x] `scenes/main.gd` + `main.tscn` (set as main scene): procedural 2048-style board + HUD (score/combo/shards/moves), tile colors by value + effect borders.
+- [x] Swipe input (arrow keys + touch/mouse drag → direction enum) → `MbEngine.step`.
+- [x] Verified live via godot-ai MCP: board+HUD render; injected swipes slide tiles, merge 2→4, update score/shards (screenshot confirmed). `tools/smoke_match.gd` headless smoke PASS.
+
+**Remaining for Phase 2:**
+- [ ] Hand UI (card row) + card targeting (tap tile) + totem tray + totem activation.
+- [ ] State-reconcile renderer with **tweens** (slide/merge-pop/spawn-fade) instead of instant redraw.
+- [ ] FX: particle bursts on merge/spawn/destroy; effect overlays/shaders; glitch full-screen.
+- [ ] Scenario picker / debug controls (wire `MbScenarios` to load tutorial/challenge boards).
 
 ### Phase 3 — Networking (gated on §5 decision)
 - [ ] `NetClient` optimistic core: OperationTracker (queue cap 10 + backpressure modal), OperationSender (opId), StateReconciler (rollback+replay), OperationReplayer.
