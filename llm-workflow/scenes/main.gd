@@ -7,6 +7,7 @@ extends Control
 const MbMatchS := preload("res://game/match_controller.gd")
 const BoardViewS := preload("res://scenes/board_view.gd")
 const MbValidatorClientS := preload("res://net/validator_client.gd")
+const Style := preload("res://scenes/style.gd")
 
 const VALIDATOR_URL := "http://localhost:5055"
 
@@ -46,8 +47,13 @@ func _build_ui() -> void:
 	var vp := get_viewport_rect().size
 	var board_px: float = clampf(minf(vp.x * 0.92, vp.y - 470.0), 300.0, 720.0)
 
+	var th := Theme.new()
+	th.default_font = load(Style.FONT_PATH)
+	th.default_font_size = 18
+	theme = th
+
 	var bg := ColorRect.new()
-	bg.color = Color("faf8ef")
+	bg.color = Style.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
@@ -57,7 +63,9 @@ func _build_ui() -> void:
 	_hud.offset_top = 60
 	_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hud.add_theme_font_size_override("font_size", 22)
-	_hud.add_theme_color_override("font_color", Color("776e65"))
+	_hud.add_theme_color_override("font_color", Style.TEXT)
+	_hud.add_theme_color_override("font_outline_color", Style.PRIMARY)
+	_hud.add_theme_constant_override("outline_size", 1)
 	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hud)
 
@@ -65,7 +73,7 @@ func _build_ui() -> void:
 	_scen_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_scen_label.position = Vector2(20, 16)
 	_scen_label.add_theme_font_size_override("font_size", 15)
-	_scen_label.add_theme_color_override("font_color", Color("bbada0"))
+	_scen_label.add_theme_color_override("font_color", Style.DIM)
 	_scen_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_scen_label)
 
@@ -75,7 +83,7 @@ func _build_ui() -> void:
 	_net_label.size = Vector2(240, 40)
 	_net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_net_label.add_theme_font_size_override("font_size", 15)
-	_net_label.add_theme_color_override("font_color", Color("bbada0"))
+	_net_label.add_theme_color_override("font_color", Style.DIM)
 	_net_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_net_label.text = "validator: offline\nV to connect"
 	add_child(_net_label)
@@ -104,11 +112,11 @@ func _build_ui() -> void:
 
 	_toast = Label.new()
 	_toast.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_toast.offset_top = -118
-	_toast.offset_bottom = -98
+	_toast.offset_top = -176
+	_toast.offset_bottom = -156
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_font_size_override("font_size", 18)
-	_toast.add_theme_color_override("font_color", Color("9c8b7a"))
+	_toast.add_theme_color_override("font_color", Style.DIM)
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_toast)
 
@@ -116,8 +124,8 @@ func _build_ui() -> void:
 	_hand_box.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_hand_box.offset_left = 20
 	_hand_box.offset_right = -20
-	_hand_box.offset_top = -92
-	_hand_box.offset_bottom = -16
+	_hand_box.offset_top = -148
+	_hand_box.offset_bottom = -12
 	_hand_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_hand_box.add_theme_constant_override("separation", 10)
 	add_child(_hand_box)
@@ -218,20 +226,33 @@ func _rebuild_hand() -> void:
 	if cards.is_empty():
 		var lbl := Label.new()
 		lbl.text = "no cards — merge to earn shards (auto-draws a card at 8)"
-		lbl.add_theme_color_override("font_color", Color("9c8b7a"))
+		lbl.add_theme_color_override("font_color", Style.DIM)
 		lbl.add_theme_font_size_override("font_size", 16)
 		_hand_box.add_child(lbl)
 		return
 	for i in range(cards.size()):
 		var card: Dictionary = cards[i]
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(140, 74)
-		b.text = "%s\n%s" % [str(card.get("name", "?")), str(card["type"])]
-		b.add_theme_font_size_override("font_size", 14)
-		if i == _sel_index:
-			b.modulate = Color("ffd54a")
-		b.pressed.connect(_select_card.bind(i))
-		_hand_box.add_child(b)
+		var type := str(card["type"])
+		var tex := Style.card_texture(type)
+		var sel: bool = i == _sel_index
+		if tex != null:
+			var tb := TextureButton.new()
+			tb.texture_normal = tex
+			tb.ignore_texture_size = true
+			tb.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+			tb.custom_minimum_size = Vector2(82, 130)
+			tb.modulate = Color("ffd54a") if sel else Color.WHITE
+			tb.pressed.connect(_select_card.bind(i))
+			_hand_box.add_child(tb)
+		else:
+			var b := Button.new()
+			b.custom_minimum_size = Vector2(110, 130)
+			b.text = "%s\n%s" % [str(card.get("name", "?")), type]
+			b.add_theme_font_size_override("font_size", 13)
+			if sel:
+				b.modulate = Color("ffd54a")
+			b.pressed.connect(_select_card.bind(i))
+			_hand_box.add_child(b)
 
 
 func _rebuild_totems() -> void:
@@ -239,11 +260,22 @@ func _rebuild_totems() -> void:
 		c.queue_free()
 	var totems: Array = _match.state["totems"]["active"]
 	for t in totems:
-		var lbl := Label.new()
-		lbl.text = "◆ %s" % str((t as Dictionary).get("type", "?"))
-		lbl.add_theme_font_size_override("font_size", 16)
-		lbl.add_theme_color_override("font_color", Color("8f7a66"))
-		_totem_box.add_child(lbl)
+		var type := str((t as Dictionary).get("type", "?"))
+		var tex := Style.totem_texture(type)
+		if tex != null:
+			var tr := TextureRect.new()
+			tr.texture = tex
+			tr.custom_minimum_size = Vector2(42, 42)
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			tr.tooltip_text = type
+			_totem_box.add_child(tr)
+		else:
+			var lbl := Label.new()
+			lbl.text = "◆ %s" % type
+			lbl.add_theme_font_size_override("font_size", 16)
+			lbl.add_theme_color_override("font_color", Style.PRIMARY)
+			_totem_box.add_child(lbl)
 
 
 func _update_hud() -> void:
