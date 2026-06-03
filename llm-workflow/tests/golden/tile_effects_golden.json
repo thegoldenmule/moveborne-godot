@@ -1,0 +1,2944 @@
+{
+  "cases": [
+    {
+      "name": "createTileEffect",
+      "kind": "factory",
+      "result": {
+        "freeze": {
+          "type": "freeze",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": false,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": true,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+              "overlayWidth": 100,
+              "overlayHeight": 100,
+              "spawnEmitter": "freeze-spawn",
+              "activeEmitter": "freeze-run",
+              "removalEmitter": "freeze-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": false
+            }
+          }
+        },
+        "black_hole": {
+          "type": "black_hole",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 7,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 7,
+            "allowsValueMerge": true,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+              "overlayWidth": 100,
+              "overlayHeight": 100,
+              "spawnEmitter": "black-hole-spawn",
+              "activeEmitter": "black-hole-run",
+              "removalEmitter": "black-hole-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "amplify": {
+          "type": "amplify",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 2,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+              "backgroundWidth": 78,
+              "backgroundHeight": 78,
+              "spawnEmitter": "amplify-spawn",
+              "activeEmitter": "amplify-run",
+              "removalEmitter": "amplify-removal",
+              "showMultiplier": true
+            },
+            "mergeConfig": {
+              "valueMultiplier": 2,
+              "consumedOnMerge": true,
+              "consumptionEmitter": "amplify",
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "amplify_static": {
+          "type": "amplify_static",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 2,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+              "backgroundWidth": 78,
+              "backgroundHeight": 78,
+              "spawnEmitter": "amplify-spawn",
+              "activeEmitter": "amplify-run",
+              "removalEmitter": "amplify-removal",
+              "showMultiplier": true
+            },
+            "mergeConfig": {
+              "valueMultiplier": 2,
+              "consumedOnMerge": false,
+              "consumptionEmitter": "amplify",
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "lock": {
+          "type": "lock",
+          "active": true,
+          "config": {
+            "remainingTriggers": 1,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+              "overlayWidth": 70,
+              "overlayHeight": 70,
+              "spawnEmitter": "lock-spawn",
+              "removalEmitter": "lock-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "decay": {
+          "type": "decay",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0.5,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 5,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "spawnEmitter": "decay-spawn",
+              "removalEmitter": "decay-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": false
+            }
+          }
+        },
+        "stone": {
+          "type": "stone",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": false,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": true,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+              "overlayWidth": 78,
+              "overlayHeight": 78,
+              "spawnEmitter": "stone-spawn",
+              "removalEmitter": "stone-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "none": {
+          "type": "none",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": false,
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": false
+            }
+          }
+        },
+        "black_hole_override": {
+          "type": "black_hole",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 7,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 3,
+            "allowsValueMerge": true,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+              "overlayWidth": 100,
+              "overlayHeight": 100,
+              "spawnEmitter": "black-hole-spawn",
+              "activeEmitter": "black-hole-run",
+              "removalEmitter": "black-hole-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            },
+            "customKey": 42
+          }
+        },
+        "lock_override": {
+          "type": "lock",
+          "active": true,
+          "config": {
+            "remainingTriggers": 5,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+              "overlayWidth": 70,
+              "overlayHeight": 70,
+              "spawnEmitter": "lock-spawn",
+              "removalEmitter": "lock-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "canValueMove",
+      "kind": "predicate",
+      "inputs": {
+        "empty": {
+          "isEmpty": true,
+          "value": 0,
+          "row": 0,
+          "col": 0,
+          "status": "normal"
+        },
+        "plain": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {}
+        },
+        "freeze": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "freeze",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "freeze-spawn",
+                "activeEmitter": "freeze-run",
+                "removalEmitter": "freeze-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          }
+        },
+        "stone": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "stone",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                "overlayWidth": 78,
+                "overlayHeight": 78,
+                "spawnEmitter": "stone-spawn",
+                "removalEmitter": "stone-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "black_hole": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "black_hole",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 7,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 7,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "black-hole-spawn",
+                "activeEmitter": "black-hole-run",
+                "removalEmitter": "black-hole-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "amplify": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "amplify",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 2,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                "backgroundWidth": 78,
+                "backgroundHeight": 78,
+                "spawnEmitter": "amplify-spawn",
+                "activeEmitter": "amplify-run",
+                "removalEmitter": "amplify-removal",
+                "showMultiplier": true
+              },
+              "mergeConfig": {
+                "valueMultiplier": 2,
+                "consumedOnMerge": true,
+                "consumptionEmitter": "amplify",
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "inactive": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "stone",
+            "active": false,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                "overlayWidth": 78,
+                "overlayHeight": 78,
+                "spawnEmitter": "stone-spawn",
+                "removalEmitter": "stone-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        }
+      },
+      "result": {
+        "empty": false,
+        "plain": true,
+        "freeze": true,
+        "stone": false,
+        "black_hole": false,
+        "amplify": true,
+        "inactive": true
+      }
+    },
+    {
+      "name": "canValueMerge",
+      "kind": "predicate",
+      "inputs": {
+        "plain": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {}
+        },
+        "freeze": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "freeze",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "freeze-spawn",
+                "activeEmitter": "freeze-run",
+                "removalEmitter": "freeze-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          }
+        },
+        "stone": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "stone",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                "overlayWidth": 78,
+                "overlayHeight": 78,
+                "spawnEmitter": "stone-spawn",
+                "removalEmitter": "stone-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "amplify": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "amplify",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 2,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                "backgroundWidth": 78,
+                "backgroundHeight": 78,
+                "spawnEmitter": "amplify-spawn",
+                "activeEmitter": "amplify-run",
+                "removalEmitter": "amplify-removal",
+                "showMultiplier": true
+              },
+              "mergeConfig": {
+                "valueMultiplier": 2,
+                "consumedOnMerge": true,
+                "consumptionEmitter": "amplify",
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "inactive": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "freeze",
+            "active": false,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "freeze-spawn",
+                "activeEmitter": "freeze-run",
+                "removalEmitter": "freeze-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          }
+        }
+      },
+      "result": {
+        "plain": true,
+        "freeze": false,
+        "stone": false,
+        "amplify": true,
+        "inactive": true
+      }
+    },
+    {
+      "name": "canTilesMergeTogether",
+      "kind": "predicate",
+      "inputs": {
+        "match": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          }
+        ],
+        "mismatchVal": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          }
+        ],
+        "oneEmpty": [
+          {
+            "isEmpty": true,
+            "value": 0,
+            "row": 0,
+            "col": 0,
+            "status": "normal"
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          }
+        ],
+        "bothEmpty": [
+          {
+            "isEmpty": true,
+            "value": 0,
+            "row": 0,
+            "col": 0,
+            "status": "normal"
+          },
+          {
+            "isEmpty": true,
+            "value": 0,
+            "row": 0,
+            "col": 1,
+            "status": "normal"
+          }
+        ],
+        "frozenLeft": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "freeze",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "freeze-spawn",
+                  "activeEmitter": "freeze-run",
+                  "removalEmitter": "freeze-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": false
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          }
+        ],
+        "frozenRight": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "freeze",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "freeze-spawn",
+                  "activeEmitter": "freeze-run",
+                  "removalEmitter": "freeze-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": false
+                }
+              }
+            }
+          }
+        ],
+        "stoneBoth": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "stone",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                  "overlayWidth": 78,
+                  "overlayHeight": 78,
+                  "spawnEmitter": "stone-spawn",
+                  "removalEmitter": "stone-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "stone",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                  "overlayWidth": 78,
+                  "overlayHeight": 78,
+                  "spawnEmitter": "stone-spawn",
+                  "removalEmitter": "stone-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          }
+        ],
+        "amplifyMatch": [
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "amplify",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 2,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                  "backgroundWidth": 78,
+                  "backgroundHeight": 78,
+                  "spawnEmitter": "amplify-spawn",
+                  "activeEmitter": "amplify-run",
+                  "removalEmitter": "amplify-removal",
+                  "showMultiplier": true
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 2,
+                  "consumedOnMerge": true,
+                  "consumptionEmitter": "amplify",
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 4,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          }
+        ]
+      },
+      "result": {
+        "match": true,
+        "mismatchVal": false,
+        "oneEmpty": false,
+        "bothEmpty": false,
+        "frozenLeft": false,
+        "frozenRight": false,
+        "stoneBoth": false,
+        "amplifyMatch": true
+      }
+    },
+    {
+      "name": "isBlackHoleTile",
+      "kind": "predicate",
+      "inputs": {
+        "plain": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {}
+        },
+        "bh": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "black_hole",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 7,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 7,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "black-hole-spawn",
+                "activeEmitter": "black-hole-run",
+                "removalEmitter": "black-hole-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "bhInactive": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "black_hole",
+            "active": false,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 7,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 7,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "black-hole-spawn",
+                "activeEmitter": "black-hole-run",
+                "removalEmitter": "black-hole-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          }
+        },
+        "freeze": {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal",
+          "meta": {},
+          "effect": {
+            "type": "freeze",
+            "active": true,
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "freeze-spawn",
+                "activeEmitter": "freeze-run",
+                "removalEmitter": "freeze-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          }
+        }
+      },
+      "result": {
+        "plain": false,
+        "bh": true,
+        "bhInactive": false,
+        "freeze": false
+      }
+    },
+    {
+      "name": "findBlackHoleInPath",
+      "kind": "predicate",
+      "inputs": {
+        "horizontalHit": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 2,
+              "status": "normal",
+              "meta": {},
+              "effect": {
+                "type": "black_hole",
+                "active": true,
+                "config": {
+                  "remainingTriggers": 0,
+                  "decayRate": 0,
+                  "tilesConsumed": 0,
+                  "maxTilesToImplosion": 7,
+                  "decayMoveInterval": 0,
+                  "lastDecayMove": 0,
+                  "multiplier": 1,
+                  "removalCost": 7,
+                  "allowsValueMerge": true,
+                  "allowsValueMovement": false,
+                  "effectRemovedByAdjacentMerge": false,
+                  "visual": {
+                    "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                    "overlayWidth": 100,
+                    "overlayHeight": 100,
+                    "spawnEmitter": "black-hole-spawn",
+                    "activeEmitter": "black-hole-run",
+                    "removalEmitter": "black-hole-removal"
+                  },
+                  "mergeConfig": {
+                    "valueMultiplier": 1,
+                    "consumedOnMerge": false,
+                    "effectStaysAtSource": true
+                  }
+                }
+              }
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            }
+          ],
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 0,
+            "col": 3
+          }
+        },
+        "horizontalMiss": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            }
+          ],
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 0,
+            "col": 3
+          }
+        },
+        "verticalHit": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 1,
+              "status": "normal",
+              "meta": {},
+              "effect": {
+                "type": "black_hole",
+                "active": true,
+                "config": {
+                  "remainingTriggers": 0,
+                  "decayRate": 0,
+                  "tilesConsumed": 0,
+                  "maxTilesToImplosion": 7,
+                  "decayMoveInterval": 0,
+                  "lastDecayMove": 0,
+                  "multiplier": 1,
+                  "removalCost": 7,
+                  "allowsValueMerge": true,
+                  "allowsValueMovement": false,
+                  "effectRemovedByAdjacentMerge": false,
+                  "visual": {
+                    "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                    "overlayWidth": 100,
+                    "overlayHeight": 100,
+                    "spawnEmitter": "black-hole-spawn",
+                    "activeEmitter": "black-hole-run",
+                    "removalEmitter": "black-hole-removal"
+                  },
+                  "mergeConfig": {
+                    "valueMultiplier": 1,
+                    "consumedOnMerge": false,
+                    "effectStaysAtSource": true
+                  }
+                }
+              }
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            }
+          ],
+          "from": {
+            "row": 0,
+            "col": 1
+          },
+          "to": {
+            "row": 3,
+            "col": 1
+          }
+        },
+        "adjacentNoMid": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 1,
+              "status": "normal",
+              "meta": {},
+              "effect": {
+                "type": "black_hole",
+                "active": true,
+                "config": {
+                  "remainingTriggers": 0,
+                  "decayRate": 0,
+                  "tilesConsumed": 0,
+                  "maxTilesToImplosion": 7,
+                  "decayMoveInterval": 0,
+                  "lastDecayMove": 0,
+                  "multiplier": 1,
+                  "removalCost": 7,
+                  "allowsValueMerge": true,
+                  "allowsValueMovement": false,
+                  "effectRemovedByAdjacentMerge": false,
+                  "visual": {
+                    "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                    "overlayWidth": 100,
+                    "overlayHeight": 100,
+                    "spawnEmitter": "black-hole-spawn",
+                    "activeEmitter": "black-hole-run",
+                    "removalEmitter": "black-hole-removal"
+                  },
+                  "mergeConfig": {
+                    "valueMultiplier": 1,
+                    "consumedOnMerge": false,
+                    "effectStaysAtSource": true
+                  }
+                }
+              }
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            }
+          ],
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 0,
+            "col": 1
+          }
+        },
+        "reverseHit": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 1,
+              "status": "normal",
+              "meta": {},
+              "effect": {
+                "type": "black_hole",
+                "active": true,
+                "config": {
+                  "remainingTriggers": 0,
+                  "decayRate": 0,
+                  "tilesConsumed": 0,
+                  "maxTilesToImplosion": 7,
+                  "decayMoveInterval": 0,
+                  "lastDecayMove": 0,
+                  "multiplier": 1,
+                  "removalCost": 7,
+                  "allowsValueMerge": true,
+                  "allowsValueMovement": false,
+                  "effectRemovedByAdjacentMerge": false,
+                  "visual": {
+                    "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                    "overlayWidth": 100,
+                    "overlayHeight": 100,
+                    "spawnEmitter": "black-hole-spawn",
+                    "activeEmitter": "black-hole-run",
+                    "removalEmitter": "black-hole-removal"
+                  },
+                  "mergeConfig": {
+                    "valueMultiplier": 1,
+                    "consumedOnMerge": false,
+                    "effectStaysAtSource": true
+                  }
+                }
+              }
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 0,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 1,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 2,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 0,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 1,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 2,
+              "status": "normal",
+              "meta": {}
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "row": 3,
+              "col": 3,
+              "status": "normal",
+              "meta": {}
+            }
+          ],
+          "from": {
+            "row": 0,
+            "col": 3
+          },
+          "to": {
+            "row": 0,
+            "col": 0
+          }
+        }
+      },
+      "result": {
+        "horizontalHit": {
+          "row": 0,
+          "col": 2
+        },
+        "horizontalMiss": null,
+        "verticalHit": {
+          "row": 2,
+          "col": 1
+        },
+        "adjacentNoMid": null,
+        "reverseHit": {
+          "row": 0,
+          "col": 1
+        }
+      }
+    },
+    {
+      "name": "processBlackHoleDestruction",
+      "kind": "mutation",
+      "result": {
+        "normal": {
+          "consumedAfter": {
+            "isEmpty": true,
+            "value": 0,
+            "row": 1,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          },
+          "blackHoleAfter": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "black_hole",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 1,
+                "maxTilesToImplosion": 7,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 7,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "black-hole-spawn",
+                  "activeEmitter": "black-hole-run",
+                  "removalEmitter": "black-hole-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "scoreLoss": 16,
+            "shouldImplode": false
+          }
+        },
+        "implosion": {
+          "consumedAfter": {
+            "isEmpty": true,
+            "value": 0,
+            "row": 2,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          "blackHoleAfter": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "black_hole",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 7,
+                "maxTilesToImplosion": 7,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 7,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "black-hole-spawn",
+                  "activeEmitter": "black-hole-run",
+                  "removalEmitter": "black-hole-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "scoreLoss": 8,
+            "shouldImplode": true
+          }
+        },
+        "noConfig": {
+          "consumedAfter": {
+            "isEmpty": true,
+            "value": 0,
+            "row": 2,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          "blackHoleAfter": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          "ret": {
+            "scoreLoss": 32,
+            "shouldImplode": false
+          }
+        }
+      }
+    },
+    {
+      "name": "processLockTriggerOnMerge",
+      "kind": "mutation",
+      "result": {
+        "decrement": {
+          "after": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "lock",
+              "active": true,
+              "config": {
+                "remainingTriggers": 2,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+                  "overlayWidth": 70,
+                  "overlayHeight": 70,
+                  "spawnEmitter": "lock-spawn",
+                  "removalEmitter": "lock-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": null
+        },
+        "removeAtOne": {
+          "after": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 1,
+            "col": 1,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "lock",
+              "active": false,
+              "config": {
+                "remainingTriggers": 1,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+                  "overlayWidth": 70,
+                  "overlayHeight": 70,
+                  "spawnEmitter": "lock-spawn",
+                  "removalEmitter": "lock-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "row": 1,
+            "col": 1
+          }
+        },
+        "noLock": {
+          "after": {
+            "isEmpty": false,
+            "value": 2,
+            "row": 2,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          "ret": null
+        }
+      }
+    },
+    {
+      "name": "processTileEffectsOnMerge",
+      "kind": "mutation",
+      "result": {
+        "amplify": {
+          "after": {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "amplify",
+              "active": false,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 2,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                  "backgroundWidth": 78,
+                  "backgroundHeight": 78,
+                  "spawnEmitter": "amplify-spawn",
+                  "activeEmitter": "amplify-run",
+                  "removalEmitter": "amplify-removal",
+                  "showMultiplier": true
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 2,
+                  "consumedOnMerge": true,
+                  "consumptionEmitter": "amplify",
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "finalValue": 16,
+            "consumedEffects": [
+              {
+                "type": "amplify",
+                "row": 0,
+                "col": 0,
+                "metadata": {
+                  "multiplier": 2,
+                  "emitter": "amplify"
+                }
+              }
+            ]
+          }
+        },
+        "amplifyStatic": {
+          "after": {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "amplify_static",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 2,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                  "backgroundWidth": 78,
+                  "backgroundHeight": 78,
+                  "spawnEmitter": "amplify-spawn",
+                  "activeEmitter": "amplify-run",
+                  "removalEmitter": "amplify-removal",
+                  "showMultiplier": true
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 2,
+                  "consumedOnMerge": false,
+                  "consumptionEmitter": "amplify",
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "finalValue": 16,
+            "consumedEffects": []
+          }
+        },
+        "blackHole": {
+          "after": {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "black_hole",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 7,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 7,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "black-hole-spawn",
+                  "activeEmitter": "black-hole-run",
+                  "removalEmitter": "black-hole-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "finalValue": 8,
+            "consumedEffects": []
+          }
+        },
+        "noEffect": {
+          "after": {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          "ret": {
+            "finalValue": 16,
+            "consumedEffects": []
+          }
+        },
+        "inactiveAmplify": {
+          "after": {
+            "isEmpty": false,
+            "value": 8,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "amplify",
+              "active": false,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 2,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                  "backgroundWidth": 78,
+                  "backgroundHeight": 78,
+                  "spawnEmitter": "amplify-spawn",
+                  "activeEmitter": "amplify-run",
+                  "removalEmitter": "amplify-removal",
+                  "showMultiplier": true
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 2,
+                  "consumedOnMerge": true,
+                  "consumptionEmitter": "amplify",
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          "ret": {
+            "finalValue": 8,
+            "consumedEffects": []
+          }
+        }
+      }
+    },
+    {
+      "name": "getEffectToPreserveAtSource",
+      "kind": "value",
+      "result": {
+        "amplifyStays": {
+          "type": "amplify",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 0,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 2,
+            "removalCost": 0,
+            "allowsValueMerge": true,
+            "allowsValueMovement": true,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+              "backgroundWidth": 78,
+              "backgroundHeight": 78,
+              "spawnEmitter": "amplify-spawn",
+              "activeEmitter": "amplify-run",
+              "removalEmitter": "amplify-removal",
+              "showMultiplier": true
+            },
+            "mergeConfig": {
+              "valueMultiplier": 2,
+              "consumedOnMerge": true,
+              "consumptionEmitter": "amplify",
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "freezeNoStay": null,
+        "blackHoleStays": {
+          "type": "black_hole",
+          "active": true,
+          "config": {
+            "remainingTriggers": 0,
+            "decayRate": 0,
+            "tilesConsumed": 0,
+            "maxTilesToImplosion": 7,
+            "decayMoveInterval": 0,
+            "lastDecayMove": 0,
+            "multiplier": 1,
+            "removalCost": 7,
+            "allowsValueMerge": true,
+            "allowsValueMovement": false,
+            "effectRemovedByAdjacentMerge": false,
+            "visual": {
+              "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+              "overlayWidth": 100,
+              "overlayHeight": 100,
+              "spawnEmitter": "black-hole-spawn",
+              "activeEmitter": "black-hole-run",
+              "removalEmitter": "black-hole-removal"
+            },
+            "mergeConfig": {
+              "valueMultiplier": 1,
+              "consumedOnMerge": false,
+              "effectStaysAtSource": true
+            }
+          }
+        },
+        "noEffect": null,
+        "decayNoStay": null
+      }
+    },
+    {
+      "name": "processFreezeRemovalFromAdjacentMerge",
+      "kind": "mutation",
+      "result": {
+        "removed": [
+          {
+            "row": 0,
+            "col": 1
+          },
+          {
+            "row": 1,
+            "col": 0
+          }
+        ],
+        "boardAfter": [
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 1,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "freeze",
+              "active": false,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "freeze-spawn",
+                  "activeEmitter": "freeze-run",
+                  "removalEmitter": "freeze-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": false
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 0,
+            "col": 3,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 1,
+            "col": 0,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "stone",
+              "active": false,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 0,
+                "allowsValueMerge": false,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": true,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/stone/overlay.png",
+                  "overlayWidth": 78,
+                  "overlayHeight": 78,
+                  "spawnEmitter": "stone-spawn",
+                  "removalEmitter": "stone-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 1,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 1,
+            "col": 2,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "amplify",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 0,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 2,
+                "removalCost": 0,
+                "allowsValueMerge": true,
+                "allowsValueMovement": true,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "backgroundTexture": "/assets/tile-effects/amplify/background.png",
+                  "backgroundWidth": 78,
+                  "backgroundHeight": 78,
+                  "spawnEmitter": "amplify-spawn",
+                  "activeEmitter": "amplify-run",
+                  "removalEmitter": "amplify-removal",
+                  "showMultiplier": true
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 2,
+                  "consumedOnMerge": true,
+                  "consumptionEmitter": "amplify",
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 1,
+            "col": 3,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 2,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 2,
+            "col": 1,
+            "status": "normal",
+            "meta": {},
+            "effect": {
+              "type": "black_hole",
+              "active": true,
+              "config": {
+                "remainingTriggers": 0,
+                "decayRate": 0,
+                "tilesConsumed": 0,
+                "maxTilesToImplosion": 7,
+                "decayMoveInterval": 0,
+                "lastDecayMove": 0,
+                "multiplier": 1,
+                "removalCost": 7,
+                "allowsValueMerge": true,
+                "allowsValueMovement": false,
+                "effectRemovedByAdjacentMerge": false,
+                "visual": {
+                  "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                  "overlayWidth": 100,
+                  "overlayHeight": 100,
+                  "spawnEmitter": "black-hole-spawn",
+                  "activeEmitter": "black-hole-run",
+                  "removalEmitter": "black-hole-removal"
+                },
+                "mergeConfig": {
+                  "valueMultiplier": 1,
+                  "consumedOnMerge": false,
+                  "effectStaysAtSource": true
+                }
+              }
+            }
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 2,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 2,
+            "col": 3,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 3,
+            "col": 0,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 3,
+            "col": 1,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 3,
+            "col": 2,
+            "status": "normal",
+            "meta": {}
+          },
+          {
+            "isEmpty": false,
+            "value": 2,
+            "row": 3,
+            "col": 3,
+            "status": "normal",
+            "meta": {}
+          }
+        ]
+      }
+    },
+    {
+      "name": "attemptSpawnEffectOnTile",
+      "kind": "spawn",
+      "result": {
+        "guaranteedFreeze": {
+          "success": true,
+          "gameStateHash": "315801977fe975d9f4107b6c5fc4c9a4b5d3ac5fa49a9652e2fc2533841f31c5",
+          "effectSpawned": {
+            "type": "freeze",
+            "position": {
+              "row": 1,
+              "col": 1
+            },
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": false,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": true,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/freeze/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "freeze-spawn",
+                "activeEmitter": "freeze-run",
+                "removalEmitter": "freeze-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          },
+          "rngDelta": 1,
+          "tilesHash": "92202835b3bab637861aceca897e0d02be07afbd5bea99b04ffc2891c41f3523"
+        },
+        "zeroChance": {
+          "success": false,
+          "gameStateHash": "9634a64c7ac6320aba49fd7735a2173f9c0c5484a7ed6a91c303dbb0bbe0cf1e",
+          "effectSpawned": null,
+          "rngDelta": 1,
+          "tilesHash": "fc6656639cf9d021e868bb8eded5155691ec529b382d68a88b03d9c7bbe0cd35"
+        },
+        "maxActiveZero": {
+          "success": false,
+          "gameStateHash": "4edad0f2f93eec9074e9a57de120b74593f6548a87956a97bd83dbb65be0cf24",
+          "effectSpawned": null,
+          "rngDelta": 0,
+          "tilesHash": "fc6656639cf9d021e868bb8eded5155691ec529b382d68a88b03d9c7bbe0cd35"
+        },
+        "noScenario": {
+          "success": false,
+          "gameStateHash": "002fa1e9acfd91e72087dc54ed2b961ce4f85361a16d696eea03da8dfbe0cdfb",
+          "effectSpawned": null,
+          "rngDelta": 0,
+          "tilesHash": "fc6656639cf9d021e868bb8eded5155691ec529b382d68a88b03d9c7bbe0cd35"
+        },
+        "orderingFreezeThenBH": {
+          "success": true,
+          "gameStateHash": "3daf3db2bac97bf4fb9e5d8743e04bbf6bb3ae7aa5ba986db2fc274e841f33e0",
+          "effectSpawned": {
+            "type": "black_hole",
+            "position": {
+              "row": 1,
+              "col": 1
+            },
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 7,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 7,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/black-hole/overlay.png",
+                "overlayWidth": 100,
+                "overlayHeight": 100,
+                "spawnEmitter": "black-hole-spawn",
+                "activeEmitter": "black-hole-run",
+                "removalEmitter": "black-hole-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          },
+          "rngDelta": 2,
+          "tilesHash": "4bc021ac643f1a0e1a8936215aabac5923a9af14ba929907707c27e8e41f347a"
+        },
+        "linearOverride": {
+          "success": true,
+          "gameStateHash": "02fbd62e452eddac13b20c1931ca55e128605326a27d69330803da52fbe0cdc0",
+          "effectSpawned": {
+            "type": "lock",
+            "position": {
+              "row": 1,
+              "col": 1
+            },
+            "config": {
+              "remainingTriggers": 1,
+              "decayRate": 0,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 0,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": false,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "overlayTexture": "/assets/tile-effects/lock/overlay.png",
+                "overlayWidth": 70,
+                "overlayHeight": 70,
+                "spawnEmitter": "lock-spawn",
+                "removalEmitter": "lock-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": true
+              }
+            }
+          },
+          "rngDelta": 1,
+          "tilesHash": "99218cf91a6fe3779f545be44d9995ac5cf052f134ad68fe5003da1d7be0cd8b"
+        },
+        "tileHasEffect": {
+          "success": false,
+          "gameStateHash": "21d5a091dd7303f3a54b4206e881e83e2a79aaf9ff0294ec787c23cd641f305f",
+          "effectSpawned": null,
+          "rngDelta": 0,
+          "tilesHash": "ee383bfba5acc71d933e5830d7162e686c0db12318929b168d7c29f7a41f3689"
+        },
+        "emptySteppedDecay": {
+          "success": true,
+          "gameStateHash": "b3bd093f8bc16d9dabf90b8aaf7c3d52453a5a97525570a44283e1c31be0d531",
+          "effectSpawned": {
+            "type": "decay",
+            "position": {
+              "row": 1,
+              "col": 1
+            },
+            "config": {
+              "remainingTriggers": 0,
+              "decayRate": 0.5,
+              "tilesConsumed": 0,
+              "maxTilesToImplosion": 0,
+              "decayMoveInterval": 5,
+              "lastDecayMove": 0,
+              "multiplier": 1,
+              "removalCost": 0,
+              "allowsValueMerge": true,
+              "allowsValueMovement": true,
+              "effectRemovedByAdjacentMerge": false,
+              "visual": {
+                "spawnEmitter": "decay-spawn",
+                "removalEmitter": "decay-removal"
+              },
+              "mergeConfig": {
+                "valueMultiplier": 1,
+                "consumedOnMerge": false,
+                "effectStaysAtSource": false
+              }
+            }
+          },
+          "rngDelta": 1,
+          "tilesHash": "69ab0519d59e6fbb6f3bf6ceececad066e35afc1ac3299b4577c2895241f3527"
+        }
+      }
+    }
+  ]
+}
