@@ -117,8 +117,16 @@ Three things must be reproduced **byte-for-byte**:
 - Housekeeping: `MbRng`/`MbHasher` register as global `class_name`s on the next full editor scan; the suite uses `preload()` meanwhile, so nothing is blocked.
 
 ### Phase 1 — Pure deterministic engine (GDScript)
-- [ ] Core data model: `SynchronizedGameState` / tile / effect / card / totem dicts with exact keys.
-- [ ] Board + movement + merge (`performSwipe`, spawn 90/10, black-hole pass-through destruction).
+**Spine ✅ DONE (2026-06-03)** — swipe-only path proven byte-exact against the TS dist oracle:
+- `engine/constants.gd` (`MbConstants`): full `POWER_CARDS` (26, insertion-ordered) + `TOTEM_TYPES` (11) catalogs + scalars.
+- `engine/random_generator.gd` (`MbRandom`): 5-namespace RNG on `MbRng`, reseed+replay.
+- `engine/engine.gd` (`MbEngine`): `perform_swipe` (4 dirs), spawn (2 tile-gen draws, 90/10), combo, score, shards, auto-draw, `execute_swipe_action` + caller overrides (score accumulate, rngIndices, moveIndex+2-on-draw). Tile-effects/totems/events/global-effects are faithful **no-op stubs** (verified to consume 0 RNG / add 0 state when inactive).
+- `tests/test_engine_swipe.gd`: threads a 20-move golden (with 2 card draws) → **every per-move state hash matches** (`tests/golden/engine_swipe_golden.json`, via `generate_engine_golden.mjs`). Full suite: **7 tests / 2 suites green**.
+- Key finding: real board states are **clean row-major**; reference-semantics (`Dictionary`/`Array` are GDScript reference types) reproduce the JS `merge.ts` mutation behavior for free.
+
+**Remaining (breadth workflow):**
+- [ ] Core data model: full tile / effect / card / totem dict coverage (spine has the swipe subset).
+- [ ] Board + movement + merge — spine done; add black-hole pass-through destruction + effect gating.
 - [ ] Tile effects (config-flag driven: `allowsValueMerge/Movement`, `mergeConfig`, per-effect counters). *Note: spec's decay value-reduction is **not implemented** in code — match the code.*
 - [ ] Power cards (26 `performPowerCard*` + targeting predicates in `validation.ts`) + draw (`cardDraw.ts`, auto-draw every 8 shards).
 - [ ] Totems (`processTotemEffects` on game events; durations via `movesRemaining/mergesRemaining/tallyMarks`). *Note: spec's swipe-durations **not implemented**.*

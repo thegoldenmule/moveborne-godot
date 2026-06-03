@@ -1,0 +1,3640 @@
+{
+  "initial": {
+    "board": {
+      "tiles": [
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 0,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 1,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 0,
+          "col": 3,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 1,
+          "col": 0,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 1,
+          "col": 1,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 1,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": false,
+          "value": 2,
+          "row": 1,
+          "col": 3,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 0,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 1,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 2,
+          "col": 3,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 0,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 1,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 2,
+          "status": "normal"
+        },
+        {
+          "isEmpty": true,
+          "value": 0,
+          "row": 3,
+          "col": 3,
+          "status": "normal"
+        }
+      ],
+      "size": 4
+    },
+    "hand": {
+      "cards": []
+    },
+    "deck": {
+      "remainingCards": 12,
+      "nextCardIndex": 0
+    },
+    "score": 0,
+    "shards": 0,
+    "combo": 0,
+    "comboMultiplier": 1,
+    "totems": {
+      "active": []
+    },
+    "moveIndex": 0,
+    "randomSeeds": {
+      "tile-gen": 12345,
+      "shuffle": 12346,
+      "effect-spawn": 12347,
+      "totem-spawn": 12348,
+      "card-draw": 12349
+    },
+    "rngIndices": {
+      "tile-gen": 0,
+      "shuffle": 0,
+      "effect-spawn": 0,
+      "totem-spawn": 0,
+      "card-draw": 0
+    }
+  },
+  "steps": [
+    {
+      "dir": "down",
+      "scoreAdded": 80,
+      "shardsAdded": 4,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "b3a6d4a7eb072565231a60d2db5f9a9a157c57dfc30d6dec0703df0bbbe0d279",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 80,
+        "shards": 4,
+        "combo": 0,
+        "comboMultiplier": 5,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 1,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 2,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      }
+    },
+    {
+      "dir": "down",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "3f7b08416e10d65f02b7574c6c25791485ae5659d7a56c667f83dd855be0d0f3",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 80,
+        "shards": 4,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 2,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 4,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      }
+    },
+    {
+      "dir": "left",
+      "scoreAdded": 32,
+      "shardsAdded": 2,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "9f0dd678935b7dda307311ed140f2825dbf9aae0b33294d3ec7c23b4e41f3046",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 112,
+        "shards": 6,
+        "combo": 0,
+        "comboMultiplier": 2,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 3,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 6,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      }
+    },
+    {
+      "dir": "right",
+      "scoreAdded": 48,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "922e628e3671668c964c18f9cdb492c145b85006232d6613ea03d732fbe0caa0",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 160,
+        "shards": 7,
+        "combo": 0,
+        "comboMultiplier": 3,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 4,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 8,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      }
+    },
+    {
+      "dir": "up",
+      "scoreAdded": 16,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": true,
+      "hash": "18b81cd08eafa66e81d0275ba21ab923e15656684c156c755583dd945be0d102",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 176,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 4,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 6,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 10,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "down",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "135c9e9ac1f9bab8ed2f37a57ce8f96db20e56b2e2c56cbfef83ddde5be0d14c",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 176,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 7,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 12,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "left",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "24606a31c2b1296f6e3ffedc157e18a41f3455e9eb2d6bf6a503dd153be0d083",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 176,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 8,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 14,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "up",
+      "scoreAdded": 24,
+      "shardsAdded": 2,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "3b798e36c611981445d50801a18039c97b82570e08956d1b4c83de3a9be0d1a8",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 0,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "merged",
+              "meta": {},
+              "row": 0,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 200,
+        "shards": 2,
+        "combo": 0,
+        "comboMultiplier": 2,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 9,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 16,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "right",
+      "scoreAdded": 12,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "7dd6f358e38f1fba940d49cdca41f005fb29b2c082829cb3f47c2b94641f3826",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 212,
+        "shards": 3,
+        "combo": 0,
+        "comboMultiplier": 3,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 10,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 18,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "down",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "07152aa0b1a43762f9a11ef5653f4d2d072bafe85eba99db88fc28bc041f354e",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 212,
+        "shards": 3,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 11,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 20,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "left",
+      "scoreAdded": 4,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "652bc26a44caf4ec0184ef7fcace8db7e01fb072c28a9a65c5fc2946441f35d8",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 216,
+        "shards": 4,
+        "combo": 0,
+        "comboMultiplier": 1,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 12,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 22,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "right",
+      "scoreAdded": 16,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "98f7748f12eb2c51cd545fe4110c4e1c03fbb0d751fa9acabcfc29ab041f363d",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 232,
+        "shards": 5,
+        "combo": 0,
+        "comboMultiplier": 2,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 13,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 24,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "up",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "8132d4afbbfb5171f404ef04b37c8d3c472baff70aea99ea1cfc28cb841f355d",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 232,
+        "shards": 5,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 14,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 26,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "down",
+      "scoreAdded": 4,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "e7f9290170cb6d437c8a90d602930f0e7893b1c9d08a9bbc76fc2a9d041f372f",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 236,
+        "shards": 6,
+        "combo": 0,
+        "comboMultiplier": 1,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 15,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 28,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "left",
+      "scoreAdded": 8,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "f70d85cc8a9882ee9ae3f801f5f8ae392eedb0f4a9f29ae70d7c29c8a41f365a",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 11,
+          "nextCardIndex": 1
+        },
+        "score": 244,
+        "shards": 7,
+        "combo": 0,
+        "comboMultiplier": 2,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 16,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 30,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 1
+        }
+      }
+    },
+    {
+      "dir": "right",
+      "scoreAdded": 24,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": true,
+      "hash": "ebc70b21b92817ff5386b5ec77b0f7b408d254f931656b069c83dc251be0cf93",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "merged",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            },
+            {
+              "type": "scavenger_totem",
+              "name": "Scavenger",
+              "description": "Spawn Scavenger",
+              "texture": "/assets/hand/images/scavenger_totem.png",
+              "spawnsTotem": {
+                "id": "scavenger",
+                "name": "Scavenger",
+                "description": "Doubles shards earned from merges (4 uses)",
+                "defaultMerges": 4,
+                "icon": {
+                  "src": "/assets/totems/scavenger.png"
+                }
+              },
+              "isTotemCard": true,
+              "id": "card_draw_1"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 10,
+          "nextCardIndex": 2
+        },
+        "score": 268,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 3,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 18,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 32,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 2
+        }
+      }
+    },
+    {
+      "dir": "up",
+      "scoreAdded": 16,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "d1c151069594116401de55515f0f7719feba545e09056a6b1683db8a9be0cef8",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            },
+            {
+              "type": "scavenger_totem",
+              "name": "Scavenger",
+              "description": "Spawn Scavenger",
+              "texture": "/assets/hand/images/scavenger_totem.png",
+              "spawnsTotem": {
+                "id": "scavenger",
+                "name": "Scavenger",
+                "description": "Doubles shards earned from merges (4 uses)",
+                "defaultMerges": 4,
+                "icon": {
+                  "src": "/assets/totems/scavenger.png"
+                }
+              },
+              "isTotemCard": true,
+              "id": "card_draw_1"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 10,
+          "nextCardIndex": 2
+        },
+        "score": 284,
+        "shards": 1,
+        "combo": 0,
+        "comboMultiplier": 4,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 19,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 34,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 2
+        }
+      }
+    },
+    {
+      "dir": "down",
+      "scoreAdded": 20,
+      "shardsAdded": 1,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "a695e2e13b4faf3f5b3c532cd98774f4e63a5239a7056846f683d9659be0ccd3",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "merged",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            },
+            {
+              "type": "scavenger_totem",
+              "name": "Scavenger",
+              "description": "Spawn Scavenger",
+              "texture": "/assets/hand/images/scavenger_totem.png",
+              "spawnsTotem": {
+                "id": "scavenger",
+                "name": "Scavenger",
+                "description": "Doubles shards earned from merges (4 uses)",
+                "defaultMerges": 4,
+                "icon": {
+                  "src": "/assets/totems/scavenger.png"
+                }
+              },
+              "isTotemCard": true,
+              "id": "card_draw_1"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 10,
+          "nextCardIndex": 2
+        },
+        "score": 304,
+        "shards": 2,
+        "combo": 0,
+        "comboMultiplier": 5,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 20,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 36,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 2
+        }
+      }
+    },
+    {
+      "dir": "left",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "cdc3a3d679b7a23438e50821247c39e9795a572e47556d3b2a83de5a1be0d1c8",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 0
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            },
+            {
+              "type": "scavenger_totem",
+              "name": "Scavenger",
+              "description": "Spawn Scavenger",
+              "texture": "/assets/hand/images/scavenger_totem.png",
+              "spawnsTotem": {
+                "id": "scavenger",
+                "name": "Scavenger",
+                "description": "Doubles shards earned from merges (4 uses)",
+                "defaultMerges": 4,
+                "icon": {
+                  "src": "/assets/totems/scavenger.png"
+                }
+              },
+              "isTotemCard": true,
+              "id": "card_draw_1"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 10,
+          "nextCardIndex": 2
+        },
+        "score": 304,
+        "shards": 2,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 21,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 38,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 2
+        }
+      }
+    },
+    {
+      "dir": "right",
+      "scoreAdded": 0,
+      "shardsAdded": 0,
+      "moved": true,
+      "cardDrawn": false,
+      "hash": "9ce29b0ae29a762869484515bd5b36ddab1e542262356a2f0783db4edbe0cebc",
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 0,
+              "col": 3
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 1,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "new",
+              "meta": {},
+              "row": 2,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 16,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 2,
+              "status": "normal",
+              "meta": {},
+              "row": 2,
+              "col": 3
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 0
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 1
+            },
+            {
+              "isEmpty": false,
+              "value": 4,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 2
+            },
+            {
+              "isEmpty": false,
+              "value": 8,
+              "status": "normal",
+              "meta": {},
+              "row": 3,
+              "col": 3
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": [
+            {
+              "type": "transform",
+              "name": "Transmute",
+              "description": "Removes 3 random tile effects from the board",
+              "texture": "/assets/hand/images/transform.png",
+              "value": 3,
+              "id": "card_draw_0"
+            },
+            {
+              "type": "scavenger_totem",
+              "name": "Scavenger",
+              "description": "Spawn Scavenger",
+              "texture": "/assets/hand/images/scavenger_totem.png",
+              "spawnsTotem": {
+                "id": "scavenger",
+                "name": "Scavenger",
+                "description": "Doubles shards earned from merges (4 uses)",
+                "defaultMerges": 4,
+                "icon": {
+                  "src": "/assets/totems/scavenger.png"
+                }
+              },
+              "isTotemCard": true,
+              "id": "card_draw_1"
+            }
+          ]
+        },
+        "deck": {
+          "remainingCards": 10,
+          "nextCardIndex": 2
+        },
+        "score": 304,
+        "shards": 2,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 22,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 40,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 2
+        }
+      }
+    }
+  ]
+}

@@ -50,7 +50,7 @@ func test_rng_sequences() -> void:
 		for i in range(hexes.size()):
 			var got: float = MbRngS.draw(a)
 			var got_hex := _f64be_hex(got)
-			assert_eq(got_hex, hexes[i], "rng seed=%s i=%d got=%.17g (%s) want=%s" % [seed_str, i, got, got_hex, str(hexes[i])])
+			assert_eq(got_hex, hexes[i], "rng seed=%s i=%d got=%s (%s) want=%s" % [seed_str, i, str(got), got_hex, str(hexes[i])])
 
 
 func test_hash_strings() -> void:
