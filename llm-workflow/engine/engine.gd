@@ -288,12 +288,30 @@ static func calculate_shards(current: int, to_add: int) -> int:
 	return min(current + to_add, C.SHARDS_PER_CARD)
 
 
-# globalEffects.ts processGlobalEffects(MOVE_COMPLETED): no-op until a scenario
-# event rule spawns a global (Glitch) effect; ticks/reseeds will be ported then.
-static func _process_global_effects(state: Dictionary, _rng) -> Dictionary:
+# globalEffects.ts processGlobalEffects(MOVE_COMPLETED): tick each global effect.
+# Decrement movesRemaining (drop the effect at 0 — with NO rng draw), else reseed +
+# ramp the filter from 2 ordered effect-spawn draws per surviving effect.
+static func _process_global_effects(state: Dictionary, rng) -> Dictionary:
 	if not state.has("globalEffects") or state["globalEffects"] == null or (state["globalEffects"] as Array).is_empty():
 		return state
-	return state
+	var ns := state.duplicate()
+	var out := []
+	for effect in (ns["globalEffects"] as Array):
+		var e: Dictionary = effect
+		var new_remaining: int = maxi(0, int(e["movesRemaining"]) - 1)
+		if new_remaining == 0:
+			continue  # TS returns null -> filtered out; no rng drawn
+		var new_seed: float = rng.get_random(C.NS_EFFECT_SPAWN) * 10000.0
+		var offset_variation: float = 15.0 + rng.get_random(C.NS_EFFECT_SPAWN) * 10.0
+		var ne := e.duplicate()
+		ne["movesRemaining"] = new_remaining
+		var fc := (e["filterConfig"] as Dictionary).duplicate()
+		fc["seed"] = new_seed
+		fc["offset"] = offset_variation
+		ne["filterConfig"] = fc
+		out.append(ne)
+	ns["globalEffects"] = out
+	return ns
 
 
 # ----------------------------------------------------------------------------

@@ -1,0 +1,2069 @@
+{
+  "cases": [
+    {
+      "name": "no_effects",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "outputHash": "4ee8dc3086288ceeb23d3c5bcbdf1623b53c53683e2d6975af03da94bbe0ce02",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 0,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    },
+    {
+      "name": "tick_one",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 10,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "outputHash": "b86d01eb5737a4ed1a281f8053c94db82977b0737a1a9a662ffc2947441f35d9",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 9,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 18.263542103384847,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 6968.296082470701,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 2,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    },
+    {
+      "name": "tick_remove",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 1,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "outputHash": "ba471d0f4232ec4df222abba04aad5820ff452c7be7d68d42103d9f3bbe0cd61",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": []
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 0,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    },
+    {
+      "name": "tick_mixed",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 5,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          },
+          {
+            "id": "trigger_1_effect_888",
+            "type": "glitch",
+            "movesRemaining": 1,
+            "maxMoves": 10,
+            "triggerId": "trigger_1",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "outputHash": "397e1490290e5f72551fc78506a7edbd1761b07831c29a6baa7c294ce41f35de",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 4,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 18.263542103384847,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 6968.296082470701,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 2,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    },
+    {
+      "name": "tick_two",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 5,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          },
+          {
+            "id": "trigger_1_effect_999",
+            "type": "glitch",
+            "movesRemaining": 3,
+            "maxMoves": 10,
+            "triggerId": "trigger_1",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 1234.5,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "outputHash": "690c0f146e4265f6a2bd780914a0ae4163a1b0fc66129aef467c29d0641f3662",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_777",
+            "type": "glitch",
+            "movesRemaining": 4,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 18.263542103384847,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 6968.296082470701,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          },
+          {
+            "id": "trigger_1_effect_999",
+            "type": "glitch",
+            "movesRemaining": 2,
+            "maxMoves": 10,
+            "triggerId": "trigger_1",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 17.746358744366113,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 4528.410562653503,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 4,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    },
+    {
+      "name": "created_then_tick",
+      "input": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 2,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_696829",
+            "type": "glitch",
+            "movesRemaining": 10,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 5,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 3263.542103384847,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "outputHash": "0f262f4131737edff497d1ccb18b7394bc3650d90b6566e67983d805dbe0cb73",
+      "output": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 2,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "globalEffects": [
+          {
+            "id": "trigger_0_effect_696829",
+            "type": "glitch",
+            "movesRemaining": 9,
+            "maxMoves": 10,
+            "triggerId": "trigger_0",
+            "filterConfig": {
+              "slices": 10,
+              "offset": 17.746358744366113,
+              "direction": 0,
+              "fillMode": 0,
+              "seed": 4528.410562653503,
+              "average": false,
+              "minSize": 8,
+              "sampleSize": 512
+            }
+          }
+        ]
+      },
+      "rngIndicesAfter": {
+        "tile-gen": 0,
+        "shuffle": 0,
+        "effect-spawn": 4,
+        "totem-spawn": 0,
+        "card-draw": 0
+      }
+    }
+  ]
+}
