@@ -38,6 +38,8 @@ var _combo_lbl: Label             # "{N}X COMBO", shown when combo > 1, pops on 
 var _shown_score := 0             # animated (count-up) score currently displayed
 var _shown_combo := 1            # last combo, to detect increases
 var _score_tw: Tween
+var _shown_shards := 0            # displayed shards; filled as doobers land
+var _doobers_pending := 0        # in-flight shard doobers
 var _scen_label: Label
 var _net_label: Label
 var _toast: Label
@@ -447,7 +449,7 @@ func _rebuild_totems() -> void:
 func _update_hud() -> void:
 	var st: Dictionary = _match.state
 	_moves_val.text = str(int(st["moveIndex"]))
-	_shards_val.text = "%d/8" % int(st["shards"])
+	_set_shards(int(st["shards"]))
 	_set_score(int(st["score"]))
 	_set_combo(int(st["comboMultiplier"]))
 	_scen_label.text = "Scenario: %s" % _match.scenario_name
@@ -500,6 +502,14 @@ func _set_score_text(v) -> void:
 	_score_val.text = str(int(v))
 
 
+## Hold the shard count while doobers are in flight (they fill it on arrival); snap
+## on a decrease (auto-draw 8->0 reset) or when nothing is flying.
+func _set_shards(target: int) -> void:
+	if target < _shown_shards or _doobers_pending <= 0:
+		_shown_shards = target
+	_shards_val.text = "%d/8" % _shown_shards
+
+
 ## Show "{N}X COMBO" while combo > 1; elastic-pop on every increase (hud.ts).
 func _set_combo(combo: int) -> void:
 	if combo > 1:
@@ -522,7 +532,17 @@ func shard_target_pos() -> Vector2:
 func _on_shard_earned(board_pos: Vector2) -> void:
 	var d := DooberS.new()
 	_fx_layer.add_child(d)
+	_doobers_pending += 1
+	d.arrived.connect(_on_doober_arrived)
 	d.fly(_board.rest_position() + board_pos, shard_target_pos())
+
+
+## A doober reached the counter: tick the displayed shards up one (clamped to the
+## real total, so an auto-draw reset mid-flight can't overshoot).
+func _on_doober_arrived() -> void:
+	_doobers_pending = maxi(0, _doobers_pending - 1)
+	_shown_shards = mini(_shown_shards + 1, int(_match.state["shards"]))
+	_shards_val.text = "%d/8" % _shown_shards
 
 
 func _load_scenario(scenario_id: int) -> void:

@@ -6,6 +6,9 @@ extends Node2D
 ## is emergent: x uses cubicInOut and y uses cubicOut over the same 600ms (NOT a
 ## bezier). See VFX_MAPPING.md §5.6.
 
+## Emitted when the doober reaches the counter (pop), before it frees itself.
+signal arrived
+
 var _icon: Node2D   # scaled for the pulse/pop (separate from position-animated self)
 
 
@@ -52,4 +55,9 @@ func fly(start: Vector2, target: Vector2) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	pop.parallel().tween_property(self, "modulate:a", 0.0, 0.2) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	pop.chain().tween_callback(queue_free)
+	pop.chain().tween_callback(_finish)
+
+
+func _finish() -> void:
+	arrived.emit()
+	queue_free()
