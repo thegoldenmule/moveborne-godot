@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_child(_overlay)
 
 	# "Get Ready!" — cream fill, brown outline, 100px above center.
-	_ready_lbl = _make_label("Get Ready!", 48, Color("faf8ef"), Color("776e65"), 4, vp)
+	_ready_lbl = _make_label("Get Ready!", 48, Style.MSG_CREAM, Style.MSG_BROWN, 4, vp)
 	_ready_lbl.position.y = -100.0
 	add_child(_ready_lbl)
 
@@ -59,15 +59,23 @@ func play(on_done := Callable()) -> void:
 		_pulse(_number, 1.5)
 		_pulse(_ready_lbl, 1.2)
 		await get_tree().create_timer(1.0).timeout
+		if not is_inside_tree():
+			return  # interrupted (e.g. R restart freed us mid-intro) — bail before touching freed nodes
 	_number.text = "GO!"
 	_ready_lbl.visible = false
 	_number.scale = Vector2(2, 2)
 	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree():
+		return
 	var fout := create_tween().set_parallel(true)  # fade out while the number grows
 	fout.tween_property(_overlay, "modulate:a", 0.0, 0.45)
 	fout.tween_property(_number, "modulate:a", 0.0, 0.45)
 	fout.tween_property(_number, "scale", Vector2(3, 3), 0.45)
-	await fout.finished
+	# Wait on a tree-owned timer, NOT fout.finished: a node-bound tween dies with the
+	# node on interrupt and never emits 'finished', which would leak this coroutine.
+	await get_tree().create_timer(0.45).timeout
+	if not is_inside_tree():
+		return
 	if on_done.is_valid():
 		on_done.call()
 	queue_free()

@@ -180,7 +180,7 @@ func _on_swiped(direction: String) -> void:
 ## Floating "+score" on each merged tile (input.ts:789): green normally, yellow on
 ## high combo (>2). board_pos is board-local; offset by the board's rest position.
 func _on_score_popup(score: int, board_pos: Vector2, combo: int) -> void:
-	var screen_pos: Vector2 = _board.position + board_pos
+	var screen_pos: Vector2 = _board.rest_position() + board_pos
 	var color := Color("ffff00") if combo > 2 else Color("00ff00")
 	Anim.float_text(_fx_layer, screen_pos, "+%d" % score, color, 20, 1.5, 30.0)
 

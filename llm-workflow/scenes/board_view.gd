@@ -102,9 +102,20 @@ func setup(n: int, px: float) -> void:
 
 
 func render(state: Dictionary) -> void:
+	# Re-setup if the engine board changed size (a scenario can be 5/6/8), and reset
+	# the VFX gate on a fresh game (moveIndex went backwards). Mirrors board.ts's
+	# handleBoardSizeChange + a fresh BoardController per match. Without the reset, an
+	# R-restart / scenario-load leaves the moveIndex gate stale and merge VFX silently
+	# dead until moveIndex climbs back past the previous game's value.
+	var bs := int(state["board"].get("size", _size))
+	if bs != _size:
+		setup(bs, custom_minimum_size.x)
+	var move_index := int(state.get("moveIndex", 0))
+	if move_index < _last_move_index:
+		_reset_render_state()
+
 	# moveIndex gate + per-move dedup, mirroring board.ts: VFX fire at most once
 	# per move; visuals always update so re-renders stay correct.
-	var move_index := int(state.get("moveIndex", 0))
 	var is_new_move := move_index > _last_move_index
 	if is_new_move:
 		_last_move_index = move_index
@@ -154,6 +165,22 @@ func render(state: Dictionary) -> void:
 
 func set_highlight(indices: Array) -> void:
 	_highlight = indices
+
+
+## Reset per-game render/VFX state without rebuilding cells (same-size new game).
+func _reset_render_state() -> void:
+	_last_move_index = -1
+	for i in range(_prev.size()):
+		_prev[i] = 0
+	if _shaking:
+		position = _base_pos
+		_shaking = false
+
+
+## The board's resting (un-shaken) position, so popups anchor to the tile center
+## even if a previous merge's shake is still decaying.
+func rest_position() -> Vector2:
+	return _base_pos if _shaking else position
 
 
 func _apply_effect_and_border(sb: StyleBoxFlat, overlay: TextureRect, t: Dictionary, v: int, highlighted: bool) -> void:

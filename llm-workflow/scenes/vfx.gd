@@ -24,6 +24,7 @@ const EMITTERS := {
 	"bomb-explode": {frame = "plus",        count = 12, life = 0.55, color = "b400ff", blend = "add", shape = "disc",  vmin = 90.0,  vmax = 280.0, smin = 0.5, smax = 1.2, radius = 20.0, grow = false},
 	"purge-column": {frame = "plus",        count = 20, life = 0.5,  color = "b400ff", blend = "add", shape = "disc",  vmin = 120.0, vmax = 420.0, smin = 0.4, smax = 1.0, radius = 10.0, grow = false},
 	"amplify":      {frame = "plus",        count = 10, life = 0.5,  color = "fedc56", blend = "add", shape = "point", vmin = 0.0,   vmax = 40.0,  smin = 0.5, smax = 1.6, radius = 4.0,  grow = true},
+	# deck-ready is not dispatched yet — awaits a ported deck-display (deck-display.ts:124).
 	"deck-ready":   {frame = "deck-symbol", count = 5,  life = 0.5,  color = "b400ff", blend = "add", shape = "point", vmin = 0.0,   vmax = 0.0,   smin = 0.5, smax = 2.2, radius = 0.0,  grow = true},
 }
 

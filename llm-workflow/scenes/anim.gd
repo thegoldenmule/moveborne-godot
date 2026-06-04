@@ -53,9 +53,9 @@ func banner(parent: Node, text: String, duration := 2.0, font_size := 48) -> Lab
 	var ls := LabelSettings.new()
 	ls.font = load(Style.FONT_PATH)
 	ls.font_size = font_size
-	ls.font_color = Color("776e65")     # brown
+	ls.font_color = Style.MSG_BROWN
 	ls.outline_size = 4
-	ls.outline_color = Color("faf8ef")  # cream stroke
+	ls.outline_color = Style.MSG_CREAM
 	l.label_settings = ls
 	l.modulate.a = 0.0
 	parent.add_child(l)

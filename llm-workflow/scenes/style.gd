@@ -17,6 +17,8 @@ static var GRID := Color("b400ff")       # grid line (drawn faint)
 static var HIGHLIGHT := Color("44ff88")  # valid-target highlight 0x44ff88
 static var TEXT := Color("ececf4")        # light text on dark
 static var DIM := Color("8a7fb0")         # dimmed label
+static var MSG_BROWN := Color("776e65")   # hud.ts showMessage fill / countdown stroke
+static var MSG_CREAM := Color("faf8ef")   # hud.ts showMessage stroke / countdown fill
 
 
 ## Per-tile-value style (TileValueStyles in tile-display.ts):
