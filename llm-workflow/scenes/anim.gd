@@ -5,6 +5,8 @@ extends Node
 ## tooltip/selection-pulse loops later — see VFX_MAPPING.md §2.7 / §4 / §5.6).
 ## Presentation-only; never touches engine state. Durations are in SECONDS.
 
+const Style := preload("res://scenes/style.gd")
+
 
 ## Spawn a rising, fading "+score"-style Label at `pos` (in `parent`'s space) and
 ## free it when done. Mirrors fx.ts createFloatingText: rise `distance` cubicOut
@@ -35,4 +37,31 @@ func float_text(parent: Node, pos: Vector2, text: String, color: Color,
 	tw.tween_property(l, "modulate:a", 0.0, duration / 2.0) \
 		.set_delay(duration / 2.0).set_trans(Tween.TRANS_LINEAR)
 	tw.chain().tween_callback(l.queue_free)
+	return l
+
+
+## Centered screen message that fades in, holds, then fades out (hud.ts showMessage):
+## Grammara bold, brown fill / cream outline. `parent` is a screen-space CanvasLayer.
+func banner(parent: Node, text: String, duration := 2.0, font_size := 48) -> Label:
+	var vp := get_viewport().get_visible_rect().size
+	var l := Label.new()
+	l.text = text
+	l.size = vp
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ls := LabelSettings.new()
+	ls.font = load(Style.FONT_PATH)
+	ls.font_size = font_size
+	ls.font_color = Color("776e65")     # brown
+	ls.outline_size = 4
+	ls.outline_color = Color("faf8ef")  # cream stroke
+	l.label_settings = ls
+	l.modulate.a = 0.0
+	parent.add_child(l)
+	var tw := l.create_tween()
+	tw.tween_property(l, "modulate:a", 1.0, 0.3)
+	tw.tween_interval(maxf(0.0, duration - 0.7))
+	tw.tween_property(l, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(l.queue_free)
 	return l

@@ -8,6 +8,7 @@ const MbMatchS := preload("res://game/match_controller.gd")
 const BoardViewS := preload("res://scenes/board_view.gd")
 const MbValidatorClientS := preload("res://net/validator_client.gd")
 const Style := preload("res://scenes/style.gd")
+const CountdownS := preload("res://scenes/countdown.gd")
 
 const VALIDATOR_URL := "http://localhost:5055"
 
@@ -30,6 +31,7 @@ var _toast: Label
 var _hand_box: HBoxContainer
 var _totem_box: HBoxContainer
 var _fx_layer: CanvasLayer       # screen-space, shake-immune floating text
+var _countdown                   # active CountdownS overlay, if any
 
 var _sel_index := -1
 var _sel_type := ""
@@ -43,6 +45,7 @@ func _ready() -> void:
 	_match.changed.connect(_on_changed)
 	_match.new_game()
 	_add_size_debug()  # TEMP — shows the real window size on screen
+	_play_intro()
 
 
 func _add_size_debug() -> void:
@@ -180,6 +183,19 @@ func _on_score_popup(score: int, board_pos: Vector2, combo: int) -> void:
 	var screen_pos: Vector2 = _board.position + board_pos
 	var color := Color("ffff00") if combo > 2 else Color("00ff00")
 	Anim.float_text(_fx_layer, screen_pos, "+%d" % score, color, 20, 1.5, 30.0)
+
+
+## 3-2-1-GO! intro overlay, then the "Let's Play!" banner (engine.ts:744 / 760).
+func _play_intro() -> void:
+	if _countdown != null and is_instance_valid(_countdown):
+		_countdown.queue_free()
+	_countdown = CountdownS.new()
+	add_child(_countdown)
+	_countdown.play(_show_lets_play)
+
+
+func _show_lets_play() -> void:
+	Anim.banner(_fx_layer, "Let's Play!", 1.0, 48)
 
 
 func _on_cell_tapped(row: int, col: int) -> void:
@@ -340,6 +356,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_R:
 				_cancel_target()
 				_match.new_game()
+				_play_intro()
 			KEY_ESCAPE:
 				_cancel_target()
 				_toast.text = "Swipe to move  •  tap a card to play  •  0–7 scenarios  •  R = new game"
