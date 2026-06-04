@@ -15,10 +15,24 @@ const MIN_SWIPE := 24.0
 
 var _size := 4
 var _tile := 0.0
-var _cells: Array = []          # [{panel, sb, label, overlay}]
+var _cells: Array = []          # [{panel, sb, label, overlay, flash_tw}]
 var _prev: Array = []
 var _highlight: Array = []
 var _press = null
+
+# VFX — status-driven particle bursts + merge flash + value-scaled screenshake,
+# mirroring board.ts. Gated on moveIndex so re-renders/resizes emit nothing.
+var _vfx_layer: Node2D
+var _last_move_index := -1
+
+# Screenshake (board.ts:677): one decaying random jitter per move, scaled by the
+# total merged value. Shakes this board Control's position; the HUD (in the parent)
+# stays put. Captures rest position on the first frame of a fresh shake.
+var _shaking := false
+var _base_pos := Vector2.ZERO
+var _shake_t := 0.0
+var _shake_dur := 0.0
+var _shake_intensity := 0.0
 
 
 func setup(n: int, px: float) -> void:
@@ -30,6 +44,8 @@ func setup(n: int, px: float) -> void:
 		c.queue_free()
 	_cells.clear()
 	_prev.clear()
+	_last_move_index = -1
+	_shaking = false  # rest pos re-captured lazily on the next shake
 
 	var frame := Panel.new()
 	var fsb := StyleBoxFlat.new()
@@ -72,11 +88,26 @@ func setup(n: int, px: float) -> void:
 			panel.add_child(label)
 
 			add_child(panel)
-			_cells.append({"panel": panel, "sb": sb, "label": label, "overlay": overlay})
+			_cells.append({"panel": panel, "sb": sb, "label": label, "overlay": overlay, "flash_tw": null})
 			_prev.append(0)
+
+	# Board-local FX layer: particle coords == panel.position + tile/2. Drawn on
+	# top of the cells; shakes with the board since it's a child of this Control.
+	_vfx_layer = Node2D.new()
+	_vfx_layer.z_index = 50
+	add_child(_vfx_layer)
 
 
 func render(state: Dictionary) -> void:
+	# moveIndex gate + per-move dedup, mirroring board.ts: VFX fire at most once
+	# per move; visuals always update so re-renders stay correct.
+	var move_index := int(state.get("moveIndex", 0))
+	var is_new_move := move_index > _last_move_index
+	if is_new_move:
+		_last_move_index = move_index
+	var shown := {}            # board.ts tileEffectsShown (per-move set of keys)
+	var total_merge_value := 0
+
 	var tiles: Array = state["board"]["tiles"]
 	for i in range(_cells.size()):
 		var t: Dictionary = tiles[i]
@@ -84,6 +115,11 @@ func render(state: Dictionary) -> void:
 		var sb: StyleBoxFlat = cell["sb"]
 		var label: Label = cell["label"]
 		var overlay: TextureRect = cell["overlay"]
+
+		# A fresh direct bg set must win over any in-flight white-flash tween.
+		if cell["flash_tw"] != null and cell["flash_tw"].is_running():
+			cell["flash_tw"].kill()
+
 		var v := 0 if bool(t["isEmpty"]) else int(t["value"])
 
 		if v == 0:
@@ -100,9 +136,16 @@ func render(state: Dictionary) -> void:
 
 		_apply_effect_and_border(sb, overlay, t, v, _highlight.has(i))
 
+		if is_new_move:
+			total_merge_value += _trigger_tile_vfx(t, i, cell, shown)
+
 		if v != int(_prev[i]) and v != 0:
 			_pop(cell["panel"], int(_prev[i]) == 0)
 		_prev[i] = v
+
+	if is_new_move and total_merge_value > 0:
+		# intensity = min(5 + totalMergeValue/32 * 0.5, 20); 200ms (board.ts:677)
+		_shake(minf(5.0 + float(total_merge_value) / 32.0 * 0.5, 20.0), 0.2)
 
 
 func set_highlight(indices: Array) -> void:
@@ -147,6 +190,79 @@ func _pop(panel: Control, spawn: bool) -> void:
 		panel.scale = Vector2.ONE
 		tw.tween_property(panel, "scale", Vector2(1.18, 1.18), 0.07)
 		tw.tween_property(panel, "scale", Vector2.ONE, 0.07)
+
+
+## Fire status-driven particle bursts for one tile; returns its merged value
+## contribution (0 unless this tile merged this move). Mirrors board.ts statuses.
+func _trigger_tile_vfx(t: Dictionary, i: int, cell: Dictionary, shown: Dictionary) -> int:
+	var status := str(t.get("status", "normal"))
+	var row := i / _size
+	var col := i % _size
+	var panel: Control = cell["panel"]
+	var center: Vector2 = panel.position + Vector2(_tile / 2.0, _tile / 2.0)
+	match status:
+		"bombed":
+			_fire_once(shown, "bombed-%d-%d" % [row, col], "bomb-explode", center)
+		"destroyed":
+			_fire_once(shown, "destroyed-%d-%d" % [row, col], "delete", center)
+		"purged":
+			# once per column, at the column center (row 1.5), like board.ts
+			var cx := GAP + col * (_tile + GAP) + _tile / 2.0
+			var cy := GAP + 1.5 * (_tile + GAP) + _tile / 2.0
+			_fire_once(shown, "purged-col-%d" % col, "purge-column", Vector2(cx, cy))
+		"amplified":
+			_fire_once(shown, "amplified-%d-%d" % [row, col], "amplify", center)
+		"new":
+			_fire_once(shown, "new-%d-%d" % [row, col], "new-tile", center)
+		"merged":
+			var key := "merged-%d-%d" % [row, col]
+			if not shown.has(key):
+				shown[key] = true
+				Vfx.create_effect("merge", center, _vfx_layer)
+				_flash(cell)
+				return int(t.get("value", 0))
+	return 0
+
+
+func _fire_once(shown: Dictionary, key: String, effect: String, pos: Vector2) -> void:
+	if shown.has(key):
+		return
+	shown[key] = true
+	Vfx.create_effect(effect, pos, _vfx_layer)
+
+
+## Flash a merged cell white, then ease its bg back to the tile color (0.75s cubicOut).
+func _flash(cell: Dictionary) -> void:
+	var sb: StyleBoxFlat = cell["sb"]
+	var target_bg: Color = sb.bg_color  # the tile bg just set by render()
+	sb.bg_color = Color.WHITE
+	var tw := create_tween()
+	cell["flash_tw"] = tw
+	tw.tween_property(sb, "bg_color", target_bg, 0.75).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+func _shake(intensity: float, duration_s: float) -> void:
+	if not _shaking:
+		_base_pos = position  # board is static between shakes -> current pos is rest
+		_shaking = true
+	else:
+		position = _base_pos
+	_shake_intensity = intensity
+	_shake_dur = duration_s
+	_shake_t = 0.0
+
+
+func _process(delta: float) -> void:
+	if not _shaking:
+		return
+	_shake_t += delta
+	var x := clampf(_shake_t / _shake_dur, 0.0, 1.0)
+	var eased := 1.0 - pow(1.0 - x, 3.0)         # cubicOut (ease.ts)
+	var amp := _shake_intensity * (1.0 - eased)  # intensity * (1 - cubicOut(t))
+	position = _base_pos + Vector2((randf() - 0.5) * 2.0 * amp, (randf() - 0.5) * 2.0 * amp)
+	if x >= 1.0:
+		position = _base_pos
+		_shaking = false
 
 
 func _effect_color(effect_type: String) -> Color:

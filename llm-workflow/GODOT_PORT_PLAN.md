@@ -154,7 +154,7 @@ Three things must be reproduced **byte-for-byte**:
 - [x] Totem tray (active totems) + totem-spawn from totem cards (`spawn_totem`).
 - [x] `scenes/board_view.gd` (`MbBoardView`): rendering + **spawn/merge pop tweens** + effect-colored borders (freeze=blue, amplify=yellow, black-hole=indigo, …) + pointer→swipe/tap.
 - [x] Scenario picker: keys `0–7` load `MbScenarios` configs (startingCards + spawnConfigs + eventRules) via `new_game_scenario`; verified live (scenario 1 dealt bomb+swap, effects spawned during play).
-- [ ] *Optional polish:* true **slide** animations (tiles glide between cells — currently pop/fade only; needs per-tile move tracking) and **particle/shader FX** (merge/spawn/destroy bursts, glitch full-screen).
+- [~] *Optional polish:* **particle/shader FX** — see **`VFX_MAPPING.md`** (full Moveborne→Godot VFX reference + roadmap). Shipped (2026-06-04, verified live): status/`moveIndex`-driven trigger arch in `board_view`, the `Vfx` autoload (CPUParticles2D dispatcher + `EMITTERS` table) + board `_vfx_layer`, and the **merge feedback trio** (purple burst + white bg-flash + value-scaled board shake) [roadmap P0a+P1]. Started: particle presets for new/bomb/destroy/purge/amplify [P2, partial]. Still TODO: tile-effect emitters, glow shaders, full-screen glitch, HUD/doober/floating-text, slide animations.
 
 ➡️ **Phase 2 is a complete, playable single-player game** (swipe + cards + totems + effects + scenarios), no backend, driven by the byte-exact engine. Next: **Phase 3 — networking** (or the optional Phase 2 FX polish).
 
@@ -169,7 +169,7 @@ Three things must be reproduced **byte-for-byte**:
 ➡️ **The Godot client now plays against the real validator service, no Nakama.**
 
 ### Phase 4 — Polish & parity
-- [ ] Quality settings (low/med/high glow), remaining FX, full-screen-effects polish.
+- [ ] VFX/polish per **`VFX_MAPPING.md`** roadmap: HUD build + `Anim` helper (P0b/c), particle Wave 1 finish (P2), countdown/banner (P3), floating text + doober (P4), combo pop + glow shaders (P5–P6), `Quality` tiers (P7), black-hole + full-screen glitch (P8/P10, glitch needs `engine.gd:293 _process_global_effects` completed — golden-verified), streak shader (P11).
 - [ ] Cross-client parity harness (shared history fixtures).
 - [ ] Mobile build verification (Forward Mobile shader compile); optional web export.
 
