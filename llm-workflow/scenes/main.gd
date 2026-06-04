@@ -163,7 +163,7 @@ func _build_ui() -> void:
 	_toast.add_theme_font_size_override("font_size", 18)
 	_toast.add_theme_color_override("font_color", Style.DIM)
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast.text = "Swipe / arrows to move  ·  tap a card to play  ·  0–7 scenarios  ·  R restart  ·  V validator"
+	_toast.text = "Swipe / arrows  ·  tap a card  ·  0–7 scenarios  ·  R restart  ·  V validator  ·  Q quality"
 	add_child(_toast)
 
 	_hand_box = Control.new()
@@ -554,6 +554,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_6: _load_scenario(6)
 			KEY_7: _load_scenario(7)
 			KEY_V: _connect_validator()
+			KEY_Q: _cycle_quality()
+
+
+func _cycle_quality() -> void:
+	Quality.cycle()
+	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
 func _connect_validator() -> void:

@@ -69,7 +69,7 @@ func create_effect(effect_name: String, pos: Vector2, layer: Node) -> void:
 ## Spawn a CONTINUOUS emitter (effect "run" loop) and return it so the caller can
 ## free it when the effect clears. Returns null for an unknown name / null layer.
 func create_loop(effect_name: String, pos: Vector2, layer: Node) -> CPUParticles2D:
-	if not EMITTERS.has(effect_name) or layer == null:
+	if not EMITTERS.has(effect_name) or layer == null or not Quality.loops_enabled():
 		return null
 	var p := _build(EMITTERS[effect_name], pos)
 	p.one_shot = false
@@ -84,7 +84,7 @@ func create_loop(effect_name: String, pos: Vector2, layer: Node) -> CPUParticles
 func _build(e: Dictionary, pos: Vector2) -> CPUParticles2D:
 	var p := CPUParticles2D.new()
 	p.position = pos
-	p.amount = int(e["count"])
+	p.amount = maxi(1, int(round(float(e["count"]) * Quality.particle_scale())))
 	p.lifetime = float(e["life"])
 	p.texture = _frame(str(e["frame"]))
 	p.direction = Vector2(0, -1)
