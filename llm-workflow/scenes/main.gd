@@ -345,13 +345,15 @@ func _make_card(card: Dictionary, csize: Vector2) -> Button:
 	var btn := Button.new()
 	btn.custom_minimum_size = csize
 	btn.size = csize
-	btn.clip_contents = true
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color("0c0c12")           # dark card body
 	sb.set_corner_radius_all(8)
 	sb.border_color = Style.PRIMARY
 	sb.set_border_width_all(2)
+	if Quality.glow_enabled():              # purple glow halo around the card (MED/HIGH)
+		sb.shadow_color = Color(Style.PRIMARY, 0.45)
+		sb.shadow_size = 7
 	for st in ["normal", "hover", "pressed", "focus"]:
 		btn.add_theme_stylebox_override(st, sb)
 
@@ -580,7 +582,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _cycle_quality() -> void:
 	Quality.cycle()
-	_board.render(_match.state)  # refresh overlay materials (twist on/off) now
+	_on_changed()  # refresh board (twist/tile glow) + hand (card glow) for the new tier
 	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
