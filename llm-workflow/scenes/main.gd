@@ -29,6 +29,7 @@ var _net_label: Label
 var _toast: Label
 var _hand_box: HBoxContainer
 var _totem_box: HBoxContainer
+var _fx_layer: CanvasLayer       # screen-space, shake-immune floating text
 
 var _sel_index := -1
 var _sel_type := ""
@@ -132,6 +133,12 @@ func _build_ui() -> void:
 	_board.position = Vector2((vp.x - board_px) / 2.0, board_y)
 	_board.swiped.connect(_on_swiped)
 	_board.cell_tapped.connect(_on_cell_tapped)
+	_board.score_popup.connect(_on_score_popup)
+
+	# Screen-space overlay for floating score text (above the board; not shaken).
+	_fx_layer = CanvasLayer.new()
+	_fx_layer.layer = 5
+	add_child(_fx_layer)
 
 	_toast = Label.new()
 	_toast.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -165,6 +172,14 @@ func _on_swiped(direction: String) -> void:
 	if _target_kind != "":
 		return
 	_match.swipe(direction)
+
+
+## Floating "+score" on each merged tile (input.ts:789): green normally, yellow on
+## high combo (>2). board_pos is board-local; offset by the board's rest position.
+func _on_score_popup(score: int, board_pos: Vector2, combo: int) -> void:
+	var screen_pos: Vector2 = _board.position + board_pos
+	var color := Color("ffff00") if combo > 2 else Color("00ff00")
+	Anim.float_text(_fx_layer, screen_pos, "+%d" % score, color, 20, 1.5, 30.0)
 
 
 func _on_cell_tapped(row: int, col: int) -> void:

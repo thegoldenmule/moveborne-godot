@@ -8,6 +8,9 @@ extends Control
 
 signal swiped(direction)
 signal cell_tapped(row, col)
+## A tile merged: per-tile score contribution + board-local center + combo, for
+## a floating "+score" popup spawned on a shake-immune layer by the parent.
+signal score_popup(score, board_pos, combo)
 
 const Style := preload("res://scenes/style.gd")
 const GAP := 10.0
@@ -107,6 +110,7 @@ func render(state: Dictionary) -> void:
 		_last_move_index = move_index
 	var shown := {}            # board.ts tileEffectsShown (per-move set of keys)
 	var total_merge_value := 0
+	var combo := int(state.get("comboMultiplier", 1))
 
 	var tiles: Array = state["board"]["tiles"]
 	for i in range(_cells.size()):
@@ -137,7 +141,7 @@ func render(state: Dictionary) -> void:
 		_apply_effect_and_border(sb, overlay, t, v, _highlight.has(i))
 
 		if is_new_move:
-			total_merge_value += _trigger_tile_vfx(t, i, cell, shown)
+			total_merge_value += _trigger_tile_vfx(t, i, cell, shown, combo)
 
 		if v != int(_prev[i]) and v != 0:
 			_pop(cell["panel"], int(_prev[i]) == 0)
@@ -194,7 +198,7 @@ func _pop(panel: Control, spawn: bool) -> void:
 
 ## Fire status-driven particle bursts for one tile; returns its merged value
 ## contribution (0 unless this tile merged this move). Mirrors board.ts statuses.
-func _trigger_tile_vfx(t: Dictionary, i: int, cell: Dictionary, shown: Dictionary) -> int:
+func _trigger_tile_vfx(t: Dictionary, i: int, cell: Dictionary, shown: Dictionary, combo: int) -> int:
 	var status := str(t.get("status", "normal"))
 	var row := i / _size
 	var col := i % _size
@@ -220,7 +224,11 @@ func _trigger_tile_vfx(t: Dictionary, i: int, cell: Dictionary, shown: Dictionar
 				shown[key] = true
 				Vfx.create_effect("merge", center, _vfx_layer)
 				_flash(cell)
-				return int(t.get("value", 0))
+				# per-tile score = calculateComboScore(value, combo) (merge.ts:1237)
+				var value := int(t.get("value", 0))
+				var tile_score := value if combo <= 0 else value * combo
+				score_popup.emit(tile_score, center, combo)
+				return value
 	return 0
 
 
