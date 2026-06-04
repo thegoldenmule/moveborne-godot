@@ -15,8 +15,12 @@ signal score_popup(score, board_pos, combo)
 signal shard_earned(board_pos)
 
 const Style := preload("res://scenes/style.gd")
+const TwistShader := preload("res://scenes/twist.gdshader")
 const GAP := 10.0
 const MIN_SWIPE := 24.0
+
+# Shared black-hole twist material (TIME-animated, so one instance drives all).
+static var _twist_mat: ShaderMaterial
 
 var _size := 4
 var _tile := 0.0
@@ -211,6 +215,9 @@ func _apply_effect_and_border(sb: StyleBoxFlat, overlay: TextureRect, eff_type: 
 	else:
 		overlay.visible = false
 
+	# Animated swirl on the black-hole overlay (HIGH only).
+	overlay.material = _twist_material() if (eff_type == "black_hole" and Quality.twist_enabled()) else null
+
 	if highlighted:
 		sb.border_color = Style.HIGHLIGHT
 		sb.set_border_width_all(5)
@@ -349,6 +356,13 @@ func _effect_color(effect_type: String) -> Color:
 	match effect_type:
 		"decay": return Color("6b8e23")
 		_: return Style.PRIMARY
+
+
+func _twist_material() -> ShaderMaterial:
+	if _twist_mat == null:
+		_twist_mat = ShaderMaterial.new()
+		_twist_mat.shader = TwistShader
+	return _twist_mat
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -30,6 +30,11 @@ func loops_enabled() -> bool:
 	return level != Level.LOW
 
 
+## The animated black-hole twist shader runs only on HIGH (it's the priciest).
+func twist_enabled() -> bool:
+	return level == Level.HIGH
+
+
 ## For the future tile/HUD glow shader.
 func glow_enabled() -> bool:
 	return level != Level.LOW

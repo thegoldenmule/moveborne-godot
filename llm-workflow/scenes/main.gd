@@ -575,10 +575,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_7: _load_scenario(7)
 			KEY_V: _connect_validator()
 			KEY_Q: _cycle_quality()
+			KEY_B: _load_scenario(101)  # test scenario: starts with a black-hole tile
 
 
 func _cycle_quality() -> void:
 	Quality.cycle()
+	_board.render(_match.state)  # refresh overlay materials (twist on/off) now
 	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
