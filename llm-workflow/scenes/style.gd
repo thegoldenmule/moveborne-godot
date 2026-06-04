@@ -35,6 +35,18 @@ static func tile_style(v: int) -> Dictionary:
 		_:   return {bg = Color.WHITE, fill = Color.BLACK, outline = PRIMARY, ow = 4, fs = 26}  # 256+
 
 
+## Glow halo color + outline size for a tile value (TileValueStyles glow): none
+## below 8, white for mid values, brand purple for 256+. null = no glow.
+static func tile_glow(v: int):
+	if v < 8:
+		return null
+	if v < 128:
+		return {color = Color.WHITE, size = 8}
+	if v < 256:
+		return {color = Color.WHITE, size = 12}
+	return {color = PRIMARY, size = 16}
+
+
 ## Card art for the hand (engine card type -> hand/images/<type>.png).
 static func card_texture(card_type: String) -> Texture2D:
 	var path := "res://assets/hand/images/%s.png" % card_type

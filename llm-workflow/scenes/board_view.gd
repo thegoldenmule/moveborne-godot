@@ -16,11 +16,14 @@ signal shard_earned(board_pos)
 
 const Style := preload("res://scenes/style.gd")
 const TwistShader := preload("res://scenes/twist.gdshader")
+const GlowShader := preload("res://scenes/glow_text.gdshader")
 const GAP := 10.0
 const MIN_SWIPE := 24.0
 
 # Shared black-hole twist material (TIME-animated, so one instance drives all).
 static var _twist_mat: ShaderMaterial
+# Glow materials cached per value tier (color+size), shared across tiles.
+static var _glow_mats := {}
 
 var _size := 4
 var _tile := 0.0
@@ -149,14 +152,23 @@ func render(state: Dictionary) -> void:
 		if v == 0:
 			sb.bg_color = Style.CELL
 			label.text = ""
+			label.material = null
 		else:
 			var ts := Style.tile_style(v)
 			sb.bg_color = ts["bg"]
 			label.text = str(v)
 			label.add_theme_color_override("font_color", ts["fill"])
 			label.add_theme_color_override("font_outline_color", ts["outline"])
-			label.add_theme_constant_override("outline_size", int(ts["ow"]))
 			label.add_theme_font_size_override("font_size", int(ts["fs"]))
+			# MSDF glow halo (MED/HIGH); the shader replaces the crisp outline so it
+			# isn't drawn twice. LOW / low values keep the plain readability outline.
+			var g = Style.tile_glow(v) if Quality.glow_enabled() else null
+			if g != null:
+				label.material = _glow_material(g)
+				label.add_theme_constant_override("outline_size", 0)
+			else:
+				label.material = null
+				label.add_theme_constant_override("outline_size", int(ts["ow"]))
 
 		var eff := _effect_type(t)
 		_apply_effect_and_border(sb, overlay, eff, v, _highlight.has(i))
@@ -363,6 +375,20 @@ func _twist_material() -> ShaderMaterial:
 		_twist_mat = ShaderMaterial.new()
 		_twist_mat.shader = TwistShader
 	return _twist_mat
+
+
+## Shared MSDF glow material for a value tier (color + size from Style.tile_glow).
+func _glow_material(g: Dictionary) -> ShaderMaterial:
+	var col: Color = g["color"]
+	var sz := int(g["size"])
+	var key := "%s-%d" % [col.to_html(false), sz]
+	if not _glow_mats.has(key):
+		var m := ShaderMaterial.new()
+		m.shader = GlowShader
+		m.set_shader_parameter("glow_color", col)
+		m.set_shader_parameter("glow_width", clampf(float(sz) / 40.0, 0.12, 0.45))
+		_glow_mats[key] = m
+	return _glow_mats[key]
 
 
 func _gui_input(event: InputEvent) -> void:
