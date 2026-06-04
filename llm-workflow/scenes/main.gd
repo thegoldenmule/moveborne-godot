@@ -22,6 +22,12 @@ const TARGET := {
 	"shuffle": "none", "transform": "none",
 }
 
+# Hand fan layout (hand.ts): cards arc + rotate instead of a flat row.
+const FAN_RADIUS := 130.0
+const FAN_SPREAD := PI / 6.0     # ~30deg total spread
+const FAN_OVERLAP := 0.62        # horizontal overlap fraction (web 0.7)
+const FAN_CARD_W := 86.0
+
 var _match  # MbMatch (untyped to avoid class_name registration flakiness)
 var _board
 var _net
@@ -35,10 +41,11 @@ var _score_tw: Tween
 var _scen_label: Label
 var _net_label: Label
 var _toast: Label
-var _hand_box: HBoxContainer
+var _hand_box: Control           # plain container; cards are fanned by hand
 var _totem_box: HBoxContainer
 var _fx_layer: CanvasLayer       # screen-space, shake-immune floating text
 var _countdown                   # active CountdownS overlay, if any
+var _fan_center: Vector2         # hand-box-local origin for the card fan
 
 var _sel_index := -1
 var _sel_type := ""
@@ -159,15 +166,16 @@ func _build_ui() -> void:
 	_toast.text = "Swipe / arrows to move  ·  tap a card to play  ·  0–7 scenarios  ·  R restart  ·  V validator"
 	add_child(_toast)
 
-	_hand_box = HBoxContainer.new()
+	_hand_box = Control.new()
 	_hand_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	_hand_box.offset_left = 16
 	_hand_box.offset_right = -16
 	_hand_box.offset_top = hand_top
 	_hand_box.offset_bottom = hand_top + hand_h
-	_hand_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	_hand_box.add_theme_constant_override("separation", 10)
+	_hand_box.mouse_filter = Control.MOUSE_FILTER_IGNORE  # cards handle their own clicks
 	add_child(_hand_box)
+	# Fan origin in hand-box-local coords: card centers land ~65px down, peaking middle.
+	_fan_center = Vector2((vp.x - 32.0) / 2.0, 65.0 + FAN_RADIUS)
 
 
 func _on_changed() -> void:
@@ -288,31 +296,129 @@ func _rebuild_hand() -> void:
 		lbl.text = "no cards — merge to earn shards (auto-draws a card at 8)"
 		lbl.add_theme_color_override("font_color", Style.DIM)
 		lbl.add_theme_font_size_override("font_size", 16)
+		lbl.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		lbl.offset_top = 40
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_hand_box.add_child(lbl)
 		return
-	for i in range(cards.size()):
+	var n := cards.size()
+	var csize := Vector2(88, 130)
+	for i in range(n):
 		var card: Dictionary = cards[i]
 		var type := str(card["type"])
-		var tex := Style.card_texture(type)
 		var sel: bool = i == _sel_index
-		if tex != null:
-			var tb := TextureButton.new()
-			tb.texture_normal = tex
-			tb.ignore_texture_size = true
-			tb.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-			tb.custom_minimum_size = Vector2(82, 130)
-			tb.modulate = Color("ffd54a") if sel else Color.WHITE
-			tb.pressed.connect(_select_card.bind(i))
-			_hand_box.add_child(tb)
-		else:
-			var b := Button.new()
-			b.custom_minimum_size = Vector2(110, 130)
-			b.text = "%s\n%s" % [str(card.get("name", "?")), type]
-			b.add_theme_font_size_override("font_size", 13)
-			if sel:
-				b.modulate = Color("ffd54a")
-			b.pressed.connect(_select_card.bind(i))
-			_hand_box.add_child(b)
+		var supported: bool = TARGET.has(type) or bool(card.get("isTotemCard", false))
+		var btn := _make_card(card, csize)
+		btn.z_index = i  # later cards overlap on top
+		btn.pressed.connect(_select_card.bind(i))
+		_hand_box.add_child(btn)
+		# Fan placement: arc + rotation; the selected card straightens and lifts out.
+		var fan := _fan_pos(i, n)
+		var center: Vector2 = _fan_center + fan["pos"]
+		var rot: float = fan["rot"]
+		if sel:
+			rot = 0.0
+			center.y -= 22.0
+		btn.rotation = rot
+		btn.position = center - csize / 2.0
+		_card_juice(btn, sel, supported)
+
+
+## Arc position + rotation for card `index` of `total` (hand.ts calculateFanPosition).
+func _fan_pos(index: int, total: int) -> Dictionary:
+	if total <= 1:
+		return {"pos": Vector2(0.0, -FAN_RADIUS), "rot": 0.0}
+	var angle_per := FAN_SPREAD / float(total - 1)
+	var a := -FAN_SPREAD / 2.0 + index * angle_per
+	var arc := Vector2(sin(a) * FAN_RADIUS, -cos(a) * FAN_RADIUS)
+	var base_spacing := FAN_CARD_W * (1.0 - FAN_OVERLAP)
+	var x_off := index * base_spacing - (total - 1) * base_spacing / 2.0
+	return {"pos": Vector2(arc.x + x_off, arc.y), "rot": a}
+
+
+## A physical-looking card (power-card-display.ts): dark rounded body + purple
+## border, the art, and a purple nameplate with the title. The Button handles clicks.
+func _make_card(card: Dictionary, csize: Vector2) -> Button:
+	var type := str(card["type"])
+	var btn := Button.new()
+	btn.custom_minimum_size = csize
+	btn.size = csize
+	btn.clip_contents = true
+	btn.focus_mode = Control.FOCUS_NONE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("0c0c12")           # dark card body
+	sb.set_corner_radius_all(8)
+	sb.border_color = Style.PRIMARY
+	sb.set_border_width_all(2)
+	for st in ["normal", "hover", "pressed", "focus"]:
+		btn.add_theme_stylebox_override(st, sb)
+
+	var tex := Style.card_texture(type)
+	if tex != null:
+		var art := TextureRect.new()
+		art.texture = tex
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.set_anchors_preset(Control.PRESET_FULL_RECT)
+		art.offset_left = 5
+		art.offset_top = 5
+		art.offset_right = -5
+		art.offset_bottom = -22   # leave room for the nameplate
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(art)
+
+	# Purple nameplate strip + black title at the bottom.
+	var plate := Panel.new()
+	plate.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	plate.offset_left = 3
+	plate.offset_right = -3
+	plate.offset_top = -19
+	plate.offset_bottom = -3
+	var psb := StyleBoxFlat.new()
+	psb.bg_color = Style.PRIMARY
+	psb.set_corner_radius_all(3)
+	plate.add_theme_stylebox_override("panel", psb)
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(plate)
+
+	var name_lbl := Label.new()
+	name_lbl.text = str(card.get("name", type))
+	name_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_lbl.add_theme_font_size_override("font_size", 9)
+	name_lbl.add_theme_color_override("font_color", Color.BLACK)
+	name_lbl.clip_text = true
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plate.add_child(name_lbl)
+	return btn
+
+
+## Card feel: yellow + lifted/pulsing when selected, dimmed when it has no board
+## action, scale-on-hover otherwise.
+func _card_juice(btn: Control, selected: bool, supported: bool) -> void:
+	btn.pivot_offset = btn.custom_minimum_size / 2.0  # scale/rotate around center
+	if selected:
+		btn.z_index = 100  # selected card sits in front of the fan
+		btn.modulate = Color("ffd54a")
+	elif not supported:
+		btn.modulate = Color(0.6, 0.6, 0.6, 0.55)  # dim: no board action yet
+	else:
+		btn.modulate = Color.WHITE
+	btn.mouse_entered.connect(_card_hover.bind(btn, true, selected))
+	btn.mouse_exited.connect(_card_hover.bind(btn, false, selected))
+	if selected:
+		btn.scale = Vector2(1.12, 1.12)
+		var tw := btn.create_tween().set_loops()  # gentle idle pulse (freed with the button)
+		tw.tween_property(btn, "scale", Vector2(1.18, 1.18), 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(btn, "scale", Vector2(1.12, 1.12), 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _card_hover(btn: Control, entering: bool, selected: bool) -> void:
+	if selected or not is_instance_valid(btn):
+		return
+	var to := Vector2(1.08, 1.08) if entering else Vector2.ONE
+	btn.create_tween().tween_property(btn, "scale", to, 0.12).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _rebuild_totems() -> void:
