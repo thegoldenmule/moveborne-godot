@@ -22,6 +22,7 @@ var _size := 4
 var _tile := 0.0
 var _cells: Array = []          # [{panel, sb, label, overlay, flash_tw}]
 var _prev: Array = []
+var _prev_effect: Array = []    # per-cell active effect type, for spawn/removal bursts
 var _highlight: Array = []
 var _press = null
 
@@ -49,6 +50,7 @@ func setup(n: int, px: float) -> void:
 		c.queue_free()
 	_cells.clear()
 	_prev.clear()
+	_prev_effect.clear()
 	_last_move_index = -1
 	_shaking = false  # rest pos re-captured lazily on the next shake
 
@@ -93,8 +95,9 @@ func setup(n: int, px: float) -> void:
 			panel.add_child(label)
 
 			add_child(panel)
-			_cells.append({"panel": panel, "sb": sb, "label": label, "overlay": overlay, "flash_tw": null})
+			_cells.append({"panel": panel, "sb": sb, "label": label, "overlay": overlay, "flash_tw": null, "run_fx": null})
 			_prev.append(0)
+			_prev_effect.append("")
 
 	# Board-local FX layer: particle coords == panel.position + tile/2. Drawn on
 	# top of the cells; shakes with the board since it's a child of this Control.
@@ -151,10 +154,12 @@ func render(state: Dictionary) -> void:
 			label.add_theme_constant_override("outline_size", int(ts["ow"]))
 			label.add_theme_font_size_override("font_size", int(ts["fs"]))
 
-		_apply_effect_and_border(sb, overlay, t, v, _highlight.has(i))
+		var eff := _effect_type(t)
+		_apply_effect_and_border(sb, overlay, eff, v, _highlight.has(i))
 
 		if is_new_move:
 			total_merge_value += _trigger_tile_vfx(t, i, cell, shown, combo)
+			_trigger_effect_vfx(eff, i, cell)
 
 		if v != int(_prev[i]) and v != 0:
 			_pop(cell["panel"], int(_prev[i]) == 0)
@@ -174,6 +179,10 @@ func _reset_render_state() -> void:
 	_last_move_index = -1
 	for i in range(_prev.size()):
 		_prev[i] = 0
+	for i in range(_prev_effect.size()):
+		_prev_effect[i] = ""
+	for cell in _cells:
+		_stop_run_fx(cell)
 	if _shaking:
 		position = _base_pos
 		_shaking = false
@@ -185,13 +194,16 @@ func rest_position() -> Vector2:
 	return _base_pos if _shaking else position
 
 
-func _apply_effect_and_border(sb: StyleBoxFlat, overlay: TextureRect, t: Dictionary, v: int, highlighted: bool) -> void:
-	var eff_type := ""
+## Active tile-effect type ("" if none/inactive), e.g. "freeze", "black_hole".
+func _effect_type(t: Dictionary) -> String:
 	if t.has("effect") and t["effect"] != null:
 		var e: Dictionary = t["effect"]
 		if bool(e.get("active", false)) and str(e.get("type", "")) != "none":
-			eff_type = str(e.get("type", ""))
+			return str(e.get("type", ""))
+	return ""
 
+
+func _apply_effect_and_border(sb: StyleBoxFlat, overlay: TextureRect, eff_type: String, v: int, highlighted: bool) -> void:
 	var tex: Texture2D = Style.effect_texture(eff_type) if eff_type != "" else null
 	if tex != null:
 		overlay.texture = tex
@@ -267,6 +279,36 @@ func _fire_once(shown: Dictionary, key: String, effect: String, pos: Vector2) ->
 		return
 	shown[key] = true
 	Vfx.create_effect(effect, pos, _vfx_layer)
+
+
+## Spawn pop when a tile gains an effect, falling removal burst when it clears, and
+## a continuous "run" loop while it's active (started on gain, freed on loss/swap).
+func _trigger_effect_vfx(eff: String, i: int, cell: Dictionary) -> void:
+	var prev := str(_prev_effect[i])
+	if eff != prev:
+		var panel: Control = cell["panel"]
+		var center: Vector2 = panel.position + Vector2(_tile / 2.0, _tile / 2.0)
+		_stop_run_fx(cell)  # old effect's loop ends regardless of what comes next
+		if prev != "":
+			Vfx.create_effect(_eff_base(prev) + "-removal", center, _vfx_layer)
+		if eff != "":
+			Vfx.create_effect(_eff_base(eff) + "-spawn", center, _vfx_layer)
+			cell["run_fx"] = Vfx.create_loop(_eff_base(eff) + "-run", center, _vfx_layer)
+	_prev_effect[i] = eff
+
+
+func _stop_run_fx(cell: Dictionary) -> void:
+	if cell["run_fx"] != null and is_instance_valid(cell["run_fx"]):
+		cell["run_fx"].queue_free()
+	cell["run_fx"] = null
+
+
+## Effect type -> emitter base name (handles hyphen + amplify_static alias).
+func _eff_base(effect_type: String) -> String:
+	match effect_type:
+		"black_hole": return "black-hole"
+		"amplify_static": return "amplify"
+		_: return effect_type
 
 
 ## Flash a merged cell white, then ease its bg back to the tile color (0.75s cubicOut).
