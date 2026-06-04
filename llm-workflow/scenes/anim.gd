@@ -40,6 +40,20 @@ func float_text(parent: Node, pos: Vector2, text: String, color: Color,
 	return l
 
 
+## Elastic scale punch then settle, scaling around the node's center. Used for the
+## HUD combo pop (hud.ts triggerComboAnimation: 1->1.6 elasticOut, then ->1 cubicOut).
+func pop(node: Control, peak := 1.6, up := 0.3, down := 0.5) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+	node.pivot_offset = node.size / 2.0
+	node.scale = Vector2.ONE
+	var tw := node.create_tween()
+	tw.tween_property(node, "scale", Vector2(peak, peak), up) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(node, "scale", Vector2.ONE, down) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
 ## Centered screen message that fades in, holds, then fades out (hud.ts showMessage):
 ## Grammara bold, brown fill / cream outline. `parent` is a screen-space CanvasLayer.
 func banner(parent: Node, text: String, duration := 2.0, font_size := 48) -> Label:

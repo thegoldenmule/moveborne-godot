@@ -24,7 +24,13 @@ const TARGET := {
 var _match  # MbMatch (untyped to avoid class_name registration flakiness)
 var _board
 var _net
-var _hud: Label
+var _score_val: Label
+var _moves_val: Label
+var _shards_val: Label
+var _combo_lbl: Label             # "{N}X COMBO", shown when combo > 1, pops on increase
+var _shown_score := 0             # animated (count-up) score currently displayed
+var _shown_combo := 1            # last combo, to detect increases
+var _score_tw: Tween
 var _scen_label: Label
 var _net_label: Label
 var _toast: Label
@@ -44,24 +50,7 @@ func _ready() -> void:
 	_build_ui()
 	_match.changed.connect(_on_changed)
 	_match.new_game()
-	_add_size_debug()  # TEMP — shows the real window size on screen
 	_play_intro()
-
-
-func _add_size_debug() -> void:
-	var dbg := Label.new()
-	dbg.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	dbg.offset_top = 2
-	dbg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	dbg.add_theme_font_size_override("font_size", 14)
-	dbg.add_theme_color_override("font_color", Color.YELLOW)
-	dbg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ws := DisplayServer.window_get_size()
-	var ss := DisplayServer.screen_get_size()
-	var scale := DisplayServer.screen_get_scale()
-	dbg.text = "DBG  window=%dx%d   screen=%dx%d   scale=%.2f" % [ws.x, ws.y, ss.x, ss.y, scale]
-	add_child(dbg)
-	print("[size] window=", ws, " screen=", ss, " scale=", scale)
 
 
 func _build_ui() -> void:
@@ -85,34 +74,48 @@ func _build_ui() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
-	_hud = Label.new()
-	_hud.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_hud.offset_top = 60
-	_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hud.add_theme_font_size_override("font_size", 22)
-	_hud.add_theme_color_override("font_color", Style.TEXT)
-	_hud.add_theme_color_override("font_outline_color", Style.PRIMARY)
-	_hud.add_theme_constant_override("outline_size", 1)
-	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_hud)
+	# HUD stat row: MOVES / SCORE / SHARDS as caption+value widgets (hud.ts HudText).
+	var stat_row := HBoxContainer.new()
+	stat_row.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	stat_row.offset_top = 30
+	stat_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	stat_row.add_theme_constant_override("separation", 46)
+	stat_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(stat_row)
+	_moves_val = _make_stat(stat_row, "MOVES")
+	_score_val = _make_stat(stat_row, "SCORE")
+	_shards_val = _make_stat(stat_row, "SHARDS")
+
+	# Combo banner (centered, its own band below the stats), shown while combo > 1.
+	_combo_lbl = Label.new()
+	_combo_lbl.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_combo_lbl.offset_top = 80
+	_combo_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_combo_lbl.add_theme_font_size_override("font_size", 22)
+	_combo_lbl.add_theme_color_override("font_color", Color.WHITE)
+	_combo_lbl.add_theme_color_override("font_outline_color", Style.PRIMARY)
+	_combo_lbl.add_theme_constant_override("outline_size", 3)
+	_combo_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_lbl.visible = false
+	add_child(_combo_lbl)
 
 	_scen_label = Label.new()
 	_scen_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_scen_label.position = Vector2(20, 16)
-	_scen_label.add_theme_font_size_override("font_size", 15)
+	_scen_label.position = Vector2(16, 8)
+	_scen_label.add_theme_font_size_override("font_size", 13)
 	_scen_label.add_theme_color_override("font_color", Style.DIM)
 	_scen_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_scen_label)
 
 	_net_label = Label.new()
 	_net_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_net_label.position = Vector2(-260, 16)
-	_net_label.size = Vector2(240, 40)
+	_net_label.position = Vector2(-250, 8)
+	_net_label.size = Vector2(234, 18)
 	_net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_net_label.add_theme_font_size_override("font_size", 15)
+	_net_label.add_theme_font_size_override("font_size", 13)
 	_net_label.add_theme_color_override("font_color", Style.DIM)
 	_net_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_net_label.text = "validator: offline\nV to connect"
+	_net_label.text = "validator: off"
 	add_child(_net_label)
 
 	_net = MbValidatorClientS.new()
@@ -124,7 +127,7 @@ func _build_ui() -> void:
 
 	_totem_box = HBoxContainer.new()
 	_totem_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_totem_box.offset_top = 96
+	_totem_box.offset_top = 110
 	_totem_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_totem_box.add_theme_constant_override("separation", 14)
 	_totem_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -151,6 +154,7 @@ func _build_ui() -> void:
 	_toast.add_theme_font_size_override("font_size", 18)
 	_toast.add_theme_color_override("font_color", Style.DIM)
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.text = "Swipe / arrows to move  ·  tap a card to play  ·  0–7 scenarios  ·  R restart  ·  V validator"
 	add_child(_toast)
 
 	_hand_box = HBoxContainer.new()
@@ -334,10 +338,75 @@ func _rebuild_totems() -> void:
 
 func _update_hud() -> void:
 	var st: Dictionary = _match.state
-	_hud.text = "Score %d    Combo x%d    Shards %d/8    Moves %d" % [
-		int(st["score"]), int(st["comboMultiplier"]), int(st["shards"]), int(st["moveIndex"])
-	]
-	_scen_label.text = "Scenario: %s\n0–7 load · R restart" % _match.scenario_name
+	_moves_val.text = str(int(st["moveIndex"]))
+	_shards_val.text = "%d/8" % int(st["shards"])
+	_set_score(int(st["score"]))
+	_set_combo(int(st["comboMultiplier"]))
+	_scen_label.text = "Scenario: %s" % _match.scenario_name
+
+
+## One HUD stat: a caption (purple) over a value (white, purple-outlined). Returns
+## the value Label so the caller can update/animate it.
+func _make_stat(parent: Node, caption: String) -> Label:
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 2)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cap := Label.new()
+	cap.text = caption
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cap.add_theme_font_size_override("font_size", 16)
+	cap.add_theme_color_override("font_color", Style.PRIMARY)
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var val := Label.new()
+	val.text = "0"
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	val.add_theme_font_size_override("font_size", 22)
+	val.add_theme_color_override("font_color", Style.TEXT)
+	val.add_theme_color_override("font_outline_color", Style.PRIMARY)
+	val.add_theme_constant_override("outline_size", 1)
+	val.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(cap)
+	box.add_child(val)
+	parent.add_child(box)
+	return val
+
+
+## Score with a count-up tween on increase; snap on reset/correction (new game).
+func _set_score(target: int) -> void:
+	if target == _shown_score:
+		return
+	if _score_tw != null and _score_tw.is_running():
+		_score_tw.kill()
+	if target < _shown_score:
+		_shown_score = target
+		_score_val.text = str(target)
+		return
+	_score_tw = create_tween()
+	_score_tw.tween_method(_set_score_text, _shown_score, target, 0.4) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_shown_score = target
+
+
+func _set_score_text(v) -> void:
+	_score_val.text = str(int(v))
+
+
+## Show "{N}X COMBO" while combo > 1; elastic-pop on every increase (hud.ts).
+func _set_combo(combo: int) -> void:
+	if combo > 1:
+		_combo_lbl.text = "%dX COMBO" % combo
+		_combo_lbl.visible = true
+		if combo > _shown_combo:
+			Anim.pop(_combo_lbl)
+	else:
+		_combo_lbl.visible = false
+	_shown_combo = combo
+
+
+## Screen position of the shard counter — the target for shard doobers (future P4).
+func shard_target_pos() -> Vector2:
+	return _shards_val.global_position + _shards_val.size / 2.0
 
 
 func _load_scenario(scenario_id: int) -> void:
@@ -378,32 +447,32 @@ func _connect_validator() -> void:
 	var match_id := "gd_%d" % (randi() % 1000000)
 	var player_id := "player_%d" % (randi() % 1000000)
 	_net.init_and_connect(VALIDATOR_URL, match_id, _match.state, player_id)
-	_net_label.text = "validator: connecting…"
+	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % VALIDATOR_URL
 
 
 func _on_net_ready(_current_state: Dictionary) -> void:
 	_match.online = true
-	_net_label.text = "validator: connected ✓\nmoves validated"
+	_net_label.text = "validator: on ✓"
 	_net_label.add_theme_color_override("font_color", Color("2e9e5b"))
 	_toast.text = "Connected — every move is now validated by the server"
 
 
 func _on_net_validated(index: int, matched: bool, corrected_state) -> void:
 	if matched:
-		_net_label.text = "validator: ✓ move %d ok" % index
+		_net_label.text = "validator: ✓ %d" % index
 		_net_label.add_theme_color_override("font_color", Color("2e9e5b"))
 	else:
 		if corrected_state is Dictionary:
 			_match.adopt_server_state(corrected_state)
-		_net_label.text = "validator: ✗ move %d corrected" % index
+		_net_label.text = "validator: ✗ %d" % index
 		_net_label.add_theme_color_override("font_color", Color("c0392b"))
 		_toast.text = "Desync at move %d — snapped to validator state" % index
 
 
 func _on_net_error(message: String) -> void:
 	_match.online = false
-	_net_label.text = "validator: error"
+	_net_label.text = "validator: err"
 	_net_label.add_theme_color_override("font_color", Color("c0392b"))
 	_toast.text = "Validator: %s" % message
 
