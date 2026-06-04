@@ -10,6 +10,7 @@ const MbValidatorClientS := preload("res://net/validator_client.gd")
 const Style := preload("res://scenes/style.gd")
 const CountdownS := preload("res://scenes/countdown.gd")
 const DooberS := preload("res://scenes/doober.gd")
+const GlowShader := preload("res://scenes/glow_text.gdshader")
 
 const VALIDATOR_URL := "http://localhost:5055"
 
@@ -40,6 +41,7 @@ var _shown_combo := 1            # last combo, to detect increases
 var _score_tw: Tween
 var _shown_shards := 0            # displayed shards; filled as doobers land
 var _doobers_pending := 0        # in-flight shard doobers
+var _hud_glow: ShaderMaterial    # shared white glow for HUD value labels
 var _scen_label: Label
 var _net_label: Label
 var _toast: Label
@@ -454,7 +456,29 @@ func _update_hud() -> void:
 	_set_shards(int(st["shards"]))
 	_set_score(int(st["score"]))
 	_set_combo(int(st["comboMultiplier"]))
+	_apply_hud_glow(_moves_val, 1)
+	_apply_hud_glow(_score_val, 1)
+	_apply_hud_glow(_shards_val, 1)
 	_scen_label.text = "Scenario: %s" % _match.scenario_name
+
+
+func _hud_glow_material() -> ShaderMaterial:
+	if _hud_glow == null:
+		_hud_glow = ShaderMaterial.new()
+		_hud_glow.shader = GlowShader
+		_hud_glow.set_shader_parameter("glow_color", Color.WHITE)
+		_hud_glow.set_shader_parameter("glow_width", 0.28)
+	return _hud_glow
+
+
+## White MSDF glow on a HUD value label (MED/HIGH); plain outline on LOW.
+func _apply_hud_glow(lbl: Label, base_outline: int) -> void:
+	if Quality.glow_enabled():
+		lbl.material = _hud_glow_material()
+		lbl.add_theme_constant_override("outline_size", 0)
+	else:
+		lbl.material = null
+		lbl.add_theme_constant_override("outline_size", base_outline)
 
 
 ## One HUD stat: a caption (purple) over a value (white, purple-outlined). Returns
@@ -517,6 +541,7 @@ func _set_combo(combo: int) -> void:
 	if combo > 1:
 		_combo_lbl.text = "%dX COMBO" % combo
 		_combo_lbl.visible = true
+		_apply_hud_glow(_combo_lbl, 3)
 		if combo > _shown_combo:
 			Anim.pop(_combo_lbl)
 	else:
