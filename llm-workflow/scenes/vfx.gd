@@ -54,16 +54,23 @@ var _fade: Gradient
 
 ## Spawn the named one-shot burst at `pos` (in `layer`'s local space). No-op for
 ## an unknown effect name or a null layer.
+const _MAX_LIVE := 60  # safety cap: drop new bursts if the layer is saturated
+
+
 func create_effect(effect_name: String, pos: Vector2, layer: Node) -> void:
-	if not EMITTERS.has(effect_name) or layer == null:
+	if not EMITTERS.has(effect_name) or layer == null or layer.get_child_count() >= _MAX_LIVE:
 		return
 	var p := _build(EMITTERS[effect_name], pos)
 	p.one_shot = true
 	p.explosiveness = 1.0  # whole count in one burst
 	p.emitting = false
 	layer.add_child(p)
-	p.finished.connect(p.queue_free)  # free once the burst has finished
 	p.emitting = true
+	# Deterministic cleanup (CPUParticles2D.finished is unreliable; leaked one-shots
+	# pile up and CPUParticles2D is CPU-bound -> frame-rate death after many bursts).
+	get_tree().create_timer(p.lifetime + 0.5).timeout.connect(func() -> void:
+		if is_instance_valid(p):
+			p.queue_free())
 
 
 ## Spawn a CONTINUOUS emitter (effect "run" loop) and return it so the caller can
