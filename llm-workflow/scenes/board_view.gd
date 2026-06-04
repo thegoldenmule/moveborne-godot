@@ -11,6 +11,8 @@ signal cell_tapped(row, col)
 ## A tile merged: per-tile score contribution + board-local center + combo, for
 ## a floating "+score" popup spawned on a shake-immune layer by the parent.
 signal score_popup(score, board_pos, combo)
+## A tile merged (earns a shard): board-local center, for a shard doober flight.
+signal shard_earned(board_pos)
 
 const Style := preload("res://scenes/style.gd")
 const GAP := 10.0
@@ -255,6 +257,7 @@ func _trigger_tile_vfx(t: Dictionary, i: int, cell: Dictionary, shown: Dictionar
 				var value := int(t.get("value", 0))
 				var tile_score := value if combo <= 0 else value * combo
 				score_popup.emit(tile_score, center, combo)
+				shard_earned.emit(center)  # each merge earns a shard -> a doober (engine.ts:515)
 				return value
 	return 0
 

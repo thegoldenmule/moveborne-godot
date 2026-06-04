@@ -9,6 +9,7 @@ const BoardViewS := preload("res://scenes/board_view.gd")
 const MbValidatorClientS := preload("res://net/validator_client.gd")
 const Style := preload("res://scenes/style.gd")
 const CountdownS := preload("res://scenes/countdown.gd")
+const DooberS := preload("res://scenes/doober.gd")
 
 const VALIDATOR_URL := "http://localhost:5055"
 
@@ -140,6 +141,7 @@ func _build_ui() -> void:
 	_board.swiped.connect(_on_swiped)
 	_board.cell_tapped.connect(_on_cell_tapped)
 	_board.score_popup.connect(_on_score_popup)
+	_board.shard_earned.connect(_on_shard_earned)
 
 	# Screen-space overlay for floating score text (above the board; not shaken).
 	_fx_layer = CanvasLayer.new()
@@ -404,9 +406,17 @@ func _set_combo(combo: int) -> void:
 	_shown_combo = combo
 
 
-## Screen position of the shard counter — the target for shard doobers (future P4).
+## Screen position of the shard counter — the target for shard doobers.
 func shard_target_pos() -> Vector2:
 	return _shards_val.global_position + _shards_val.size / 2.0
+
+
+## One merged tile earned a shard: fly a doober from the tile to the shard counter
+## on the shake-immune fx layer (fx/doober.ts). board_pos is board-local.
+func _on_shard_earned(board_pos: Vector2) -> void:
+	var d := DooberS.new()
+	_fx_layer.add_child(d)
+	d.fly(_board.rest_position() + board_pos, shard_target_pos())
 
 
 func _load_scenario(scenario_id: int) -> void:
