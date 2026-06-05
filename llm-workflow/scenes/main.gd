@@ -10,6 +10,7 @@ const MbValidatorClientS := preload("res://net/validator_client.gd")
 const Style := preload("res://scenes/style.gd")
 const CountdownS := preload("res://scenes/countdown.gd")
 const DooberS := preload("res://scenes/doober.gd")
+const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 
 const VALIDATOR_URL := "http://localhost:5055"
@@ -49,6 +50,7 @@ var _hand_box: Control           # plain container; cards are fanned by hand
 var _totem_box: HBoxContainer
 var _fx_layer: CanvasLayer       # screen-space, shake-immune floating text
 var _countdown                   # active CountdownS overlay, if any
+var _glitch                      # full-screen glitch overlay (GlitchS)
 var _fan_center: Vector2         # hand-box-local origin for the card fan
 
 var _sel_index := -1
@@ -159,6 +161,10 @@ func _build_ui() -> void:
 	_fx_layer.layer = 5
 	add_child(_fx_layer)
 
+	# Full-screen glitch overlay (driven by globalEffects during the Fracture scenario).
+	_glitch = GlitchS.new()
+	add_child(_glitch)
+
 	_toast = Label.new()
 	_toast.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	_toast.offset_top = hand_top + hand_h + 12.0
@@ -187,6 +193,26 @@ func _on_changed() -> void:
 	_rebuild_hand()
 	_rebuild_totems()
 	_update_hud()
+	_update_glitch()
+
+
+## Show the full-screen glitch when a glitch global effect is active (MED/HIGH).
+func _update_glitch() -> void:
+	var fc = _active_glitch_config()
+	if fc != null and Quality.glow_enabled():
+		_glitch.apply(fc)
+	else:
+		_glitch.clear()
+
+
+func _active_glitch_config():
+	var ge = _match.state.get("globalEffects", null)
+	if ge == null or (ge as Array).is_empty():
+		return null
+	for e in ge:
+		if str((e as Dictionary).get("type", "")) == "glitch":
+			return (e as Dictionary).get("filterConfig", null)
+	return null
 
 
 func _on_swiped(direction: String) -> void:
@@ -603,6 +629,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_V: _connect_validator()
 			KEY_Q: _cycle_quality()
 			KEY_B: _load_scenario(101)  # test scenario: starts with a black-hole tile
+			KEY_G: _load_scenario(17)   # "Fracture": COMBO_BREAK >=3 spawns the screen glitch
 
 
 func _cycle_quality() -> void:
