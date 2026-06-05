@@ -76,6 +76,9 @@ verifier/suite — never hand-write expected values.
   (`source:"game"`). Inject input with `game_manage input_key` — note keys are
   **names** (`"Left"`, `"V"`), not keycodes; `input_mouse` uses `event:"button"` +
   `position`. `get_ui_elements` returns exact rects for clicking.
+- **Drive the game by game concepts** (swipe / read board / play card): use the
+  `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
+  analog of the TS `window.__moveborne`. Full reference: **`MCP_GAME_API.md`**.
 - **Validator:** `tools/run_validator.sh` (DEV_MODE, `:5055`). It runs the validator
   **unchanged**; its `workspace:*` dep on the logic package is satisfied out-of-repo
   (deps in `~/.cache/moveborne-validator-deps`, the prebuilt logic dist linked in).

@@ -254,19 +254,23 @@ func _show_lets_play() -> void:
 	Anim.banner(_fx_layer, "Let's Play!", 1.0, 48)
 
 
-func _on_cell_tapped(row: int, col: int) -> void:
+## Tap handler / MCP target supplier. Returns a status Dictionary (the board's
+## cell_tapped signal connection discards it; MbDebug consumes it).
+func _on_cell_tapped(row: int, col: int) -> Dictionary:
 	if _target_kind == "":
-		return
+		return {"status": "error", "message": "no card awaiting a target"}
 	match _target_kind:
-		"tile": _play({"tile": {"row": row, "col": col}})
-		"column": _play({"column": col})
-		"quadrant": _play({"row": row, "column": col})
+		"tile": return _play({"tile": {"row": row, "col": col}})
+		"column": return _play({"column": col})
+		"quadrant": return _play({"row": row, "column": col})
 		"two":
 			_pending.append({"row": row, "col": col})
 			if _pending.size() == 1:
 				_toast.text = "Tap the second tile for %s" % _sel_type
-			else:
-				_play(_two_params())
+				return {"status": "awaiting_selection", "selection_mode": "two",
+					"message": "tap the second tile for %s" % _sel_type}
+			return _play(_two_params())
+	return {"status": "error", "message": "unknown target kind '%s'" % _target_kind}
 
 
 func _two_params() -> Dictionary:
@@ -275,10 +279,16 @@ func _two_params() -> Dictionary:
 	return {"sourceTile": _pending[0], "targetTile": _pending[1]}
 
 
-func _select_card(index: int) -> void:
+## Begin playing the card at `index`. Returns a status Dictionary:
+##   {status:"complete"}            — totem / no-target card played immediately
+##   {status:"awaiting_selection",  — needs targets; selection_mode is the kind
+##    selection_mode:"tile"|"column"|"quadrant"|"two"}
+##   {status:"error", message}      — invalid index or unsupported card
+## The hand button's pressed signal discards the return; MbDebug consumes it.
+func _select_card(index: int) -> Dictionary:
 	var cards: Array = _match.state["hand"]["cards"]
 	if index < 0 or index >= cards.size():
-		return
+		return {"status": "error", "message": "invalid card index %d" % index}
 	var card: Dictionary = cards[index]
 	var type := str(card["type"])
 	if bool(card.get("isTotemCard", false)):
@@ -286,28 +296,35 @@ func _select_card(index: int) -> void:
 		var ok: bool = _match.spawn_totem(tt, index)
 		_toast.text = ("Spawned totem: %s" % tt) if ok else "Totem spawn failed"
 		_cancel_target()
-		return
+		return {"status": "complete" if ok else "error", "totem": tt,
+			"message": ("spawned totem %s" % tt) if ok else "totem spawn failed"}
 	if not TARGET.has(type):
 		_toast.text = "'%s' has no board action yet" % type
-		return
+		return {"status": "error", "message": "'%s' has no board action yet" % type}
 	var kind := str(TARGET[type])
 	if kind == "none":
 		var ok: bool = _match.play_card(type, {}, index)
 		_toast.text = ("Played %s" % type) if ok else "%s: no valid targets" % type
 		_cancel_target()
-		return
+		return {"status": "complete" if ok else "error", "card_type": type,
+			"message": ("played %s" % type) if ok else "%s: no valid targets" % type}
 	_sel_index = index
 	_sel_type = type
 	_target_kind = kind
 	_pending = []
 	_toast.text = _prompt()
 	_rebuild_hand()
+	return {"status": "awaiting_selection", "selection_mode": kind, "card_type": type,
+		"message": _prompt()}
 
 
-func _play(params: Dictionary) -> void:
+func _play(params: Dictionary) -> Dictionary:
+	var type := _sel_type  # _cancel_target() clears _sel_type, so capture it first
 	var ok: bool = _match.play_card(_sel_type, params, _sel_index)
 	_toast.text = ("Played %s" % _sel_type) if ok else "%s: invalid target" % _sel_type
 	_cancel_target()
+	return {"status": "complete" if ok else "error", "card_type": type,
+		"message": ("played %s" % type) if ok else "%s: invalid target" % type}
 
 
 func _cancel_target() -> void:
@@ -691,3 +708,73 @@ func _on_net_error(message: String) -> void:
 func _key_swipe(direction: String) -> void:
 	if _target_kind == "":
 		_match.swipe(direction)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# MCP / LLM control surface (game-semantic). These public wrappers are driven by
+# the MbDebug autoload (game/mcp_game_api.gd) — see MCP_GAME_API.md. They reuse the
+# exact targeting state machine the player uses (TARGET / _select_card /
+# _on_cell_tapped / _play), so plays animate the board, hand, and VFX normally.
+# ──────────────────────────────────────────────────────────────────────────────
+
+## The live match controller (MbMatch), for read access + history binding.
+func mcp_match():
+	return _match
+
+## Swipe a direction. Cancels any pending card selection first (an automated driver
+## shouldn't get wedged mid-target). Returns {ok, moved, move_index}.
+func mcp_swipe(direction: String) -> Dictionary:
+	if _target_kind != "":
+		_cancel_target()
+	var moved: bool = _match.swipe(direction)
+	return {"ok": true, "moved": moved, "move_index": int(_match.state["moveIndex"])}
+
+## Begin playing the hand card at `index`. See _select_card for the return shape.
+func mcp_play_card(index: int) -> Dictionary:
+	return _select_card(index)
+
+## Supply a tile/quadrant target (or first/second tile of a two-target card) to the
+## card currently awaiting selection. See _on_cell_tapped for the return shape.
+func mcp_select_target(row: int, col: int) -> Dictionary:
+	return _on_cell_tapped(row, col)
+
+## Supply a column target to the card currently awaiting a column. Row is ignored.
+func mcp_select_column(col: int) -> Dictionary:
+	return _on_cell_tapped(0, col)
+
+## Cancel the in-progress card selection (clears highlights, re-fans the hand).
+func mcp_cancel() -> void:
+	_cancel_target()
+
+## Cards playable right now: totem cards + any card whose type has a board action.
+## Returns [{index, type, name, selection_mode}] (selection_mode "totem" for totems).
+func mcp_playable_cards() -> Array:
+	var out: Array = []
+	var cards: Array = _match.state["hand"]["cards"]
+	for i in range(cards.size()):
+		var card: Dictionary = cards[i]
+		var type := str(card["type"])
+		if bool(card.get("isTotemCard", false)):
+			out.append({"index": i, "type": type, "name": str(card.get("name", type)),
+				"selection_mode": "totem"})
+		elif TARGET.has(type):
+			out.append({"index": i, "type": type, "name": str(card.get("name", type)),
+				"selection_mode": str(TARGET[type])})
+	return out
+
+## Start a fresh Endless game (optionally seeded), with the 3-2-1-GO! intro.
+func mcp_new_game(seed_value: int = -1) -> Dictionary:
+	_cancel_target()
+	_match.new_game(seed_value)
+	_play_intro()
+	return {"ok": true, "scenario": _match.scenario_name,
+		"move_index": int(_match.state["moveIndex"])}
+
+## Load a built-in scenario (0–7, 17 "Fracture", 101 black-hole), optionally seeded.
+func mcp_load_scenario(scenario_id: int, seed_value: int = -1) -> Dictionary:
+	_cancel_target()
+	_match.new_game_scenario(scenario_id, seed_value)
+	_toast.text = "Loaded scenario %s" % _match.scenario_name
+	return {"ok": true, "scenario": _match.scenario_name,
+		"board_size": int(_match.state["board"]["size"]),
+		"move_index": int(_match.state["moveIndex"])}

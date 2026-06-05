@@ -21,6 +21,7 @@ Vfx="*res://scenes/vfx.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Anim="*res://scenes/anim.gd"
 Quality="*res://scenes/quality.gd"
+MbDebug="*res://game/mcp_game_api.gd"
 
 [display]
 
