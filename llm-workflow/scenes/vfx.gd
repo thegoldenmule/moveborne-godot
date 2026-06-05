@@ -47,6 +47,7 @@ const EMITTERS := {
 }
 
 var _tex_cache := {}
+var _add_mat: CanvasItemMaterial   # shared additive blend material for all add presets
 var _grow_curve: Curve
 var _shrink_curve: Curve
 var _fade: Gradient
@@ -112,10 +113,15 @@ func _build(e: Dictionary, pos: Vector2) -> CPUParticles2D:
 	p.color = col
 	p.color_ramp = _fade_gradient()
 	if str(e["blend"]) == "add":
-		var m := CanvasItemMaterial.new()
-		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-		p.material = m
+		p.material = _additive_material()   # shared — blend mode is a constant
 	return p
+
+
+func _additive_material() -> CanvasItemMaterial:
+	if _add_mat == null:
+		_add_mat = CanvasItemMaterial.new()
+		_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	return _add_mat
 
 
 func _frame(frame_name: String) -> Texture2D:

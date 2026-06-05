@@ -45,9 +45,15 @@ func float_text(parent: Node, pos: Vector2, text: String, color: Color,
 func pop(node: Control, peak := 1.6, up := 0.3, down := 0.5) -> void:
 	if node == null or not is_instance_valid(node):
 		return
+	# Kill an in-flight pop so rapid re-triggers don't stack and fight over scale.
+	if node.has_meta("_pop_tw"):
+		var prev = node.get_meta("_pop_tw")
+		if prev is Tween and prev.is_running():
+			prev.kill()
 	node.pivot_offset = node.size / 2.0
 	node.scale = Vector2.ONE
 	var tw := node.create_tween()
+	node.set_meta("_pop_tw", tw)
 	tw.tween_property(node, "scale", Vector2(peak, peak), up) \
 		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 	tw.tween_property(node, "scale", Vector2.ONE, down) \

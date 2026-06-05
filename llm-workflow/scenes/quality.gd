@@ -35,13 +35,9 @@ func twist_enabled() -> bool:
 	return level == Level.HIGH
 
 
-## For the future tile/HUD glow shader.
+## Gates the tile/card/HUD glow (the per-node MSDF glow shader + StyleBox shadow).
 func glow_enabled() -> bool:
 	return level != Level.LOW
-
-
-func glow_quality() -> float:
-	return 0.1 if level == Level.MEDIUM else 0.3
 
 
 func level_name() -> String:

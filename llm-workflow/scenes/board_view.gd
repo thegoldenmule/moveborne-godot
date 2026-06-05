@@ -161,9 +161,12 @@ func render(state: Dictionary) -> void:
 			label.add_theme_color_override("font_outline_color", ts["outline"])
 			label.add_theme_font_size_override("font_size", int(ts["fs"]))
 			# MSDF glow halo (MED/HIGH); the shader replaces the crisp outline so it
-			# isn't drawn twice. LOW / low values keep the plain readability outline.
+			# isn't drawn twice. The glow shader draws no stroke, so a dark numeral on a
+			# dark bg (value 8: black-on-black) would lose its readability outline — keep
+			# the plain outline there. LOW also keeps it.
 			var g = Style.tile_glow(v) if Quality.glow_enabled() else null
-			if g != null:
+			var dark_on_dark: bool = ts["fill"].v < 0.3 and ts["bg"].v < 0.3
+			if g != null and not dark_on_dark:
 				label.material = _glow_material(g)
 				label.add_theme_constant_override("outline_size", 0)
 			else:
@@ -320,6 +323,23 @@ func _stop_run_fx(cell: Dictionary) -> void:
 	if cell["run_fx"] != null and is_instance_valid(cell["run_fx"]):
 		cell["run_fx"].queue_free()
 	cell["run_fx"] = null
+
+
+## Reconcile continuous run loops to the current quality tier. A Q-cycle re-renders
+## without advancing moveIndex, so the gated _trigger_effect_vfx never runs — without
+## this, LOW leaves loops emitting and MED/HIGH leaves active effects without a loop.
+func refresh_run_fx() -> void:
+	var enabled := Quality.loops_enabled()
+	for i in range(_cells.size()):
+		var cell: Dictionary = _cells[i]
+		var has := cell["run_fx"] != null and is_instance_valid(cell["run_fx"])
+		if not enabled:
+			if has:
+				_stop_run_fx(cell)
+		elif not has and str(_prev_effect[i]) != "":
+			var panel: Control = cell["panel"]
+			var center: Vector2 = panel.position + Vector2(_tile / 2.0, _tile / 2.0)
+			cell["run_fx"] = Vfx.create_loop(_eff_base(str(_prev_effect[i])) + "-run", center, _vfx_layer)
 
 
 ## Effect type -> emitter base name (handles hyphen + amplify_static alias).

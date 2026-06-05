@@ -37,7 +37,7 @@ func apply(fc: Dictionary) -> void:
 	_rect.size = vp
 	_mat.set_shader_parameter("screen_size", vp)
 	_mat.set_shader_parameter("slices", float(fc.get("slices", 10)))
-	_mat.set_shader_parameter("offset_px", float(fc.get("offset", 15)))
+	_mat.set_shader_parameter("offset_px", float(fc.get("offset", 75)))  # engine defaultConfig.offset
 	_mat.set_shader_parameter("direction_deg", float(fc.get("direction", 0)))
 	_mat.set_shader_parameter("seed", float(fc.get("seed", 0)))
 	visible = true

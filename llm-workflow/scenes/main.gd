@@ -375,7 +375,7 @@ func _make_card(card: Dictionary, csize: Vector2) -> Button:
 	btn.size = csize
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color("0c0c12")           # dark card body
+	sb.bg_color = Style.BOARD               # dark card body
 	sb.set_corner_radius_all(8)
 	sb.border_color = Style.PRIMARY
 	sb.set_border_width_all(2)
@@ -635,6 +635,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _cycle_quality() -> void:
 	Quality.cycle()
 	_on_changed()  # refresh board (twist/tile glow) + hand (card glow) for the new tier
+	_board.refresh_run_fx()  # start/stop continuous loops for the new tier (no moveIndex change)
 	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
