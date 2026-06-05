@@ -215,7 +215,7 @@ static func perform_swipe(state: Dictionary, direction: String, rng) -> Dictiona
 		if rules != null and (rules as Array).size() > 0:
 			result = EV.process_event_spawn_rules(result, {"type": "SCORE_UPDATE", "value": net_score}, rules, rng, removed_effect_positions)
 
-	return {"gameState": result, "moved": sr["moved"], "score": net_score, "mergedTilesCount": sr["count"]}
+	return {"gameState": result, "moved": sr["moved"], "score": net_score, "mergedTilesCount": sr["count"], "destroyed": destroyed}
 
 
 # ----------------------------------------------------------------------------
@@ -370,7 +370,7 @@ static func execute_swipe_action(state: Dictionary, direction: String, rng) -> D
 			ns["deck"] = deck
 			card_drawn = true
 		ns = _process_global_effects(ns, rng)
-		return {"newState": ns, "scoreAdded": total_score, "shardsAdded": shards_to_add, "moved": true, "cardDrawn": card_drawn, "drawnCard": drawn_card}
+		return {"newState": ns, "scoreAdded": total_score, "shardsAdded": shards_to_add, "moved": true, "cardDrawn": card_drawn, "drawnCard": drawn_card, "destroyed": result.get("destroyed", [])}
 	else:
 		var ns: Dictionary = result["gameState"]
 		ns = update_combo_multiplier(ns, 0, rng)
@@ -378,7 +378,7 @@ static func execute_swipe_action(state: Dictionary, direction: String, rng) -> D
 		var add_res := add_random_tile_with_effects(ns, rng)
 		ns = add_res["gameState"]
 		ns = _process_global_effects(ns, rng)
-		return {"newState": ns, "scoreAdded": 0, "shardsAdded": 0, "moved": false, "cardDrawn": false, "drawnCard": null}
+		return {"newState": ns, "scoreAdded": 0, "shardsAdded": 0, "moved": false, "cardDrawn": false, "drawnCard": null, "destroyed": []}
 
 
 static func execute_play_card_action(state: Dictionary, action: String, action_data: Dictionary, card_index: int, rng) -> Dictionary:
@@ -459,7 +459,7 @@ static func step(state: Dictionary, direction: String) -> Dictionary:
 	next["score"] = int(ns["score"]) + int(res["scoreAdded"])
 	next["rngIndices"] = rng.get_indices()
 	next["moveIndex"] = int(state["moveIndex"]) + (2 if res["cardDrawn"] else 1)
-	return {"state": next, "hash": Hasher.hash_value(next), "scoreAdded": res["scoreAdded"], "cardDrawn": res["cardDrawn"], "moved": res["moved"]}
+	return {"state": next, "hash": Hasher.hash_value(next), "scoreAdded": res["scoreAdded"], "cardDrawn": res["cardDrawn"], "moved": res["moved"], "destroyed": res.get("destroyed", [])}
 
 
 static func step_card(state: Dictionary, action: String, action_data: Dictionary, card_index: int) -> Dictionary:

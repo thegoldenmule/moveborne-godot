@@ -350,6 +350,51 @@ func _eff_base(effect_type: String) -> String:
 		_: return effect_type
 
 
+func _cell_center(row: int, col: int) -> Vector2:
+	var idx := row * _size + col
+	if idx < 0 or idx >= _cells.size():
+		return Vector2.ZERO
+	var panel: Control = _cells[idx]["panel"]
+	return panel.position + Vector2(_tile / 2.0, _tile / 2.0)
+
+
+## A tile consumed by a black hole: its numeral flies from the tile into the hole
+## (shrinking to 0, 400ms cubicIn), then a consume burst + a red "-value" float
+## (TILE_DESTROYED w/ target — engine.ts). Driven by MbMatch.tiles_destroyed.
+func black_hole_fly(from_row: int, from_col: int, value: int, bh_row: int, bh_col: int) -> void:
+	var from_c := _cell_center(from_row, from_col)
+	var to_c := _cell_center(bh_row, bh_col)
+	var csize := Vector2(_tile, _tile)
+	var lbl := Label.new()
+	lbl.text = str(value)
+	lbl.size = csize
+	lbl.pivot_offset = csize / 2.0
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ls := LabelSettings.new()
+	ls.font = load(Style.FONT_PATH)
+	ls.font_size = int(_tile * 0.5)
+	ls.font_color = Color.WHITE
+	ls.outline_size = 4
+	ls.outline_color = Color.BLACK
+	lbl.label_settings = ls
+	lbl.position = from_c - csize / 2.0
+	_vfx_layer.add_child(lbl)
+	var tw := lbl.create_tween().set_parallel(true)
+	tw.tween_property(lbl, "position", to_c - csize / 2.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw.tween_property(lbl, "scale", Vector2.ZERO, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(_on_fly_done.bind(lbl, to_c))
+	# red penalty float rising from the hole
+	Anim.float_text(_vfx_layer, to_c, "-%d" % value, Color("ff0000"), 20, 1.0, 30.0)
+
+
+func _on_fly_done(lbl: Label, to_c: Vector2) -> void:
+	Vfx.create_effect("black-hole-removal", to_c, _vfx_layer)
+	if is_instance_valid(lbl):
+		lbl.queue_free()
+
+
 ## Flash a merged cell white, then ease its bg back to the tile color (0.75s cubicOut).
 func _flash(cell: Dictionary) -> void:
 	var sb: StyleBoxFlat = cell["sb"]

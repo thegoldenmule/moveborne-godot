@@ -63,6 +63,7 @@ func _ready() -> void:
 	_match = MbMatchS.new()
 	_build_ui()
 	_match.changed.connect(_on_changed)
+	_match.tiles_destroyed.connect(_on_tiles_destroyed)
 	_match.new_game()
 	_play_intro()
 
@@ -227,6 +228,17 @@ func _on_score_popup(score: int, board_pos: Vector2, combo: int) -> void:
 	var screen_pos: Vector2 = _board.rest_position() + board_pos
 	var color := Color("ffff00") if combo > 2 else Color("00ff00")
 	Anim.float_text(_fx_layer, screen_pos, "+%d" % score, color, 20, 1.5, 30.0)
+
+
+## Black-hole consume: fly each consumed tile into the hole that ate it (P8). The
+## engine tags destroyed tiles with destroyedBy={type:black_hole, position}.
+func _on_tiles_destroyed(destroyed: Array) -> void:
+	for d in destroyed:
+		var db = (d as Dictionary).get("destroyedBy", null)
+		if db != null and str((db as Dictionary).get("type", "")) == "black_hole":
+			var pos: Dictionary = d["position"]
+			var bh: Dictionary = db["position"]
+			_board.black_hole_fly(int(pos["row"]), int(pos["col"]), int(d["value"]), int(bh["row"]), int(bh["col"]))
 
 
 ## 3-2-1-GO! intro overlay, then the "Let's Play!" banner (engine.ts:744 / 760).

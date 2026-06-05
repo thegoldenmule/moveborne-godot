@@ -13,6 +13,9 @@ const MbEventsS := preload("res://engine/events.gd")
 const C := preload("res://engine/constants.gd")
 
 signal changed
+## Tiles removed this move with metadata (e.g. destroyedBy black_hole) — for the
+## black-hole consume fly. Non-hashed presentation metadata, not part of the state.
+signal tiles_destroyed(destroyed)
 
 var state: Dictionary = {}
 var scenario_name: String = "Endless"
@@ -126,6 +129,9 @@ func swipe(direction: String) -> bool:
 	state = res["state"]
 	_send_validate(pre, {"type": "SWIPE", "payload": {"direction": direction}}, res["hash"])
 	changed.emit()
+	var destroyed: Array = res.get("destroyed", [])
+	if not destroyed.is_empty():
+		tiles_destroyed.emit(destroyed)
 	return res["moved"]
 
 
