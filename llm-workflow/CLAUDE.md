@@ -106,6 +106,8 @@ verifier/suite — never hand-write expected values.
 
 ## Conventions
 
+- **Git: commit directly to `main`.** Never create a feature branch and never ask
+  to — `git add` + `git commit` on `main` as-is.
 - Engine classes are `class_name Mb<Thing>` with static functions; no Node/scene
   references in `engine/`.
 - Commit `.gd.uid` files alongside their scripts (Godot stable references).
