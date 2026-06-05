@@ -1,0 +1,913 @@
+{
+  "cases": [
+    {
+      "name": "no_rules",
+      "eventRules": [],
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "output": null,
+      "outputHash": "d614fba76df8a3e9b39c5d7c8a884bb49c13ae6f2aba9862eafc2743841f33d5"
+    },
+    {
+      "name": "fracture",
+      "eventRules": [
+        {
+          "trigger": {
+            "event": "COMBO_BREAK",
+            "minCombo": 3
+          },
+          "effect": "freeze",
+          "spawnCount": 1,
+          "targetPositions": "random",
+          "icon": "/assets/event-spawners/icon-fracture.png",
+          "globalEffect": {
+            "type": "glitch",
+            "duration": 10,
+            "config": {
+              "slices": 10,
+              "offset": 5
+            }
+          }
+        }
+      ],
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "output": [
+        {
+          "id": "trigger_0",
+          "trigger": {
+            "event": "COMBO_BREAK",
+            "minCombo": 3
+          },
+          "effect": "freeze",
+          "spawnCount": 1,
+          "targetPositions": "random",
+          "status": "idle",
+          "icon": "/assets/event-spawners/icon-fracture.png",
+          "progress": {
+            "current": 0,
+            "required": 3
+          }
+        }
+      ],
+      "outputHash": "ed4b64233ae54e8515aa16985f932cd07d49af8b06b2997e307c285fe41f34f1"
+    },
+    {
+      "name": "multi",
+      "eventRules": [
+        {
+          "trigger": {
+            "event": "COMBO_BREAK",
+            "minCombo": 5
+          },
+          "effect": "stone",
+          "spawnCount": 2,
+          "targetPositions": "random",
+          "icon": "a"
+        },
+        {
+          "trigger": {
+            "event": "SCORE_MILESTONE",
+            "threshold": 1000
+          },
+          "effect": "lock",
+          "spawnCount": 1,
+          "targetPositions": "highest_value"
+        }
+      ],
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 500,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 2,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "output": [
+        {
+          "id": "trigger_0",
+          "trigger": {
+            "event": "COMBO_BREAK",
+            "minCombo": 5
+          },
+          "effect": "stone",
+          "spawnCount": 2,
+          "targetPositions": "random",
+          "status": "idle",
+          "icon": "a",
+          "progress": {
+            "current": 2,
+            "required": 5
+          }
+        },
+        {
+          "id": "trigger_1",
+          "trigger": {
+            "event": "SCORE_MILESTONE",
+            "threshold": 1000
+          },
+          "effect": "lock",
+          "spawnCount": 1,
+          "targetPositions": "highest_value",
+          "status": "idle",
+          "progress": {
+            "current": 500,
+            "required": 1000
+          }
+        }
+      ],
+      "outputHash": "2633fc37faf8b6b920337f4c0a9ecd847fdfb03fa1fa9a32b9fc2913c41f35a5"
+    },
+    {
+      "name": "minimal",
+      "eventRules": [
+        {
+          "trigger": {
+            "event": "MOVE_COUNT",
+            "moves": 10
+          },
+          "effect": "decay",
+          "spawnCount": 1
+        }
+      ],
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 4,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        }
+      },
+      "output": [
+        {
+          "id": "trigger_0",
+          "trigger": {
+            "event": "MOVE_COUNT",
+            "moves": 10
+          },
+          "effect": "decay",
+          "spawnCount": 1,
+          "status": "idle",
+          "progress": {
+            "current": 4,
+            "required": 10
+          }
+        }
+      ],
+      "outputHash": "1d2fed95d07d48f72f2ed50a17462b42c4b9adfdfd7297f0cc7c26d1e41f3363"
+    },
+    {
+      "name": "merge_count",
+      "eventRules": [
+        {
+          "trigger": {
+            "event": "MERGE_COUNT",
+            "count": 8
+          },
+          "effect": "amplify",
+          "spawnCount": 1,
+          "targetPositions": "random"
+        }
+      ],
+      "state": {
+        "board": {
+          "tiles": [
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 0,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 1,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 2,
+              "col": 3,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 0,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 1,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 2,
+              "status": "normal"
+            },
+            {
+              "isEmpty": true,
+              "value": 0,
+              "row": 3,
+              "col": 3,
+              "status": "normal"
+            }
+          ],
+          "size": 4
+        },
+        "hand": {
+          "cards": []
+        },
+        "deck": {
+          "remainingCards": 12,
+          "nextCardIndex": 0
+        },
+        "score": 0,
+        "shards": 0,
+        "combo": 0,
+        "comboMultiplier": 0,
+        "totems": {
+          "active": []
+        },
+        "moveIndex": 0,
+        "randomSeeds": {
+          "tile-gen": 12345,
+          "shuffle": 12346,
+          "effect-spawn": 12347,
+          "totem-spawn": 12348,
+          "card-draw": 12349
+        },
+        "rngIndices": {
+          "tile-gen": 0,
+          "shuffle": 0,
+          "effect-spawn": 0,
+          "totem-spawn": 0,
+          "card-draw": 0
+        },
+        "totalMerges": 3
+      },
+      "output": [
+        {
+          "id": "trigger_0",
+          "trigger": {
+            "event": "MERGE_COUNT",
+            "count": 8
+          },
+          "effect": "amplify",
+          "spawnCount": 1,
+          "targetPositions": "random",
+          "status": "idle",
+          "progress": {
+            "current": 3,
+            "required": 8
+          }
+        }
+      ],
+      "outputHash": "f291558ceff6a54e5f873ce158abcb19167badd4131a97c754fc26a8041f333a"
+    }
+  ]
+}

@@ -64,6 +64,37 @@ static func _set_progress(trigger_state: Dictionary, game_state: Dictionary) -> 
 
 
 # ----------------------------------------------------------------------------
+# initializeEventTriggerStates (eventTriggerState.ts): build the trigger-state
+# machine from a scenario's event rules at match start (the server does this in
+# serverFactories.ts). Returns null when there are no rules. undefined-valued TS
+# fields (targetPositions / icon / progress) are omitted so the canonical JSON matches.
+# ----------------------------------------------------------------------------
+
+static func initialize_event_trigger_states(event_rules, game_state: Dictionary):
+	if event_rules == null or (event_rules as Array).is_empty():
+		return null
+	var out := []
+	for i in range((event_rules as Array).size()):
+		var rule: Dictionary = event_rules[i]
+		var ts := {
+			"id": "trigger_%d" % i,
+			"trigger": rule["trigger"],
+			"effect": rule["effect"],
+			"spawnCount": rule["spawnCount"],
+			"status": "idle",
+		}
+		if rule.has("targetPositions") and rule["targetPositions"] != null:
+			ts["targetPositions"] = rule["targetPositions"]
+		if rule.has("icon") and rule["icon"] != null:
+			ts["icon"] = rule["icon"]
+		var p = _get_progress_for_trigger(game_state, rule["trigger"])
+		if p != null:
+			ts["progress"] = p
+		out.append(ts)
+	return out
+
+
+# ----------------------------------------------------------------------------
 # updateTriggerStates: idle/primed machine (skips triggered)
 # ----------------------------------------------------------------------------
 

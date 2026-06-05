@@ -9,6 +9,7 @@ extends RefCounted
 const MbEngineS := preload("res://engine/engine.gd")
 const MbRandomS := preload("res://engine/random_generator.gd")
 const MbScenariosS := preload("res://engine/scenarios.gd")
+const MbEventsS := preload("res://engine/events.gd")
 const C := preload("res://engine/constants.gd")
 
 signal changed
@@ -99,6 +100,13 @@ func new_game_scenario(scenario_id: int, seed_value: int = -1) -> void:
 		cfg["maxActiveOverrides"] = scen["maxActiveOverrides"]
 	if not cfg.is_empty():
 		state["scenarioConfig"] = cfg
+
+	# Initialize the event-trigger state machine from the scenario's rules (the server
+	# does this at match start). Without it, COMBO_BREAK / SCORE_MILESTONE event spawns
+	# — including the Fracture glitch global effect — can never fire.
+	var ets = MbEventsS.initialize_event_trigger_states(scen.get("eventRules", null), state)
+	if ets != null:
+		state["eventTriggerStates"] = ets
 
 	# Build the configured board (explicit/random placements) then thread RNG forward.
 	var rng := MbRandomS.new(state["randomSeeds"], state["rngIndices"])
