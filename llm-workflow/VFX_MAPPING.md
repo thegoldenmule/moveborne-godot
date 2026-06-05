@@ -85,13 +85,13 @@ Tween durations are in **ms** → divide by 1000. `blendMode 1 = ADD`, `0 = NORM
 | Effect | Trigger | Pixi impl | Key params | Godot mapping | Effort |
 |---|---|---|---|---|---|
 | **new-tile** (spawn pop) | `status=='new'` & new move (board.ts:622) | emitter id0, 5× `plus.png`, ADD, no motion | count 5, life 0.01–0.5s, alpha 0.7→0, tint `0xB400FF`, scale 0.1→1..3 easeInCubic, box point | "pop" preset, emission POINT, amount 5, lifetime 0.5, **scale_max=3** + ramp curve | low |
-| **merge** (radial streak burst) | `status=='merged'` & new move (board.ts:643) | emitter id26, 20× `plus.png`, radial box 10×200 rot −90° | count 20, life 0.01–0.25s, dist 10–150 easeOutExpo, alpha 0.1–0.5→0, tint `0xB400FF`, **scaleX 0.5→2 / scaleY 0.1→0.2** | GPUParticles2D + **streak `.gdshader`** (anisotropic) | high |
+| **merge** (radial streak burst) | `status=='merged'` & new move (board.ts:643) | emitter id26, 20× `plus.png`, radial box 10×200 rot −90° | count 20, life 0.01–0.25s, dist 10–150 easeOutExpo, alpha 0.1–0.5→0, tint `0xB400FF`, **scaleX 0.5→2 / scaleY 0.1→0.2** | **DONE** `Vfx._spawn_streak_burst` (tweened `Sprite2D` dashes) | high |
 | **delete** (tile destroyed) | `status=='destroyed'` (board.ts:550) | emitter id4, 4–10× `x.png`, circle r70 | count 4–10, moveSpeed 1–10, life 0.1–0.4s, scale 0.1→0.5..2, tint `0xB400FF`, ADD | disc r70, scale_max=2 | medium |
 | **bomb-explode** | `status=='bombed'` (board.ts:529) | emitter id7, 6–12× `plus.png`, circle r70 | count 6–12, life 0.1–0.6s, scale 0.1→0.5..2, ADD | disc r70 | medium |
-| **purge-column** | `status=='purged'`, once/column (board.ts:572) | emitter id10, 20× `plus.png` streak, box 10×200 | dist 10–150 easeOutExpo, scaleX 0.5→2 / scaleY 0.1→0.2 | streak shader, at column center (row 1.5) | high |
-| **black-hole spawn/run/removal/consume** | tile-effect lifecycle (tile-display.ts:413/440/465) + consume on 400ms suck (engine.ts:665) | ids 17/18/6/9, `x.png` | run: infinite box 70×70, dist 1–3, scaleX 0.5→2; consume: 4–10 circle r70 | spawn/removal=pop; run=looping streak (`emitting` toggled by lifecycle); consume=disc | medium |
-| **freeze spawn/run/removal** | tile-effect 'freeze' | ids 14/16/15, `snowflake.png`, tint `0x406EBB` | run: **NORMAL blend**, alpha 0.8–1; removal: 10–30 gravity 0.35 | pop(blue)+streak(NORMAL)+gravity burst | medium |
-| **amplify spawn/run/removal** | tile-effect 'amplify'/'amplify_static' | ids 19/13/20, `plus.png`, run tint `0xFEDC56` gold | run: infinite streak; removal: 10–30 gravity | gold pop+streak+gravity burst | medium |
+| **purge-column** | `status=='purged'`, once/column (board.ts:572) | emitter id10, 20× `plus.png` streak, box 10×200 | dist 10–150 easeOutExpo, scaleX 0.5→2 / scaleY 0.1→0.2 | **DONE** `_spawn_streak_burst` (tall spawn box), at column center (row 1.5) | high |
+| **black-hole spawn/run/removal/consume** | tile-effect lifecycle (tile-display.ts:413/440/465) + consume on 400ms suck (engine.ts:665) | ids 17/18/6/9, `x.png` | run: infinite box 70×70, dist 1–3, scaleX 0.5→2; consume: 4–10 circle r70 | spawn/removal=pop; run=looping uniform puff (`uniformScale=true`, not a streak; `emitting` toggled by lifecycle); consume=disc | medium |
+| **freeze spawn/run/removal** | tile-effect 'freeze' | ids 14/16/15, `snowflake.png`, tint `0x406EBB` | run: **NORMAL blend**, alpha 0.8–1; removal: 10–30 gravity 0.35 | pop(blue)+uniform-puff run(NORMAL)+gravity burst | medium |
+| **amplify spawn/run/removal** | tile-effect 'amplify'/'amplify_static' | ids 19/13/20, `plus.png`, run tint `0xFEDC56` gold | run: infinite streak; removal: 10–30 gravity | gold pop+uniform-puff run+gravity burst | medium |
 | **lock spawn/removal** | tile-effect 'lock' | ids 22/21, **`lock-2.png`**, removal gravity | spawn 5 pop; removal 10–30 gravity 0.35 | pop+gravity burst, `lock-2.png` frame | low |
 | **stone spawn/removal** | tile-effect 'stone' | ids 23/24, `stone.png`, **NORMAL blend, no tint** | removal 5–10, useRotation (rotSpeed 0–0.0349 rad), gravity, scale 0.3–0.4 | pop+gravity burst w/ `angular_velocity`, NORMAL, native color | low |
 | **deck-ready** | deck becomes ready (deck-display.ts:124) | emitter id12, 5× `deck-symbol.png`, ADD purple | count 5, scale 0.1→1..3 easeInCubic | pop preset, `deck-symbol.png` | low |
@@ -280,22 +280,26 @@ alpha_curve = <Curve 0.85 -> 0.0>   # 0.7..1 -> 0 fade (via color_ramp alpha)
   velocity 1–10, amount 10–30. Stone adds `angular_velocity_min/max` (rotSpeed 0–0.0349 rad) +
   NORMAL blend + native color (`useTint=false`).
 
-**Streak particles** (merge / purge-column / all `*-run`) — `scaleX 0.5→2`, `scaleY 0.1→0.2`
-independently. **No `ParticleProcessMaterial` analogue** (uniform scale only). Needs a custom
-particle `.gdshader` that stretches along velocity:
-```glsl
-// streak_particle.gdshader (high-effort, defer)
-shader_type particles;
-void process() {
-    // anisotropic stretch: TRANSFORM scaled X by lerp(0.5,2,age), Y by lerp(0.1,0.2,age)
-    // align long axis to VELOCITY; emit radially from box core
-}
-```
-Alternative: `CPUParticles2D` with manual per-particle transform. The radial **merge** burst reads
-fine on its own — **defer the streak shader** (single highest-effort particle item).
+**Streak particles** — `scaleX 0.5→2`, `scaleY 0.1→0.2` independently. **No
+`ParticleProcessMaterial` analogue** (uniform scale only). **DONE (P11)** via `Vfx._spawn_streak_burst`:
+a fan of tweened `Sprite2D` dashes, each rotated to its outward direction and stretched along it,
+flying out (`TRANS_EXPO` `EASE_OUT`) and fading, all parented under one `Node2D` per burst.
+
+> **Two corrections to the original plan, confirmed against the real `effects.json` bundle:**
+> 1. **Only `merge` (id26) + `purge-column` (id10) are true streaks** (`uniformScale=false`). The
+>    three `*-run` loops have `uniformScale=true` → revolt-fx ignores their `scaleX/Y` and uses the
+>    master ramp (uniform `0.1→1.0` grow-puff). So the run loops are **not** streaks — they stay as
+>    the CPU uniform puffs already shipped. (The table rows below said "looping streak" — wrong.)
+> 2. **No velocity-alignment in the source** (`align=false` everywhere; the stretch is the emitter's
+>    fixed X axis). For these radial bursts a velocity-aligned dash reads better, so `_spawn_streak_burst`
+>    rotates each dash to its outward dir by default (`align_vel`; set 0 for faithful fixed-axis).
+>
+> Not a shader: the `shader_type particles` GPU route compiled but **GPUParticles2D do not render on
+> this macOS `gl_compatibility`/Metal-OpenGL backend**, so the manual tweened-`Sprite2D` path is the
+> gl_compat-safe implementation (same tech as `board_view.black_hole_fly`).
 
 **`*-run` continuous emitters** (black-hole/freeze/amplify): `one_shot=false`, `emitting` toggled
-by the tile-effect lifecycle, parented under the tile node so it follows.
+by the tile-effect lifecycle, parented under the tile node so it follows. (Uniform puffs, not streaks.)
 
 ### 5.3 Glow (per-object) — `.gdshader` (resolved §2.3)
 
@@ -528,8 +532,10 @@ Every item is **presentation-only** — reacts to `MbMatch` state/signals, never
   (tick `movesRemaining`, reseed, ramp `offset`, drop at 0); **re-verify against a golden**. *(§2.2.)*
 - [ ] **P10b · Full-screen glitch** *(med)* — `ColorRect` + glitch `.gdshader` (`hint_screen_texture`,
   no `BackBufferCopy`). Depends on P10a or it won't tick.
-- [ ] **P11 · Streak particle shader (Wave 2)** *(high — defer)* — anisotropic `scaleX≠scaleY` for
-  merge/purge/`*-run`. Single highest-effort item; radial merge already reads well.
+- [x] **P11 · Streak particles (Wave 2)** — anisotropic `scaleX 0.5→2 / scaleY 0.1→0.2` for
+  **merge + purge-column** via `Vfx._spawn_streak_burst` (tweened `Sprite2D` dashes; GPUParticles2D
+  don't render on this gl_compat backend). Per the real bundle, the `*-run` loops are uniform puffs,
+  **not** streaks, so they were left as the shipped CPU emitters.
 - [ ] **Optional / net-new** *(skip unless desired)* — totem spawn/idle/trigger juice (source has
   none), score/shard **count-up** (source replaces instantly), positional tile-slide tweens (web
   never slides — pure repaint+particles). Allowed as enhancements; flag as divergence.
@@ -543,12 +549,13 @@ Every item is **presentation-only** — reacts to `MbMatch` state/signals, never
 
 - **No native Pixi `GlowFilter`.** Resolved to per-node outline `.gdshader` (§2.3) — preserves
   per-value distance/strength tuning; no global bloom.
-- **Streak particles** (`scaleX≠scaleY`) have no `ParticleProcessMaterial` path — needs the custom
-  particle shader (P11).
+- **Streak particles** (`scaleX≠scaleY`) have no `ParticleProcessMaterial` path — **resolved (P11)**
+  with tweened `Sprite2D` dashes (`Vfx._spawn_streak_burst`), not a shader: GPUParticles2D don't
+  render on this macOS `gl_compatibility`/Metal-OpenGL backend.
 - **`back`/`elastic` curve shapes** differ from web (web `backOut` overshoot 2; elastic constants
   13/10/π2). Resolved: **close enough** (§2.6) — use `TRANS_BACK`/`TRANS_ELASTIC`. `cubic`/`bounce`
   are identical to built-ins.
 - **revolt-fx silhouettes** depend on the frame PNGs (present in `assets/fx/frames/`) — fidelity is
-  good; the only gap is the streak stretch (P11).
+  good; the streak stretch is now done (P11).
 - **Glitch depends on an engine task** (P10a) — until `_process_global_effects` ticks/reseeds, the
   glitch state never animates. Keep it a golden-verified parity change, separate from the VFX work.

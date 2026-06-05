@@ -19,10 +19,13 @@ const FRAME_DIR := "res://assets/fx/frames/"
 # (burst shrink). vmin/vmax = initial speed px/s; radius = emission disc radius.
 const EMITTERS := {
 	"new-tile":     {frame = "plus",        count = 5,  life = 0.5,  color = "b400ff", blend = "add", shape = "point", vmin = 0.0,   vmax = 0.0,   smin = 0.6, smax = 2.6, radius = 0.0,  grow = true},
-	"merge":        {frame = "plus",        count = 18, life = 0.28, color = "b400ff", blend = "add", shape = "disc",  vmin = 200.0, vmax = 560.0, smin = 0.4, smax = 0.9, radius = 6.0,  grow = false},
+	# Anisotropic streak (P11): radial purple dashes that stretch as they fly out
+	# (scaleX 0.5->2 / scaleY 0.1->0.2 over life). Tweened Sprite2D — see _spawn_streak_burst.
+	"merge":        {streak = true, frame = "plus", count = 20, life = 0.3, color = "b400ff", blend = "add", dist_min = 12.0, dist_max = 120.0, emit_w = 12.0, emit_h = 12.0,  base_scale = 0.5, sx0 = 0.5, sx1 = 2.0, sy0 = 0.1, sy1 = 0.2, alpha_min = 0.4, alpha = 0.8},
 	"delete":       {frame = "x",           count = 10, life = 0.4,  color = "b400ff", blend = "add", shape = "disc",  vmin = 60.0,  vmax = 220.0, smin = 0.4, smax = 1.0, radius = 28.0, grow = false},
 	"bomb-explode": {frame = "plus",        count = 12, life = 0.55, color = "b400ff", blend = "add", shape = "disc",  vmin = 90.0,  vmax = 280.0, smin = 0.5, smax = 1.2, radius = 20.0, grow = false},
-	"purge-column": {frame = "plus",        count = 20, life = 0.5,  color = "b400ff", blend = "add", shape = "disc",  vmin = 120.0, vmax = 420.0, smin = 0.4, smax = 1.0, radius = 10.0, grow = false},
+	# Column sweep streak (P11): same dashes from a tall vertical spawn box.
+	"purge-column": {streak = true, frame = "plus", count = 20, life = 0.3, color = "b400ff", blend = "add", dist_min = 12.0, dist_max = 120.0, emit_w = 12.0, emit_h = 140.0, base_scale = 0.5, sx0 = 0.5, sx1 = 2.0, sy0 = 0.1, sy1 = 0.2, alpha_min = 0.4, alpha = 0.8},
 	"amplify":      {frame = "plus",        count = 10, life = 0.5,  color = "fedc56", blend = "add", shape = "point", vmin = 0.0,   vmax = 40.0,  smin = 0.5, smax = 1.6, radius = 4.0,  grow = true},
 	# deck-ready is not dispatched yet — awaits a ported deck-display (deck-display.ts:124).
 	"deck-ready":   {frame = "deck-symbol", count = 5,  life = 0.5,  color = "b400ff", blend = "add", shape = "point", vmin = 0.0,   vmax = 0.0,   smin = 0.5, smax = 2.2, radius = 0.0,  grow = true},
@@ -61,7 +64,14 @@ const _MAX_LIVE := 60  # safety cap: drop new bursts if the layer is saturated
 func create_effect(effect_name: String, pos: Vector2, layer: Node) -> void:
 	if not EMITTERS.has(effect_name) or layer == null or layer.get_child_count() >= _MAX_LIVE:
 		return
-	var p := _build(EMITTERS[effect_name], pos)
+	var e: Dictionary = EMITTERS[effect_name]
+	# Streak emitters can't be CPUParticles2D (no per-particle scaleX != scaleY) and
+	# GPUParticles2D don't render on this macOS gl_compatibility/Metal-OpenGL backend,
+	# so streaks are tweened Sprite2D dashes (same tech as board_view.black_hole_fly).
+	if bool(e.get("streak", false)):
+		_spawn_streak_burst(e, pos, layer)
+		return
+	var p := _build(e, pos)
 	p.one_shot = true
 	p.explosiveness = 1.0  # whole count in one burst
 	p.emitting = false
@@ -115,6 +125,61 @@ func _build(e: Dictionary, pos: Vector2) -> CPUParticles2D:
 	if str(e["blend"]) == "add":
 		p.material = _additive_material()   # shared — blend mode is a constant
 	return p
+
+
+## Anisotropic "streak" burst (P11): a fan of tweened Sprite2D dashes, each rotated
+## to its outward direction and stretched along it (scaleX 0.5->2 / scaleY 0.1->0.2)
+## while flying out (easeOutExpo) and fading. CPUParticles2D can't do non-uniform
+## per-particle scale and GPUParticles2D don't render on this gl_compatibility
+## backend, so this is the gl_compat-safe path. All sprites parent under one Node2D
+## so the layer's _MAX_LIVE cap counts a burst as one (matching the CPU emitters).
+func _spawn_streak_burst(e: Dictionary, pos: Vector2, layer: Node) -> void:
+	var root := Node2D.new()
+	root.position = pos
+	layer.add_child(root)
+
+	var count := maxi(1, int(round(float(e["count"]) * Quality.particle_scale())))
+	var life := float(e["life"])
+	var dmin := float(e.get("dist_min", 10.0))
+	var dmax := float(e.get("dist_max", 120.0))
+	var ew := float(e.get("emit_w", 12.0))
+	var eh := float(e.get("emit_h", 12.0))
+	var base := float(e.get("base_scale", 0.5))
+	var sx0 := float(e.get("sx0", 0.5))
+	var sx1 := float(e.get("sx1", 2.0))
+	var sy0 := float(e.get("sy0", 0.1))
+	var sy1 := float(e.get("sy1", 0.2))
+	var align := float(e.get("align_vel", 1.0)) >= 0.5
+	var amin := float(e.get("alpha_min", 0.4))
+	var amax := float(e.get("alpha", 0.8))
+	var tint := Color(str(e["color"]))
+	var tex := _frame(str(e["frame"]))
+	var add := str(e.get("blend", "add")) == "add"
+
+	for i in range(count):
+		var ang := randf() * TAU
+		var dir := Vector2(cos(ang), sin(ang))
+		var dist := lerpf(dmin, dmax, randf())
+		var a0 := lerpf(amin, amax, randf())
+		var s := Sprite2D.new()
+		s.texture = tex
+		var off := Vector2(randf_range(-ew, ew) * 0.5, randf_range(-eh, eh) * 0.5)
+		s.position = off
+		s.rotation = dir.angle() if align else 0.0   # long axis points outward
+		s.scale = Vector2(base * sx0, base * sy0)
+		s.modulate = Color(tint.r, tint.g, tint.b, a0)
+		if add:
+			s.material = _additive_material()
+		root.add_child(s)
+		var tw := s.create_tween().set_parallel(true)
+		tw.tween_property(s, "position", off + dir * dist, life).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		tw.tween_property(s, "scale", Vector2(base * sx1, base * sy1), life)
+		tw.tween_property(s, "modulate:a", 0.0, life)
+
+	# Single deterministic cleanup for the whole burst (frees all child sprites).
+	get_tree().create_timer(life + 0.3).timeout.connect(func() -> void:
+		if is_instance_valid(root):
+			root.queue_free())
 
 
 func _additive_material() -> CanvasItemMaterial:
