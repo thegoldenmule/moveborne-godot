@@ -1,0 +1,63 @@
+{
+  "name": "byosnap-validator",
+  "description": "Real-time game-action validation service",
+  "platform": "linux/arm64",
+  "language": "node",
+  "prefix": "/v1",
+  "ingress": {
+    "external_port": { "name": "http", "port": 8080 },
+    "internal_ports": []
+  },
+  "readiness_probe_config": {
+    "initial_delay_seconds": 5,
+    "path": "/health"
+  },
+  "dev_template": {
+    "cpu": 250,
+    "memory": 0.25,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "SNAPSER_ENVIRONMENT", "value": "DEVELOPMENT" },
+      { "key": "PORT", "value": "8080" },
+      { "key": "DEV_MODE", "value": "true" },
+      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
+      { "key": "MATCH_SESSION_TTL", "value": "3600" },
+      { "key": "VALIDATOR_SHARED_SECRET", "value": "dev-byosnap-throwaway-secret" }
+    ],
+    "hpa": null
+  },
+  "stage_template": {
+    "cpu": 250,
+    "memory": 0.25,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "SNAPSER_ENVIRONMENT", "value": "STAGING" },
+      { "key": "PORT", "value": "8080" },
+      { "key": "DEV_MODE", "value": "true" },
+      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
+      { "key": "MATCH_SESSION_TTL", "value": "3600" },
+      { "key": "VALIDATOR_SHARED_SECRET", "value": "stage-set-via-dashboard" }
+    ],
+    "hpa": null
+  },
+  "prod_template": {
+    "cpu": 500,
+    "memory": 0.5,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "SNAPSER_ENVIRONMENT", "value": "PRODUCTION" },
+      { "key": "PORT", "value": "8080" },
+      { "key": "DEV_MODE", "value": "false" },
+      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
+      { "key": "MATCH_SESSION_TTL", "value": "3600" },
+      { "key": "VALIDATOR_SHARED_SECRET", "value": "prod-set-via-dashboard" }
+    ],
+    "hpa": null
+  }
+}

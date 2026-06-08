@@ -1,0 +1,18 @@
+# Never copy host installs (would clobber the image's workspace symlinks) or secrets.
+node_modules
+**/node_modules
+.env
+**/.env
+.env.local
+**/.env.local
+
+# VCS / logs / runtime data / OS cruft
+.git
+*.log
+data/
+.DS_Store
+
+# Snapser profile is read by snapctl from the build path, not needed inside the image,
+# but harmless to include; keep the image lean by excluding docs.
+README.md
+**/README.md

@@ -228,6 +228,9 @@ const { websocket } = engine.handler();
 // Export Bun server configuration
 export default {
   port: process.env.PORT || 3000,
+  // Bind all interfaces so the container accepts traffic from the Snapser gateway
+  // (Bun's default hostname is not guaranteed across environments).
+  hostname: "0.0.0.0",
   // Must be greater than the "pingInterval" option of the engine (default: 25 seconds)
   idleTimeout: 30,
 
