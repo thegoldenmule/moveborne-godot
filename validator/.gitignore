@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+*.bun
+
+# Environment (.env.example is committed; real secrets are not)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Runtime data written by the validator (history snapshots, etc.)
+data/
+
+# Note: src/logic/dist is intentionally committed so the validator runs
+# without a build step. Rebuild it with `bun run build` when logic changes.

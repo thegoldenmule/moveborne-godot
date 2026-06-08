@@ -1,0 +1,30 @@
+{
+  "name": "@spyre-io/moveborne-logic",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "seedrandom": "^3.0.5",
+    "json-stable-stringify": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/seedrandom": "^3.0.8",
+    "@types/json-stable-stringify": "^1.0.36",
+    "tsup": "^8.0.0",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
+  }
+}

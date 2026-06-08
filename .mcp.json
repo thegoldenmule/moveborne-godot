@@ -3,6 +3,21 @@
     "wiki": {
       "type": "http",
       "url": "http://127.0.0.1:4439/mcp"
-    }
+    },
+    "validator": {
+      "type": "http",
+      "url": "http://127.0.0.1:5555/mcp"
+    },
+    "snapser": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@snapser/mcp-server-snapser@latest",
+          "--application-id=c4n1awfs"
+        ],
+        "env": {
+          "SNAPSER_API_KEY": "${SNAPSER_API_KEY}"
+        }
+      }
   }
 }

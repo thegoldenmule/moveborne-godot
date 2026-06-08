@@ -1,0 +1,19 @@
+{
+  "name": "godot-llm-workflow-validator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "src/*"
+  ],
+  "scripts": {
+    "dev": "cd src/validator && bun run dev",
+    "start": "cd src/validator && bun run start",
+    "build": "cd src/logic && bun run build",
+    "test": "cd src/logic && bun run test",
+    "type-check": "cd src/validator && bun run type-check"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

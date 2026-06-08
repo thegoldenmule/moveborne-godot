@@ -1,0 +1,24 @@
+# Bun
+node_modules/
+bun.lockb
+*.bun
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+dist/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
