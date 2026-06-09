@@ -8,7 +8,7 @@
 - [x] Phase 0 — In main.gd._ready() call add_to_group('mb_match'); update MbDebug._scene() (game/mcp_game_api.gd L66-78) to fall back to get_tree().get_first_node_in_group('mb_match') filtered by has_method('mcp_match').
 - [x] Phase 0 — VERIFY: scenes/main.tscn still runs standalone (Endless default), and MCP game_eval + state-history still resolve the live match. No logic/ change (parity untouched).
 - [x] Phase 1 — Add res://ui/game_state.gd autoload (next_match: Dictionary, last_result: Dictionary); register GameState in project.godot [autoload] alongside Vfx/Anim/Quality/MbDebug.
-- [ ] Phase 1 — Add display/window/stretch/aspect=expand to project.godot; re-audit main.gd's fixed Y offsets (top_bar=120, hand_h=150) on a couple of phone aspect ratios under expand.
+- [x] Phase 1 — Add display/window/stretch/aspect=expand to project.godot; re-audit main.gd's fixed Y offsets (top_bar=120, hand_h=150) on a couple of phone aspect ratios under expand.
 - [x] Phase 2 — Add res://ui/router/ui_state.gd (base lifecycle enter/exit/suspend/resume + blocks_below) and res://ui/router/app_router.gd (autoload: _stack, _busy, push/pop/replace/reset, content_root CanvasLayer at layer 1, cover/reveal fade on a layer-200 CanvasLayer). Register UiRouter autoload.
 - [x] Phase 2 — VERIFY: drive two dummy UiStates (push then pop) and confirm enter()/exit() are awaited (transition completes before control returns) and the _busy lock rejects a re-entrant push.
 - [x] Phase 3 — Create res://ui/theme/moveborne_ui.theme: Grammara font, button StyleBoxFlat states (normal/hover/pressed/disabled), panel styles, and a 'HomeTab' theme_type_variation for the emphasized center tab.
@@ -16,8 +16,8 @@
 - [x] Phase 3 — Build home.tscn (central hero view + Story/Infinite/PvP launchers; PvP rendered disabled/badged 'coming soon') and four placeholder tab scenes (collection/leaderboard/guilds/settings), each a single centered Label.
 - [x] Phase 3 — Repoint project.godot run/main_scene to res://ui/shell/app_shell.tscn; on boot UiRouter.reset(ShellState.new()). App boots to Home; the shell's flat selector toggles tab screens in ContentHost (no router transition for tabs).
 - [x] Phase 4 — Add MatchState. Home play buttons write GameState.next_match and call UiRouter.push(MatchState.new(UiRouter.content_root), cfg). enter() covers -> instances scenes/main.tscn -> reveals; ShellState.suspend() hides the nav. Connect match_exited -> UiRouter.pop() -> queue_free -> ShellState.resume().
-- [ ] Phase 4 — Android Back on the shell root: get_tree().set_quit_on_go_back(false) + _notification(NOTIFICATION_WM_GO_BACK_REQUEST) -> UiRouter.pop() when in a match, else quit on Home. Do not steal ESC (main.gd uses it for cancel-card).
-- [ ] Phase 4 — Safe-area insets: wrap nav/content in a MarginContainer fed from DisplayServer.get_display_safe_area() converted to stretch space + a fixed ~16-24px iOS bottom pad; re-run on the size_changed signal.
+- [x] Phase 4 — Android Back on the shell root: get_tree().set_quit_on_go_back(false) + _notification(NOTIFICATION_WM_GO_BACK_REQUEST) -> UiRouter.pop() when in a match, else quit on Home. Do not steal ESC (main.gd uses it for cancel-card).
+- [x] Phase 4 — Safe-area insets: wrap nav/content in a MarginContainer fed from DisplayServer.get_display_safe_area() converted to stretch space + a fixed ~16-24px iOS bottom pad; re-run on the size_changed signal.
 - [ ] Phase 4 — VERIFY on device under GL Compatibility: nav StyleBoxFlat, ContentHost, and the cover overlay (layer 200) render correctly and the fade sits above the in-match countdown/glitch (layer 100). Optional: gate MbValidatorClient creation in _build_ui on cfg.online; add button/transition SFX.
 - [ ] Deferred (measure-first) — threaded/background match loading via ResourceLoader.load_threaded_request + a progress overlay ONLY if synchronous load('res://scenes/main.tscn').instantiate() actually hitches on device. Likely skipped.
 

@@ -65,3 +65,4 @@ _None._
 
 ## Commits
 - `f419dbf` feat(ui): app shell + stack-based UI router + bottom nav — verified boot->Home, tab switching, Story+Infinite launch, in-match Home returns to shell
+- `09ace10` feat(ui): mobile hardening — aspect=expand, Android Back -> UiRouter.pop, safe-area nav inset, Grammara font in the menu theme
