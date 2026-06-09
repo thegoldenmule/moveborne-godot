@@ -6,11 +6,11 @@ extends RefCounted
 ## server" path — fully playable with no backend. (Phase 3 swaps this for a
 ## NetClient that talks to the validator/Nakama.)
 
-const MbEngineS := preload("res://engine/engine.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
-const MbScenariosS := preload("res://engine/scenarios.gd")
-const MbEventsS := preload("res://engine/events.gd")
-const C := preload("res://engine/constants.gd")
+const MbEngineS := preload("res://logic/engine.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
+const MbScenariosS := preload("res://logic/scenarios.gd")
+const MbEventsS := preload("res://logic/events.gd")
+const C := preload("res://logic/constants.gd")
 
 signal changed
 ## Tiles removed this move with metadata (e.g. destroyedBy black_hole) — for the

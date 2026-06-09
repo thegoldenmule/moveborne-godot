@@ -6,7 +6,7 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/verify_combined.gd
 
 func _initialize() -> void:
-	var eng := load("res://engine/engine.gd")
+	var eng := load("res://logic/engine.gd")
 	var g: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/combined_golden.json"))
 	var state: Dictionary = g["initial"]
 	var steps: Array = g["steps"]

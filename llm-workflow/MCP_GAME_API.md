@@ -9,7 +9,7 @@ animate exactly as they do for a human player.
 - **Implementation:** `game/mcp_game_api.gd` (autoload singleton `MbDebug`) +
   thin `mcp_*` wrappers on `scenes/main.gd`.
 - **Mirrors:** `moveborne/src/game/components/match/Play.tsx` (`window.__moveborne`).
-- **Parity-safe:** nothing under `engine/` is touched; `MbDebug` only calls the
+- **Parity-safe:** nothing under `logic/` is touched; `MbDebug` only calls the
   already-tested `MbMatch` / `main.gd` paths. See `CLAUDE.md` for the parity rules.
 
 ---
@@ -177,7 +177,7 @@ state = {
 }
 ```
 
-**Tile** (`engine/engine.gd`): `{ isEmpty, value, row, col, status, meta, effect? }`
+**Tile** (`logic/engine.gd`): `{ isEmpty, value, row, col, status, meta, effect? }`
 — `value` is a power of two; `effect` is present on tiles with an active effect
 (`lock`, `freeze`, `black_hole`, …). Empty cells have `isEmpty: true`.
 

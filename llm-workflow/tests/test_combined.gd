@@ -8,7 +8,7 @@ extends McpTestSuite
 ## (tests/golden/combined_golden.json via generate_combined_golden.mjs).
 
 const GOLDEN := "res://tests/golden/combined_golden.json"
-const MbEngineS := preload("res://engine/engine.gd")
+const MbEngineS := preload("res://logic/engine.gd")
 
 var _g: Dictionary = {}
 

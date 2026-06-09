@@ -7,7 +7,7 @@ extends McpTestSuite
 ## from the real @spyre-io/moveborne-logic dist).
 
 const GOLDEN := "res://tests/golden/engine_swipe_golden.json"
-const MbEngineS := preload("res://engine/engine.gd")
+const MbEngineS := preload("res://logic/engine.gd")
 
 var _g: Dictionary = {}
 

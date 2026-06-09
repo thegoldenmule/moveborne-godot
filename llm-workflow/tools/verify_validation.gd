@@ -3,7 +3,7 @@ extends SceneTree
 ## Headless parity harness for the validation predicates port.
 ##   godot --headless --path . --script res://tools/verify_validation.gd
 
-const V := preload("res://engine/validation.gd")
+const V := preload("res://logic/validation.gd")
 
 func _dispatch(predicate: String, tiles: Array, c: Dictionary) -> bool:
 	var args: Array = c.get("args", [])

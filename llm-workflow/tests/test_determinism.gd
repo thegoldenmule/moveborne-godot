@@ -9,8 +9,8 @@ const GOLDEN_PATH := "res://tests/golden/determinism_golden.json"
 
 # preload by path so the suite loads even before the class_name globals are
 # registered in the editor's class cache.
-const MbRngS := preload("res://engine/rng.gd")
-const MbHasherS := preload("res://engine/hasher.gd")
+const MbRngS := preload("res://logic/rng.gd")
+const MbHasherS := preload("res://logic/hasher.gd")
 
 var _golden: Dictionary = {}
 

@@ -10,7 +10,7 @@ extends RefCounted
 ## whose key insertion order matches the TS object literals in factories.ts so
 ## the canonical-JSON hash is byte-exact.
 
-const C := preload("res://engine/constants.gd")
+const C := preload("res://logic/constants.gd")
 
 # ----------------------------------------------------------------------------
 # factories.ts createTileEffect — default config per effect type.

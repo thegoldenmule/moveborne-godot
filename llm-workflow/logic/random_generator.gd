@@ -6,7 +6,7 @@ extends RefCounted
 ## Each namespace is an independent seedrandom(ARC4) stream seeded by the integer
 ## seed as a base-10 string; state is restored by replaying `index` draws.
 
-const Rng := preload("res://engine/rng.gd")
+const Rng := preload("res://logic/rng.gd")
 
 var _streams: Dictionary = {}
 var _indices: Dictionary = {}

@@ -5,9 +5,9 @@ extends SceneTree
 ##   /Applications/Godot.app/Contents/MacOS/Godot --headless \
 ##     --path <repo> --script res://tools/verify_scenarios.gd 2>&1 | grep -E 'VERIFY|FAIL'
 
-const Scn := preload("res://engine/scenarios.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const Scn := preload("res://logic/scenarios.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 
 func _initialize() -> void:

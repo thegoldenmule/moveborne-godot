@@ -5,7 +5,7 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/verify_engine_swipe.gd
 
 func _initialize() -> void:
-	var eng := load("res://engine/engine.gd")
+	var eng := load("res://logic/engine.gd")
 	var txt := FileAccess.get_file_as_string("res://tests/golden/engine_swipe_golden.json")
 	var g: Dictionary = JSON.parse_string(txt)
 	var state: Dictionary = g["initial"]

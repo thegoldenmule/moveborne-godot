@@ -4,9 +4,9 @@ extends SceneTree
 ## tests/golden/tile_effects_golden.json (generated from the real TS bundle).
 ##   godot --headless --path . --script res://tools/verify_tile_effects.gd
 
-const TE := preload("res://engine/tile_effects.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const TE := preload("res://logic/tile_effects.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 var _fail_msg := ""
 

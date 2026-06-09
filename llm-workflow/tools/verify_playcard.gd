@@ -4,7 +4,7 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/verify_playcard.gd
 
 func _initialize() -> void:
-	var eng := load("res://engine/engine.gd")
+	var eng := load("res://logic/engine.gd")
 	var arr: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/playcard_golden.json"))
 	var ok := true
 	var n := 0

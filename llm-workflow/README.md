@@ -65,7 +65,7 @@ authoritative state.
 ## Project layout
 
 ```
-engine/        Pure deterministic rules engine (no scene/Node deps). The core port.
+logic/        Pure deterministic rules engine (no scene/Node deps). The core port.
   rng.gd                seedrandom@3.0.5 ARC4 (53-bit double), bit-exact
   hasher.gd             custom rolling state hash + json-stable-stringify canonical JSON
   random_generator.gd   5-namespace RNG manager
@@ -89,11 +89,11 @@ GODOT_PORT_PLAN.md      the working plan / architecture / status
 A hard wall separates **deterministic logic** from **presentation**:
 
 ```
-input → action → engine/ (pure) → new state + hash → scenes/ render
+input → action → logic/ (pure) → new state + hash → scenes/ render
                                  → net/ validator confirms
 ```
 
-- `engine/` is pure GDScript: state is a `Dictionary` mirror of the TS
+- `logic/` is pure GDScript: state is a `Dictionary` mirror of the TS
   `SynchronizedGameState`; tiles are a flat row-major `Array` of `Dictionary`s.
   GDScript `Dictionary`/`Array` are reference types, which lets the port reproduce
   the original `merge.ts` in-place-mutation semantics exactly.

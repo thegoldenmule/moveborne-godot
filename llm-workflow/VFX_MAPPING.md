@@ -4,7 +4,7 @@ The engineering reference for porting Moveborne's web-client polish (PixiJS 8 + 
 + pixi-filters) to the Godot 4.6 (GDScript) port. Companion to `GODOT_PORT_PLAN.md`.
 
 **Prime directive (repeated where it bites):** all VFX live in `scenes/` (presentation),
-react to `MbMatch` state, and **never write back into `engine/`**. Determinism parity is
+react to `MbMatch` state, and **never write back into `logic/`**. Determinism parity is
 load-bearing — VFX state (tweens, shake offsets, particle counts) must never feed into the
 hashed engine state. The TS source of truth is `~/projects/thegoldenmule/moveborne/src/game`
 (client VFX) and `.../src/logic/src` (synchronized state).
@@ -145,7 +145,7 @@ are legacy — ignore. `displacement.png` is a **red herring** (black hole uses 
 
 ---
 
-## 4. Godot VFX architecture (keep `engine/` pure)
+## 4. Godot VFX architecture (keep `logic/` pure)
 
 **Trigger source (resolved §2.1):** `board_view.gd` diffs per-tile `status`
 (`new`/`merged`/`bombed`/`destroyed`/`purged`/`amplified`) from `state["board"]["tiles"]`,
@@ -414,7 +414,7 @@ func fly(start: Vector2, target: Vector2) -> void:
     pop.chain().tween_callback(_on_arrived)   # unlock+apply pending shard, then queue_free
 ```
 - **Shard-counter lock gate** is gameplay-felt: lock on spawn, apply pending value on `_on_arrived`.
-  Keep in the **presentation layer** (`pending`+`locked` vars), never in `engine/`.
+  Keep in the **presentation layer** (`pending`+`locked` vars), never in `logic/`.
 
 **Floating text:**
 ```gdscript

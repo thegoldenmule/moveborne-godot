@@ -6,7 +6,7 @@ extends McpTestSuite
 ## (tests/golden/playcard_golden.json via generate_playcard_golden.mjs).
 
 const GOLDEN := "res://tests/golden/playcard_golden.json"
-const MbEngineS := preload("res://engine/engine.gd")
+const MbEngineS := preload("res://logic/engine.gd")
 
 var _cases: Array = []
 

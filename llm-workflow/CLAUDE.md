@@ -5,12 +5,12 @@ Godot 4.6 (GDScript) port of **Moveborne** (a 2048-style merge puzzle). See
 
 ## Prime directive: determinism parity
 
-The `engine/` code is a **byte-for-byte deterministic port** of the TypeScript
+The `logic/` code is a **byte-for-byte deterministic port** of the TypeScript
 `@spyre-io/moveborne-logic` package. Its whole value is that it computes the **same
 state hashes** as the TS engine and the validator service. Treat the parity tests as
 load-bearing:
 
-- **Never change `engine/` behavior without re-running the parity tests.** If a
+- **Never change `logic/` behavior without re-running the parity tests.** If a
   golden hash changes, you broke compatibility — figure out why before committing.
 - The TS source is the **source of truth**: `~/projects/thegoldenmule/moveborne/src/logic/src`
   (rules) and `src/game/engine/scenarios.ts` (scenario table). **Code beats spec**
@@ -21,7 +21,7 @@ load-bearing:
 ## Repo map
 
 ```
-engine/   pure rules engine (no Node/scene deps). class_name Mb* + static funcs.
+logic/   pure rules engine (no Node/scene deps). class_name Mb* + static funcs.
           rng.gd, hasher.gd, random_generator.gd, constants.gd, engine.gd,
           powercards.gd, validation.gd, tile_effects.gd, totems.gd, events.gd, scenarios.gd
 game/     match_controller.gd (MbMatch): state + new_game/swipe/play_card/spawn_totem,
@@ -64,7 +64,7 @@ Run parity tests two ways:
 # Editor suite (McpTestSuite) — via the godot-ai MCP:  test_run
 ```
 
-**Always run the relevant verifier(s) after touching `engine/`.** When adding new
+**Always run the relevant verifier(s) after touching `logic/`.** When adding new
 logic, generate an oracle from the real TS dist (the `tests/golden/*.mjs` generators
 import a copy of `moveborne/src/logic/dist/index.js` with `seedrandom` +
 `json-stable-stringify` installed), dump expected hashes, and assert them in a
@@ -93,7 +93,7 @@ verifier/suite — never hand-write expected values.
 - `Engine` is a reserved native class name — don't use it as an identifier (the
   engine script is referenced as `MbEngineS := preload(...)` in tests/scenes).
 - `class_name` globals do **not** register from `reimport` alone — tests/scenes
-  reference engine classes via `preload("res://engine/x.gd")`. A full editor scan
+  reference engine classes via `preload("res://logic/x.gd")`. A full editor scan
   registers the `Mb*` globals.
 - `McpTestSuite`: every `test_*` must make ≥1 assertion or it auto-fails; name
   throwaway nodes `_McpTest*`.
@@ -109,7 +109,7 @@ verifier/suite — never hand-write expected values.
 - **Git: commit directly to `main`.** Never create a feature branch and never ask
   to — `git add` + `git commit` on `main` as-is.
 - Engine classes are `class_name Mb<Thing>` with static functions; no Node/scene
-  references in `engine/`.
+  references in `logic/`.
 - Commit `.gd.uid` files alongside their scripts (Godot stable references).
 - Keep `GODOT_PORT_PLAN.md` and the project memory up to date as phases progress.
 - Don't add features the engine can't back deterministically; if unsure whether a

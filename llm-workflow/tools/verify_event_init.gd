@@ -5,8 +5,8 @@ extends SceneTree
 ## from event_init_golden.json (generated from the real TS dist) and asserts the
 ## resulting eventTriggerStates hash byte-for-byte.
 
-const MbEventsS := preload("res://engine/events.gd")
-const Hasher := preload("res://engine/hasher.gd")
+const MbEventsS := preload("res://logic/events.gd")
+const Hasher := preload("res://logic/hasher.gd")
 
 const GOLDEN := "res://tests/golden/event_init_golden.json"
 

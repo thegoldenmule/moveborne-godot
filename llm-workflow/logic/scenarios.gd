@@ -14,7 +14,7 @@ extends RefCounted
 ## createEmptyTile) create NEW dicts. RNG: tile-gen namespace, two draws per random tile
 ## (position then value), in board order — same as boardBuilder.ts.
 
-const C := preload("res://engine/constants.gd")
+const C := preload("res://logic/constants.gd")
 
 
 # ----------------------------------------------------------------------------

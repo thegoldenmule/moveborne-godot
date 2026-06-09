@@ -5,7 +5,7 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/test_validator_client.gd
 
 const ClientS := preload("res://net/validator_client.gd")
-const MbEngineS := preload("res://engine/engine.gd")
+const MbEngineS := preload("res://logic/engine.gd")
 
 var _client
 var _done := false

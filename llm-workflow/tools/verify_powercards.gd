@@ -4,9 +4,9 @@ extends SceneTree
 ## Runs each golden case through the GDScript port and compares tiles (via state hash),
 ## success, and score. Prints "VERIFY powercards: PASS (N cases)" or a FAIL diff.
 
-const PC := preload("res://engine/powercards.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const PC := preload("res://logic/powercards.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 
 func _initialize() -> void:

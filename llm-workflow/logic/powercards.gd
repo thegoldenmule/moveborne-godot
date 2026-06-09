@@ -19,7 +19,7 @@ extends RefCounted
 ## source tile carried one (null/undefined effect keys are omitted, matching JS
 ## JSON dropping `undefined`). Spawned/destroyed empties carry no "meta".
 
-const C := preload("res://engine/constants.gd")
+const C := preload("res://logic/constants.gd")
 
 # ----------------------------------------------------------------------------
 # board helpers (board.ts)

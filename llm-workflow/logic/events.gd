@@ -17,7 +17,7 @@ extends RefCounted
 ## does. process_event_spawn_rules constructs NEW dicts/boards where the TS uses
 ## object spreads, draws from the "effect-spawn" RNG namespace in the same order.
 
-const C := preload("res://engine/constants.gd")
+const C := preload("res://logic/constants.gd")
 
 # ----------------------------------------------------------------------------
 # Trigger-state progress / condition helpers (eventTriggerState.ts)

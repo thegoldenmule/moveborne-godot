@@ -1,8 +1,8 @@
 extends SceneTree
 
-const MbEventsS := preload("res://engine/events.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const MbEventsS := preload("res://logic/events.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 const GOLDEN := "res://tests/golden/events_golden.json"
 

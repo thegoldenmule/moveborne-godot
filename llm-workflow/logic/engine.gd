@@ -10,13 +10,13 @@ extends RefCounted
 ## Array of tile Dicts. GDScript Dictionary/Array are reference types, so JS [...]/
 ## {...}/in-place-mutation semantics from merge.ts are reproduced exactly.
 
-const C := preload("res://engine/constants.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
-const PC := preload("res://engine/powercards.gd")
-const TE := preload("res://engine/tile_effects.gd")
-const TT := preload("res://engine/totems.gd")
-const EV := preload("res://engine/events.gd")
+const C := preload("res://logic/constants.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
+const PC := preload("res://logic/powercards.gd")
+const TE := preload("res://logic/tile_effects.gd")
+const TT := preload("res://logic/totems.gd")
+const EV := preload("res://logic/events.gd")
 
 # ----------------------------------------------------------------------------
 # board helpers (board.ts / factories.ts)

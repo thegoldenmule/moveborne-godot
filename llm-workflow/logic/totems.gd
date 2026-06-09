@@ -15,7 +15,7 @@ extends RefCounted
 ## .duplicate() (shallow) where the TS uses spreads {...} / [...] and mutate in
 ## place exactly where the TS does. Only ghost_merge consumes RNG (totem-spawn).
 
-const C := preload("res://engine/constants.gd")
+const C := preload("res://logic/constants.gd")
 
 # 4x4 board constant used by magnet_core (mirrors TS BOARD_SIZE).
 const _MAGNET_BOARD_SIZE := 4

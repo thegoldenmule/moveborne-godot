@@ -5,9 +5,9 @@ extends SceneTree
 ## from the real TS dist) and asserts both the full state hash AND the effect-spawn
 ## RNG draw count match byte-for-byte.
 
-const MbEngineS := preload("res://engine/engine.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const MbEngineS := preload("res://logic/engine.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 const GOLDEN := "res://tests/golden/glitch_golden.json"
 

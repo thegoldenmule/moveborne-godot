@@ -110,27 +110,27 @@ Three things must be reproduced **byte-for-byte**:
 ### Phase 0 — Determinism foundation  ✅ COMPLETE (2026-06-03)
 - [x] Generate golden vectors from real TS packages → `tests/golden/determinism_golden.json` (+ `generate_golden.js`, vendored `seedrandom-3.0.5-reference.js`).
 - [x] Resolved: default `seedrandom()` returns the **53-bit double** (`g(6)` + significance loop), not 32-bit.
-- [x] `engine/rng.gd` (`class_name MbRng`): ARC4 KSA + RC4-drop[256] + 53-bit `draw()` + `mixkey`. **Proven bit-exact** (180 assertions: 9 seeds × 20 draws via f64 big-endian comparison).
-- [x] `engine/hasher.gd` (`class_name MbHasher`): canonical serializer (sorted keys, 2-space, JS number format, **`[\n  ]` empty array**, **null-key omission**) + 8-lane rolling hash. **Proven exact** (hash + canonical round-trip vectors).
+- [x] `logic/rng.gd` (`class_name MbRng`): ARC4 KSA + RC4-drop[256] + 53-bit `draw()` + `mixkey`. **Proven bit-exact** (180 assertions: 9 seeds × 20 draws via f64 big-endian comparison).
+- [x] `logic/hasher.gd` (`class_name MbHasher`): canonical serializer (sorted keys, 2-space, JS number format, **`[\n  ]` empty array**, **null-key omission**) + 8-lane rolling hash. **Proven exact** (hash + canonical round-trip vectors).
 - [x] `tests/test_determinism.gd` (`McpTestSuite`): **5 tests, 197 assertions, all green** via the godot-ai `test_run`.
 - Design note: `RNG`/`Hasher` implemented as static `class_name` utility classes (pure functions) rather than autoloads — cleaner and directly testable editor-side. The stateful `GameEngine`/`NetClient` autoloads come in Phase 1/3. A 5-namespace `RandomGenerator` wrapper (TS `random.ts` parity) is added in Phase 1.
 - Housekeeping: `MbRng`/`MbHasher` register as global `class_name`s on the next full editor scan; the suite uses `preload()` meanwhile, so nothing is blocked.
 
 ### Phase 1 — Pure deterministic engine (GDScript)
 **Spine ✅ DONE (2026-06-03)** — swipe-only path proven byte-exact against the TS dist oracle:
-- `engine/constants.gd` (`MbConstants`): full `POWER_CARDS` (26, insertion-ordered) + `TOTEM_TYPES` (11) catalogs + scalars.
-- `engine/random_generator.gd` (`MbRandom`): 5-namespace RNG on `MbRng`, reseed+replay.
-- `engine/engine.gd` (`MbEngine`): `perform_swipe` (4 dirs), spawn (2 tile-gen draws, 90/10), combo, score, shards, auto-draw, `execute_swipe_action` + caller overrides (score accumulate, rngIndices, moveIndex+2-on-draw). Tile-effects/totems/events/global-effects are faithful **no-op stubs** (verified to consume 0 RNG / add 0 state when inactive).
+- `logic/constants.gd` (`MbConstants`): full `POWER_CARDS` (26, insertion-ordered) + `TOTEM_TYPES` (11) catalogs + scalars.
+- `logic/random_generator.gd` (`MbRandom`): 5-namespace RNG on `MbRng`, reseed+replay.
+- `logic/engine.gd` (`MbEngine`): `perform_swipe` (4 dirs), spawn (2 tile-gen draws, 90/10), combo, score, shards, auto-draw, `execute_swipe_action` + caller overrides (score accumulate, rngIndices, moveIndex+2-on-draw). Tile-effects/totems/events/global-effects are faithful **no-op stubs** (verified to consume 0 RNG / add 0 state when inactive).
 - `tests/test_engine_swipe.gd`: threads a 20-move golden (with 2 card draws) → **every per-move state hash matches** (`tests/golden/engine_swipe_golden.json`, via `generate_engine_golden.mjs`). Full suite: **7 tests / 2 suites green**.
 - Key finding: real board states are **clean row-major**; reference-semantics (`Dictionary`/`Array` are GDScript reference types) reproduce the JS `merge.ts` mutation behavior for free.
 
 **Breadth modules ✅ PORTED + VERIFIED (2026-06-03)** — 6-agent parallel workflow, each self-verified headlessly against dist-generated goldens (~5,470 parity cases):
-- [x] `engine/powercards.gd` (`MbPowerCards`) — 14 `performPowerCard*` (46 cases). *transform/shuffle consume the `shuffle` namespace, not effect-spawn.*
-- [x] `engine/validation.gd` (`MbValidation`) — 28 target/playability predicates (5244 cases).
-- [x] `engine/tile_effects.gd` (`MbTileEffects`) — merge/move gating, black hole, on-merge, effect spawn (64 cases).
-- [x] `engine/totems.gd` (`MbTotems`) — `processTotemEffects` + 11 totem handlers (57 cases). *swipe-durations not implemented in code; uses moves/merges/tallyMarks.*
-- [x] `engine/events.gd` (`MbEvents`) — trigger machine + event spawn (17 cases). *only `COMBO_BREAK` + `SCORE_UPDATE` routed.*
-- [x] `engine/scenarios.gd` (`MbScenarios`) — `buildInitialBoard` + scenario table + factories (45 cases).
+- [x] `logic/powercards.gd` (`MbPowerCards`) — 14 `performPowerCard*` (46 cases). *transform/shuffle consume the `shuffle` namespace, not effect-spawn.*
+- [x] `logic/validation.gd` (`MbValidation`) — 28 target/playability predicates (5244 cases).
+- [x] `logic/tile_effects.gd` (`MbTileEffects`) — merge/move gating, black hole, on-merge, effect spawn (64 cases).
+- [x] `logic/totems.gd` (`MbTotems`) — `processTotemEffects` + 11 totem handlers (57 cases). *swipe-durations not implemented in code; uses moves/merges/tallyMarks.*
+- [x] `logic/events.gd` (`MbEvents`) — trigger machine + event spawn (17 cases). *only `COMBO_BREAK` + `SCORE_UPDATE` routed.*
+- [x] `logic/scenarios.gd` (`MbScenarios`) — `buildInitialBoard` + scenario table + factories (45 cases).
 - [x] `MbHasher` float formatting upgraded to JS shortest-round-trip (globalEffects `filterConfig.seed` now hashes correctly).
 
 **Integration ✅ — engine functionally complete (2026-06-03):**

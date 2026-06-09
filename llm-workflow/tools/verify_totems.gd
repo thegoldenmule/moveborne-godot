@@ -1,8 +1,8 @@
 extends SceneTree
 
-const MbTotemsS := preload("res://engine/totems.gd")
-const Hasher := preload("res://engine/hasher.gd")
-const MbRandomS := preload("res://engine/random_generator.gd")
+const MbTotemsS := preload("res://logic/totems.gd")
+const Hasher := preload("res://logic/hasher.gd")
+const MbRandomS := preload("res://logic/random_generator.gd")
 
 const GOLDEN_PATH := "res://tests/golden/totems_golden.json"
 
