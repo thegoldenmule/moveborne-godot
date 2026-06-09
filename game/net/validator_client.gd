@@ -41,9 +41,10 @@ func init_and_connect(base_url: String, match_id: String, starting_state: Dictio
 	var http := HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(_on_init_done.bind(http))
+	# Auth is the gateway-validated User-Id header (== player_id); no signature.
 	var body := JSON.stringify({
 		"match_id": match_id, "starting_state": starting_state,
-		"player_id": player_id, "signature": "dev",
+		"player_id": player_id,
 	})
 	var req_headers := PackedStringArray(["Content-Type: application/json"])
 	req_headers.append_array(headers)
