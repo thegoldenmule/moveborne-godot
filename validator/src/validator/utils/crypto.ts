@@ -33,29 +33,6 @@ export function verifyHmacSignature(
   return timingSafeEqual(signatureBuffer, expectedBuffer);
 }
 
-export function signNakamaPayload(
-  match_id: string,
-  starting_state: unknown,
-  player_id: string,
-  secret: string,
-): string {
-  return computeHmacSignature({ match_id, starting_state, player_id }, secret);
-}
-
-export function verifyNakamaSignature(
-  match_id: string,
-  starting_state: unknown,
-  player_id: string,
-  signature: string,
-  secret: string,
-): boolean {
-  return verifyHmacSignature(
-    { match_id, starting_state, player_id },
-    signature,
-    secret,
-  );
-}
-
 export function signValidatorResponse(
   match_id: string,
   index: number,

@@ -8,7 +8,8 @@ import type {
   StateHistoryFile,
 } from "../types";
 import { getConfig } from "../config";
-import { verifyNakamaSignature, generateConnectionId } from "../utils/crypto";
+import { generateConnectionId } from "../utils/crypto";
+import { verifySnapserCaller } from "../utils/snapser-auth";
 import type { MatchStateStore } from "../store/match-state";
 import type { IHistoryStore } from "../store/history-store";
 import { readFile } from "node:fs/promises";
@@ -20,13 +21,13 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
   app.post("/init", async (c) => {
     try {
       const body = (await c.req.json()) as ValidatorInitRequest;
-      const { match_id, starting_state, player_id, signature } = body;
+      const { match_id, starting_state, player_id } = body;
 
-      if (!match_id || !starting_state || !player_id || !signature) {
+      if (!match_id || !starting_state || !player_id) {
         return c.json(
           {
             error: "VALIDATION_ERROR",
-            message: "Missing required fields: match_id, starting_state, player_id, signature",
+            message: "Missing required fields: match_id, starting_state, player_id",
           },
           400,
         );
@@ -35,25 +36,18 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
       const config = getConfig();
 
       if (!config.devMode) {
-        const isValid = verifyNakamaSignature(
-          match_id,
-          starting_state,
-          player_id,
-          signature,
-          config.sharedSecret,
-        );
-
-        if (!isValid) {
+        const auth = verifySnapserCaller(c.req.header(), player_id);
+        if (!auth.ok) {
           return c.json(
             {
-              error: "INVALID_SIGNATURE",
-              message: "Failed to verify Nakama signature",
+              error: "UNAUTHORIZED",
+              message: auth.reason,
             },
             401,
           );
         }
       } else {
-        console.warn("⚠️  DEV MODE: Skipping Nakama signature verification");
+        console.warn("⚠️  DEV MODE: Skipping Snapser gateway auth check");
       }
 
       const connection_id = generateConnectionId();
@@ -115,6 +109,21 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
           },
           400,
         );
+      }
+
+      // Same caller check as /init — this route previously had no auth at all
+      // outside dev mode, despite being gateway-passthrough.
+      if (!getConfig().devMode) {
+        const auth = verifySnapserCaller(c.req.header(), player_id);
+        if (!auth.ok) {
+          return c.json(
+            {
+              error: "UNAUTHORIZED",
+              message: auth.reason,
+            },
+            401,
+          );
+        }
       }
 
       if (!history_file_id && !history_data) {

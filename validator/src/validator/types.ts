@@ -6,7 +6,9 @@ export interface ValidatorInitRequest {
   match_id: string;
   starting_state: SynchronizedGameState;
   player_id: string;
-  signature: string;
+  /** Legacy Nakama HMAC field — ignored; auth is the Snapser gateway's
+   *  validated User-Id header (see utils/snapser-auth.ts). */
+  signature?: string;
 }
 
 export interface ValidatorInitResponse {

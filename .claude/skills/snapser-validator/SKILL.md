@@ -39,7 +39,7 @@ python3 .claude/skills/snapser-validator/scripts/client.py smoke      # login + 
 python3 .claude/skills/snapser-validator/scripts/client.py login      # anon login, cache token
 python3 .claude/skills/snapser-validator/scripts/client.py token      # print cached session token
 python3 .claude/skills/snapser-validator/scripts/client.py call GET /health
-python3 .claude/skills/snapser-validator/scripts/client.py call POST /api/match/init --body '{"match_id":"m1","player_id":"p1","signature":"x","starting_state":{...}}'
+python3 .claude/skills/snapser-validator/scripts/client.py call POST /api/match/init --body '{"match_id":"m1","player_id":"<your user_id>","starting_state":{...}}'
 ```
 
 `call` auto-logs-in if there is no cached token and retries once if the token is stale.

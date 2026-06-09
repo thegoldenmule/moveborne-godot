@@ -29,8 +29,8 @@ The validator supports initializing matches from saved state histories via `POST
 - `history_file_id` (optional): ID of fixture file in `src/game/fixtures/history/{id}.json`
 - `history_data` (optional): Array of StateHistorySnapshot objects
 - `start_from_index` (optional): moveIndex to start from (defaults to last state)
-- `player_id` (required): Player identifier
-- `signature` (required): Authentication signature
+- `player_id` (required): Player identifier (must match the gateway-validated
+  `User-Id` header unless DEV_MODE)
 
 One of `history_file_id` or `history_data` must be provided.
 
@@ -43,8 +43,7 @@ curl -X POST http://localhost:5555/api/match/init-from-history \
   -d '{
     "history_file_id": "hash-mismatch-debug",
     "start_from_index": 5,
-    "player_id": "test-player-1",
-    "signature": "test-signature"
+    "player_id": "test-player-1"
   }'
 ```
 

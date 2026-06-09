@@ -3,7 +3,7 @@
   "info": {
     "title": "Validator Service",
     "version": "0.1.0",
-    "description": "Real-time game-action validation service (BYOSnap). Provides HTTP endpoints for match lifecycle plus a Socket.IO transport for live action validation and an MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public — the gateway does not require a session token. Public operations: service info, health, status, match init, init-from-history, and the Socket.IO transport. save-history, load-history, and /mcp require api-key/internal auth. The validator additionally performs its own signature/connection checks (see DEV_MODE)."
+    "description": "Real-time game-action validation service (BYOSnap). Provides HTTP endpoints for match lifecycle plus a Socket.IO transport for live action validation and an MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public — the gateway does not require a session token. Public operations: service info, health, status, match init, init-from-history, and the Socket.IO transport. save-history, load-history, and /mcp require api-key/internal auth. Unless DEV_MODE is enabled, the validator additionally binds requests to the gateway-validated User-Id header (must match player_id) on match init and the Socket.IO handshake."
   },
   "servers": [
     {
@@ -124,7 +124,7 @@
           "Match"
         ],
         "summary": "Initialize a match",
-        "description": "Registers a new match with its starting synchronized state and returns a short-lived connection token used to open the Socket.IO connection. Unless DEV_MODE is enabled, the request `signature` is verified against the shared secret.",
+        "description": "Registers a new match with its starting synchronized state and returns a short-lived connection token used to open the Socket.IO connection. Unless DEV_MODE is enabled, the gateway-validated `User-Id` header must match `player_id` (api-key/internal callers are accepted without user binding).",
         "operationId": "initMatch",
         "requestBody": {
           "required": true,
@@ -158,7 +158,7 @@
             }
           },
           "401": {
-            "description": "Invalid signature",
+            "description": "Caller not authorized for this player_id",
             "content": {
               "application/json": {
                 "schema": {
@@ -715,14 +715,13 @@
           },
           "signature": {
             "type": "string",
-            "description": "HMAC signature over the request, verified unless DEV_MODE is enabled"
+            "description": "Legacy Nakama HMAC field — ignored; auth is the gateway-validated User-Id header"
           }
         },
         "required": [
           "match_id",
           "starting_state",
-          "player_id",
-          "signature"
+          "player_id"
         ]
       },
       "ValidatorInitResponse": {
