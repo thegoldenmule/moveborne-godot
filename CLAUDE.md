@@ -14,6 +14,7 @@ Godot 4.6 port of the originally TypeScript/PixiJS client. The top-level directo
 | `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + Socket.IO |
 | `wiki/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
 | `snapser-docs/` | Vendored Snapser platform docs + swagger (reference only, not built) | — |
+| `art/` | Source art (`MoveBorne.psd`), extracted renders (`extracted/`), and the visual style guide | — |
 
 ## The one idea everything rests on
 
@@ -33,6 +34,7 @@ Don't restate the architecture here — read the canonical pages:
 | Godot/GDScript working notes + hard-won gotchas + parity-test loop | `game/CLAUDE.md` |
 | Driving the game via MCP (the `MbDebug` autoload) | `game/MCP_GAME_API.md` |
 | Native VFX mapping | `game/VFX_MAPPING.md` |
+| Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its HTTP/Socket.IO/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
 | Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
