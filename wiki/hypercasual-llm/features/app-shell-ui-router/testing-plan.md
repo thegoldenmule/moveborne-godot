@@ -3,12 +3,6 @@
 **Status:** draft
 
 ## Planned
-- Boot lands on Home with the bottom nav visible and Home selected — NO match starts at boot.
-- Tapping each nav tab (Collection/Leaderboard/Guilds/Settings) shows its placeholder screen and highlights that tab; Home returns to the Home screen. Selection is exclusive (one ButtonGroup).
-- The center Home tab renders emphasized (larger/raised) relative to the other four tabs.
-- Tapping Infinite starts an Endless match (board appears); the in-match Home/Quit button returns to the shell on Home with the nav restored.
-- Tapping Story starts the selected scenario via new_game_scenario(id) — the correct scenario loads (verify against the MbScenarios table).
-- The PvP button is visibly gated ('coming soon') and does not start a live match.
 - Rapid double-tap on a play-mode button starts EXACTLY ONE match (router _busy lock holds); rapid tab taps during a transition do not corrupt state.
 - After returning from a match, GameState.last_result is populated and the match instance is freed — no leaked MbMatch / MbValidatorClient Node / match CanvasLayers (check node count).
 - Same-mode 'Play Again' (R / in-place restart) restarts WITHOUT teardown+re-instance of the whole match scene.
@@ -19,7 +13,12 @@
 - Under GL Compatibility on device: nav StyleBoxFlat, ContentHost, and the cover fade overlay (layer 200) render correctly, and the fade sits above the in-match countdown/glitch (layer 100).
 
 ## Passed
-_None._
+- Boot lands on Home with the bottom nav visible and Home selected — NO match starts at boot.
+- Tapping each nav tab (Collection/Leaderboard/Guilds/Settings) shows its placeholder screen and highlights that tab; Home returns to the Home screen. Selection is exclusive (one ButtonGroup).
+- The center Home tab renders emphasized (larger/raised) relative to the other four tabs.
+- Tapping Infinite starts an Endless match (board appears); the in-match Home/Quit button returns to the shell on Home with the nav restored.
+- Tapping Story starts the selected scenario via new_game_scenario(id) — the correct scenario loads (verify against the MbScenarios table).
+- The PvP button is visibly gated ('coming soon') and does not start a live match.
 
 ## Failed
 _None._

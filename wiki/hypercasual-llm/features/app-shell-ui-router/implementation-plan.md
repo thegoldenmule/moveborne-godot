@@ -63,11 +63,11 @@ func resume() -> void:                         # match popped; we are top again
 ```
 
 ## Open questions
-1. **Folder layout: put the new menu layer under res://ui/ (router/, shell/, screens/, theme/) and keep res://scenes/ for the match/board code — confirm, or prefer everything under res://scenes/ per the current convention?**
-2. **Should the match scene later move to res://scenes/match/ for symmetry, or stay at res://scenes/main.tscn to minimize churn and keep test/tool paths stable?**
+_None._
 
 ## Resolved questions
-_None._
+1. **Folder layout: put the new menu layer under res://ui/ (router/, shell/, screens/, theme/) and keep res://scenes/ for the match/board code — confirm, or prefer everything under res://scenes/ per the current convention?** — _Confirmed and shipped: the menu layer lives under res://ui/ (router/, shell/, screens/, theme/); res://scenes/ keeps the match/board code._
+2. **Should the match scene later move to res://scenes/match/ for symmetry, or stay at res://scenes/main.tscn to minimize churn and keep test/tool paths stable?** — _Left at res://scenes/main.tscn to minimize churn and keep test/tool paths stable. A move to res://scenes/match/ is optional future tidy-up, not done._
 
 ## References
 _None._
