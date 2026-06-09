@@ -15,6 +15,11 @@ const store = new InMemoryMatchStateStore();
 const historyStore = new FileSystemHistoryStore();
 const config = getConfig();
 
+// The Snapser gateway forwards the full route prefix (e.g. /v1/byosnap-validator) to the
+// container without stripping it. Serve all routes under this base path so they match.
+// Empty for local dev (no prefix).
+const BASE_PATH = (process.env.BYOSNAP_BASE_PATH || "").replace(/\/+$/, "");
+
 const io = new SocketIOServer({
   cors: {
     origin: "*",
@@ -24,7 +29,7 @@ const io = new SocketIOServer({
 });
 
 const engine = new Engine({
-  path: "/socket.io/",
+  path: `${BASE_PATH}/socket.io/`,
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -181,7 +186,7 @@ io.on("connection", async (socket) => {
   });
 });
 
-const app = new Hono();
+const app = new Hono().basePath(BASE_PATH);
 
 app.use("/*", cors({
   origin: "*",
@@ -241,8 +246,15 @@ export default {
   fetch(req: Request, server: any) {
     const url = new URL(req.url);
 
-    // Route Socket.IO requests to engine
-    if (url.pathname.startsWith("/socket.io/")) {
+    // Always answer the readiness/liveness probe at the unprefixed /health. The platform
+    // probes the container directly (no gateway prefix), so this must work even when
+    // BASE_PATH moves the gateway-facing health route under the prefix.
+    if (url.pathname === "/health") {
+      return Response.json({ status: "ok", timestamp: Date.now() });
+    }
+
+    // Route Socket.IO requests to engine (path includes BASE_PATH when set)
+    if (url.pathname.startsWith(`${BASE_PATH}/socket.io/`)) {
       return engine.handleRequest(req, server);
     }
 

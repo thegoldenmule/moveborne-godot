@@ -5,7 +5,10 @@
   "language": "node",
   "prefix": "/v1",
   "ingress": {
-    "external_port": { "name": "http", "port": 8080 },
+    "external_port": {
+      "name": "http",
+      "port": 8080
+    },
     "internal_ports": []
   },
   "readiness_probe_config": {
@@ -19,12 +22,34 @@
     "cmd": "",
     "args": [],
     "env_params": [
-      { "key": "SNAPSER_ENVIRONMENT", "value": "DEVELOPMENT" },
-      { "key": "PORT", "value": "8080" },
-      { "key": "DEV_MODE", "value": "true" },
-      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
-      { "key": "MATCH_SESSION_TTL", "value": "3600" },
-      { "key": "VALIDATOR_SHARED_SECRET", "value": "dev-byosnap-throwaway-secret" }
+      {
+        "key": "SNAPSER_ENVIRONMENT",
+        "value": "DEVELOPMENT"
+      },
+      {
+        "key": "PORT",
+        "value": "8080"
+      },
+      {
+        "key": "DEV_MODE",
+        "value": "true"
+      },
+      {
+        "key": "CONNECTION_TOKEN_TTL",
+        "value": "300"
+      },
+      {
+        "key": "MATCH_SESSION_TTL",
+        "value": "3600"
+      },
+      {
+        "key": "VALIDATOR_SHARED_SECRET",
+        "value": "dev-byosnap-throwaway-secret"
+      },
+      {
+        "key": "BYOSNAP_BASE_PATH",
+        "value": "/v1/byosnap-validator"
+      }
     ],
     "hpa": null
   },
@@ -35,12 +60,34 @@
     "cmd": "",
     "args": [],
     "env_params": [
-      { "key": "SNAPSER_ENVIRONMENT", "value": "STAGING" },
-      { "key": "PORT", "value": "8080" },
-      { "key": "DEV_MODE", "value": "true" },
-      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
-      { "key": "MATCH_SESSION_TTL", "value": "3600" },
-      { "key": "VALIDATOR_SHARED_SECRET", "value": "stage-set-via-dashboard" }
+      {
+        "key": "SNAPSER_ENVIRONMENT",
+        "value": "STAGING"
+      },
+      {
+        "key": "PORT",
+        "value": "8080"
+      },
+      {
+        "key": "DEV_MODE",
+        "value": "true"
+      },
+      {
+        "key": "CONNECTION_TOKEN_TTL",
+        "value": "300"
+      },
+      {
+        "key": "MATCH_SESSION_TTL",
+        "value": "3600"
+      },
+      {
+        "key": "VALIDATOR_SHARED_SECRET",
+        "value": "stage-set-via-dashboard"
+      },
+      {
+        "key": "BYOSNAP_BASE_PATH",
+        "value": "/v1/byosnap-validator"
+      }
     ],
     "hpa": null
   },
@@ -51,12 +98,34 @@
     "cmd": "",
     "args": [],
     "env_params": [
-      { "key": "SNAPSER_ENVIRONMENT", "value": "PRODUCTION" },
-      { "key": "PORT", "value": "8080" },
-      { "key": "DEV_MODE", "value": "false" },
-      { "key": "CONNECTION_TOKEN_TTL", "value": "300" },
-      { "key": "MATCH_SESSION_TTL", "value": "3600" },
-      { "key": "VALIDATOR_SHARED_SECRET", "value": "prod-set-via-dashboard" }
+      {
+        "key": "SNAPSER_ENVIRONMENT",
+        "value": "PRODUCTION"
+      },
+      {
+        "key": "PORT",
+        "value": "8080"
+      },
+      {
+        "key": "DEV_MODE",
+        "value": "false"
+      },
+      {
+        "key": "CONNECTION_TOKEN_TTL",
+        "value": "300"
+      },
+      {
+        "key": "MATCH_SESSION_TTL",
+        "value": "3600"
+      },
+      {
+        "key": "VALIDATOR_SHARED_SECRET",
+        "value": "prod-set-via-dashboard"
+      },
+      {
+        "key": "BYOSNAP_BASE_PATH",
+        "value": "/v1/byosnap-validator"
+      }
     ],
     "hpa": null
   }
