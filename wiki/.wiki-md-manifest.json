@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 667,
+    "version": 686,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "38a3bd7b40e89ba094b8cbb0818eddcda49b8bf2fc851a1c25f755006b56a59b",
@@ -33,10 +33,10 @@
       "hypercasual-llm/adrs/two-tier-game-state-local-vs-synchronized.md": "9c4b1d9ae44a2b7c3cbe2f8173d2f921f83d531b2ceec384dd1c85a6dbfd18a1",
       "hypercasual-llm/adrs/unify-all-player-input-as-messages-through-a-single-interface.md": "7b7d5bd860c8ae3878f07a0008c1dba63e50d2f233cd4f8b686637a18fdd6372",
       "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
-      "hypercasual-llm/features/app-shell-ui-router/index.md": "f348d43e738965a2621266041a54a97cb66fa888f5e2c723886927a060942576",
-      "hypercasual-llm/features/app-shell-ui-router/implementation-plan.md": "23851f4aa8f901dacdb9ed21a1c671aedf3eee19a40adfc0cc9083e8a4f22287",
-      "hypercasual-llm/features/app-shell-ui-router/testing-plan.md": "96d1a3b655c3d8480fad9d10d39bb577ca78c989e0fb18fc042b637c7cf20d4b",
-      "hypercasual-llm/features/app-shell-ui-router/spec.md": "cf8c804a6a377e07c350be5e36e2f8f16a3ceaa3b824fd9ecc58f3128fefee92"
+      "hypercasual-llm/features/app-shell-ui-router/index.md": "3e973901de8e50b04e422a205071f63704e318f68342a1ca732604711818824b",
+      "hypercasual-llm/features/app-shell-ui-router/implementation-plan.md": "4a0c30f122794ff8718da7c5319d7f67eefe36799a602051c1900ad6e436dce9",
+      "hypercasual-llm/features/app-shell-ui-router/testing-plan.md": "afcd0d9d9f13e5a1a4dec8a4c859664799307e14a017363731c56fb496667c13",
+      "hypercasual-llm/features/app-shell-ui-router/spec.md": "167228300c1546bb8908e0f0df243078c997c09dc8000d120899f559b1968c86"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",

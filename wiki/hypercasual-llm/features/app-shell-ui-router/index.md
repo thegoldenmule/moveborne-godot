@@ -1,6 +1,6 @@
 # Feature: App Shell & UI Router
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 Replace the boot-straight-into-a-match flow with a persistent app shell and a stack-based UI router. Godot's run/main_scene is repointed from scenes/main.tscn to a new app_shell scene that hosts a Royal-Match-style persistent bottom navigation (Collection · Leaderboard · Home · Guilds · Settings, with the center Home tab emphasized) plus a content region. Home is the only real tab in v1 and presents a central hero view plus three play-mode launchers — Story, Infinite, and PvP. Navigation is driven by a UiRouter autoload that manages a stack of UiState entries, each with an await-able enter/exit lifecycle so screen transitions are first-class: tab selection is a flat selector inside the shell state, while launching a play mode pushes a MatchState that covers the shell. The existing match scene (scenes/main.tscn) is demoted from 'the app' to 'the match screen' via surgical edits — it reads a per-match config Dictionary, emits match_exited, and joins the mb_match group so MCP/LLM automation keeps resolving the live match. The menu layer is authored as composed .tscn scenes + a shared Theme resource (a deliberate modernization away from the all-code match UI), while the parity-locked logic/ engine is never touched. PvP ships gated 'coming soon' because the validator path today is single-player dev validation, not a real two-player match.

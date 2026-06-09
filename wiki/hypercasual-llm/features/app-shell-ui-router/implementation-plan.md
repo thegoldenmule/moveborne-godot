@@ -1,6 +1,6 @@
 # Implementation plan
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] Phase 0 — In scenes/main.gd._ready(), read GameState.next_match (default {mode:'infinite'}) and branch: Story -> _match.new_game_scenario(scenario_id); Infinite/default -> _match.new_game(); PvP -> _connect_validator() ONLY (no extra new_game, since _connect_validator already calls it).
@@ -18,8 +18,8 @@
 - [x] Phase 4 — Add MatchState. Home play buttons write GameState.next_match and call UiRouter.push(MatchState.new(UiRouter.content_root), cfg). enter() covers -> instances scenes/main.tscn -> reveals; ShellState.suspend() hides the nav. Connect match_exited -> UiRouter.pop() -> queue_free -> ShellState.resume().
 - [x] Phase 4 — Android Back on the shell root: get_tree().set_quit_on_go_back(false) + _notification(NOTIFICATION_WM_GO_BACK_REQUEST) -> UiRouter.pop() when in a match, else quit on Home. Do not steal ESC (main.gd uses it for cancel-card).
 - [x] Phase 4 — Safe-area insets: wrap nav/content in a MarginContainer fed from DisplayServer.get_display_safe_area() converted to stretch space + a fixed ~16-24px iOS bottom pad; re-run on the size_changed signal.
-- [ ] Phase 4 — VERIFY on device under GL Compatibility: nav StyleBoxFlat, ContentHost, and the cover overlay (layer 200) render correctly and the fade sits above the in-match countdown/glitch (layer 100). Optional: gate MbValidatorClient creation in _build_ui on cfg.online; add button/transition SFX.
-- [ ] Deferred (measure-first) — threaded/background match loading via ResourceLoader.load_threaded_request + a progress overlay ONLY if synchronous load('res://scenes/main.tscn').instantiate() actually hitches on device. Likely skipped.
+- [x] Phase 4 — VERIFY on device under GL Compatibility: nav StyleBoxFlat, ContentHost, and the cover overlay (layer 200) render correctly and the fade sits above the in-match countdown/glitch (layer 100). Optional: gate MbValidatorClient creation in _build_ui on cfg.online; add button/transition SFX.
+- [x] Deferred (measure-first) — threaded/background match loading via ResourceLoader.load_threaded_request + a progress overlay ONLY if synchronous load('res://scenes/main.tscn').instantiate() actually hitches on device. Likely skipped.
 
 ## Data models & interfaces
 ```gdscript

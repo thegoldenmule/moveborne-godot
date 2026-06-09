@@ -1,6 +1,6 @@
 # Spec
 
-**Status:** drafting
+**Status:** sealed
 
 ## Overview
 This feature turns Moveborne from a game that boots straight into a match into an app with a persistent shell and a real navigation layer. The load-bearing pieces are a UiRouter autoload (a stack-based UI state machine whose transitions are awaited) and a UiState lifecycle contract, plus a Royal-Match-style bottom nav and a Home screen that launches matches. This page is the design; the sibling Build Plan lists the steps and the Test Plan the cases.
@@ -217,7 +217,13 @@ Native: manual scene instancing (add-child / queue-free — the persistent-shell
 Real two-player PvP (Snapser matchmaking plus session token); resume-into-match after an app kill (nothing about an in-flight match is persisted — a killed app returns to Home); fleshing out the four placeholder tabs (Settings onto the Quality autoload is the likely first); button and transition SFX; threaded/background match loading (add a loading overlay only if a real hitch is measured on device).
 
 ## Decisions
-_None._
+Greenlighted on 2026-06-09; implemented Phases 0 through 4 and verified the boot-to-Home, tab-switching, and match-launch/return flow in-editor. Shipped to main. Greenlight to begin implementation (Phases 0–4 in the build plan)? The design, spec, and plan are captured and rest in 'planning'; firing beginImplementation should wait for explicit go-ahead to start writing the shell/router code.
+
+PvP ships gated coming-soon: the validator path is single-player dev validation, not a real two-player match. Real PvP awaits Snapser matchmaking + a session token. Decision — PvP behavior in v1: gated coming-soon, wire the dev-validator path, or omit PvP?
+
+Menu layer authored as .tscn scenes plus a shared Theme resource (moveborne-ui); the match scene stays imperatively code-built and only surgically edited. Decision — menu layer build style: pure-code house style, or .tscn scenes + a shared Theme resource?
+
+A real UiRouter autoload with a stackable UiState FSM and async (await-able) enter for transitions; not a lightweight method-set. Chosen as load-bearing infrastructure. Decision — navigation: a lightweight method-set on the shell, or a real UiRouter with a stackable FSM + async enter?
 
 ## References
 _None._
