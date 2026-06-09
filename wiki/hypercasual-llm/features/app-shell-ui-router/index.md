@@ -64,4 +64,4 @@ _None._
 - [Test Plan — App Shell & UI Router](testing-plan:mq6xk2qt-001x-3oapg4)
 
 ## Commits
-_None._
+- `f419dbf` feat(ui): app shell + stack-based UI router + bottom nav — verified boot->Home, tab switching, Story+Infinite launch, in-match Home returns to shell
