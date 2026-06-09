@@ -79,7 +79,7 @@ verifier/suite — never hand-write expected values.
 - **Drive the game by game concepts** (swipe / read board / play card): use the
   `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
   analog of the TS `window.__moveborne`. Full reference: **`MCP_GAME_API.md`**.
-- **Validator:** `tools/run_validator.sh` (DEV_MODE, `:5555`) wraps this repo's
+- **Validator:** `tools/run_validator.sh` (`:5555`) wraps this repo's
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
   dist), or `cd ../validator && bun run dev`. Endpoints + the MCP debug tools are in
   `../validator/README.md` and `../validator/src/validator/CLAUDE.md`.

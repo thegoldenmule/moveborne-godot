@@ -787,14 +787,17 @@ func _cycle_quality() -> void:
 	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
-## Dev shortcut (V key): restart Endless against the LOCAL dev validator (:5555).
+## Dev shortcut (V key): restart Endless against the LOCAL validator (:5555).
 func _connect_validator() -> void:
 	# new_game() BEFORE _cancel_target(): _cancel_target -> _rebuild_hand reads
 	# _match.state["hand"], so the state must exist first.
 	_match.online = false
 	_match.new_game()
 	_cancel_target()
-	_start_net(LOCAL_VALIDATOR_URL, "player_%d" % (randi() % 1000000), PackedStringArray())
+	# No gateway in front of the local validator, so self-stamp the User-Id it now
+	# requires (== player_id). Locally this is just a consistency check, not real auth.
+	var player_id := "player_%d" % (randi() % 1000000)
+	_start_net(LOCAL_VALIDATOR_URL, player_id, PackedStringArray(["User-Id: " + player_id]))
 
 
 ## Story/PvP: anonymous Snapser sign-in, then register the CURRENT match state with

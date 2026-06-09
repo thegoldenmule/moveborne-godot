@@ -59,11 +59,9 @@ io.use(async (socket, next) => {
 
     // Bind the WS upgrade to the gateway-validated user too: the gateway checks
     // the session token on the upgrade request and forwards User-Id, same as HTTP.
-    if (!config.devMode) {
-      const auth = verifySnapserCaller(socket.handshake.headers, player_id);
-      if (!auth.ok) {
-        return next(new Error("UNAUTHORIZED"));
-      }
+    const auth = verifySnapserCaller(socket.handshake.headers, player_id);
+    if (!auth.ok) {
+      return next(new Error("UNAUTHORIZED"));
     }
 
     socket.data.match_id = match.match_id;
@@ -279,8 +277,3 @@ console.log(`🚀 Validator server starting on port ${process.env.PORT || 3000}`
 console.log(`📡 Socket.IO endpoint: /socket.io/`);
 console.log(`🏥 Health check: /health`);
 console.log(`🔧 MCP endpoint: /mcp`);
-
-if (config.devMode) {
-  console.warn(`⚠️  WARNING: DEV_MODE is enabled - Snapser gateway auth checks are DISABLED`);
-  console.warn(`⚠️  This should ONLY be used in development environments`);
-}

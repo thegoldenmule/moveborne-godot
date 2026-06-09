@@ -20,21 +20,12 @@ function getEnvNumber(name: string, defaultValue: number): number {
   return parsed;
 }
 
-function getEnvBoolean(name: string, defaultValue: boolean): boolean {
-  const value = process.env[name];
-  if (!value) {
-    return defaultValue;
-  }
-  return value.toLowerCase() === "true" || value === "1";
-}
-
 export function loadConfig(): ValidatorConfig {
   return {
     sharedSecret: getEnvVar("VALIDATOR_SHARED_SECRET"),
     connectionTokenTTL: getEnvNumber("CONNECTION_TOKEN_TTL", 300),
     matchSessionTTL: getEnvNumber("MATCH_SESSION_TTL", 3600),
     port: getEnvNumber("PORT", 3000),
-    devMode: getEnvBoolean("DEV_MODE", false),
   };
 }
 

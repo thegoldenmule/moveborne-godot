@@ -1,7 +1,8 @@
 extends SceneTree
 
 ## Headless end-to-end check of MbValidatorClient against a running validator
-## (DEV_MODE on :5555):  init -> connect -> ready -> validate_action -> expect MATCH.
+## on :5555 (self-stamps the User-Id it binds, == player_id):
+##   init -> connect -> ready -> validate_action -> expect MATCH.
 ##   godot --headless --path . --script res://tools/test_validator_client.gd
 
 const ClientS := preload("res://net/validator_client.gd")
@@ -22,7 +23,8 @@ func _start() -> void:
 	_client.ready_received.connect(func(_cur): _on_ready(starting))
 	_client.action_validated.connect(_on_validated)
 	_client.validator_error.connect(func(m): _fail("validator_error: " + m))
-	_client.init_and_connect("http://localhost:5555", "m_gd_1", starting, "p_gd")
+	# Local validator has no gateway in front, so self-stamp the User-Id it requires (== player_id).
+	_client.init_and_connect("http://localhost:5555", "m_gd_1", starting, "p_gd", PackedStringArray(["User-Id: p_gd"]))
 	create_timer(10.0).timeout.connect(func(): _fail("timeout"))
 
 

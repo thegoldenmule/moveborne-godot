@@ -30,7 +30,7 @@ The validator supports initializing matches from saved state histories via `POST
 - `history_data` (optional): Array of StateHistorySnapshot objects
 - `start_from_index` (optional): moveIndex to start from (defaults to last state)
 - `player_id` (required): Player identifier (must match the gateway-validated
-  `User-Id` header unless DEV_MODE)
+  `User-Id` header; locally, the self-stamped one)
 
 One of `history_file_id` or `history_data` must be provided.
 

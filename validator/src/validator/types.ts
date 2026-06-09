@@ -59,11 +59,10 @@ export interface ValidatorConfig {
   connectionTokenTTL: number;
   matchSessionTTL: number;
   port: number;
-  devMode: boolean;
 }
 
 export type ValidatorErrorCode =
-  | "INVALID_SIGNATURE"
+  | "UNAUTHORIZED"
   | "MATCH_NOT_FOUND"
   | "INVALID_TOKEN"
   | "TOKEN_EXPIRED"

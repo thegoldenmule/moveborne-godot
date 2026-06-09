@@ -86,13 +86,18 @@ e.g. `/v1/byosnap-validator`) without stripping it, so routes are served under t
 
 ## Online play (game ⇄ validator)
 
-The game client and all tooling target **one validator on `:5555`** — the self-contained `validator/`
-in this repo:
+Two targets, same `validator/` code:
 
-- Start it: `tools/run_validator.sh` (one-shot wrapper) **or** `cd validator && bun run dev` **or** the
-  `run-validator` skill. All serve `:5555` in DEV_MODE.
-- In-game, press **`V`** to connect (`game/scenes/main.gd` → `VALIDATOR_URL = http://localhost:5555`).
-  The HUD shows `validator: ✓ move N ok`; on a hash mismatch the client snaps to authoritative state.
+- **Story (and PvP)** sign in to Snapser anonymously and validate against the **deployed
+  BYOSnap** (gateway + `/v1/byosnap-validator`); **Infinite is always offline**. See
+  `game/net/snapser_auth.gd` + `_connect_snapser()` in `game/scenes/main.gd`.
+- **Local dev:** start `tools/run_validator.sh` (one-shot) **or** `cd validator && bun run dev`
+  **or** the `run-validator` skill (all serve `:5555`), then press **`V`** in-game
+  (`main.gd` → `LOCAL_VALIDATOR_URL`). The HUD shows `validator: ✓ move N`; on a hash mismatch
+  the client snaps to authoritative state.
+- **Auth has no bypass switch.** Match-init + the Socket.IO handshake bind the gateway-validated
+  `User-Id` header to `player_id`. Locally there's no gateway, so callers self-stamp a matching
+  `User-Id` (the game and `run_validator.sh` do this). api-key/internal callers pass unbound.
 
 ## MCP servers & skills
 

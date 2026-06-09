@@ -31,8 +31,12 @@ For production, set a strong secret in `src/validator/.env`:
 
 ```bash
 VALIDATOR_SHARED_SECRET=$(openssl rand -hex 32)
-DEV_MODE=false
 ```
+
+Auth has no bypass switch: match-init and the Socket.IO handshake require the
+Snapser gateway's validated `User-Id` header to equal `player_id`. Locally
+there's no gateway, so callers self-stamp a matching `User-Id` (the game and
+`run_validator.sh` do this); api-key/internal callers pass without user binding.
 
 ## Run
 

@@ -372,8 +372,11 @@ VALIDATOR_SHARED_SECRET=dev-shared-secret-change-me
 PORT=5555
 CONNECTION_TOKEN_TTL=300
 MATCH_SESSION_TTL=3600
-DEV_MODE=true
 ```
+
+Auth has no bypass switch: match-init and the Socket.IO handshake require a
+`User-Id` header equal to `player_id` (the Snapser gateway sets it in prod; local
+callers self-stamp it). Direct `curl`/MCP probes must send `-H "User-Id: <player_id>"`.
 
 ### Port Configuration
 

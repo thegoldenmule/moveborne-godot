@@ -52,7 +52,8 @@ lock = grey, decay = green, stone = dark.
 ## Online play against the validator (optional)
 
 This repo's `validator/` re-runs the same rules engine and confirms every move. Run
-it in DEV_MODE (which skips the Nakama signature check, so Nakama isn't needed):
+it locally (no Nakama, no Snapser gateway needed — the client self-stamps the
+`User-Id` the validator binds to):
 
 ```bash
 tools/run_validator.sh          # serves the in-repo validator on http://localhost:5555

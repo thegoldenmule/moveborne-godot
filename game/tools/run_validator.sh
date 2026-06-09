@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run THIS repo's validator in DEV_MODE (authoritative move validation, no Nakama).
+# Run THIS repo's validator locally (authoritative move validation, no Nakama).
 #
 # Convenience wrapper around the self-contained `validator/` Bun workspace at the
 # repo root. Its `@spyre-io/moveborne-logic` dep is the prebuilt dist committed
@@ -26,7 +26,9 @@ fi
 cd "$VALIDATOR"
 [ -d node_modules ] || bun install
 
-echo "Starting in-repo validator on :$PORT (DEV_MODE — Nakama signature check disabled)"
+# No gateway in front locally, so callers self-stamp the User-Id the validator
+# requires (== player_id) — see scenes/main.gd / test_validator_client.gd.
+echo "Starting in-repo validator on :$PORT"
 exec env \
   VALIDATOR_SHARED_SECRET="${VALIDATOR_SHARED_SECRET:-dev-secret}" \
-  DEV_MODE=true PORT="$PORT" bun run dev
+  PORT="$PORT" bun run dev

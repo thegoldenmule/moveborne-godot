@@ -35,19 +35,15 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
 
       const config = getConfig();
 
-      if (!config.devMode) {
-        const auth = verifySnapserCaller(c.req.header(), player_id);
-        if (!auth.ok) {
-          return c.json(
-            {
-              error: "UNAUTHORIZED",
-              message: auth.reason,
-            },
-            401,
-          );
-        }
-      } else {
-        console.warn("⚠️  DEV MODE: Skipping Snapser gateway auth check");
+      const auth = verifySnapserCaller(c.req.header(), player_id);
+      if (!auth.ok) {
+        return c.json(
+          {
+            error: "UNAUTHORIZED",
+            message: auth.reason,
+          },
+          401,
+        );
       }
 
       const connection_id = generateConnectionId();
@@ -111,19 +107,16 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
         );
       }
 
-      // Same caller check as /init — this route previously had no auth at all
-      // outside dev mode, despite being gateway-passthrough.
-      if (!getConfig().devMode) {
-        const auth = verifySnapserCaller(c.req.header(), player_id);
-        if (!auth.ok) {
-          return c.json(
-            {
-              error: "UNAUTHORIZED",
-              message: auth.reason,
-            },
-            401,
-          );
-        }
+      // Same caller check as /init.
+      const auth = verifySnapserCaller(c.req.header(), player_id);
+      if (!auth.ok) {
+        return c.json(
+          {
+            error: "UNAUTHORIZED",
+            message: auth.reason,
+          },
+          401,
+        );
       }
 
       if (!history_file_id && !history_data) {
