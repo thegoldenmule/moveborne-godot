@@ -13,7 +13,8 @@ signal play_mode_selected(cfg: Dictionary)
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Root size comes from the shell (screen.size = viewport); the CenterContainer
+	# fills the root via anchors and centers the content.
 	_center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_vbox.add_theme_constant_override("separation", 18)
 	_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -21,9 +22,9 @@ func _ready() -> void:
 	_hero.text = "MOVEBORNE"
 	_hero.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hero.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_hero.add_theme_font_size_override("font_size", 46)
+	_hero.add_theme_font_size_override("font_size", 34)
 	_hero.add_theme_color_override("font_color", MbStyle.PRIMARY)
-	_hero.custom_minimum_size = Vector2(360, 200)
+	_hero.custom_minimum_size = Vector2(320, 180)
 
 	_style_play(_story, "Story")
 	_style_play(_infinite, "Infinite")

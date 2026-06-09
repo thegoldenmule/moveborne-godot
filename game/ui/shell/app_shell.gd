@@ -10,6 +10,7 @@ const PlaceholderScene := preload("res://ui/screens/placeholder_tab.tscn")
 
 const HOME_INDEX := 2
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
+const NAV_HEIGHT := 96.0
 
 @onready var _content: Control = $Content
 @onready var _nav_layer: CanvasLayer = $NavLayer
@@ -24,36 +25,44 @@ const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
 ]
 
 var _screens: Array = []
+var _bg: ColorRect
 
 
 func _ready() -> void:
+	# Wire the brand font into the shared menu theme (theme_manage can't set it).
+	if theme != null:
+		theme.default_font = load(MbStyle.FONT_PATH)
+		theme.default_font_size = 18
+
 	# A Control parented under a CanvasLayer doesn't reliably inherit the viewport
 	# size from anchors alone, so size the shell + content host explicitly.
 	var vp := get_viewport_rect().size
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Top-left anchors (equal-opposite) + explicit size: fills the viewport without
+	# the "size overridden by anchors" warning that full-rect + explicit size emits.
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	position = Vector2.ZERO
 	size = vp
-	_content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_content.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_content.position = Vector2.ZERO
 	_content.size = vp
 
 	# Dark app background behind the content (the brand near-black).
-	var bg := ColorRect.new()
-	bg.color = MbStyle.BG
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(bg)
-	move_child(bg, 0)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.size = vp
+	_bg = ColorRect.new()
+	_bg.color = MbStyle.BG
+	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg)
+	move_child(_bg, 0)
+	_bg.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_bg.size = vp
 
 	# Nav on its own higher CanvasLayer so its buttons win the GUI-input race over the
 	# full-screen content Controls (which otherwise swallow taps in the bottom strip).
 	_nav_layer.layer = 5
 
-	# Nav bar pinned to the bottom of the viewport.
+	# Nav bar pinned to the bottom of the viewport (raised above the safe-area inset).
 	_nav_bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_nav_bar.offset_top = -96.0
-	_nav_bar.offset_bottom = 0.0
+	_apply_safe_area()
+	get_viewport().size_changed.connect(_on_viewport_resized)
 	var nav_sb := StyleBoxFlat.new()
 	nav_sb.bg_color = MbStyle.BOARD
 	nav_sb.border_color = MbStyle.PRIMARY
@@ -72,7 +81,6 @@ func _ready() -> void:
 			screen = PlaceholderScene.instantiate()
 			screen.set_title(TAB_LABELS[i])
 		_content.add_child(screen)
-		screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 		screen.position = Vector2.ZERO
 		screen.size = vp
 		_screens.append(screen)
@@ -114,3 +122,37 @@ func _on_play_mode_selected(cfg: Dictionary) -> void:
 func set_active(v: bool) -> void:
 	visible = v
 	_nav_layer.visible = v
+
+
+## Raise the nav bar above the device's bottom safe inset (iOS home indicator /
+## Android gesture bar). On desktop/editor the safe area equals the window, so this
+## resolves to a no-op (pad = 0).
+func _apply_safe_area() -> void:
+	var pad := _bottom_safe_inset()
+	_nav_bar.offset_top = -(NAV_HEIGHT + pad)
+	_nav_bar.offset_bottom = -pad
+
+
+func _bottom_safe_inset() -> float:
+	var win := DisplayServer.window_get_size()
+	if win.y <= 0:
+		return 0.0
+	var safe := DisplayServer.get_display_safe_area()
+	var phys_bottom := float(win.y) - float(safe.position.y + safe.size.y)
+	if phys_bottom <= 0.0:
+		return 0.0
+	# Physical px -> logical (canvas) px via the viewport/window height ratio.
+	return phys_bottom * get_viewport_rect().size.y / float(win.y)
+
+
+## Re-fill on viewport resize (aspect=expand changes the logical size per device).
+func _on_viewport_resized() -> void:
+	var vp := get_viewport_rect().size
+	size = vp
+	_content.size = vp
+	if is_instance_valid(_bg):
+		_bg.size = vp
+	for s in _screens:
+		if is_instance_valid(s):
+			s.size = vp
+	_apply_safe_area()

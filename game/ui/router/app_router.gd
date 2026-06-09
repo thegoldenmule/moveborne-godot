@@ -23,6 +23,22 @@ func _ready() -> void:
 	content_root.name = "RouterContent"
 	content_root.layer = 1
 	add_child(content_root)
+	# Own the Android/system Back button: route it through the stack instead of
+	# letting it quit the app outright.
+	get_tree().set_quit_on_go_back(false)
+
+
+## Android system Back (NOTIFICATION_WM_GO_BACK_REQUEST): pop one level, or quit
+## when already at the root (the shell). Distinct from ESC, which main.gd uses to
+## cancel card targeting.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if _busy:
+			return
+		if _stack.size() > 1:
+			pop()
+		else:
+			get_tree().quit()
 
 
 func top():
