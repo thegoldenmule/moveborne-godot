@@ -32,7 +32,7 @@ _None._
 `bun run dev`. REST init returns a `connection_id`; clients then open a Socket.IO connection carrying it. Match routes (`createMatchRoutes`) are mounted on the Hono app; CORS is wide-open for dev. Per CLAUDE.md, the dev server runs under `bun run --watch` — do not kill/restart it; it hot-reloads on file change.
 
 ## Invariants & constraints
-- Handshake auth (connection_id → match_id → player_id, plus the gateway-validated User-Id binding outside DEV_MODE) must pass before any action is processed; failures reject with MATCH_NOT_FOUND / PLAYER_MISMATCH / UNAUTHORIZED / AUTHENTICATION_FAILED.
+- Handshake auth (connection_id → match_id → player_id, plus the gateway-validated User-Id binding) must pass before any action is processed; failures reject with MATCH_NOT_FOUND / PLAYER_MISMATCH / UNAUTHORIZED / AUTHENTICATION_FAILED. The check always runs (no DEV_MODE).
 
 ## Synced commit
-3e6874e
+7f55d94

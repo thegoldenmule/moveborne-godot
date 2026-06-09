@@ -39,11 +39,11 @@ _No dependencies._
 Wire types: `ValidatorInitRequest/Response`, `GameActionRequest {index, action, state_hash}`, and the response union `GameActionResponseMatch {index, signature}` | `GameActionResponseMismatch {index, state, signature}`. State and action types come from `@spyre-io/moveborne-logic` (`SynchronizedGameState`, `GameAction`), keeping the validator's serialization identical to client and engine.
 
 ## Usage
-`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it in **DEV_MODE** on `:5555` (skips the Snapser gateway auth checks, which need the gateway in front).
+`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it on `:5555`.
 
-**Lifecycle:** (1) `POST /api/match/init` with `(match_id, starting_state, player_id)` → outside DEV_MODE, the gateway-validated `User-Id` header must match `player_id` (see Crypto & Signing); stores match, returns `connection_id`. (2) Client connects via Socket.IO with `(connection_id, player_id)` — the handshake is bound to the same gateway-validated user. (3) Per action, client emits `(index, action, state_hash)`; validator executes, hashes, signs, replies match or mismatch. (4) `POST /api/match/init-from-history` replays a saved state history for debugging (same caller check).
+**Lifecycle:** (1) `POST /api/match/init` with `(match_id, starting_state, player_id)` → the gateway-validated `User-Id` header must match `player_id` (see Crypto & Signing); stores match, returns `connection_id`. (2) Client connects via Socket.IO with `(connection_id, player_id)` — the handshake is bound to the same gateway-validated user. (3) Per action, client emits `(index, action, state_hash)`; validator executes, hashes, signs, replies match or mismatch. (4) `POST /api/match/init-from-history` replays a saved state history for debugging (same caller check). Locally there is no gateway, so callers self-stamp a matching `User-Id`.
 
-**Config (env):** `VALIDATOR_SHARED_SECRET` (required), `CONNECTION_TOKEN_TTL` (300s), `MATCH_SESSION_TTL` (3600s), `PORT` (3000), `DEV_MODE`.
+**Config (env):** `VALIDATOR_SHARED_SECRET` (required), `CONNECTION_TOKEN_TTL` (300s), `MATCH_SESSION_TTL` (3600s), `PORT` (3000). There is no DEV_MODE — the auth check always runs.
 
 ## Invariants & constraints
 - The validator is the source of truth for state: on any hash mismatch it returns its computed authoritative state and the client must sync to it.
@@ -52,4 +52,4 @@ Wire types: `ValidatorInitRequest/Response`, `GameActionRequest {index, action, 
 - Sessions are single-player scoped; socket auth binds `connection_id` → `match_id` → `player_id`, rejecting MATCH_NOT_FOUND / PLAYER_MISMATCH before any game logic runs.
 
 ## Synced commit
-3e6874e
+7f55d94

@@ -9,7 +9,7 @@ subsystem
 Inbound trust + outbound signing. `utils/snapser-auth.ts` — gateway-header caller verification (`verifySnapserCaller`) binding the Snapser gateway's validated `User-Id` to the claimed `player_id`. `utils/crypto.ts` — HMAC-SHA256 over canonical serialization for the outbound validator response `(match_id, index, action, state_hash)`, plus connection-id/UUID generation.
 
 ## Purpose
-Establish trust at both ends of the loop. Inbound: the BYOSnap is only reachable through the Snapser gateway, which validates the caller's session token against the Auth snap BEFORE forwarding and stamps the result as plain headers (`User-Id`, `Auth-Type`, `Gateway`) — Snapser exposes no signed claim/JWKS for offline verification, so those headers ARE the claim. `verifySnapserCaller` gates `/init`, `/init-from-history`, and the Socket.IO handshake (all skipped in DEV_MODE): the gateway-validated `User-Id` must equal the claimed `player_id`; `api-key` and `internal` (snap-to-snap) callers carry no user context and pass without binding. This replaced the original Nakama init HMAC (`verifyNakamaSignature`, removed). Outbound: `signValidatorResponse` signs every ACK/mismatch so a downstream server can accept validated actions without re-simulating; HMACs are computed over `canonicalStringify(data)` and compared with `timingSafeEqual`.
+Establish trust at both ends of the loop. Inbound: the BYOSnap is only reachable through the Snapser gateway, which validates the caller's session token against the Auth snap BEFORE forwarding and stamps the result as plain headers (`User-Id`, `Auth-Type`, `Gateway`) — Snapser exposes no signed claim/JWKS for offline verification, so those headers ARE the claim. `verifySnapserCaller` gates `/init`, `/init-from-history`, and the Socket.IO handshake unconditionally (there is no DEV_MODE bypass): the gateway-validated `User-Id` must equal the claimed `player_id`; `api-key` and `internal` (snap-to-snap) callers carry no user context and pass without binding. Locally there is no gateway, so callers self-stamp a matching `User-Id` (the check is a no-op consistency check there, not real auth). This replaced the original Nakama init HMAC (`verifyNakamaSignature`, removed). Outbound: `signValidatorResponse` signs every ACK/mismatch so a downstream server can accept validated actions without re-simulating; HMACs are computed over `canonicalStringify(data)` and compared with `timingSafeEqual`.
 
 ## Design notes
 _None._
@@ -33,7 +33,7 @@ _None._
 
 ## Invariants & constraints
 - Signing canonicalization MUST match the client/engine's (canonicalStringify) byte-for-byte, or a correct state would fail verification. Comparison is constant-time (timingSafeEqual).
-- Gateway-header trust is only sound while the BYOSnap has no ingress other than the Snapser gateway (private snapend network). Never expose the container port directly, and never run DEV_MODE=true behind real traffic — it disables all inbound auth.
+- Gateway-header trust is only sound while the BYOSnap has no ingress other than the Snapser gateway (private snapend network), AND the gateway sanitizes client-supplied User-Id/Gateway headers and re-stamps User-Id from the validated token. Never expose the container port directly to untrusted callers.
 
 ## Synced commit
-3e6874e
+7f55d94
