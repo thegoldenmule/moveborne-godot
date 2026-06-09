@@ -59,17 +59,21 @@ func _ready() -> void:
 	# full-screen content Controls (which otherwise swallow taps in the bottom strip).
 	_nav_layer.layer = 5
 
-	# Nav bar pinned to the bottom of the viewport (raised above the safe-area inset).
-	_nav_bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	# Nav bar pinned full-width to the bottom. Sized explicitly: a Control under a
+	# CanvasLayer doesn't resolve BOTTOM_WIDE anchors to the viewport reliably (it
+	# would collapse to its content width instead).
+	_nav_bar.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_on_viewport_resized)
 	var nav_sb := StyleBoxFlat.new()
 	nav_sb.bg_color = MbStyle.BOARD
 	nav_sb.border_color = MbStyle.PRIMARY
 	nav_sb.set_border_width(SIDE_TOP, 2)
+	nav_sb.set_content_margin_all(0)
+	nav_sb.set_content_margin(SIDE_TOP, 2)
 	_nav_bar.add_theme_stylebox_override("panel", nav_sb)
-	_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_row.add_theme_constant_override("separation", 6)
+	_row.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_row.add_theme_constant_override("separation", 0)
 
 	# Build the five tab screens into the content host (Home is real; rest stubs).
 	for i in range(5):
@@ -85,7 +89,8 @@ func _ready() -> void:
 		screen.size = vp
 		_screens.append(screen)
 
-	# Radio selection across the five tab buttons (exactly one active).
+	# Radio selection across the five tab buttons; each takes an equal share of the
+	# full bar width (Home a wider share), exactly one active.
 	var group := ButtonGroup.new()
 	for i in range(5):
 		var b: Button = _tabs[i]
@@ -93,14 +98,17 @@ func _ready() -> void:
 		b.button_group = group
 		b.focus_mode = Control.FOCUS_NONE
 		b.text = TAB_LABELS[i]
-		b.custom_minimum_size = Vector2(62, 70)
+		b.clip_text = true
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 72)
 		b.add_theme_font_size_override("font_size", 13)
+		_style_nav_button(b)
 		b.pressed.connect(_select_tab.bind(i))
 
-	# Emphasize the center Home tab (larger).
+	# Emphasize the center Home tab: a wider share + a larger label.
 	var home_btn: Button = _tabs[HOME_INDEX]
-	home_btn.custom_minimum_size = Vector2(96, 86)
-	home_btn.add_theme_font_size_override("font_size", 17)
+	home_btn.size_flags_stretch_ratio = 1.5
+	home_btn.add_theme_font_size_override("font_size", 18)
 
 	_select_tab(HOME_INDEX)
 	home_btn.button_pressed = true
@@ -124,13 +132,34 @@ func set_active(v: bool) -> void:
 	_nav_layer.visible = v
 
 
+## Flat nav-bar look: transparent tabs with dim text; the selected (toggled) tab
+## gets a subtle purple highlight + bright text. Overrides the themed Button box.
+func _style_nav_button(b: Button) -> void:
+	var empty := StyleBoxEmpty.new()
+	b.add_theme_stylebox_override("normal", empty)
+	b.add_theme_stylebox_override("focus", empty)
+	var hover := StyleBoxFlat.new()
+	hover.bg_color = Color(1.0, 1.0, 1.0, 0.06)
+	b.add_theme_stylebox_override("hover", hover)
+	var sel := StyleBoxFlat.new()
+	sel.bg_color = Color(MbStyle.PRIMARY, 0.20)
+	sel.set_corner_radius_all(10)
+	b.add_theme_stylebox_override("pressed", sel)
+	b.add_theme_stylebox_override("hover_pressed", sel)
+	b.add_theme_color_override("font_color", MbStyle.DIM)
+	b.add_theme_color_override("font_hover_color", MbStyle.TEXT)
+	b.add_theme_color_override("font_pressed_color", MbStyle.TEXT)
+	b.add_theme_color_override("font_hover_pressed_color", MbStyle.TEXT)
+
+
 ## Raise the nav bar above the device's bottom safe inset (iOS home indicator /
 ## Android gesture bar). On desktop/editor the safe area equals the window, so this
 ## resolves to a no-op (pad = 0).
 func _apply_safe_area() -> void:
+	var vp := get_viewport_rect().size
 	var pad := _bottom_safe_inset()
-	_nav_bar.offset_top = -(NAV_HEIGHT + pad)
-	_nav_bar.offset_bottom = -pad
+	_nav_bar.size = Vector2(vp.x, NAV_HEIGHT)
+	_nav_bar.position = Vector2(0.0, vp.y - NAV_HEIGHT - pad)
 
 
 func _bottom_safe_inset() -> float:
