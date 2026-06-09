@@ -19,7 +19,7 @@ _No components._
 
 ## Dependencies
 - **depends-on** → [Match State Store](architecture:mq1c31rb-000x-6l2ehj) — Reads/writes match state and resolves sockets by connection_id.
-- **depends-on** → [Crypto &amp; Signing](architecture:mq1c351c-0011-gtfyxx) — Verifies the Nakama init signature and signs each validation response.
+- **depends-on** → [Crypto &amp; Signing](architecture:mq1c351c-0011-gtfyxx) — Verifies the Snapser gateway caller (User-Id binding) on init + the Socket.IO handshake, and signs each validation response.
 
 ## Code references
 - `validator/src/validator/index.ts`
@@ -32,7 +32,7 @@ _None._
 `bun run dev`. REST init returns a `connection_id`; clients then open a Socket.IO connection carrying it. Match routes (`createMatchRoutes`) are mounted on the Hono app; CORS is wide-open for dev. Per CLAUDE.md, the dev server runs under `bun run --watch` — do not kill/restart it; it hot-reloads on file change.
 
 ## Invariants & constraints
-- Handshake auth (connection_id → match_id → player_id) must pass before any action is processed; failures reject with MATCH_NOT_FOUND / PLAYER_MISMATCH / AUTHENTICATION_FAILED.
+- Handshake auth (connection_id → match_id → player_id, plus the gateway-validated User-Id binding outside DEV_MODE) must pass before any action is processed; failures reject with MATCH_NOT_FOUND / PLAYER_MISMATCH / UNAUTHORIZED / AUTHENTICATION_FAILED.
 
 ## Synced commit
-ada25ef
+3e6874e

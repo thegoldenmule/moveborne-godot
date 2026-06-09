@@ -9,9 +9,9 @@ service
 Real-time state-validation authority for Moveborne, built with **Bun + Hono + Socket.IO** (`@socket.io/bun-engine`). It re-runs the canonical `@spyre-io/moveborne-logic` engine for every action, signs valid transitions with HMAC-SHA256, and returns authoritative state on mismatch. Lives in this repo at `validator/src/validator` and runs unchanged against the Godot client.
 
 ## Purpose
-Be the trusted arbiter of game state. The client plays optimistically; the validator independently executes each action against stored state, hashes the result, and either ACKs the client's predicted hash (fast path) or ships back the authoritative state to sync. Signed responses `HMAC((match_id, index, action, state_hash), secret)` let the downstream server (Nakama) accept validated actions without re-simulating.
+Be the trusted arbiter of game state. The client plays optimistically; the validator independently executes each action against stored state, hashes the result, and either ACKs the client's predicted hash (fast path) or ships back the authoritative state to sync. Signed responses `HMAC((match_id, index, action, state_hash), secret)` let a downstream server accept validated actions without re-simulating.
 
-Sessions are scoped to a single player; multi-user orchestration is Nakama's job, relaying validated actions.
+Sessions are scoped to a single player; multi-user orchestration is the platform's job (Snapser — the validator deploys there as a BYOSnap), relaying validated actions.
 
 ## Design notes
 _None._
@@ -39,9 +39,9 @@ _No dependencies._
 Wire types: `ValidatorInitRequest/Response`, `GameActionRequest {index, action, state_hash}`, and the response union `GameActionResponseMatch {index, signature}` | `GameActionResponseMismatch {index, state, signature}`. State and action types come from `@spyre-io/moveborne-logic` (`SynchronizedGameState`, `GameAction`), keeping the validator's serialization identical to client and engine.
 
 ## Usage
-`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it in **DEV_MODE** on `:5555` (skips the Nakama signature check so Nakama isn't needed).
+`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it in **DEV_MODE** on `:5555` (skips the Snapser gateway auth checks, which need the gateway in front).
 
-**Lifecycle:** (1) `POST /api/match/init` with `(match_id, starting_state, player_id, signature)` → verifies Nakama signature, stores match, returns `connection_id`. (2) Client connects via Socket.IO with `(connection_id, player_id)`. (3) Per action, client emits `(index, action, state_hash)`; validator executes, hashes, signs, replies match or mismatch. (4) `POST /api/match/init-from-history` replays a saved state history for debugging.
+**Lifecycle:** (1) `POST /api/match/init` with `(match_id, starting_state, player_id)` → outside DEV_MODE, the gateway-validated `User-Id` header must match `player_id` (see Crypto & Signing); stores match, returns `connection_id`. (2) Client connects via Socket.IO with `(connection_id, player_id)` — the handshake is bound to the same gateway-validated user. (3) Per action, client emits `(index, action, state_hash)`; validator executes, hashes, signs, replies match or mismatch. (4) `POST /api/match/init-from-history` replays a saved state history for debugging (same caller check).
 
 **Config (env):** `VALIDATOR_SHARED_SECRET` (required), `CONNECTION_TOKEN_TTL` (300s), `MATCH_SESSION_TTL` (3600s), `PORT` (3000), `DEV_MODE`.
 
@@ -52,4 +52,4 @@ Wire types: `ValidatorInitRequest/Response`, `GameActionRequest {index, action, 
 - Sessions are single-player scoped; socket auth binds `connection_id` → `match_id` → `player_id`, rejecting MATCH_NOT_FOUND / PLAYER_MISMATCH before any game logic runs.
 
 ## Synced commit
-ada25ef
+3e6874e
