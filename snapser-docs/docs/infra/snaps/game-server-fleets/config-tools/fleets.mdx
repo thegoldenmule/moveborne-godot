@@ -1,0 +1,51 @@
+# Fleets
+A fleet is a collection of game servers that can be allocated on Snapser's global infrastructure. You can create multiple fleets for your game.
+
+To get started:
+1. Click on Fleets from the side Nav and then click on the **Add fleet** button
+2. This will show you a form where you can start configuring your first fleet.
+
+## Fleet Details
+- **Name** - A unique name for your fleet. This can be any alphanumeric string with dashes and underscores.
+- **Description** - The description of your fleet.
+
+## Server Image
+- **Image Selector** - Pick the tag of the game server image you uploaded using the SnapCtl. This is the image that will be used to spin up your game servers.
+
+## Server Ports
+- **Ingress Port** - The port on which your game server will be listening. This is the port that your game client will connect to.
+- **Debug Port** - This port is optional. The port on which your game server will be listening for debugging. This is the port that you can use to connect to your game server for debugging.
+
+## Configuration Regions
+- **Regions** - The regions in which you want to deploy your fleet. You can select multiple regions.
+
+## Configuration Allocation Settings
+- **Min Server Count** - The minimum number of servers you want to run for your fleet. If you use a buffer % then min server count has to at least be 1. If you use a buffer number, then minimum server count should be equal to buffer count.
+- **Max Server Count** - The maximum number of servers you want to run for your fleet. This number should be greater or equal to the min server count.
+- **Buffer Server Count** - The number of servers you want to keep in a buffer state. This is the number of servers that will be ready to be allocated to your game within a few seconds. Value can be a number or a percentage.
+  <Note>
+    For example, if you have 1 server allocated and you set the buffer server count to 75%, then you will have 3 servers in the buffer or state.
+  </Note>
+
+![Fleet Add](/images/docs/fleet-add.png)
+
+## Configuration Hardware Settings
+- **CPU** - The number of CPUs you want to allocate to your game server.
+- **Memory** - The amount of memory you want to allocate to your game server.
+
+## Configuration Optional Settings
+- **Command** - The command to run when starting the game server.
+- **Arguments** - The arguments to pass to the command when starting the game server.
+- **Environment Variables** - The environment variables to set when starting the game server. Snapser will set some environment variables by default.
+  <Note>
+    The SNAPEND_ENV will be set to DEVELOPMENT, STAGING OR PRODUCTION based on the environment you are running in.
+    THE SNAPEND_ID will be set to the Snapend ID.
+  </Note>
+
+
+<Note>
+The multi environment configuration is to allow you to have different configurations for different environments.
+For example, you may want to have a different max server count for your development environment
+than your staging environment. So if you clone a snapend from development to a staging snapend, Snapser will
+automatically apply the fleet configuration under staging.
+</Note>

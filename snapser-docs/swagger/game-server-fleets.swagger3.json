@@ -1,0 +1,230 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "contact" : {
+      "name" : "Snapser Inc.",
+      "url" : "https://discord.com/channels/958377106776162304/958377261235585064"
+    },
+    "description" : "GameServerFleets control plane",
+    "title" : "GameServerFleets",
+    "version" : "0.25.0"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "tags" : [ {
+    "name" : "GameServerFleetsService"
+  } ],
+  "paths" : {
+    "/v1/game-server-fleets/game-servers/{game_server_name}/state" : {
+      "put" : {
+        "description" : "Update game server status",
+        "operationId" : "UpdateGameServerState",
+        "parameters" : [ {
+          "explode" : false,
+          "in" : "path",
+          "name" : "game_server_name",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateGameServerState_request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/game_server_fleetsUpdateGameServerStateResponse"
+                }
+              }
+            },
+            "description" : "A successful response."
+          }
+        },
+        "summary" : "Game Server",
+        "tags" : [ "GameServerFleetsService" ],
+        "x-codegen-request-body-name" : "body",
+        "x-snapser-auth-types" : [ "api-key", "internal" ]
+      }
+    },
+    "/v1/game-server-fleets/settings/fleets/{fleet_name}/game-servers" : {
+      "post" : {
+        "description" : "Allocate a game server",
+        "operationId" : "AllocateGameServer",
+        "parameters" : [ {
+          "description" : "The name of the fleet to allocate a game server from",
+          "explode" : false,
+          "in" : "path",
+          "name" : "fleet_name",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AllocateGameServer_request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/game_server_fleetsAllocateGameServerResponse"
+                }
+              }
+            },
+            "description" : "A successful response."
+          }
+        },
+        "summary" : "Game Server",
+        "tags" : [ "GameServerFleetsService" ],
+        "x-codegen-request-body-name" : "body",
+        "x-snapser-auth-types" : [ "internal" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AllocateGameServer_request" : {
+        "properties" : {
+          "match_players" : {
+            "description" : "List of player IDs to associate with the allocated game server",
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "maxPlayers" : {
+            "description" : "The maximum number of players expected for the game session",
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "metadata" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Custom key-value metadata to attach to the allocated game server",
+            "type" : "object"
+          },
+          "minPlayers" : {
+            "description" : "The minimum number of players expected for the game session",
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "region" : {
+            "description" : "Region for the game server allocation",
+            "type" : "string"
+          }
+        },
+        "required" : [ "region" ],
+        "type" : "object"
+      },
+      "GameServerState" : {
+        "default" : "UNSPECIFIED_STATE",
+        "enum" : [ "UNSPECIFIED_STATE", "REQUEST_READY", "READY", "SCHEDULED", "ALLOCATED", "PENDING", "FAILED", "TERMINATING" ],
+        "type" : "string"
+      },
+      "UpdateGameServerState_request" : {
+        "properties" : {
+          "game_server_state_metadata" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "title" : "metadata provided by the game server forwarded along in the event",
+            "type" : "object"
+          },
+          "state" : {
+            "$ref" : "#/components/schemas/game_server_fleetsGameServerState"
+          }
+        },
+        "type" : "object"
+      },
+      "game_server_fleetsAllocateGameServerResponse" : {
+        "properties" : {
+          "game_server" : {
+            "$ref" : "#/components/schemas/game_server_fleetsGameServer"
+          }
+        },
+        "type" : "object"
+      },
+      "game_server_fleetsGameServer" : {
+        "properties" : {
+          "address" : {
+            "description" : "The network address of the game server",
+            "type" : "string"
+          },
+          "debug_port" : {
+            "description" : "The debug port of the game server",
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "fleet_name" : {
+            "description" : "The name of the fleet this game server belongs to",
+            "type" : "string"
+          },
+          "id" : {
+            "description" : "Unique identifier of the game server",
+            "type" : "string"
+          },
+          "image_tag" : {
+            "description" : "The container image tag running on the game server",
+            "type" : "string"
+          },
+          "metadata" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Custom key-value metadata associated with the game server",
+            "type" : "object"
+          },
+          "port" : {
+            "description" : "The port the game server is listening on",
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "region" : {
+            "description" : "The region where the game server is deployed",
+            "type" : "string"
+          },
+          "state" : {
+            "$ref" : "#/components/schemas/GameServerState"
+          }
+        },
+        "type" : "object"
+      },
+      "game_server_fleetsGameServerState" : {
+        "default" : "UNKNOWN",
+        "enum" : [ "UNKNOWN", "ALLOCATED", "READY", "SHUTTING_DOWN" ],
+        "type" : "string"
+      },
+      "game_server_fleetsUpdateGameServerStateResponse" : {
+        "properties" : {
+          "success" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      }
+    }
+  },
+  "x-original-swagger-version" : "2.0"
+}

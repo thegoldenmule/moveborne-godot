@@ -1,0 +1,254 @@
+export const description = 'Snapser Access'
+
+export const meta = {
+  author: 'AJ Apte',
+}
+
+# Roles
+
+Snapser supports a role-based access control system. This allows you to assign different levels of access to different users.
+
+The Snapser access control system has four main categories:
+1. company
+2. game
+3. cluster
+4. cluster-service
+
+<Note>
+**IMPORTANT**: Each level supersedes in control over the next. E.g., **cluster-** roles have more power than **cluster-service** roles. **game-** roles have more power than **cluster-** roles and **company-** roles have more power than **game-roles**.
+</Note>
+
+<Warning>
+  Tiers below Premium are limited to company and game roles. Upgrade to the Premium Tier or higher for granular access control, including cluster and cluster-service roles.
+</Warning>
+
+![Access Pic](/images/docs/access.png)
+
+## Access Tool
+
+The role assignment tool is located inside the **Access** tool in the left Nav. There are three flavors of
+this tool:
+
+- Tool at the studio level. This tool allows you to manage company-_ and game-_ roles.
+  ![Access Company Pic](/images/docs/access-company.png)
+
+- Tool at the game level. This tool allows you to manage game-_, cluster-_, and cluster-service-\* roles.
+  ![Access Game Pic](/images/docs/access-game.png)
+
+- Tool at the cluster level. This tool allows you to manage cluster-_ and cluster-service-_ roles.
+  ![Access Cluster Pic](/images/docs/access-snapend.png)
+
+## A. Company roles
+
+There are three types of company roles:
+
+1. company-admin
+2. company-edit
+3. company-view
+
+### 1. company-admin
+
+The company-admin role has the highest amount of power. Users with this role
+can
+
+- Update other user roles at any level
+- Create, edit, and delete games
+- Create, edit, and delete snapends
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on any snapend
+- Push game code to Production for any game
+
+<Note>Usually, this role is assigned to the CTO of your company.</Note>
+
+### 2. company-edit
+
+Users with this role can
+
+- Update all other user roles except at the **Company-** level
+- Create and delete any game
+- Create and delete any snapend
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on any snapend
+
+<Note>
+  Usually, this role is assigned to the higher-level technical staff of a gaming
+  company or people who operate across game teams.
+</Note>
+
+### 3. company-view
+
+This role allows users to view everything but act on nothing. Users with this
+role can
+
+- View all user roles
+- View all games
+- View all snapends
+- View all Configuration & User Tools
+
+<Note>
+  Usually, this role is assigned to a gaming company's highest-level
+  non-technical staff.
+</Note>
+
+## B. Game roles
+
+There are three game roles:
+
+1. game-admin
+2. game-edit
+3. game-view
+
+This role is always associated with a \*\*Game\*\*.
+
+### 1. game-admin
+
+The game-admin role has the highest amount of power for a game. Users with
+this role can
+
+- Update all user roles for their game
+- Edit and delete game
+- Create and delete snapends
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on any snapend
+- Push game code to Production
+
+<Note>
+  Usually, this role is assigned to the Technical Director of an individual game.
+</Note>
+
+### 2. game-edit
+
+Users with this role can
+
+- Update all user roles except the ones at the **game-** level
+- Create and delete snapends
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on any snapend
+
+<Note>
+  Usually, this role is assigned to a game's higher-level technical staff.
+</Note>
+
+### 3. game-view
+
+This role allows users to view everything but act on nothing for a particular
+game. Users with this role can
+
+- View all user roles belonging to a game
+- View all snapends in a game
+- View all Configuration & User Tools
+
+<Note>
+  Usually, this role is assigned to a game's highest-level non-technical staff.
+</Note>
+
+## C. Cluster roles
+
+There are three cluster roles:
+
+1. cluster-admin
+2. cluster-edit
+3. cluster-view
+
+This role is always associated with a Snapend.
+
+### 1. cluster-admin
+
+This role gives complete control of a Snapend to a user. A user that creates a Snapend automatically gets this role. Users with this role can
+
+- Update other user roles for their snapend only
+- Create, edit, and delete snapends
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on the snapend
+
+<Note>
+  Usually, this role is assigned to senior engineers of a game studio
+</Note>
+
+### 2. cluster-edit
+
+Users with this role can
+
+- Update all user roles except the ones at the **company-**, **game-** and **cluster-** level
+- Create and edit snapends
+- Redeploy non-production snapends
+- Use the Configuration & User Tools on the snapend
+
+<Note>
+  Usually, this role is assigned to other engineers collaborating with you on a Snapend.
+</Note>
+
+### 3. cluster-view
+
+This role lets users view everything but act on nothing for a game snapend.
+Users with this role can
+
+- View all user roles belonging to a game snapend
+- View all Configuration & User Tools
+
+<Note>
+  Usually, this role is assigned to any non-technical staff of a game.
+</Note>
+
+## C. Cluster Service roles
+
+There are three cluster-service roles:
+
+1. cluster-service-admin
+2. cluster-service-edit
+3. cluster-service-view
+
+<Note>This role is always associated with a Snapend Snap.</Note>
+
+### 1. cluster-service-admin
+
+This is the ideal role to give someone access to all Configuration & User Tools for your
+Snapend.
+
+<Note>
+  Usually, this role is assigned to Product, QA, or other disciplines who use
+  the admin tool to set up the game. E.g., PMs may set up experiments on the
+  production cluster, and you only want to give them access to its admin tool.
+</Note>
+
+Users with this role can
+
+- View, Add, Edit and Delete Snap configuration
+
+### 2. cluster-service-edit
+
+This is the ideal role to give someone who needs the ability to view add and edit but you
+do not want to give them permissions to delete any Snap configuration.
+
+Users with this role can
+
+- View, Add and Edit Snap configuration
+
+<Note>
+  Usually, this role is assigned to junior members of Product, QA, or other
+  disciplines.
+</Note>
+
+### 3. cluster-service-view
+
+This role lets users view everything in the Configuration & User Tools for a Snapend but act
+on nothing.
+
+Users with this role can
+
+- View all Configuration & User Tools settings
+
+<Note>
+  Usually, this role is assigned to a junior non-technical staff of a game snapend.
+</Note>
+
+## FAQs
+
+### Who should have the company-admin role?
+The company-admin role should be given to the CTO or the highest level of technical staff in your company. This role has the highest level of access and can manage all users and games.
+
+### Who should have the game-admin role?
+The game-admin role should be given to the Technical Director of your game. This role has the highest level of access for a game and can manage all users and snapends for that game.
+
+### I want to give my QA access to the Experiment configuration tool only on my production snapend. What role should I give them?
+You should give them the **cluster-service-edit** role and select the `Production` Snapend and the `Experiment` snap. You can also assign them the QA studio function

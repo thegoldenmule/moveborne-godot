@@ -1,0 +1,12 @@
+# Python Virtual Environment
+.venv/
+
+# Search Index and Lookup files
+*.ann
+snapser-search.json
+
+# Temp files
+temp/
+
+docs_md/
+docs_md_flat/
