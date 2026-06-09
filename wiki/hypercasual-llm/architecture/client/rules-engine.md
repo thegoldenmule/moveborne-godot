@@ -21,18 +21,18 @@ _No components._
 - **depends-on** → [Determinism Primitives](architecture:mq1c2syb-000l-6okg54) — Draws RNG and computes state hashes via the determinism primitives.
 
 ## Code references
-- class `MbEngine` in `llm-workflow/engine/engine.gd`
-- `llm-workflow/engine/powercards.gd`
-- `llm-workflow/engine/tile_effects.gd`
-- `llm-workflow/engine/totems.gd`
-- `llm-workflow/engine/scenarios.gd`
-- `llm-workflow/engine/constants.gd`
+- class `MbEngine` in `game/logic/engine.gd`
+- `game/logic/powercards.gd`
+- `game/logic/tile_effects.gd`
+- `game/logic/totems.gd`
+- `game/logic/scenarios.gd`
+- `game/logic/constants.gd`
 
 ## Data model
 _None._
 
 ## Usage
-Call `MbEngine.step(state, action)` etc.; never mutate state outside the engine's documented in-place semantics. After touching any `engine/` file, run the relevant headless verifier (`tools/verify_engine_swipe.gd`, `verify_playcard.gd`, …) or the `McpTestSuite` via MCP `test_run`. New logic needs a golden oracle dumped from the real TS dist before its expected hashes can be asserted — never hand-write expected values.
+Call `MbEngine.step(state, action)` etc.; never mutate state outside the engine's documented in-place semantics. After touching any `logic/` file, run the relevant headless verifier (`tools/verify_engine_swipe.gd`, `verify_playcard.gd`, …) or the `McpTestSuite` via MCP `test_run`. New logic needs a golden oracle dumped from the real TS dist before its expected hashes can be asserted — never hand-write expected values.
 
 ## Invariants & constraints
 - Mirror the TS in-place mutation semantics: shallow .duplicate() for [...]/{...}, mutate tile dicts where TS does, new dicts for merged/spawned tiles. Non-empty merge/spawn tiles carry "meta": {}; empties don't.

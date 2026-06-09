@@ -6,9 +6,11 @@ Godot 4.6 (GDScript) port of **Moveborne** (a 2048-style merge puzzle). See
 ## Prime directive: determinism parity
 
 The `logic/` code is a **byte-for-byte deterministic port** of the TypeScript
-`@spyre-io/moveborne-logic` package. Its whole value is that it computes the **same
-state hashes** as the TS engine and the validator service. Treat the parity tests as
-load-bearing:
+`@spyre-io/moveborne-logic` package: it computes the **same state hashes** as the TS
+engine and the validator service. (Why this matters, plus the optimistic-reconciliation
+model it buys, is recorded in the ADRs `byte-for-byte-determinism-parity-…` and
+`optimistic-client-updates-…` under `../wiki/hypercasual-llm/adrs/`.) Treat the parity
+tests as load-bearing:
 
 - **Never change `logic/` behavior without re-running the parity tests.** If a
   golden hash changes, you broke compatibility — figure out why before committing.
@@ -34,20 +36,18 @@ tools/    verify_*.gd (headless parity), smoke_*.gd, run_validator.sh.
 
 ## How the engine works (mental model)
 
-- State is a `Dictionary` mirror of the TS `SynchronizedGameState`. Tiles are a flat
-  **row-major** `Array` of tile `Dictionary`s. Field names match the TS exactly.
-- **Reference semantics matter.** GDScript `Dictionary`/`Array` are reference types
-  like JS objects/arrays. The port reproduces `merge.ts` by using shallow
-  `.duplicate()` to mirror JS `[...arr]`/`{...obj}`, mutating tile dicts in place
-  where the TS does, and creating new dicts for merged/spawned tiles. **Do not
-  deep-copy unless the TS does** (it changes identity/aliasing).
-- Non-empty tiles produced by merge/spawn carry `"meta": {}`; empties don't.
-- `MbEngine.step / step_card / step_totem` apply an action and also apply the
-  "caller overrides" the validator applies: accumulated `score`, `rngIndices`,
-  and `moveIndex` (+2 on auto-draw, else +1). They return `{state, hash, ...}`.
-- RNG: 5 namespaces (`tile-gen`, `shuffle`, `effect-spawn`, `totem-spawn`,
-  `card-draw`), seeded by integer→string, restored by reseed+replay. `MbHasher`
-  hashes `canonical_stringify(state)` (sorted keys, 2-space, JS number format).
+The state shape, the engine contract (`MbEngine.step / step_card / step_totem` + the
+validator's caller-overrides), the 5 RNG namespaces, and the hashing are documented in
+full in the wiki — read these before editing `logic/`:
+`../wiki/hypercasual-llm/architecture/client/rules-engine.md`,
+`.../client/determinism-primitives.md`, and the **Data model** section of
+`.../client/index.md`.
+
+The one trap worth inlining, because GDScript makes it easy to get wrong: **reference
+semantics.** `Dictionary`/`Array` are reference types like JS objects/arrays — the port
+reproduces `merge.ts` with shallow `.duplicate()` (mirroring `[...arr]`/`{...obj}`),
+in-place tile mutation where the TS mutates, and fresh dicts for merged/spawned tiles.
+**Do not deep-copy unless the TS does** — it changes identity/aliasing and breaks hashes.
 
 ## Editing + testing loop
 
@@ -79,10 +79,10 @@ verifier/suite — never hand-write expected values.
 - **Drive the game by game concepts** (swipe / read board / play card): use the
   `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
   analog of the TS `window.__moveborne`. Full reference: **`MCP_GAME_API.md`**.
-- **Validator:** `tools/run_validator.sh` (DEV_MODE, `:5055`). It runs the validator
-  **unchanged**; its `workspace:*` dep on the logic package is satisfied out-of-repo
-  (deps in `~/.cache/moveborne-validator-deps`, the prebuilt logic dist linked in).
-  Do not edit files under `moveborne/src/validator`.
+- **Validator:** `tools/run_validator.sh` (DEV_MODE, `:5555`) wraps this repo's
+  self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
+  dist), or `cd ../validator && bun run dev`. Endpoints + the MCP debug tools are in
+  `../validator/README.md` and `../validator/src/validator/CLAUDE.md`.
 
 ## GDScript gotchas (learned the hard way)
 

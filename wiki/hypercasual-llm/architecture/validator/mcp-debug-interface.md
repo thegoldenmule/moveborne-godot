@@ -21,7 +21,7 @@ _No components._
 - **depends-on** → [Match State Store](architecture:mq1c31rb-000x-6l2ehj) — Reads (and clears) entries from the match-state store.
 
 ## Code references
-- function `createValidatorMCP` in `moveborne/src/validator/mcp.ts`
+- function `createValidatorMCP` in `validator/src/validator/mcp.ts`
 
 ## Data model
 _None._

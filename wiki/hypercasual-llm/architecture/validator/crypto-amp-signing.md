@@ -21,8 +21,8 @@ _No components._
 _No dependencies._
 
 ## Code references
-- function `signValidatorResponse` in `moveborne/src/validator/utils/crypto.ts`
-- interface `ValidatorConfig` in `moveborne/src/validator/config.ts`
+- function `signValidatorResponse` in `validator/src/validator/utils/crypto.ts`
+- interface `ValidatorConfig` in `validator/src/validator/config.ts`
 
 ## Data model
 _None._

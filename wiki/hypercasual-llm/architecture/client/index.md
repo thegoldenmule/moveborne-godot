@@ -28,12 +28,12 @@ _None._
 - **depends-on** → [Server](architecture:mq1c2nid-000j-6cf0hr) — Nakama match creation / authoritative submission — omitted in this single-player port (DEV_MODE).
 
 ## Code references
-- class `MbEngine` in `llm-workflow/engine/engine.gd`
-- class `MbMatch` in `llm-workflow/game/match_controller.gd`
-- class `MbValidatorClient` in `llm-workflow/net/validator_client.gd`
-- `llm-workflow/scenes/main.gd`
-- `llm-workflow/CLAUDE.md`
-- `llm-workflow/GODOT_PORT_PLAN.md`
+- class `MbEngine` in `game/logic/engine.gd`
+- class `MbMatch` in `game/game/match_controller.gd`
+- class `MbValidatorClient` in `game/net/validator_client.gd`
+- `game/scenes/main.gd`
+- `game/CLAUDE.md`
+- `game/GODOT_PORT_PLAN.md`
 
 ## Data model
 Game state is a `Dictionary` mirror of the TS `SynchronizedGameState`; field names match the TS **exactly**. Tiles are a flat **row-major** `Array` of tile `Dictionary`s. GDScript `Dictionary`/`Array` are **reference types** (like JS objects/arrays), which lets the port reproduce the original `merge.ts` in-place mutation/aliasing semantics — shallow `.duplicate()` mirrors `[...arr]`/`{...obj}`; deep copies are avoided unless the TS does them.
@@ -45,14 +45,14 @@ Open the project in **Godot 4.6.3** and press Play (`scenes/main.tscn`). The gam
 
 **Controls:** arrow keys / drag = move tiles; tap a card then tap target tile(s) = play a power card; `0`–`7` = load a scenario; `R` = new game; `Esc` = cancel targeting; `V` = connect to the validator.
 
-**Online play:** run `tools/run_validator.sh` (DEV_MODE, `:5055`), press `V`. The HUD shows `validator: ✓ move N ok`; on a hash mismatch the client snaps to the validator's authoritative state.
+**Online play:** run `tools/run_validator.sh` (DEV_MODE, `:5555`), press `V`. The HUD shows `validator: ✓ move N ok`; on a hash mismatch the client snaps to the validator's authoritative state.
 
 **Driving via MCP:** the `MbDebug` autoload (analog of the TS `window.__moveborne`) exposes game-semantic commands through `game_eval` — see `MCP_GAME_API.md`.
 
 ## Invariants & constraints
-- Determinism parity is load-bearing: `engine/` must compute the same state hashes as the TS engine and validator. Never change engine behavior without re-running the parity tests; a changed golden hash means broken compatibility.
+- Determinism parity is load-bearing: `logic/` must compute the same state hashes as the TS engine and validator. Never change engine behavior without re-running the parity tests; a changed golden hash means broken compatibility.
 - The TS source (`moveborne/src/logic/src` + `src/game/engine/scenarios.ts`) is the source of truth. Code beats spec. Ports must mirror iteration order, RNG draw order/count per namespace, and which fields are present in state.
-- `engine/` is pure: no Node/scene references. Classes are `class_name Mb<Thing>` with static functions; scenes/tests reference them via `preload("res://engine/x.gd")`.
+- `logic/` is pure: no Node/scene references. Classes are `class_name Mb<Thing>` with static functions; scenes/tests reference them via `preload("res://logic/x.gd")`.
 - The client plays optimistically — every move is applied locally for instant feedback and (when online) its predicted hash is sent to the validator; a match ACKs the fast path, a mismatch returns authoritative state to snap to.
 
 ## Synced commit

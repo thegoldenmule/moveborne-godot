@@ -6,7 +6,7 @@
 service
 
 ## Summary
-Real-time state-validation authority for Moveborne, built with **Bun + Hono + Socket.IO** (`@socket.io/bun-engine`). It re-runs the canonical `@spyre-io/moveborne-logic` engine for every action, signs valid transitions with HMAC-SHA256, and returns authoritative state on mismatch. Lives in `moveborne/src/validator` and runs unchanged against the Godot client.
+Real-time state-validation authority for Moveborne, built with **Bun + Hono + Socket.IO** (`@socket.io/bun-engine`). It re-runs the canonical `@spyre-io/moveborne-logic` engine for every action, signs valid transitions with HMAC-SHA256, and returns authoritative state on mismatch. Lives in this repo at `validator/src/validator` and runs unchanged against the Godot client.
 
 ## Purpose
 Be the trusted arbiter of game state. The client plays optimistically; the validator independently executes each action against stored state, hashes the result, and either ACKs the client's predicted hash (fast path) or ships back the authoritative state to sync. Signed responses `HMAC((match_id, index, action, state_hash), secret)` let the downstream server (Nakama) accept validated actions without re-simulating.
@@ -27,10 +27,10 @@ _None._
 _No dependencies._
 
 ## Code references
-- `moveborne/src/validator/index.ts`
-- function `createMatchRoutes` in `moveborne/src/validator/routes/match.ts`
-- interface `StoredMatch` in `moveborne/src/validator/types.ts`
-- function `getConfig` in `moveborne/src/validator/config.ts`
+- `validator/src/validator/index.ts`
+- function `createMatchRoutes` in `validator/src/validator/routes/match.ts`
+- interface `StoredMatch` in `validator/src/validator/types.ts`
+- function `getConfig` in `validator/src/validator/config.ts`
 - `moveborne/spec/validator/connection-flow.md`
 
 ## Data model
@@ -39,7 +39,7 @@ _No dependencies._
 Wire types: `ValidatorInitRequest/Response`, `GameActionRequest {index, action, state_hash}`, and the response union `GameActionResponseMatch {index, signature}` | `GameActionResponseMismatch {index, state, signature}`. State and action types come from `@spyre-io/moveborne-logic` (`SynchronizedGameState`, `GameAction`), keeping the validator's serialization identical to client and engine.
 
 ## Usage
-`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it in **DEV_MODE** on `:5055` (skips the Nakama signature check so Nakama isn't needed).
+`bun run dev` (hot reload) or `bun run start`. Default port `3000`; the Godot client's `tools/run_validator.sh` runs it in **DEV_MODE** on `:5555` (skips the Nakama signature check so Nakama isn't needed).
 
 **Lifecycle:** (1) `POST /api/match/init` with `(match_id, starting_state, player_id, signature)` → verifies Nakama signature, stores match, returns `connection_id`. (2) Client connects via Socket.IO with `(connection_id, player_id)`. (3) Per action, client emits `(index, action, state_hash)`; validator executes, hashes, signs, replies match or mismatch. (4) `POST /api/match/init-from-history` replays a saved state history for debugging.
 

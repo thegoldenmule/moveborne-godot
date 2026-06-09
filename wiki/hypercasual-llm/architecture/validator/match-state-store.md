@@ -21,8 +21,8 @@ _No components._
 _No dependencies._
 
 ## Code references
-- class `InMemoryMatchStateStore` in `moveborne/src/validator/store/match-state.ts`
-- interface `StoredMatch` in `moveborne/src/validator/types.ts`
+- class `InMemoryMatchStateStore` in `validator/src/validator/store/match-state.ts`
+- interface `StoredMatch` in `validator/src/validator/types.ts`
 
 ## Data model
 _None._

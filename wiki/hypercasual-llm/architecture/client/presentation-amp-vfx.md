@@ -21,10 +21,10 @@ _No components._
 - **depends-on** → [Match Controller](architecture:mq1c2vaw-000p-3fdst6) — Renders state published by MbMatch and forwards input as actions to it.
 
 ## Code references
-- `llm-workflow/scenes/main.gd`
-- `llm-workflow/scenes/board_view.gd`
-- `llm-workflow/scenes/vfx.gd`
-- `llm-workflow/VFX_MAPPING.md`
+- `game/scenes/main.gd`
+- `game/scenes/board_view.gd`
+- `game/scenes/vfx.gd`
+- `game/VFX_MAPPING.md`
 
 ## Data model
 _None._

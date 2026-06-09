@@ -21,7 +21,7 @@ _No components._
 - **depends-on** → [Match State Store](architecture:mq1c31rb-000x-6l2ehj) — Seeds match state_history / current_state into the match-state store.
 
 ## Code references
-- interface `IHistoryStore` in `moveborne/src/validator/store/history-store.ts`
+- interface `IHistoryStore` in `validator/src/validator/store/history-store.ts`
 
 ## Data model
 _None._

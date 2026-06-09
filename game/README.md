@@ -51,11 +51,11 @@ lock = grey, decay = green, stone = dark.
 
 ## Online play against the validator (optional)
 
-The validator re-runs the same `src/logic` engine and confirms every move. Run it
-in DEV_MODE (which skips the Nakama signature check, so Nakama isn't needed):
+This repo's `validator/` re-runs the same rules engine and confirms every move. Run
+it in DEV_MODE (which skips the Nakama signature check, so Nakama isn't needed):
 
 ```bash
-tools/run_validator.sh          # serves on http://localhost:5055
+tools/run_validator.sh          # serves the in-repo validator on http://localhost:5555
 ```
 
 Then in the game press **`V`**. The top-right shows `validator: ✓ move N ok` as

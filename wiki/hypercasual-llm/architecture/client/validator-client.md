@@ -21,13 +21,13 @@ _No components._
 - **calls** → [Validator](architecture:mq1c2ixi-000h-kd018q) — Connects to and validates moves against the Validator service over Socket.IO.
 
 ## Code references
-- class `MbValidatorClient` in `llm-workflow/net/validator_client.gd`
+- class `MbValidatorClient` in `game/net/validator_client.gd`
 
 ## Data model
 _None._
 
 ## Usage
-Activated by the `V` key (or MCP). Requires the validator running (`tools/run_validator.sh`, DEV_MODE on `:5055`). The HUD reflects status as `validator: ✓ move N ok`. Verified headless against the live validator via a `tools/verify_*` client smoke.
+Activated by the `V` key (or MCP). Requires the validator running (`tools/run_validator.sh`, DEV_MODE on `:5555`). The HUD reflects status as `validator: ✓ move N ok`. Verified headless against the live validator via a `tools/verify_*` client smoke.
 
 ## Invariants & constraints
 - The predicted hash sent up is exactly the hash MbEngine produced for the optimistic move — same canonical serialization as the validator, or every move would falsely mismatch.

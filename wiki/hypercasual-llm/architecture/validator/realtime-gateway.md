@@ -22,8 +22,8 @@ _No components._
 - **depends-on** → [Crypto &amp; Signing](architecture:mq1c351c-0011-gtfyxx) — Verifies the Nakama init signature and signs each validation response.
 
 ## Code references
-- `moveborne/src/validator/index.ts`
-- function `createMatchRoutes` in `moveborne/src/validator/routes/match.ts`
+- `validator/src/validator/index.ts`
+- function `createMatchRoutes` in `validator/src/validator/routes/match.ts`
 
 ## Data model
 _None._

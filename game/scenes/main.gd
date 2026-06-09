@@ -13,7 +13,7 @@ const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 
-const VALIDATOR_URL := "http://localhost:5055"
+const VALIDATOR_URL := "http://localhost:5555"
 
 # Card -> targeting kind. Totem cards are detected via isTotemCard; time/magnet
 # have no engine action (shown as unsupported).

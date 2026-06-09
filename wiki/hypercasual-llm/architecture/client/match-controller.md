@@ -22,8 +22,8 @@ _No components._
 - **depends-on** → [Validator Client](architecture:mq1c2wgh-000r-sjn10a) — Sends predicted hashes and applies authoritative state on mismatch.
 
 ## Code references
-- class `MbMatch` in `llm-workflow/game/match_controller.gd`
-- class `MbDebug` in `llm-workflow/game/mcp_game_api.gd`
+- class `MbMatch` in `game/game/match_controller.gd`
+- class `MbDebug` in `game/game/mcp_game_api.gd`
 
 ## Data model
 _None._

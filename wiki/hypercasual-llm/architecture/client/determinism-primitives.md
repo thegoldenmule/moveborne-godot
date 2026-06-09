@@ -21,9 +21,9 @@ _No components._
 _No dependencies._
 
 ## Code references
-- `llm-workflow/engine/rng.gd`
-- `llm-workflow/engine/random_generator.gd`
-- class `MbHasher` in `llm-workflow/engine/hasher.gd`
+- `game/logic/rng.gd`
+- `game/logic/random_generator.gd`
+- class `MbHasher` in `game/logic/hasher.gd`
 
 ## Data model
 _None._
