@@ -6,6 +6,13 @@ extends Node
 ## connection (auth = {connection_id, player_id}), the 'ready' event, and
 ## 'validate_action' emits with ack callbacks.
 ##
+## Works against the local dev validator (base_url http://localhost:5555) and the
+## Snapser-deployed BYOSnap (base_url = gateway + snap prefix, e.g.
+## https://gateway.snapser.com/c4n1awfs/v1/byosnap-validator) — the validator
+## mounts both its HTTP routes and the Socket.IO engine under BYOSNAP_BASE_PATH,
+## so every path is just base_url + suffix. The optional `headers` are sent on
+## the init POST and the WebSocket upgrade (the gateway requires Token/User-Id).
+##
 ## Engine.IO packet = first char of each WS text frame: 0 open, 1 close, 2 ping,
 ## 3 pong, 4 message, 6 noop. Socket.IO packet (inside a '4' message) = next char:
 ## 0 CONNECT, 1 DISCONNECT, 2 EVENT, 3 ACK, 4 CONNECT_ERROR.
@@ -18,6 +25,7 @@ signal connected()
 var _base_url: String
 var _match_id: String
 var _player_id: String
+var _headers := PackedStringArray()   # extra headers (gateway auth), HTTP + WS handshake
 var _ws := WebSocketPeer.new()
 var _polling := false
 var _sio_connected := false
@@ -25,10 +33,11 @@ var _ack_id := 0
 var _pending: Dictionary = {}   # ack_id -> {index:int}
 
 
-func init_and_connect(base_url: String, match_id: String, starting_state: Dictionary, player_id: String) -> void:
+func init_and_connect(base_url: String, match_id: String, starting_state: Dictionary, player_id: String, headers: PackedStringArray = PackedStringArray()) -> void:
 	_base_url = base_url
 	_match_id = match_id
 	_player_id = player_id
+	_headers = headers
 	var http := HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(_on_init_done.bind(http))
@@ -36,7 +45,9 @@ func init_and_connect(base_url: String, match_id: String, starting_state: Dictio
 		"match_id": match_id, "starting_state": starting_state,
 		"player_id": player_id, "signature": "dev",
 	})
-	var err := http.request(base_url + "/api/match/init", ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var req_headers := PackedStringArray(["Content-Type: application/json"])
+	req_headers.append_array(headers)
+	var err := http.request(base_url + "/api/match/init", req_headers, HTTPClient.METHOD_POST, body)
 	if err != OK:
 		validator_error.emit("HTTPRequest failed to start: %d" % err)
 
@@ -53,6 +64,7 @@ func _on_init_done(_result: int, code: int, _headers: PackedStringArray, body: P
 
 func _connect_socket(connection_id: String) -> void:
 	var ws_url := _base_url.replace("https://", "wss://").replace("http://", "ws://") + "/socket.io/?EIO=4&transport=websocket"
+	_ws.handshake_headers = _headers
 	var err := _ws.connect_to_url(ws_url)
 	if err != OK:
 		validator_error.emit("WS connect failed: %d" % err)

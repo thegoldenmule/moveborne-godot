@@ -7,13 +7,18 @@ extends Control
 const MbMatchS := preload("res://game/match_controller.gd")
 const BoardViewS := preload("res://scenes/board_view.gd")
 const MbValidatorClientS := preload("res://net/validator_client.gd")
+const MbSnapserAuthS := preload("res://net/snapser_auth.gd")
 const Style := preload("res://scenes/style.gd")
 const CountdownS := preload("res://scenes/countdown.gd")
 const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 
-const VALIDATOR_URL := "http://localhost:5555"
+## Local dev validator (the V-key debug shortcut; tools/run_validator.sh).
+const LOCAL_VALIDATOR_URL := "http://localhost:5555"
+## Snapser-deployed validator BYOSnap: gateway + snap prefix. The validator serves
+## all routes (incl. /socket.io) under this base path, so the client just appends.
+const SNAPSER_VALIDATOR_URL := MbSnapserAuthS.GATEWAY + "/v1/byosnap-validator"
 
 ## Horizontal breathing room from the screen edges for the HUD (and a guard against
 ## the bottom nav / device notches eating UI). Logical px (canvas_items stretch).
@@ -41,6 +46,7 @@ const FAN_CARD_W := 86.0
 var _match  # MbMatch (untyped to avoid class_name registration flakiness)
 var _board
 var _net
+var _auth   # MbSnapserAuth — anonymous Snapser session for the deployed validator
 var _score_val: Label
 var _moves_val: Label
 var _shards_val: Label
@@ -77,13 +83,16 @@ func _ready() -> void:
 	_build_ui()
 	_match.changed.connect(_on_changed)
 	_match.tiles_destroyed.connect(_on_tiles_destroyed)
-	# Start the board per mode. PvP delegates ENTIRELY to _connect_validator (which
-	# itself calls new_game) — do NOT also new_game here or the match double-starts.
+	# Start the board per mode. Infinite is always offline; Story (and PvP) always
+	# play against the Snapser-deployed validator: start the board locally, then
+	# sign in + register the starting state with the server (_connect_snapser).
 	match str(cfg.get("mode", "infinite")):
 		"story":
 			_match.new_game_scenario(int(cfg.get("scenario_id", 0)), int(cfg.get("seed", -1)))
+			_connect_snapser()
 		"pvp":
-			_connect_validator()
+			_match.new_game(int(cfg.get("seed", -1)))
+			_connect_snapser()
 		_:
 			_match.new_game(int(cfg.get("seed", -1)))
 	_play_intro()
@@ -165,6 +174,9 @@ func _build_ui() -> void:
 	_net.ready_received.connect(_on_net_ready)
 	_net.action_validated.connect(_on_net_validated)
 	_net.validator_error.connect(_on_net_error)
+
+	_auth = MbSnapserAuthS.new()
+	add_child(_auth)
 
 	_totem_box = HBoxContainer.new()
 	_totem_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -740,8 +752,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_UP: _key_swipe("up")
 			KEY_DOWN: _key_swipe("down")
 			KEY_R:
-				_cancel_target()
-				_match.new_game()
+				# When online, a bare new_game() would desync (the validator still
+				# holds the old match) — re-register the fresh state as a new match.
+				if _match.online:
+					_match.online = false
+					_match.new_game()
+					_cancel_target()
+					_start_net(_net_base_url, _net_player_id, _net_headers)
+				else:
+					_cancel_target()
+					_match.new_game()
 				_play_intro()
 			KEY_ESCAPE:
 				_cancel_target()
@@ -767,20 +787,44 @@ func _cycle_quality() -> void:
 	_toast.text = "VFX quality: %s  (Q to cycle)" % Quality.level_name()
 
 
+## Dev shortcut (V key): restart Endless against the LOCAL dev validator (:5555).
 func _connect_validator() -> void:
 	# new_game() BEFORE _cancel_target(): _cancel_target -> _rebuild_hand reads
-	# _match.state["hand"], so the state must exist first (matters when called from
-	# _ready before any other new_game). Behaviour is unchanged for the V-key path,
-	# which already restarts the game.
+	# _match.state["hand"], so the state must exist first.
 	_match.online = false
 	_match.new_game()
 	_cancel_target()
+	_start_net(LOCAL_VALIDATOR_URL, "player_%d" % (randi() % 1000000), PackedStringArray())
+
+
+## Story/PvP: anonymous Snapser sign-in, then register the CURRENT match state with
+## the deployed validator. The board must already be started (new_game[_scenario])
+## — that state is what the server replays from. Coroutine; runs detached.
+func _connect_snapser() -> void:
+	_match.online = false
+	_net_label.visible = true
+	_net_label.text = "validator: signing in…"
+	var ok: bool = await _auth.ensure_session()
+	if not ok:
+		_on_net_error("Snapser sign-in failed")
+		return
+	_start_net(SNAPSER_VALIDATOR_URL, _auth.user_id, _auth.auth_headers())
+
+
+var _net_base_url := ""          # last validator target, so R can re-register
+var _net_player_id := ""
+var _net_headers := PackedStringArray()
+
+
+func _start_net(base_url: String, player_id: String, headers: PackedStringArray) -> void:
+	_net_base_url = base_url
+	_net_player_id = player_id
+	_net_headers = headers
 	var match_id := "gd_%d" % (randi() % 1000000)
-	var player_id := "player_%d" % (randi() % 1000000)
-	_net.init_and_connect(VALIDATOR_URL, match_id, _match.state, player_id)
+	_net.init_and_connect(base_url, match_id, _match.state, player_id, headers)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
-	_toast.text = "Connecting to validator at %s …" % VALIDATOR_URL
+	_toast.text = "Connecting to validator at %s …" % base_url
 
 
 func _on_net_ready(_current_state: Dictionary) -> void:
