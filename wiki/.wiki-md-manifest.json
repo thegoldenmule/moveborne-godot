@@ -1,10 +1,10 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 710,
+    "version": 735,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
-      "hypercasual-llm/adrs/index.md": "32191a6e3e05c3acbfd0d531ef7fc976bebbb8358bd7fa4a7242235db97a1cb0",
+      "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "7f49a7e2a969c27aa089cee97e473eba44360e88e41db51cfefc37d20838c956",
       "hypercasual-llm/architecture/validator/index.md": "3d5f2aa68cd17abb55c31f825a75a9360f7ba41070a858ae0d5471d492f534e6",
       "hypercasual-llm/architecture/server.md": "934d65e84d080ad8c9566ad1e9064bd9872d23446979d0e245b0aad26554076e",
@@ -32,7 +32,9 @@
       "hypercasual-llm/adrs/design-the-game-to-be-driven-and-verified-by-an-llm.md": "0ddf339027386d13c84365cd63b63c1fff2eee93f31924c6e3d440e7415d7822",
       "hypercasual-llm/adrs/two-tier-game-state-local-vs-synchronized.md": "9c4b1d9ae44a2b7c3cbe2f8173d2f921f83d531b2ceec384dd1c85a6dbfd18a1",
       "hypercasual-llm/adrs/unify-all-player-input-as-messages-through-a-single-interface.md": "7b7d5bd860c8ae3878f07a0008c1dba63e50d2f233cd4f8b686637a18fdd6372",
-      "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1"
+      "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
+      "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md": "795f3afea53a545e8182ea9992a9ac83a13a9f6990ef2fd34f55c953ab0098f6",
+      "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -65,7 +67,9 @@
       "decision-record:mq1ebq40-0001-hgjnmt": "hypercasual-llm/adrs/design-the-game-to-be-driven-and-verified-by-an-llm.md",
       "decision-record:mq1ebry9-0003-sfhuso": "hypercasual-llm/adrs/two-tier-game-state-local-vs-synchronized.md",
       "decision-record:mq1ebtkg-0005-vfahik": "hypercasual-llm/adrs/unify-all-player-input-as-messages-through-a-single-interface.md",
-      "decision-record:mq1ebvcb-0007-cmmi2x": "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md"
+      "decision-record:mq1ebvcb-0007-cmmi2x": "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md",
+      "decision-record:mq74gj5v-000c-9ta022": "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md",
+      "decision-record:mq74gkil-000e-cwpjw6": "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md"
     }
   }
 }

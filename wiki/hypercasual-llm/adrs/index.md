@@ -24,3 +24,6 @@ The remaining records cover backend scope, the presentation and rendering approa
   - [Two-tier game state — local vs synchronized](decision-record:mq1ebry9-0003-sfhuso)
   - [Unify all player input as messages through a single interface](decision-record:mq1ebtkg-0005-vfahik)
   - [Fun-first — test the deterministic core, verify the game by playing it](decision-record:mq1ebvcb-0007-cmmi2x)
+- **Ungrouped**
+  - [Adopt Snapser as the online backend, replacing Nakama](decision-record:mq74gj5v-000c-9ta022)
+  - [Authenticate BYOSnap requests by trusting gateway-stamped User-Id, not signatures](decision-record:mq74gkil-000e-cwpjw6)
