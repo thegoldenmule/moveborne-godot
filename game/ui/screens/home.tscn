@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://c1aljfj5bqhjq"]
+
+[ext_resource type="Theme" uid="uid://b0j3nse8nno5p" path="res://ui/theme/moveborne_ui.tres" id="1_xcsxe"]
+[ext_resource type="Script" path="res://ui/screens/home.gd" id="2_y6gq2"]
+
+[node name="Home" type="Control" unique_id=2084446026]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_xcsxe")
+script = ExtResource("2_y6gq2")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=745737829]
+layout_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Center" unique_id=1050279522]
+layout_mode = 2
+
+[node name="Hero" type="Label" parent="Center/VBox" unique_id=1322375020]
+layout_mode = 2
+
+[node name="Story" type="Button" parent="Center/VBox" unique_id=13448039]
+layout_mode = 2
+
+[node name="Infinite" type="Button" parent="Center/VBox" unique_id=1379938965]
+layout_mode = 2
+
+[node name="PvP" type="Button" parent="Center/VBox" unique_id=881114603]
+layout_mode = 2

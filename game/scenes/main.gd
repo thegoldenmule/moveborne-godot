@@ -15,6 +15,10 @@ const GlowShader := preload("res://scenes/glow_text.gdshader")
 
 const VALIDATOR_URL := "http://localhost:5555"
 
+## Emitted when the player leaves the match (in-match Home/Quit button). The shell's
+## MatchState listens for this and pops back to Home. No-op when run standalone.
+signal match_exited(result: Dictionary)
+
 # Card -> targeting kind. Totem cards are detected via isTotemCard; time/magnet
 # have no engine action (shown as unsupported).
 const TARGET := {
@@ -60,11 +64,25 @@ var _pending: Array = []
 
 
 func _ready() -> void:
+	# Joined so MbDebug._scene() can resolve us via group lookup once the app shell
+	# (not this match) owns current_scene. See game/mcp_game_api.gd.
+	add_to_group("mb_match")
+	# Per-match config handed in by the shell's MatchState (or Endless default when
+	# this scene is launched standalone). Plain Dictionary, mirrors how state is passed.
+	var cfg: Dictionary = GameState.next_match if not GameState.next_match.is_empty() else {"mode": "infinite"}
 	_match = MbMatchS.new()
 	_build_ui()
 	_match.changed.connect(_on_changed)
 	_match.tiles_destroyed.connect(_on_tiles_destroyed)
-	_match.new_game()
+	# Start the board per mode. PvP delegates ENTIRELY to _connect_validator (which
+	# itself calls new_game) — do NOT also new_game here or the match double-starts.
+	match str(cfg.get("mode", "infinite")):
+		"story":
+			_match.new_game_scenario(int(cfg.get("scenario_id", 0)), int(cfg.get("seed", -1)))
+		"pvp":
+			_connect_validator()
+		_:
+			_match.new_game(int(cfg.get("seed", -1)))
 	_play_intro()
 
 
@@ -188,6 +206,17 @@ func _build_ui() -> void:
 	# Fan origin in hand-box-local coords: card centers land ~65px down, peaking middle.
 	_fan_center = Vector2((vp.x - 32.0) / 2.0, 65.0 + FAN_RADIUS)
 
+	# In-match Home button — emits match_exited so the shell's MatchState pops back.
+	var home_btn := Button.new()
+	home_btn.text = "‹ Home"
+	home_btn.focus_mode = Control.FOCUS_NONE
+	home_btn.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	home_btn.position = Vector2(12, 40)
+	home_btn.custom_minimum_size = Vector2(76, 30)
+	home_btn.add_theme_font_size_override("font_size", 14)
+	home_btn.pressed.connect(_on_home_pressed)
+	add_child(home_btn)
+
 
 func _on_changed() -> void:
 	_board.render(_match.state)
@@ -252,6 +281,18 @@ func _play_intro() -> void:
 
 func _show_lets_play() -> void:
 	Anim.banner(_fx_layer, "Let's Play!", 1.0, 48)
+
+
+## Leave the match: tell the shell (via match_exited) to pop back to Home. There is
+## no engine game-over, so this button IS the match-end source. No-op when the scene
+## runs standalone (no listener connected).
+func _on_home_pressed() -> void:
+	match_exited.emit({
+		"scenario": _match.scenario_name,
+		"score": int(_match.state.get("score", 0)),
+		"move_index": int(_match.state.get("moveIndex", 0)),
+		"reason": "quit",
+	})
 
 
 ## Tap handler / MCP target supplier. Returns a status Dictionary (the board's
@@ -669,9 +710,13 @@ func _cycle_quality() -> void:
 
 
 func _connect_validator() -> void:
-	_cancel_target()
+	# new_game() BEFORE _cancel_target(): _cancel_target -> _rebuild_hand reads
+	# _match.state["hand"], so the state must exist first (matters when called from
+	# _ready before any other new_game). Behaviour is unchanged for the V-key path,
+	# which already restarts the game.
 	_match.online = false
 	_match.new_game()
+	_cancel_target()
 	var match_id := "gd_%d" % (randi() % 1000000)
 	var player_id := "player_%d" % (randi() % 1000000)
 	_net.init_and_connect(VALIDATOR_URL, match_id, _match.state, player_id)

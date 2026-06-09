@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dcveah51axutb"]
+
+[ext_resource type="Theme" uid="uid://b0j3nse8nno5p" path="res://ui/theme/moveborne_ui.tres" id="1_bbk0w"]
+[ext_resource type="Script" path="res://ui/screens/placeholder_tab.gd" id="2_4a7gu"]
+
+[node name="PlaceholderTab" type="Control" unique_id=1097385107]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_bbk0w")
+script = ExtResource("2_4a7gu")
+
+[node name="Label" type="Label" parent="." unique_id=623929423]
+layout_mode = 0

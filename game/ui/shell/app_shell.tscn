@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bn8b4q6nijb2b"]
+
+[ext_resource type="Theme" uid="uid://b0j3nse8nno5p" path="res://ui/theme/moveborne_ui.tres" id="1_blmq1"]
+[ext_resource type="Script" path="res://ui/shell/app_shell.gd" id="2_xul7i"]
+
+[node name="AppShell" type="Control" unique_id=818173518]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_blmq1")
+script = ExtResource("2_xul7i")
+
+[node name="Content" type="Control" parent="." unique_id=740549220]
+anchors_preset = 0
+
+[node name="NavLayer" type="CanvasLayer" parent="." unique_id=1377195143]
+
+[node name="NavBar" type="PanelContainer" parent="NavLayer" unique_id=1194898785]
+
+[node name="Row" type="HBoxContainer" parent="NavLayer/NavBar" unique_id=659819940]
+layout_mode = 2
+
+[node name="TabCollection" type="Button" parent="NavLayer/NavBar/Row" unique_id=1402481302]
+layout_mode = 2
+
+[node name="TabLeaderboard" type="Button" parent="NavLayer/NavBar/Row" unique_id=2147253929]
+layout_mode = 2
+
+[node name="TabHome" type="Button" parent="NavLayer/NavBar/Row" unique_id=1606038837]
+layout_mode = 2
+
+[node name="TabGuilds" type="Button" parent="NavLayer/NavBar/Row" unique_id=1524070254]
+layout_mode = 2
+
+[node name="TabSettings" type="Button" parent="NavLayer/NavBar/Row" unique_id=1776543105]
+layout_mode = 2

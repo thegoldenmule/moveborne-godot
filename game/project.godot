@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="LLM Workflow"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://ui/boot.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,8 @@ _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Anim="*res://scenes/anim.gd"
 Quality="*res://scenes/quality.gd"
 MbDebug="*res://game/mcp_game_api.gd"
+GameState="*res://ui/game_state.gd"
+UiRouter="*res://ui/router/app_router.gd"
 
 [display]
 

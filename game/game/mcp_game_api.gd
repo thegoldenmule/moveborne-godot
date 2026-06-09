@@ -70,6 +70,12 @@ func _scene():
 	var sc = tree.current_scene
 	if sc != null and sc.has_method("mcp_match"):
 		return sc
+	# The app shell owns current_scene; the live match lives under
+	# UiRouter.content_root. Resolve it via the 'mb_match' group (main.gd joins it
+	# in _ready) so game_eval / MCP automation + state-history binding keep working.
+	var m = tree.get_first_node_in_group("mb_match")
+	if m != null and m.has_method("mcp_match"):
+		return m
 	return null
 
 ## The live MbMatch, or null when no match scene is active.
