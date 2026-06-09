@@ -185,8 +185,12 @@ const app = new Hono();
 
 app.use("/*", cors({
   origin: "*",
-  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowHeaders: ["Content-Type", "Authorization"],
+  allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  // Include the headers the Snapser gateway forwards so browser preflights succeed.
+  allowHeaders: [
+    "Origin", "Content-Type", "Authorization",
+    "Token", "User-Id", "App-Key", "Api-Key", "Auth-Type",
+  ],
   exposeHeaders: ["Content-Length"],
   credentials: true,
 }));
