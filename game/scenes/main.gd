@@ -15,6 +15,10 @@ const GlowShader := preload("res://scenes/glow_text.gdshader")
 
 const VALIDATOR_URL := "http://localhost:5555"
 
+## Horizontal breathing room from the screen edges for the HUD (and a guard against
+## the bottom nav / device notches eating UI). Logical px (canvas_items stretch).
+const SCREEN_MARGIN := 18.0
+
 ## Emitted when the player leaves the match (in-match Home/Quit button). The shell's
 ## MatchState listens for this and pops back to Home. No-op when run standalone.
 signal match_exited(result: Dictionary)
@@ -47,7 +51,6 @@ var _score_tw: Tween
 var _shown_shards := 0            # displayed shards; filled as doobers land
 var _doobers_pending := 0        # in-flight shard doobers
 var _hud_glow: ShaderMaterial    # shared white glow for HUD value labels
-var _scen_label: Label
 var _net_label: Label
 var _toast: Label
 var _hand_box: Control           # plain container; cards are fanned by hand
@@ -88,9 +91,12 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var vp := get_viewport_rect().size
+	var margin := SCREEN_MARGIN
+	var safe_top := _top_safe_inset()        # device notch / status bar inset (0 on desktop)
 	var board_px: float = clampf(minf(vp.x * 0.92, vp.y * 0.62), 300.0, 720.0)
-	# Vertically center the board + hand block in the space below the top bar.
-	var top_bar := 120.0
+	# Top HUD band (below the notch): a Home row, the stat row, the combo banner, then
+	# totems. The board + hand block is vertically centered in the leftover space below.
+	var top_bar := safe_top + 154.0
 	var hand_h := 150.0
 	var gap := 24.0
 	var board_y := top_bar + maxf(20.0, (vp.y - top_bar - (board_px + gap + hand_h) - 40.0) / 2.0)
@@ -110,9 +116,13 @@ func _build_ui() -> void:
 	# HUD stat row: MOVES / SCORE / SHARDS as caption+value widgets (hud.ts HudText).
 	var stat_row := HBoxContainer.new()
 	stat_row.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	stat_row.offset_top = 30
+	stat_row.offset_left = margin
+	stat_row.offset_right = -margin
+	stat_row.offset_top = safe_top + 56.0
 	stat_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	stat_row.add_theme_constant_override("separation", 46)
+	# Tight separation so all three captions (wide brand font) fit inside the edge
+	# margins; at 46 the SHARDS column overflowed the right edge.
+	stat_row.add_theme_constant_override("separation", 18)
 	stat_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(stat_row)
 	_moves_val = _make_stat(stat_row, "MOVES")
@@ -122,7 +132,9 @@ func _build_ui() -> void:
 	# Combo banner (centered, its own band below the stats), shown while combo > 1.
 	_combo_lbl = Label.new()
 	_combo_lbl.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_combo_lbl.offset_top = 80
+	_combo_lbl.offset_left = margin
+	_combo_lbl.offset_right = -margin
+	_combo_lbl.offset_top = safe_top + 106.0
 	_combo_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_combo_lbl.add_theme_font_size_override("font_size", 22)
 	_combo_lbl.add_theme_color_override("font_color", Color.WHITE)
@@ -132,23 +144,19 @@ func _build_ui() -> void:
 	_combo_lbl.visible = false
 	add_child(_combo_lbl)
 
-	_scen_label = Label.new()
-	_scen_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_scen_label.position = Vector2(16, 8)
-	_scen_label.add_theme_font_size_override("font_size", 13)
-	_scen_label.add_theme_color_override("font_color", Style.DIM)
-	_scen_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_scen_label)
-
+	# Validator status — a quiet top-right indicator, hidden until online play engages
+	# (press V / launch a PvP match). Kept out of the way during normal offline play.
 	_net_label = Label.new()
-	_net_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_net_label.position = Vector2(-250, 8)
-	_net_label.size = Vector2(234, 18)
+	_net_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_net_label.offset_left = margin
+	_net_label.offset_right = -margin
+	_net_label.offset_top = safe_top + 14.0
 	_net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_net_label.add_theme_font_size_override("font_size", 13)
 	_net_label.add_theme_color_override("font_color", Style.DIM)
 	_net_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_net_label.text = "validator: off"
+	_net_label.visible = false
 	add_child(_net_label)
 
 	_net = MbValidatorClientS.new()
@@ -160,7 +168,9 @@ func _build_ui() -> void:
 
 	_totem_box = HBoxContainer.new()
 	_totem_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_totem_box.offset_top = 110
+	_totem_box.offset_left = margin
+	_totem_box.offset_right = -margin
+	_totem_box.offset_top = safe_top + 136.0
 	_totem_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_totem_box.add_theme_constant_override("separation", 14)
 	_totem_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -184,15 +194,19 @@ func _build_ui() -> void:
 	_glitch = GlitchS.new()
 	add_child(_glitch)
 
+	# Toast: gameplay prompts + feedback ("Tap a tile for bomb", "Played split"). Empty
+	# at rest — no standing instructions cluttering the board.
 	_toast = Label.new()
 	_toast.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_toast.offset_left = margin
+	_toast.offset_right = -margin
 	_toast.offset_top = hand_top + hand_h + 12.0
 	_toast.offset_bottom = hand_top + hand_h + 40.0
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_font_size_override("font_size", 18)
 	_toast.add_theme_color_override("font_color", Style.DIM)
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast.text = "Swipe / arrows  ·  tap a card  ·  0–7 scenarios  ·  R restart  ·  V validator  ·  Q quality"
+	_toast.text = ""
 	add_child(_toast)
 
 	_hand_box = Control.new()
@@ -206,14 +220,17 @@ func _build_ui() -> void:
 	# Fan origin in hand-box-local coords: card centers land ~65px down, peaking middle.
 	_fan_center = Vector2((vp.x - 32.0) / 2.0, 65.0 + FAN_RADIUS)
 
-	# In-match Home button — emits match_exited so the shell's MatchState pops back.
+	# In-match Home button — pinned to the very top-left (below the notch), styled like
+	# the game's cards/board: dark body + purple border, rounded, brand font. Emits
+	# match_exited so the shell's MatchState pops back.
 	var home_btn := Button.new()
 	home_btn.text = "‹ Home"
 	home_btn.focus_mode = Control.FOCUS_NONE
 	home_btn.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	home_btn.position = Vector2(12, 40)
-	home_btn.custom_minimum_size = Vector2(76, 30)
-	home_btn.add_theme_font_size_override("font_size", 14)
+	home_btn.position = Vector2(margin, safe_top + 8.0)
+	home_btn.custom_minimum_size = Vector2(0, 34)
+	home_btn.add_theme_font_size_override("font_size", 15)
+	_style_home_button(home_btn)
 	home_btn.pressed.connect(_on_home_pressed)
 	add_child(home_btn)
 
@@ -293,6 +310,47 @@ func _on_home_pressed() -> void:
 		"move_index": int(_match.state.get("moveIndex", 0)),
 		"reason": "quit",
 	})
+
+
+## Style the in-match Home button to match the game's surfaces: a dark rounded body
+## with a purple border (mirrors the power-card / nav look), brighter on hover/press.
+func _style_home_button(b: Button) -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Style.BOARD
+	sb.set_corner_radius_all(8)
+	sb.border_color = Style.PRIMARY
+	sb.set_border_width_all(2)
+	sb.set_content_margin(SIDE_LEFT, 14)
+	sb.set_content_margin(SIDE_RIGHT, 14)
+	sb.set_content_margin(SIDE_TOP, 4)
+	sb.set_content_margin(SIDE_BOTTOM, 4)
+	var hover := sb.duplicate()
+	hover.bg_color = Color(Style.PRIMARY, 0.20)
+	for st in ["normal", "focus"]:
+		b.add_theme_stylebox_override(st, sb)
+	for st in ["hover", "pressed", "hover_pressed"]:
+		b.add_theme_stylebox_override(st, hover)
+	b.add_theme_color_override("font_color", Style.TEXT)
+	b.add_theme_color_override("font_hover_color", Color.WHITE)
+	b.add_theme_color_override("font_pressed_color", Color.WHITE)
+
+
+## Top device-safe inset (notch / status bar) in logical px, so the Home row and HUD
+## clear it; resolves to 0 on desktop/editor. get_display_safe_area() is reported in
+## GLOBAL screen coordinates, so we make it window-relative by subtracting the window
+## position — otherwise a multi-monitor desktop yields a huge bogus inset. Clamped to a
+## sane fraction of the viewport so a surprising reading can never wreck the layout.
+func _top_safe_inset() -> float:
+	var win := DisplayServer.window_get_size()
+	if win.y <= 0:
+		return 0.0
+	var safe := DisplayServer.get_display_safe_area()
+	var phys_top := float(safe.position.y - DisplayServer.window_get_position().y)
+	if phys_top <= 0.0:
+		return 0.0
+	# Physical px -> logical (canvas) px via the viewport/window height ratio.
+	var vp_y := get_viewport_rect().size.y
+	return minf(phys_top * vp_y / float(win.y), vp_y * 0.15)
 
 
 ## Tap handler / MCP target supplier. Returns a status Dictionary (the board's
@@ -399,6 +457,7 @@ func _rebuild_hand() -> void:
 		lbl.set_anchors_preset(Control.PRESET_TOP_WIDE)
 		lbl.offset_top = 40
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART  # wrap within the hand box, don't run off-edge
 		_hand_box.add_child(lbl)
 		return
 	var n := cards.size()
@@ -555,7 +614,6 @@ func _update_hud() -> void:
 	_apply_hud_glow(_moves_val, 1)
 	_apply_hud_glow(_score_val, 1)
 	_apply_hud_glow(_shards_val, 1)
-	_scen_label.text = "Scenario: %s" % _match.scenario_name
 
 
 func _hud_glow_material() -> ShaderMaterial:
@@ -687,7 +745,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_play_intro()
 			KEY_ESCAPE:
 				_cancel_target()
-				_toast.text = "Swipe to move  •  tap a card to play  •  0–7 scenarios  •  R = new game"
+				_toast.text = ""
 			KEY_0: _load_scenario(0)
 			KEY_1: _load_scenario(1)
 			KEY_2: _load_scenario(2)
@@ -720,6 +778,7 @@ func _connect_validator() -> void:
 	var match_id := "gd_%d" % (randi() % 1000000)
 	var player_id := "player_%d" % (randi() % 1000000)
 	_net.init_and_connect(VALIDATOR_URL, match_id, _match.state, player_id)
+	_net_label.visible = true
 	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % VALIDATOR_URL
 
