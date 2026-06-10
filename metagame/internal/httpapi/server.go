@@ -56,30 +56,33 @@ func Handler(cfg config.Config, version string, auth *snaps.AuthClient) http.Han
 	if cfg.BasePath != "" {
 		mux.HandleFunc("GET "+cfg.BasePath+"/health", s.handleHealth)
 	}
-	mux.HandleFunc("GET "+cfg.BasePath+"/ping", s.handlePing)
-	mux.HandleFunc("GET "+cfg.BasePath+"/snap-check", s.handleSnapCheck)
+	mux.HandleFunc("GET "+cfg.BasePath+"/ping", s.requireUser(s.handlePing))
+	mux.HandleFunc("GET "+cfg.BasePath+"/snap-check", s.requireUser(s.handleSnapCheck))
 	return mux
+}
+
+// requireUser gates a handler on the gateway-stamped User-Id header, so no
+// endpoint can forget the session check (only /health is unauthenticated).
+func (s *Server) requireUser(next func(w http.ResponseWriter, r *http.Request, userID string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get(userIDHeader)
+		if userID == "" {
+			writeJSON(w, http.StatusUnauthorized, errorResponse{Error: "missing User-Id header"})
+			return
+		}
+		next(w, r, userID)
+	}
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, HealthResponse{Status: "ok"})
 }
 
-func (s *Server) handlePing(w http.ResponseWriter, r *http.Request) {
-	userID := r.Header.Get(userIDHeader)
-	if userID == "" {
-		writeJSON(w, http.StatusUnauthorized, errorResponse{Error: "missing User-Id header"})
-		return
-	}
+func (s *Server) handlePing(w http.ResponseWriter, r *http.Request, userID string) {
 	writeJSON(w, http.StatusOK, PingResponse{OK: true, UserID: userID, Version: s.version})
 }
 
-func (s *Server) handleSnapCheck(w http.ResponseWriter, r *http.Request) {
-	userID := r.Header.Get(userIDHeader)
-	if userID == "" {
-		writeJSON(w, http.StatusUnauthorized, errorResponse{Error: "missing User-Id header"})
-		return
-	}
+func (s *Server) handleSnapCheck(w http.ResponseWriter, r *http.Request, userID string) {
 	resp := SnapCheckResponse{Snap: "auth", RPC: snaps.GetUserRPC}
 	if s.auth == nil {
 		resp.Upstream = "unconfigured: SNAPEND_AUTH_GRPC_URL is not set"

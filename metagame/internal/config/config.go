@@ -31,8 +31,19 @@ func FromEnv() Config {
 	}
 	return Config{
 		Port:           port,
-		BasePath:       strings.TrimSuffix(os.Getenv("BYOSNAP_BASE_PATH"), "/"),
+		BasePath:       normalizeBasePath(os.Getenv("BYOSNAP_BASE_PATH")),
 		InternalHeader: os.Getenv("SNAPEND_INTERNAL_HEADER"),
 		AuthSnapAddr:   os.Getenv("SNAPEND_AUTH_GRPC_URL"),
 	}
+}
+
+// normalizeBasePath shapes the env value into something safe to concatenate
+// into ServeMux patterns: no trailing slashes, a single leading slash, and
+// "/" collapsing to "" (unprefixed routes only).
+func normalizeBasePath(v string) string {
+	v = strings.TrimRight(v, "/")
+	if v != "" && !strings.HasPrefix(v, "/") {
+		v = "/" + v
+	}
+	return v
 }

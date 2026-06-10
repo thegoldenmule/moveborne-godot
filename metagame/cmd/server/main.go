@@ -42,6 +42,9 @@ func main() {
 		Addr:              ":" + cfg.Port,
 		Handler:           httpapi.Handler(cfg, version, auth),
 		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second, // must outlast the 5s snap-check timeout
+		IdleTimeout:       60 * time.Second,
 	}
 
 	errCh := make(chan error, 1)
