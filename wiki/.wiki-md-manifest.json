@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1216,
+    "version": 1287,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "f23e2120a1889643dd46d42236461c49f93198b932eae259bcd39badd95aa144",
+      "hypercasual-llm/features/index.md": "6998693e610a6c25a927eecb3a59a38aa2fd0522a72750023a8df05f798309ab",
       "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "e7b8195647f880e17e564aae30098d2763ce10e3cbfa91f7604cab8c562aeb45",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
@@ -40,7 +40,11 @@
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "cd7726051e4bb8f6327d846cb92abddc431ea8dc4a0860a8064fdc664b8b6638",
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "3ef67745ed54e56c54f063df80baad208a8887421b6540340ca7e27e3bed8f9f",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
-      "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f"
+      "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md": "0225ee5ef017e759401b42af20cdd4aa92d067dadb4dde675a0699afa294a0d2",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md": "95b70ee2ed840419ed791d23cde243bcf3cb27945853d3b64a86b56305fb6687",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md": "1cfcd0f5501a4c2b48675da9e278576f7921dfc671daa8f2e0050ffae315f6e7",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md": "9e6373bde5f92e7901cc2f4cdd08b458126bf1db2f34523644e395b576fc3dad"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -81,7 +85,11 @@
       "testing-plan:mq88pnku-000y-7jmitx": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md",
       "feature-spec:mq88pnkv-000z-ix8ln1": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md",
       "toc:mq88ua2j-0014-vaolwu": "hypercasual-llm/design/index.md",
-      "document:mq88uf29-0016-f5qt06": "hypercasual-llm/design/general.md"
+      "document:mq88uf29-0016-f5qt06": "hypercasual-llm/design/general.md",
+      "feature-brief:mq8ejxt1-005v-k2eu9f": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md",
+      "implementation-plan:mq8ejxt1-005w-iw8mhf": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md",
+      "testing-plan:mq8ejxt1-005x-8qonc7": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md",
+      "feature-spec:mq8ejxt1-005y-pgw5j3": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md"
     }
   }
 }
