@@ -1,0 +1,196 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Meta-Game Service",
+    "version": "0.0.1",
+    "description": "Meta-game service scaffold (BYOSnap). Exposes only enough surface to prove the two connectivity paths — client → gateway → service (`/ping`) and service → snap over internal gRPC (`/snap-check`) — plus the platform health probe. No meta-game features (quests, economy, offers) live here yet.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public — the gateway does not require a session token. Only `/health` is public. Identity is the gateway-stamped `User-Id` header: the gateway validates the session token and injects the header, and the service trusts it (no self-rolled auth). Requests arriving without it (possible for api-key/internal callers, or locally where there is no gateway) receive 401 unless the caller self-stamps `User-Id`."
+  },
+  "servers": [
+    {
+      "url": "https://gateway.snapser.com/c4n1awfs/v1/byosnap-metagame",
+      "description": "Snapser dev snapend gateway (c4n1awfs)"
+    },
+    {
+      "url": "http://localhost:18080/v1/byosnap-metagame",
+      "description": "Local development (PORT=18080, BYOSNAP_BASE_PATH=/v1/byosnap-metagame; self-stamp User-Id)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Service",
+      "description": "Health and platform probes"
+    },
+    {
+      "name": "Connectivity",
+      "description": "Connectivity-proof endpoints for the two BYOSnap paths"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Service"],
+        "summary": "Health check",
+        "description": "Liveness/readiness probe. Always returns 200 when the process is up. Used as the BYOSnap readiness probe path; also served unprefixed (outside the gateway base path) for the platform probe.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-snapser-auth-types": ["user", "api-key", "internal"],
+        "x-snapser-auth-passthrough": true
+      }
+    },
+    "/ping": {
+      "get": {
+        "tags": ["Connectivity"],
+        "summary": "Gateway-path proof",
+        "description": "Proves client → gateway → service connectivity: echoes the gateway-stamped `User-Id` header back to the caller along with the service build version. 401 when the header is absent.",
+        "operationId": "getPing",
+        "responses": {
+          "200": {
+            "description": "Authenticated round trip; `userId` is the gateway-stamped identity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No `User-Id` header on the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-snapser-auth-types": ["user"]
+      }
+    },
+    "/snap-check": {
+      "get": {
+        "tags": ["Connectivity"],
+        "summary": "Snap-path proof",
+        "description": "Proves service → snap connectivity over internal gRPC: makes one read-only `auth.AuthService/GetUser` call for the requesting user against the Auth snap (addressed via the platform-injected `SNAPEND_AUTH_GRPC_URL`, with `SNAPEND_INTERNAL_HEADER` attached as `gateway` call metadata) and reports the round-trip duration and upstream status.",
+        "operationId": "getSnapCheck",
+        "responses": {
+          "200": {
+            "description": "Upstream round trip succeeded (`upstream` is \"OK\")",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapCheckResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No `User-Id` header on the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream call failed; `upstream` carries the gRPC status text (or an unconfigured note when `SNAPEND_AUTH_GRPC_URL` is unset)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapCheckResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-snapser-auth-types": ["user"]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"],
+            "example": "ok"
+          }
+        }
+      },
+      "PingResponse": {
+        "type": "object",
+        "required": ["ok", "userId", "version"],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "The gateway-stamped User-Id header, echoed back",
+            "example": "0fc758bb-772a-4cfb-b375-01cc820214d2"
+          },
+          "version": {
+            "type": "string",
+            "description": "Service build version (ldflags-stamped; \"dev\" when unstamped)",
+            "example": "dev"
+          }
+        }
+      },
+      "SnapCheckResponse": {
+        "type": "object",
+        "required": ["snap", "rpc", "durationMs", "upstream"],
+        "properties": {
+          "snap": {
+            "type": "string",
+            "description": "Target snap id",
+            "example": "auth"
+          },
+          "rpc": {
+            "type": "string",
+            "description": "Fully-qualified gRPC method invoked",
+            "example": "/auth.AuthService/GetUser"
+          },
+          "durationMs": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Upstream round-trip time in milliseconds",
+            "example": 23
+          },
+          "upstream": {
+            "type": "string",
+            "description": "\"OK\" on success; otherwise the gRPC status text (code: message)",
+            "example": "OK"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "missing User-Id header"
+          }
+        }
+      }
+    }
+  }
+}
