@@ -83,6 +83,11 @@ verifier/suite — never hand-write expected values.
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
   dist), or `cd ../validator && bun run dev`. Endpoints + the MCP debug tools are in
   `../validator/README.md` and `../validator/src/validator/CLAUDE.md`.
+- **ArtGen (AI asset generation):** `addons/artgen/` — bottom-panel dock + Recraft
+  client + localhost bridge (`:4848`) behind the `artgen` MCP (`../tools/artgen_mcp.ts`).
+  History journals to `../art/generated/ledger.jsonl`; saves land in
+  `res://assets/generated/` with attribution in `ai_manifest.json`. Headless check:
+  `--script res://tools/verify_artgen_svg.gd`.
 
 ## GDScript gotchas (learned the hard way)
 

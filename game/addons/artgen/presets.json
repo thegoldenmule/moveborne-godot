@@ -14,7 +14,7 @@
 		},
 		"icon-raster": {
 			"model": "raster",
-			"style_id": null,
+			"style_id": "none",
 			"size": "1024x1024",
 			"prompt": "{subject} glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
 			"controls": {
@@ -47,7 +47,7 @@
 		},
 		"texture": {
 			"model": "raster",
-			"style_id": null,
+			"style_id": "none",
 			"size": "1024x1024",
 			"prompt": "{subject} seamless dark grunge screen-print texture, near-black with subtle dust, press streaks and paper scuffs, monochrome, no gradients, no recognizable objects",
 			"controls": {

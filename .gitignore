@@ -3,3 +3,6 @@
 
 # Source PSDs are too large for git (531 MB)
 art/*.psd
+
+# ArtGen thumbnail cache (rasterized previews, regenerable)
+art/generated/.thumbs/

@@ -1,0 +1,510 @@
+@tool
+class_name ArtgenService
+extends Node
+
+## UI-free ArtGen core: presets/config, request building, decode + immediate
+## write, post-processing, the save pipeline (res://assets/generated/ +
+## ai_manifest.json), ledger journaling, and thumbnails. The dock and the MCP
+## bridge are both thin callers; signals keep the dock fresh when the bridge
+## (Claude over MCP) drives generation.
+##
+## Preset "style_id" semantics: null → config.json default custom style;
+## "none" → send no style at all (required for raster output: a vector-base
+## custom style forces SVG even on raster models); "<uuid>" → explicit style.
+
+const LedgerT := preload("res://addons/artgen/ledger.gd")
+const SvgT := preload("res://addons/artgen/svg_tools.gd")
+const ClientT := preload("res://addons/artgen/recraft_client.gd")
+
+const MANIFEST_PATH := "res://assets/generated/ai_manifest.json"
+const SAVE_CATEGORIES := ["icons", "cards", "textures", "misc"]
+const THUMB_SIZE := 256
+
+signal history_changed
+signal generation_started(info: Dictionary)
+signal generation_completed(records: Array)
+signal generation_failed(error: String)
+signal balance_changed(credits: int)
+
+var config := {}
+var presets := {}
+var client: Node
+
+var repo_root := ""
+var gen_root := ""
+var ledger_path := ""
+var thumbs_dir := ""
+
+var balance := -1
+var generating := false
+
+var _index := {"generations": {}, "order": [], "styles": []}
+
+
+# _enter_tree (not _ready): the dock is added straight into the live editor UI,
+# so its _ready can fire before this service's _ready would — _enter_tree runs
+# synchronously inside the plugin's add_child, guaranteeing the client exists.
+func _enter_tree() -> void:
+	repo_root = ProjectSettings.globalize_path("res://").path_join("..").simplify_path()
+	gen_root = repo_root.path_join("art/generated")
+	ledger_path = gen_root.path_join("ledger.jsonl")
+	thumbs_dir = gen_root.path_join(".thumbs")
+	DirAccess.make_dir_recursive_absolute(thumbs_dir)
+
+	_load_json_into("res://addons/artgen/config.json", config)
+	var pres := {}
+	_load_json_into("res://addons/artgen/presets.json", pres)
+	presets = pres.get("presets", {})
+
+	client = ClientT.new()
+	client.name = "RecraftClient"
+	client.api_key = resolve_api_key()
+	add_child(client)
+
+	reload_history()
+	_refresh_balance.call_deferred()
+
+
+# -- API key ------------------------------------------------------------------
+
+## Editor project metadata (gitignored) → RECRAFT_API_KEY env → repo-root .env.
+func resolve_api_key() -> String:
+	if Engine.is_editor_hint():
+		var meta: Variant = EditorInterface.get_editor_settings().get_project_metadata(
+			"artgen", "api_key", "")
+		if str(meta) != "":
+			return str(meta)
+	var env := OS.get_environment("RECRAFT_API_KEY")
+	if not env.is_empty():
+		return env
+	var env_file := repo_root.path_join(".env")
+	if FileAccess.file_exists(env_file):
+		for line in FileAccess.get_file_as_string(env_file).split("\n"):
+			if line.strip_edges().begins_with("RECRAFT_API_KEY="):
+				return line.get_slice("=", 1).strip_edges().trim_prefix("\"").trim_suffix("\"")
+	return ""
+
+
+func set_api_key(key: String) -> void:
+	if Engine.is_editor_hint():
+		EditorInterface.get_editor_settings().set_project_metadata("artgen", "api_key", key)
+	client.api_key = key
+
+
+# -- Generation ---------------------------------------------------------------
+
+## opts: {preset*, subject, n, prompt, model, size, style_id, negative_prompt,
+## parent_id}. prompt/model/size/style_id override the preset when present.
+## Returns {"ok": bool, "generations": [records]} or {"ok": false, "error": …}.
+func generate(opts: Dictionary) -> Dictionary:
+	var preset_name := str(opts.get("preset", ""))
+	if not presets.has(preset_name):
+		return {"ok": false, "error": "unknown preset '%s' (have: %s)" % [
+			preset_name, ", ".join(presets.keys())]}
+	var preset: Dictionary = presets[preset_name]
+
+	var subject := str(opts.get("subject", ""))
+	var prompt := str(opts.get("prompt", "")) if opts.get("prompt") else \
+			str(preset.get("prompt", "{subject}")).replace("{subject}", subject)
+	var model_kind := str(opts.get("model", "")) if opts.get("model") else \
+			str(preset.get("model", "vector"))
+	var model: String = config.get("models", {}).get(model_kind, model_kind)
+	var n := clampi(int(opts.get("n", 1)), 1, 6)
+	var size := str(opts.get("size", "")) if opts.get("size") else \
+			str(preset.get("size", "1024x1024"))
+
+	var payload := {
+		"prompt": prompt, "model": model, "n": n, "size": size,
+		"response_format": "b64_json",
+	}
+	var style_id: Variant = opts.get("style_id", preset.get("style_id"))
+	if style_id == null:
+		style_id = config.get("style_id")
+	if style_id != null and str(style_id) != "none" and str(style_id) != "":
+		payload["style_id"] = str(style_id)
+	if preset.get("controls") != null:
+		payload["controls"] = preset["controls"]
+	if opts.get("negative_prompt"):
+		payload["negative_prompt"] = str(opts["negative_prompt"])
+
+	generating = true
+	generation_started.emit({"preset": preset_name, "subject": subject, "n": n})
+	if balance < 0:
+		await _refresh_balance()  # so per-image cost_units can be derived below
+	var resp: Dictionary = await client.generate(payload)
+	generating = false
+
+	var ts := _now_iso()
+	if not resp.get("ok", false):
+		var msg := str(resp.get("error", "unknown error"))
+		LedgerT.append(ledger_path, {
+			"type": "generation", "id": _new_gen_id(), "ts": ts, "provider": "recraft",
+			"model": model, "style_id": payload.get("style_id"), "style": null,
+			"preset": preset_name, "subject": subject, "prompt": prompt,
+			"negative_prompt": payload.get("negative_prompt"), "size": size,
+			"n": n, "n_index": 0, "controls": payload.get("controls"),
+			"random_seed": null, "parent_id": opts.get("parent_id"), "image_id": null,
+			"file": null, "post": preset.get("post", []),
+			"cost_units": 0, "status": "api_error", "error": msg.left(300),
+		})
+		reload_history()
+		generation_failed.emit(msg)
+		return {"ok": false, "error": msg, "code": resp.get("code", 0)}
+
+	var old_balance := balance
+	await _refresh_balance()
+	var cost: int = (old_balance - balance) if (old_balance >= 0 and balance >= 0) else 0
+
+	var month := _month_bucket()
+	DirAccess.make_dir_recursive_absolute(gen_root.path_join(month))
+	var records: Array = []
+	var data: Array = resp["data"].get("data", [])
+	for i in data.size():
+		var raw := Marshalls.base64_to_raw(str(data[i].get("b64_json", "")))
+		var ext := "svg" if _looks_like_svg(raw) else "png"
+		var gid := _new_gen_id()
+		var slug := _slugify(subject if not subject.is_empty() else preset_name)
+		var rel := "art/generated/%s/%s-%s.%s" % [month, gid, slug, ext]
+		var abs := repo_root.path_join(rel)
+		var fa := FileAccess.open(abs, FileAccess.WRITE)
+		fa.store_buffer(raw)
+		fa.close()
+		var event := {
+			"type": "generation", "id": gid, "ts": ts, "provider": "recraft",
+			"model": model, "style_id": payload.get("style_id"), "style": null,
+			"preset": preset_name, "subject": subject, "prompt": prompt,
+			"negative_prompt": payload.get("negative_prompt"), "size": size,
+			"n": n, "n_index": i, "controls": payload.get("controls"),
+			"random_seed": null, "parent_id": opts.get("parent_id"),
+			"image_id": data[i].get("image_id"), "file": rel,
+			"post": preset.get("post", []),
+			"cost_units": int(float(cost) / data.size()), "status": "ok",
+		}
+		LedgerT.append(ledger_path, event)
+		records.append(event)
+
+	reload_history()
+	generation_completed.emit(records)
+	return {"ok": true, "generations": records}
+
+
+# -- Save pipeline ------------------------------------------------------------
+
+## Promote a generation: apply its planned post steps (strip_bg_rect /
+## removeBackground), copy into res://assets/generated/<category>/<name>.<ext>,
+## import, and record attribution in ai_manifest.json + a ledger save event.
+func save_generation(gen_id: String, category: String, asset_name: String) -> Dictionary:
+	var rec: Dictionary = _index["generations"].get(gen_id, {})
+	if rec.is_empty() or rec.get("file") == null:
+		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
+	if not SAVE_CATEGORIES.has(category):
+		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
+	if not asset_name.is_valid_filename() or asset_name.is_empty():
+		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+
+	var src_abs := repo_root.path_join(str(rec["file"]))
+	var ext := str(rec["file"]).get_extension()
+	var bytes := FileAccess.get_file_as_bytes(src_abs)
+	if bytes.is_empty():
+		return {"ok": false, "error": "generation file missing: " + str(rec["file"])}
+
+	var applied: Array = []
+	for step in rec.get("post", []):
+		match str(step):
+			"strip_bg_rect":
+				if ext == "svg":
+					var stripped: Dictionary = SvgT.strip_background(
+						bytes.get_string_from_utf8(), _background_color(rec))
+					if stripped["status"] == SvgT.STATUS_STRIPPED:
+						bytes = str(stripped["text"]).to_utf8_buffer()
+						applied.append("strip_bg_rect")
+					elif stripped["status"] == SvgT.STATUS_FILL_MISMATCH:
+						return {"ok": false, "error":
+							"background fill doesn't match the requested background — " +
+							"this composition uses it as ink; save raw or regenerate"}
+			"removeBackground":
+				if ext == "png":
+					var rb: Dictionary = await client.remove_background(bytes)
+					if not rb.get("ok", false):
+						return {"ok": false, "error": "removeBackground failed: " + str(rb.get("error"))}
+					bytes = Marshalls.base64_to_raw(str(rb["data"]["image"]["b64_json"]))
+					applied.append("removeBackground")
+
+	var dest := "res://assets/generated/%s/%s.%s" % [category, asset_name, ext]
+	if FileAccess.file_exists(dest):
+		return {"ok": false, "error": "asset already exists: " + dest}
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
+	var fa := FileAccess.open(dest, FileAccess.WRITE)
+	fa.store_buffer(bytes)
+	fa.close()
+
+	await _rescan_filesystem()
+
+	var sha := FileAccess.get_sha256(dest)
+	var manifest := _load_manifest()
+	manifest["assets"][dest] = {
+		"generator": "recraft/" + str(rec.get("model", "")),
+		"style_id": rec.get("style_id"),
+		"prompt": rec.get("prompt"),
+		"gen_id": gen_id,
+		"generated_at": rec.get("ts"),
+		"saved_at": _now_iso(),
+		"sha256": sha,
+		"post": applied,
+		"modified_after_save": false,
+	}
+	_store_manifest(manifest)
+
+	LedgerT.append(ledger_path, {
+		"type": "save", "gen_id": gen_id, "ts": _now_iso(), "dest": dest, "sha256": sha,
+	})
+	reload_history()
+	return {"ok": true, "dest": dest, "sha256": sha, "post": applied}
+
+
+func discard_generation(gen_id: String) -> Dictionary:
+	if not _index["generations"].has(gen_id):
+		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
+	LedgerT.append(ledger_path, {"type": "discard", "gen_id": gen_id, "ts": _now_iso()})
+	reload_history()
+	return {"ok": true}
+
+
+func create_style(base_style: String, ref_paths: Array) -> Dictionary:
+	var resp: Dictionary = await client.create_style(base_style, ref_paths)
+	if not resp.get("ok", false):
+		return {"ok": false, "error": str(resp.get("error"))}
+	var style_id := str(resp["data"]["id"])
+	LedgerT.append(ledger_path, {
+		"type": "style_created", "ts": _now_iso(), "style_id": style_id,
+		"style": base_style,
+		"refs": ref_paths.map(func(p: String) -> String: return p.replace(repo_root + "/", "")),
+		"cost_units": 40,
+	})
+	reload_history()
+	await _refresh_balance()
+	return {"ok": true, "style_id": style_id}
+
+
+# -- History / index ----------------------------------------------------------
+
+func reload_history() -> void:
+	_index = LedgerT.fold(ledger_path)
+	history_changed.emit()
+
+
+## Newest-first records. filters: {preset, state, search} (all optional).
+func get_history(filters := {}) -> Array:
+	var out: Array = []
+	var order: Array = _index["order"]
+	for i in range(order.size() - 1, -1, -1):
+		var rec: Dictionary = _index["generations"][order[i]]
+		if filters.get("preset") and str(rec.get("preset")) != str(filters["preset"]):
+			continue
+		if filters.get("state") and str(rec.get("state")) != str(filters["state"]):
+			continue
+		var search := str(filters.get("search", ""))
+		if not search.is_empty():
+			var hay := (str(rec.get("subject", "")) + " " + str(rec.get("prompt", ""))
+				+ " " + str(rec.get("id", ""))).to_lower()
+			if not hay.contains(search.to_lower()):
+				continue
+		out.append(rec)
+	return out
+
+
+## A record plus its parent chain (oldest ancestor last).
+func get_generation(gen_id: String) -> Dictionary:
+	var rec: Dictionary = _index["generations"].get(gen_id, {})
+	if rec.is_empty():
+		return {}
+	var lineage: Array = []
+	var cursor: Variant = rec.get("parent_id")
+	while cursor != null and _index["generations"].has(cursor):
+		var parent: Dictionary = _index["generations"][cursor]
+		lineage.append(parent)
+		cursor = parent.get("parent_id")
+	var out := rec.duplicate()
+	out["lineage"] = lineage
+	return out
+
+
+func get_styles() -> Array:
+	return _index["styles"]
+
+
+# -- Thumbnails ---------------------------------------------------------------
+
+func thumbnail(gen_id: String) -> Texture2D:
+	var rec: Dictionary = _index["generations"].get(gen_id, {})
+	if rec.is_empty() or rec.get("file") == null:
+		return null
+	var cached := thumbs_dir.path_join(gen_id + ".png")
+	var img := Image.new()
+	if FileAccess.file_exists(cached):
+		if img.load(cached) == OK:
+			return ImageTexture.create_from_image(img)
+	var abs := repo_root.path_join(str(rec["file"]))
+	if str(rec["file"]).ends_with(".svg"):
+		var scale := float(THUMB_SIZE) / 1024.0
+		if img.load_svg_from_string(FileAccess.get_file_as_string(abs), scale) != OK:
+			return null
+	else:
+		if img.load(abs) != OK:
+			return null
+		img.resize(THUMB_SIZE, THUMB_SIZE, Image.INTERPOLATE_LANCZOS)
+	img.save_png(cached)
+	return ImageTexture.create_from_image(img)
+
+
+## Full-size preview with the generation's post steps applied in memory
+## (so the detail view can show the actually-transparent result pre-save).
+func preview_image(gen_id: String, apply_post := false) -> Image:
+	var rec: Dictionary = _index["generations"].get(gen_id, {})
+	if rec.is_empty() or rec.get("file") == null:
+		return null
+	var abs := repo_root.path_join(str(rec["file"]))
+	var img := Image.new()
+	if str(rec["file"]).ends_with(".svg"):
+		var text := FileAccess.get_file_as_string(abs)
+		if apply_post and rec.get("post", []).has("strip_bg_rect"):
+			var stripped: Dictionary = SvgT.strip_background(text, _background_color(rec))
+			if stripped["status"] == SvgT.STATUS_STRIPPED:
+				text = stripped["text"]
+		if img.load_svg_from_string(text, 0.5) != OK:
+			return null
+	elif img.load(abs) != OK:
+		return null
+	return img
+
+
+# -- Manifest -----------------------------------------------------------------
+
+## Re-hash every promoted asset: flags hand-edits (modified_after_save) and
+## reports files missing a manifest entry. Returns {"issues": [String]}.
+func check_manifest() -> Dictionary:
+	var manifest := _load_manifest()
+	var issues: Array = []
+	var changed := false
+	for res_path in manifest["assets"]:
+		if not FileAccess.file_exists(res_path):
+			issues.append("missing file for manifest entry: " + str(res_path))
+			continue
+		var sha := FileAccess.get_sha256(res_path)
+		var entry: Dictionary = manifest["assets"][res_path]
+		if sha != str(entry.get("sha256")) and not bool(entry.get("modified_after_save", false)):
+			entry["modified_after_save"] = true
+			changed = true
+			issues.append("hand-edited after save: " + str(res_path))
+	var dir := DirAccess.open("res://assets/generated")
+	if dir != null:
+		for sub in dir.get_directories():
+			var subdir := DirAccess.open("res://assets/generated/" + sub)
+			for f in subdir.get_files():
+				if f.ends_with(".import") or f.ends_with(".uid"):
+					continue
+				var res_path := "res://assets/generated/%s/%s" % [sub, f]
+				if not manifest["assets"].has(res_path):
+					issues.append("no manifest entry (invariant violation): " + res_path)
+	if changed:
+		_store_manifest(manifest)
+	return {"issues": issues}
+
+
+func _load_manifest() -> Dictionary:
+	var manifest := {"version": 1, "assets": {}}
+	if FileAccess.file_exists(MANIFEST_PATH):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_PATH))
+		if typeof(parsed) == TYPE_DICTIONARY:
+			manifest = parsed
+			if not manifest.has("assets"):
+				manifest["assets"] = {}
+	return manifest
+
+
+func _store_manifest(manifest: Dictionary) -> void:
+	DirAccess.make_dir_recursive_absolute(
+		ProjectSettings.globalize_path(MANIFEST_PATH.get_base_dir()))
+	var fa := FileAccess.open(MANIFEST_PATH, FileAccess.WRITE)
+	fa.store_string(JSON.stringify(manifest, "\t") + "\n")
+	fa.close()
+
+
+# -- Helpers ------------------------------------------------------------------
+
+func status() -> Dictionary:
+	return {
+		"ok": true,
+		"editor": "godot-" + str(Engine.get_version_info()["string"]),
+		"api_key_configured": client != null and not client.api_key.is_empty(),
+		"balance": balance,
+		"generating": generating,
+		"config": config,
+		"presets": presets.keys(),
+		"categories": SAVE_CATEGORIES,
+		"history_count": _index["order"].size(),
+	}
+
+
+func _refresh_balance() -> void:
+	if client.api_key.is_empty():
+		return
+	var resp: Dictionary = await client.me()
+	if resp.get("ok", false):
+		balance = int(resp["data"].get("credits", -1))
+		balance_changed.emit(balance)
+
+
+func _rescan_filesystem() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var fs := EditorInterface.get_resource_filesystem()
+	fs.scan()
+	while fs.is_scanning():
+		await get_tree().process_frame
+
+
+func _background_color(rec: Dictionary) -> Color:
+	var controls: Variant = rec.get("controls")
+	if typeof(controls) == TYPE_DICTIONARY and controls.get("background_color") != null:
+		var rgb: Array = controls["background_color"].get("rgb", [0, 0, 0])
+		return Color8(int(rgb[0]), int(rgb[1]), int(rgb[2]))
+	return Color.BLACK
+
+
+func _load_json_into(path: String, target: Dictionary) -> void:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) == TYPE_DICTIONARY:
+		target.merge(parsed, true)
+	else:
+		push_error("ArtGen: cannot parse " + path)
+
+
+func _new_gen_id() -> String:
+	return "g_%d_%s" % [
+		int(Time.get_unix_time_from_system()),
+		Crypto.new().generate_random_bytes(2).hex_encode()]
+
+
+func _now_iso() -> String:
+	return Time.get_datetime_string_from_system(true) + "Z"
+
+
+func _month_bucket() -> String:
+	var d := Time.get_datetime_dict_from_system(true)
+	return "%04d-%02d" % [d["year"], d["month"]]
+
+
+static func _looks_like_svg(raw: PackedByteArray) -> bool:
+	var head := raw.slice(0, mini(200, raw.size())).get_string_from_utf8().strip_edges()
+	return head.begins_with("<?xml") or head.begins_with("<svg")
+
+
+static func _slugify(text: String) -> String:
+	var slug := ""
+	for c in text.to_lower():
+		if (c >= "a" and c <= "z") or (c >= "0" and c <= "9"):
+			slug += c
+		elif not slug.ends_with("-"):
+			slug += "-"
+	return slug.trim_suffix("-").left(40)

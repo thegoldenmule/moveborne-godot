@@ -8,6 +8,10 @@
       "type": "http",
       "url": "http://127.0.0.1:5555/mcp"
     },
+    "artgen": {
+      "command": "bun",
+      "args": ["run", "tools/artgen_mcp.ts"]
+    },
     "snapser": {
         "command": "npx",
         "args": [

@@ -101,12 +101,16 @@ Two targets, same `validator/` code:
 
 ## MCP servers & skills
 
-`.mcp.json` registers three servers (enabled in `.claude/settings.local.json`):
+`.mcp.json` registers four servers (enabled in `.claude/settings.local.json`):
 
 - **`validator`** (`:5555/mcp`) — inspect/debug match state: `list_matches`, `get_match_state`,
   `get_state_history`, `simulate_action`, `clear_match`. **Start the validator first.**
 - **`wiki`** (`:4439/mcp`) — the structured architecture wiki / ADRs.
 - **`snapser`** (`npx @snapser/mcp-server-snapser`, app `c4n1awfs`) — the Snapser platform.
+- **`artgen`** (`bun run tools/artgen_mcp.ts`) — generate occult-arcade art via Recraft:
+  `artgen_generate`/`_history`/`_get`/`_save`/`_discard`/`_status`/`_style_create`. The shim
+  proxies the in-editor bridge (`:4848`), so the **Godot editor must be open** with the ArtGen
+  plugin enabled (`game/addons/artgen/`); key in editor settings or `RECRAFT_API_KEY`/root `.env`.
 - The **`godot-ai`** MCP (bundled under `game/addons/`) drives the Godot editor/game.
 
 Project skills (`.claude/skills/`): **`run-validator`** (start/stop/inspect the `:5555` validator) and
