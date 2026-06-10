@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1357,
+    "version": 1518,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
+      "hypercasual-llm/features/index.md": "2cfb7a6432f63cee29f939d8ac82250b6dece6c16d0499230757fb4e514cecaf",
       "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "95a2150dc0773438d9ade2e3786017b38ed87b075cf41a343bf10851ad8f8437",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
@@ -56,7 +56,15 @@
       "hypercasual-llm/.archived/implementation-plan--mq8ejxt1-005w-iw8mhf.md": "4029f79d3b300ad8ae7adde99d766bf8cf76e4e26274e37169a66b19fb2e3e48",
       "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
       "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51",
-      "hypercasual-llm/architecture/client/editor-tools.md": "edc5201e39ae8e96c3de3f57587452b0c623bd9115cd96beb77ad3aeefa073d7"
+      "hypercasual-llm/architecture/client/editor-tools.md": "edc5201e39ae8e96c3de3f57587452b0c623bd9115cd96beb77ad3aeefa073d7",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md": "9436914f5c0d7b9fddb691bcfba9f6ca39b3a4b3788c98c01091e2abaafb605c",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/implementation-plan-virtual-currency-coins-souls-gems.md": "e1a36d0515e52f6cca658a4d6b8082df0d795562edd5168c36550c1d67f11f59",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/testing-plan-virtual-currency-coins-souls-gems.md": "010436569ae9e86da610d5c5c91141ed49bcc06dfa9e3003c64e1fae95b7862f",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/spec-virtual-currency-coins-souls-gems.md": "85ddbdbb4e1c3c698b622f8a107523cf0da0dcba3b2191a73bdf546de5ba7225",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/index.md": "8c9c91e11ad85a746acb5ded7a428b315064a45f9825605f3b637a814077cd57",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/implementation-plan-leaderboards-daily-weekly-monthly-global.md": "b3c377565dff47cd597bd9f6449ecf980267116fb09bacae5b61753e9fc6a5cc",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/testing-plan-leaderboards-daily-weekly-monthly-global.md": "a4c6f07500abc8f7c03a69613a68c2bc53a42726b2f139937fa45bcf853f3d46",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/spec-leaderboards-daily-weekly-monthly-global.md": "38f99d7c46afbb42a4f30dc7736f837f172481c7ad1169e24d11ef71abf16762"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -113,7 +121,15 @@
       "implementation-plan:mq8ejxt1-005w-iw8mhf": "hypercasual-llm/.archived/implementation-plan--mq8ejxt1-005w-iw8mhf.md",
       "testing-plan:mq8ejxt1-005x-8qonc7": "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md",
       "feature-spec:mq8ejxt1-005y-pgw5j3": "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md",
-      "architecture:mq8hyn2w-000i-cryytk": "hypercasual-llm/architecture/client/editor-tools.md"
+      "architecture:mq8hyn2w-000i-cryytk": "hypercasual-llm/architecture/client/editor-tools.md",
+      "feature-brief:mq8j3xyq-0019-3vrpkh": "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md",
+      "implementation-plan:mq8j3xyq-001a-4m4rl4": "hypercasual-llm/features/virtual-currency-coins-souls-gems/implementation-plan-virtual-currency-coins-souls-gems.md",
+      "testing-plan:mq8j3xyq-001b-d7flut": "hypercasual-llm/features/virtual-currency-coins-souls-gems/testing-plan-virtual-currency-coins-souls-gems.md",
+      "feature-spec:mq8j3xyq-001c-qwt9z2": "hypercasual-llm/features/virtual-currency-coins-souls-gems/spec-virtual-currency-coins-souls-gems.md",
+      "feature-brief:mq8ja3dj-001h-ou163b": "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/index.md",
+      "implementation-plan:mq8ja3dj-001i-rpjbng": "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/implementation-plan-leaderboards-daily-weekly-monthly-global.md",
+      "testing-plan:mq8ja3dj-001j-ghgqgx": "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/testing-plan-leaderboards-daily-weekly-monthly-global.md",
+      "feature-spec:mq8ja3dj-001k-urfpez": "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/spec-leaderboards-daily-weekly-monthly-global.md"
     }
   }
 }
