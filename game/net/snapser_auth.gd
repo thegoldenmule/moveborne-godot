@@ -27,6 +27,12 @@ func auth_headers() -> PackedStringArray:
 	return PackedStringArray(["Token: " + session_token, "User-Id: " + user_id])
 
 
+## The persisted anon username — the only human-readable handle this account has
+## (leaderboards stash it in user_metadata as the display name).
+func username() -> String:
+	return _username
+
+
 ## Ensure a live session (cached or fresh anonymous login). Coroutine — await it:
 ##   var ok: bool = await auth.ensure_session()
 func ensure_session() -> bool:

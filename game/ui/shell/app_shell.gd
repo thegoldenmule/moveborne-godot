@@ -7,8 +7,13 @@ extends Control
 const MatchStateS := preload("res://ui/router/match_state.gd")
 const HomeScene := preload("res://ui/screens/home.tscn")
 const PlaceholderScene := preload("res://ui/screens/placeholder_tab.tscn")
+const LeaderboardScene := preload("res://ui/screens/leaderboard_tab.tscn")
+const SnapserAuthS := preload("res://net/snapser_auth.gd")
+const LeaderboardsClientS := preload("res://net/leaderboards_client.gd")
+const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 
 const HOME_INDEX := 2
+const LEADERBOARD_INDEX := 1
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
 const TAB_ICONS: Array[Texture2D] = [
 	preload("res://assets/generated/icons/collections_icon.svg"),
@@ -41,6 +46,9 @@ var _tab_icons: Array = []   # TextureRect per side tab (null at HOME_INDEX)
 var _tab_labels: Array = []  # Label per side tab (null at HOME_INDEX)
 var _current_tab := HOME_INDEX
 var _bg: ColorRect
+var _auth: MbSnapserAuth
+var _leaderboards: Node  # MbLeaderboardsClient (preloaded — fresh class_name globals need a full editor scan)
+var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the nav)
 
 
 func _ready() -> void:
@@ -90,12 +98,28 @@ func _ready() -> void:
 	_row.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_row.add_theme_constant_override("separation", 0)
 
-	# Build the five tab screens into the content host (Home is real; rest stubs).
+	# Snapser session + leaderboards client, owned by the shell so they survive
+	# match-scene teardown. Sign-in is lazy (first leaderboards call), so offline
+	# players incur no network on launch.
+	_auth = SnapserAuthS.new()
+	add_child(_auth)
+	_leaderboards = LeaderboardsClientS.new(_auth)
+	add_child(_leaderboards)
+
+	# Persistent top currency bar (coins/souls/gems), sharing the shell session.
+	_currency_bar = CurrencyBarS.new(_auth)
+	add_child(_currency_bar)
+
+	# Build the five tab screens into the content host (Home + Leaderboard are
+	# real; the rest stubs).
 	for i in range(5):
 		var screen: Control
 		if i == HOME_INDEX:
 			screen = HomeScene.instantiate()
 			screen.play_mode_selected.connect(_on_play_mode_selected)
+		elif i == LEADERBOARD_INDEX:
+			screen = LeaderboardScene.instantiate()
+			screen.setup(_auth, _leaderboards)
 		else:
 			screen = PlaceholderScene.instantiate()
 			screen.set_title(TAB_LABELS[i])
@@ -149,6 +173,10 @@ func _select_tab(index: int) -> void:
 	_current_tab = index
 	for i in range(_screens.size()):
 		_screens[i].visible = (i == index)
+	# Screens that expose refresh() refetch when they become the visible tab.
+	var shown: Control = _screens[index] if index < _screens.size() else null
+	if shown != null and shown.has_method("refresh"):
+		shown.refresh()
 	# Selected side tab: icon grows and pops up past the bar frame, label shows
 	# beneath it. Unselected tabs collapse back to a centered base-size icon.
 	# (Home is always icon-only — its glow is the emphasis.)
@@ -232,9 +260,20 @@ func _on_play_mode_selected(cfg: Dictionary) -> void:
 
 ## Called by ShellState on suspend/resume. Hides BOTH the Control subtree and the
 ## nav CanvasLayer (a CanvasLayer does not inherit a parent Control's visibility).
+## On resume, the freshly banked match result (if any) is flushed to the
+## leaderboards fire-and-forget — submit_pending gates by mode and a consumed
+## flag, and never blocks the router transition.
 func set_active(v: bool) -> void:
 	visible = v
 	_nav_layer.visible = v
+	if _currency_bar != null:
+		_currency_bar.visible = v
+		if v:
+			# Post-match fallback: re-read balances on every shell resume (the
+			# match_rewards ack already merged the granted deltas optimistically).
+			_currency_bar.refresh()
+	if v and _leaderboards != null:
+		_leaderboards.submit_pending(GameState.last_result)
 
 
 ## Flat nav-bar look: transparent tabs with dim text; the selected (toggled) tab

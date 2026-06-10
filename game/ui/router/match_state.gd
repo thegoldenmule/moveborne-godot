@@ -31,6 +31,11 @@ func exit() -> void:
 
 
 func _on_match_exited(result: Dictionary) -> void:
+	# Tag the banked result for post-match consumers on the shell side: which
+	# mode produced it (main.gd doesn't know — only next_match does) and a
+	# consumed flag so leaderboard submission happens exactly once.
+	result["mode"] = str(GameState.next_match.get("mode", "infinite"))
+	result["lb_submitted"] = false
 	GameState.last_result = result
 	UiRouter.pop()
 
