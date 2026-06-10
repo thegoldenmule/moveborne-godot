@@ -23,7 +23,7 @@ var _status_label: Label
 var _search_edit: LineEdit
 var _filter_preset: OptionButton
 var _filter_state: OptionButton
-var _gallery_grid: GridContainer
+var _gallery_list: VBoxContainer
 
 var _detail_box: VBoxContainer
 var _preview_panel: PanelContainer
@@ -191,10 +191,11 @@ func _build_gallery() -> Control:
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_gallery_grid = GridContainer.new()
-	_gallery_grid.columns = 4
-	_gallery_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_gallery_grid)
+	# no horizontal scroll: thumbnail rows wrap to the pane width instead
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_gallery_list = VBoxContainer.new()
+	_gallery_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_gallery_list)
 	box.add_child(scroll)
 	return box
 
@@ -471,23 +472,39 @@ func _refresh_status() -> void:
 
 
 func _refresh_gallery() -> void:
-	for child in _gallery_grid.get_children():
+	for child in _gallery_list.get_children():
 		child.queue_free()
 	var filters := {"search": _search_edit.text}
 	if _filter_preset.selected > 0:
 		filters["preset"] = _filter_preset.get_item_text(_filter_preset.selected)
 	if _filter_state.selected > 0:
 		filters["state"] = _filter_state.get_item_text(_filter_state.selected)
-	for rec in service.get_history(filters):
-		var btn := TextureButton.new()
-		btn.custom_minimum_size = Vector2(96, 96)
-		btn.ignore_texture_size = true
-		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		btn.texture_normal = service.thumbnail(str(rec["id"]))
-		btn.tooltip_text = "%s\n%s — %s\n%s" % [
-			rec["id"], rec.get("preset"), rec.get("state"), str(rec.get("subject"))]
-		btn.pressed.connect(_select.bind(str(rec["id"])))
-		_gallery_grid.add_child(btn)
+	for group in service.get_history_grouped(filters):
+		var records: Array = group["records"]
+		var first: Dictionary = records[0]
+		var block := VBoxContainer.new()
+		var head := Label.new()
+		var subject := str(first.get("subject", ""))
+		head.text = "%s — %s%s" % [
+			subject if not subject.is_empty() else "(no subject)",
+			first.get("preset"),
+			"  ×%d" % records.size() if records.size() > 1 else ""]
+		head.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
+		block.add_child(head)
+		var row := HFlowContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for rec in records:
+			var btn := TextureButton.new()
+			btn.custom_minimum_size = Vector2(96, 96)
+			btn.ignore_texture_size = true
+			btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+			btn.texture_normal = service.thumbnail(str(rec["id"]))
+			btn.tooltip_text = "%s\n%s — %s\n%s" % [
+				rec["id"], rec.get("preset"), rec.get("state"), str(rec.get("subject"))]
+			btn.pressed.connect(_select.bind(str(rec["id"])))
+			row.add_child(btn)
+		block.add_child(row)
+		_gallery_list.add_child(block)
 	if not _selected_id.is_empty():
 		_refresh_detail()
 

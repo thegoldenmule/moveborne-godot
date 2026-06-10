@@ -59,3 +59,22 @@ func test_v41_dock_and_service() -> void:
 	var p3: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "tower"})
 	assert_eq(str(p3.get("model")), "recraftv3_vector")
 	assert_eq(str(p3.get("style_id")), "19f7542f-0727-4f6f-9d07-728c439fc583")
+
+	# gallery renders one block per variation group (real ledger: groups are
+	# stable history — batches can be appended but never removed)
+	var grouped: Array = service.get_history_grouped({})
+	assert_eq(dock._gallery_list.get_child_count(), grouped.size(),
+		"one gallery block per batch")
+	var multi_total := 0
+	var multi_blocks := 0
+	for i in grouped.size():
+		var n: int = grouped[i]["records"].size()
+		var row: HFlowContainer = dock._gallery_list.get_child(i).get_child(1)
+		assert_eq(row.get_child_count(), n, "block thumbnail count matches batch")
+		if n > 1:
+			multi_total += 1
+			var head: Label = dock._gallery_list.get_child(i).get_child(0)
+			if head.text.contains("×%d" % n):
+				multi_blocks += 1
+	assert_true(multi_total > 0, "real ledger has multi-variation batches")
+	assert_eq(multi_blocks, multi_total, "multi-batch headers show the count")

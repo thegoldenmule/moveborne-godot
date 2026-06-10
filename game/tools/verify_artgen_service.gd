@@ -29,14 +29,20 @@ func _run() -> void:
 	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_2", "batch_id": "b_2",
 		"ts": "t2", "preset": "icon-flat", "subject": "gear", "prompt": "p2",
 		"status": "ok", "parent_id": "g_1", "file": "art/generated/x/g_2.svg", "post": []})
-	LedgerT.append(tmp_ledger, {"type": "save", "gen_id": "g_1", "ts": "t3",
+	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_3", "batch_id": "b_34",
+		"ts": "t3", "preset": "icon-flat", "subject": "twins", "prompt": "p3",
+		"status": "ok", "parent_id": null, "file": "art/generated/x/g_3.svg", "post": []})
+	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_4", "batch_id": "b_34",
+		"ts": "t3", "preset": "icon-flat", "subject": "twins", "prompt": "p3",
+		"status": "ok", "parent_id": null, "file": "art/generated/x/g_4.svg", "post": []})
+	LedgerT.append(tmp_ledger, {"type": "save", "gen_id": "g_1", "ts": "t5",
 		"dest": "res://assets/generated/icons/trophy.svg", "sha256": "abc"})
-	LedgerT.append(tmp_ledger, {"type": "discard", "gen_id": "g_2", "ts": "t4"})
+	LedgerT.append(tmp_ledger, {"type": "discard", "gen_id": "g_2", "ts": "t6"})
 	LedgerT.append(tmp_ledger, {"type": "style_created", "ts": "t5",
 		"style_id": "s-1", "style": "vector_illustration", "refs": [], "cost_units": 40})
 
 	var idx: Dictionary = LedgerT.fold(tmp_ledger)
-	ok = _check(ok, idx["order"] == ["g_1", "g_2"], "fold order")
+	ok = _check(ok, idx["order"] == ["g_1", "g_2", "g_3", "g_4"], "fold order")
 	ok = _check(ok, idx["generations"]["g_1"]["state"] == "saved", "g_1 folds to saved")
 	ok = _check(ok, idx["generations"]["g_1"]["dest"] == "res://assets/generated/icons/trophy.svg",
 		"g_1 carries dest")
@@ -52,10 +58,21 @@ func _run() -> void:
 	service.reload_history()
 
 	var all: Array = service.get_history()
-	ok = _check(ok, all.size() == 2 and all[0]["id"] == "g_2", "history newest-first")
+	ok = _check(ok, all.size() == 4 and all[0]["id"] == "g_4", "history newest-first")
 	ok = _check(ok, service.get_history({"state": "saved"}).size() == 1, "state filter")
 	ok = _check(ok, service.get_history({"search": "gear"}).size() == 1, "search filter")
-	ok = _check(ok, service.get_history({"preset": "icon-flat"}).size() == 2, "preset filter")
+	ok = _check(ok, service.get_history({"preset": "icon-flat"}).size() == 4, "preset filter")
+
+	var grouped: Array = service.get_history_grouped()
+	ok = _check(ok, grouped.size() == 3, "grouped: batches collapse")
+	ok = _check(ok, grouped[0]["batch_id"] == "b_34"
+		and grouped[0]["records"].map(func(r: Dictionary) -> String: return str(r["id"]))
+			== ["g_3", "g_4"],
+		"grouped: newest batch first, records in generation order")
+	ok = _check(ok, grouped[1]["records"][0]["id"] == "g_2"
+		and grouped[2]["records"][0]["id"] == "g_1", "grouped: singletons keep order")
+	ok = _check(ok, service.get_history_grouped({"search": "twins"}).size() == 1,
+		"grouped: filters apply before grouping")
 
 	var rec: Dictionary = service.get_generation("g_2")
 	ok = _check(ok, rec["lineage"].size() == 1 and rec["lineage"][0]["id"] == "g_1",

@@ -391,6 +391,27 @@ func get_history(filters := {}) -> Array:
 	return out
 
 
+## get_history() bucketed into variation groups: newest batch first, records
+## inside a group in generation order (n_index ascending). Returns
+## [{"batch_id": String, "records": [record, …]}, …]. Records without a
+## batch_id (pre-migration ledgers) become singleton groups keyed by id.
+func get_history_grouped(filters := {}) -> Array:
+	var buckets := {}
+	var order: Array = []
+	for rec in get_history(filters):
+		var key := str(rec.get("batch_id", rec.get("id")))
+		if not buckets.has(key):
+			buckets[key] = []
+			order.append(key)
+		buckets[key].append(rec)
+	var out: Array = []
+	for key in order:
+		var records: Array = buckets[key]
+		records.reverse()  # history is newest-first; restore n_index order
+		out.append({"batch_id": key, "records": records})
+	return out
+
+
 ## A record plus its parent chain (oldest ancestor last).
 func get_generation(gen_id: String) -> Dictionary:
 	var rec: Dictionary = _index["generations"].get(gen_id, {})
