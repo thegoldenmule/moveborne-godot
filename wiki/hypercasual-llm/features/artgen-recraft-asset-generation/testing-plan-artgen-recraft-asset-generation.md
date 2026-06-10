@@ -3,6 +3,9 @@
 **Status:** ready
 
 ## Planned
+_None._
+
+## Passed
 - M0 exit: custom style created from art/style_refs/; side-by-side test icons (custom style_id vs named 'Line art') generated and reviewed; SVG background-rect question answered with real output; ThorVG imports a generated SVG cleanly in Godot; default preset decided and pinned in config.json
 - Generate (dock): icon-flat preset + subject produces n variations previewed on black; one ledger line per image with full params and cost; balance display updates after the call
 - Palette discipline: generated icons are violet (#A100FF family) line-art only — no extra hues, no gradients, no baked glow (spot-check against art/STYLE_GUIDE.md do/don't list)
@@ -12,13 +15,10 @@
 - Lineage: Iterate from a generation records parent_id; the chain is navigable in the detail view and returned by artgen_get
 - MCP loop (editor open): artgen_generate (preset icon-flat, n=3) returns absolute file paths readable by Claude; artgen_save promotes the chosen one and updates the manifest; the dock gallery refreshes live without user action
 - MCP offline: with the editor closed, every artgen tool returns the clear 'editor not running / plugin disabled' error promptly — no hang, no stack trace
-- Error paths: invalid API key fails validate with a readable message; zero balance refuses Generate with a top-up hint; an API error mid-batch writes an api_error ledger line and surfaces in dock + MCP response
+- Error paths: invalid API key fails validate with a readable message; an API error writes an api_error ledger line and surfaces in dock + MCP response (zero-balance refusal clause removed 2026-06-10 — untestable without draining the account; the service surfaces the raw API error instead)
 - Secrets: the API key appears nowhere in git (project_metadata.cfg is gitignored; grep the repo); the shim process receives no key
 - Manifest invariant: every file under res://assets/generated/ (except the manifest) has an entry; hand-editing a saved file flips modified_after_save on the next check
 - Concurrency/limits: queueing 6+ generations processes serially without editor freeze (use_threads), never tripping the 5 req/s limit
-
-## Passed
-_None._
 
 ## Failed
 _None._

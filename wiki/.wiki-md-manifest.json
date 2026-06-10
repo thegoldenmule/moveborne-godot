@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 846,
+    "version": 903,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "9fd3c922d3c6f1f06d326892f4b931a2a21c1b63ca62044b3e7cae1edd16affa",
@@ -35,9 +35,9 @@
       "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
       "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md": "795f3afea53a545e8182ea9992a9ac83a13a9f6990ef2fd34f55c953ab0098f6",
       "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/index.md": "ba0b42013d024815eb465b55323928777ebc49c757181a7b3d950bb857531474",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/implementation-plan-artgen-recraft-asset-generation.md": "77ffdadb7cf4f80e67ee3700d19029f600be36b31ebfad0b51e6067edce6afea",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/testing-plan-artgen-recraft-asset-generation.md": "76bb477ee8e5f30143b4143dbb9d27845708771324dfbf19dcfe364b6a3c5fab",
+      "hypercasual-llm/features/artgen-recraft-asset-generation/index.md": "d302eb09219f22864c6c6d20ee07896f31af8a234a785e7132428dc597ac842b",
+      "hypercasual-llm/features/artgen-recraft-asset-generation/implementation-plan-artgen-recraft-asset-generation.md": "386fbda85fb13609909cfbcff8048eadb5bfbf09de9ea934e78098874dcabc3e",
+      "hypercasual-llm/features/artgen-recraft-asset-generation/testing-plan-artgen-recraft-asset-generation.md": "1a3aa6006a79cd78f220ba68b735863ea16a679cdc20ac80e02f7968d2cac5bf",
       "hypercasual-llm/features/artgen-recraft-asset-generation/spec-artgen-recraft-asset-generation.md": "8f53be6491a2e5a311a9fbe31d398a642c24a505871ed401819ff9020493842a"
     },
     "pages": {
