@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1118,
+    "version": 1204,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "f23e2120a1889643dd46d42236461c49f93198b932eae259bcd39badd95aa144",
@@ -40,7 +40,7 @@
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "cd7726051e4bb8f6327d846cb92abddc431ea8dc4a0860a8064fdc664b8b6638",
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "3ef67745ed54e56c54f063df80baad208a8887421b6540340ca7e27e3bed8f9f",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
-      "hypercasual-llm/design/general.md": "28ab636b136de8d26883035ac0c33c1c2d7be585db37e1ed62a095ee3487707b"
+      "hypercasual-llm/design/general.md": "4b5d801f97b501ac631acdea916fa1d901d7409bd6a8b121fbf4f6c2be782ec6"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
