@@ -14,7 +14,7 @@ Be the trusted arbiter of game state. The client plays optimistically; the valid
 Sessions are scoped to a single player; multi-user orchestration is the platform's job (Snapser — the validator deploys there as a BYOSnap), relaying validated actions.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 - [Realtime Gateway](architecture:mq1c2z0y-000v-v2bzv9)

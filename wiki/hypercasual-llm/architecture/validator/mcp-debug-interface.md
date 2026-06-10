@@ -12,7 +12,7 @@ subsystem
 Give agents/operators a game-semantic window into the validator without poking the wire protocol. `simulate_action` is the key tool — it runs the engine on stored state and returns score/shard deltas, before/after hashes, and updated RNG indices without mutating the match, which is how hash-mismatch divergences get diagnosed against the client's optimistic result.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

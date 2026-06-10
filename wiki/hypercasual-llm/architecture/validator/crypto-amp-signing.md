@@ -12,7 +12,7 @@ Inbound trust + outbound signing. `utils/snapser-auth.ts` — gateway-header cal
 Establish trust at both ends of the loop. Inbound: the BYOSnap is only reachable through the Snapser gateway, which validates the caller's session token against the Auth snap BEFORE forwarding and stamps the result as plain headers (`User-Id`, `Auth-Type`, `Gateway`) — Snapser exposes no signed claim/JWKS for offline verification, so those headers ARE the claim. `verifySnapserCaller` gates `/init`, `/init-from-history`, and the Socket.IO handshake unconditionally (there is no DEV_MODE bypass): the gateway-validated `User-Id` must equal the claimed `player_id`; `api-key` and `internal` (snap-to-snap) callers carry no user context and pass without binding. Locally there is no gateway, so callers self-stamp a matching `User-Id` (the check is a no-op consistency check there, not real auth). This replaced the original Nakama init HMAC (`verifyNakamaSignature`, removed). Outbound: `signValidatorResponse` signs every ACK/mismatch so a downstream server can accept validated actions without re-simulating; HMACs are computed over `canonicalStringify(data)` and compared with `timingSafeEqual`.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

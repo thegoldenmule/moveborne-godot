@@ -12,7 +12,7 @@ subsystem
 Hold mutable session state and translate player intent into engine actions, then publish the resulting state + hash to presentation. When online it hands each move's predicted hash to the Validator Client and applies the authoritative state on mismatch. This is the only place that owns 'current state' — the engine is stateless, scenes are read-only consumers.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

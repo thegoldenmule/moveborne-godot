@@ -12,7 +12,7 @@ The bit-exact foundation everything else stands on: a seedrandom@3.0.5 ARC4 PRNG
 Guarantee that identical inputs produce identical bytes across GDScript and TypeScript. `rng.gd` reimplements seedrandom's ARC4 to 53-bit-double precision; `random_generator.gd` manages the 5 named draw streams (`tile-gen`, `shuffle`, `effect-spawn`, `totem-spawn`, `card-draw`) seeded by integer→string and restored by reseed+replay; `hasher.gd` canonicalizes state (sorted keys, 2-space, JS number format) and rolls the same hash the validator computes.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

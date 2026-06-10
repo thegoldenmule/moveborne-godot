@@ -12,7 +12,7 @@ _None._
 _None._
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

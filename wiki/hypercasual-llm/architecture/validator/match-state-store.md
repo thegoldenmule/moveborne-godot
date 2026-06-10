@@ -12,7 +12,7 @@ subsystem
 Hold authoritative per-match state between actions. Each entry tracks `current_state`, `state_history` (moveIndex → state), `player_id`, `connection_id`, counters and timestamps. The interface (`get/set/delete/getByConnectionId/getAll`) is storage-agnostic — the in-memory impl is the default; the spec anticipates a Redis-backed impl for horizontal scale.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

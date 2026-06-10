@@ -12,7 +12,7 @@ The pure rules engine — the core of the port. `engine.gd` (`MbEngine`) applies
 Compute the next `SynchronizedGameState` (and its hash) for every action, byte-for-byte like `@spyre-io/moveborne-logic`. `MbEngine.step / step_card / step_totem` apply an action and the overrides the validator applies — accumulated `score`, `rngIndices`, and `moveIndex` (+2 on auto-draw else +1) — returning `{state, hash, ...}`. This is what the Match Controller drives and what the Validator independently re-runs.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

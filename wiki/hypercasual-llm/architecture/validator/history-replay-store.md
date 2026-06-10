@@ -12,7 +12,7 @@ subsystem
 Make hash-mismatch bugs reproducible. Instead of replaying a whole match, a saved history (from `src/game/fixtures/history/{id}.json` or inline `history_data`) is loaded into the match's `state_history` Map and `current_state` is set to a chosen `start_from_index`, so a session can be initialized mid-game at the exact state where a divergence occurred.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

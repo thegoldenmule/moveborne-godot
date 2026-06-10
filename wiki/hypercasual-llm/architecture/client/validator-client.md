@@ -12,7 +12,7 @@ subsystem
 Let the Godot client talk to the unmodified validator without a Socket.IO SDK. It speaks the Engine.IO framing and Socket.IO event protocol directly over a raw WebSocket: handshake with `(connection_id, player_id)`, emit per-action validation requests, and parse the match/mismatch response union. On match it confirms the optimistic move; on mismatch it returns the validator's authoritative state for the controller to snap to.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

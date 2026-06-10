@@ -12,7 +12,7 @@ The presentation layer: `scenes/main.gd`/`.tscn` (playable scene — HUD, hand, 
 Turn engine output into a playable, juicy screen and turn raw input into engine actions — without ever owning game logic. It renders the state `MbMatch` publishes, runs spawn/merge/black-hole/glitch VFX, and forwards arrow/drag/tap input as swipe/card actions. The hard wall (`input → action → engine → state → render`) keeps determinism unaffected by anything here.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._

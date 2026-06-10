@@ -14,7 +14,7 @@ Deliver the full Moveborne single-player experience natively in Godot while pres
 The port is organized so logic never depends on the scene tree: `input → action → engine (pure) → new state + hash → scenes render`, with `net/` confirming each move against the validator when online.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 - [Determinism Primitives](architecture:mq1c2syb-000l-6okg54)

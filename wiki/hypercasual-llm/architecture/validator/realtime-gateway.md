@@ -12,7 +12,7 @@ The HTTP + WebSocket front door: a Hono app for `POST /api/match/init` and `init
 Terminate client connections and orchestrate the validation loop. Socket.IO middleware authenticates the handshake (`connection_id`, `player_id`) against the store before any game logic; on each action event it fetches state, runs `executeAction`, computes the hash, signs `(match_id, index, action, state_hash)`, and emits match (`index, sig`) or mismatch (`index, state, sig`), then writes new state back to the store.
 
 ## Design notes
-_None._
+_No design notes._
 
 ## Components
 _No components._
