@@ -1,0 +1,389 @@
+{
+  "version": "v1",
+  "id": "c4n1awfs",
+  "name": "dev",
+  "environment": "DEVELOPMENT",
+  "service_definitions": [
+    {
+      "id": "auth",
+      "language": "go",
+      "version": "v1.10.0",
+      "author_id": "snapser",
+      "category": "SNAPSER",
+      "subcategory": "SERVICE",
+      "data_dependencies": [
+        {
+          "type": "POSTGRES",
+          "postgres": {
+            "database": "auth"
+          }
+        },
+        {
+          "type": "POSTGRES",
+          "postgres": {
+            "database": "auth_settings"
+          }
+        },
+        {
+          "type": "REDIS",
+          "redis": {}
+        }
+      ]
+    },
+    {
+      "id": "byosnap-metagame",
+      "language": "go",
+      "version": "v0.0.2",
+      "author_id": "c98ee59f-d7b8-45d3-86fe-e301669806cd",
+      "category": "BYOSNAP",
+      "subcategory": "SERVICE",
+      "deployment_profile": {
+        "cpu": 250,
+        "memory": 0.25,
+        "min_replicas": 1,
+        "env_params": [
+          {
+            "key": "SNAPSER_ENVIRONMENT",
+            "value": "DEVELOPMENT"
+          },
+          {
+            "key": "PORT",
+            "value": "8080"
+          },
+          {
+            "key": "BYOSNAP_BASE_PATH",
+            "value": "/v1/byosnap-metagame"
+          }
+        ]
+      }
+    },
+    {
+      "id": "byosnap-validator",
+      "language": "node",
+      "version": "c4n1awfs",
+      "author_id": "c98ee59f-d7b8-45d3-86fe-e301669806cd",
+      "category": "BYOSNAP",
+      "subcategory": "SERVICE",
+      "deployment_profile": {
+        "cpu": 250,
+        "memory": 0.25,
+        "min_replicas": 1,
+        "env_params": [
+          {
+            "key": "SNAPSER_ENVIRONMENT",
+            "value": "DEVELOPMENT"
+          },
+          {
+            "key": "PORT",
+            "value": "8080"
+          },
+          {
+            "key": "CONNECTION_TOKEN_TTL",
+            "value": "300"
+          },
+          {
+            "key": "MATCH_SESSION_TTL",
+            "value": "3600"
+          },
+          {
+            "key": "VALIDATOR_SHARED_SECRET",
+            "value": "dev-byosnap-throwaway-secret"
+          },
+          {
+            "key": "BYOSNAP_BASE_PATH",
+            "value": "/v1/byosnap-validator"
+          }
+        ]
+      }
+    },
+    {
+      "id": "inventory",
+      "language": "go",
+      "version": "v1.9.0",
+      "author_id": "snapser",
+      "category": "SNAPSER",
+      "subcategory": "SERVICE",
+      "data_dependencies": [
+        {
+          "type": "POSTGRES",
+          "postgres": {
+            "database": "inventory_settings"
+          }
+        },
+        {
+          "type": "REDIS",
+          "redis": {}
+        },
+        {
+          "type": "COUCHBASE",
+          "couchbase": {}
+        }
+      ]
+    },
+    {
+      "id": "leaderboards",
+      "language": "go",
+      "version": "v1.8.0",
+      "author_id": "snapser",
+      "category": "SNAPSER",
+      "subcategory": "SERVICE",
+      "data_dependencies": [
+        {
+          "type": "POSTGRES",
+          "postgres": {
+            "database": "leaderboards_settings"
+          }
+        },
+        {
+          "type": "REDIS",
+          "redis": {}
+        }
+      ]
+    },
+    {
+      "id": "quests",
+      "language": "go",
+      "version": "v1.10.0",
+      "author_id": "snapser",
+      "category": "SNAPSER",
+      "subcategory": "SERVICE",
+      "data_dependencies": [
+        {
+          "type": "POSTGRES",
+          "postgres": {
+            "database": "quests_settings"
+          }
+        },
+        {
+          "type": "REDIS",
+          "redis": {}
+        },
+        {
+          "type": "COUCHBASE",
+          "couchbase": {}
+        }
+      ]
+    }
+  ],
+  "feature_definitions": [
+    "WEB_SOCKETS"
+  ],
+  "settings": [
+    {
+      "id": "auth",
+      "data": {
+        "dev": {
+          "anon": {
+            "enabled": true
+          },
+          "api_keys": [],
+          "app_auth": null,
+          "app_verify": null,
+          "apple": null,
+          "disable_user_creation": false,
+          "discord": null,
+          "email": null,
+          "email_password": null,
+          "epic": null,
+          "facebook": null,
+          "fixed_rate_limiter_settings": [
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_login"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_verification"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "account_recovery"
+            }
+          ],
+          "google": null,
+          "password": null,
+          "session_inactivity_timeout": 604800,
+          "session_token_validity": 2592000,
+          "single_session_per_user": false,
+          "steam": null,
+          "user_auth_restrictions": [
+            {
+              "environment": "dev",
+              "snap_id": "inventory",
+              "method": "PUT",
+              "path": "/v1/inventory/users/{user_id}/currencies/{currency_name}"
+            }
+          ],
+          "username_password": null,
+          "x": null,
+          "xbox": null
+        },
+        "email_templates": [],
+        "prod": {
+          "anon": null,
+          "api_keys": [],
+          "app_auth": null,
+          "app_verify": null,
+          "apple": null,
+          "disable_user_creation": false,
+          "discord": null,
+          "email": null,
+          "email_password": null,
+          "epic": null,
+          "facebook": null,
+          "fixed_rate_limiter_settings": [
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_login"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_verification"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "account_recovery"
+            }
+          ],
+          "google": null,
+          "password": null,
+          "session_inactivity_timeout": 604800,
+          "session_token_validity": 2592000,
+          "single_session_per_user": false,
+          "steam": null,
+          "user_auth_restrictions": [],
+          "username_password": null,
+          "x": null,
+          "xbox": null
+        },
+        "stage": {
+          "anon": null,
+          "api_keys": [],
+          "app_auth": null,
+          "app_verify": null,
+          "apple": null,
+          "disable_user_creation": false,
+          "discord": null,
+          "email": null,
+          "email_password": null,
+          "epic": null,
+          "facebook": null,
+          "fixed_rate_limiter_settings": [
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_login"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "email_verification"
+            },
+            {
+              "allow_list": [],
+              "deny_list": [],
+              "duration_in_seconds": 60,
+              "limit": 5,
+              "lockout_duration_in_seconds": 60,
+              "type": "account_recovery"
+            }
+          ],
+          "google": null,
+          "password": null,
+          "session_inactivity_timeout": 604800,
+          "session_token_validity": 2592000,
+          "single_session_per_user": false,
+          "steam": null,
+          "user_auth_restrictions": [],
+          "username_password": null,
+          "x": null,
+          "xbox": null
+        }
+      },
+      "version": "v1.10.0",
+      "exported_at": "1781124632"
+    },
+    {
+      "id": "inventory",
+      "data": {
+        "catalog_items": [],
+        "currencies": [
+          {
+            "name": "coins",
+            "display_name": "Coins"
+          },
+          {
+            "name": "souls",
+            "display_name": "Souls"
+          },
+          {
+            "name": "gems",
+            "display_name": "Gems"
+          }
+        ],
+        "currency_conversions": [],
+        "discounts": [],
+        "drop_tables": [],
+        "inventory_settings": {
+          "default_grant": {
+            "currencies": {},
+            "currencies_64": {},
+            "items": {}
+          },
+          "drop_table_max_nesting_depth": 8
+        },
+        "one_time_grants": [],
+        "quest_callback_currencies": [],
+        "quest_callback_items": []
+      },
+      "version": "v1.9.0",
+      "exported_at": "1781124632"
+    },
+    {
+      "id": "leaderboards",
+      "data": {
+        "leaderboards": []
+      },
+      "version": "v1.8.0",
+      "exported_at": "1781124632"
+    },
+    {
+      "id": "quests",
+      "data": {
+        "quests": []
+      },
+      "version": "v1.10.0",
+      "exported_at": "1781124632"
+    }
+  ]
+}

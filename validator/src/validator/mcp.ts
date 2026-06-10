@@ -138,11 +138,12 @@ export function createValidatorMCP(store: MatchStateStore) {
           match_id: match.match_id,
           player_id: match.player_id,
           action_count: match.action_count,
+          mode: match.mode,
+          rewards_granted: match.rewards_granted,
           created_at: new Date(match.created_at).toISOString(),
           last_action_at: new Date(match.last_action_at).toISOString(),
           current_state: {
             moveIndex: match.current_state.moveIndex,
-            gameStatus: match.current_state.gameStatus,
             score: match.current_state.score,
             shards: match.current_state.shards,
             combo: match.current_state.combo,
@@ -179,7 +180,8 @@ export function createValidatorMCP(store: MatchStateStore) {
           player_id: match.player_id,
           action_count: match.action_count,
           moveIndex: match.current_state.moveIndex,
-          gameStatus: match.current_state.gameStatus,
+          mode: match.mode,
+          rewards_granted: match.rewards_granted,
           created_at: new Date(match.created_at).toISOString(),
           last_action_at: new Date(match.last_action_at).toISOString(),
         }));
@@ -338,7 +340,6 @@ export function createValidatorMCP(store: MatchStateStore) {
           .sort((a, b) => a[0] - b[0])
           .map(([moveIndex, state]) => ({
             moveIndex,
-            gameStatus: state.gameStatus,
             score: state.score,
             shards: state.shards,
             combo: state.combo,

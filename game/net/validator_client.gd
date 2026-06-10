@@ -19,6 +19,7 @@ extends Node
 
 signal ready_received(current_state: Dictionary)
 signal action_validated(index: int, matched: bool, corrected_state)   # matched=true => keep optimistic; else corrected_state is the authoritative state
+signal match_completed(response: Dictionary)   # complete_match ack: {match_id, rewards, balances, granted}
 signal validator_error(message: String)
 signal connected()
 
@@ -33,7 +34,7 @@ var _ack_id := 0
 var _pending: Dictionary = {}   # ack_id -> {index:int}
 
 
-func init_and_connect(base_url: String, match_id: String, starting_state: Dictionary, player_id: String, headers: PackedStringArray = PackedStringArray()) -> void:
+func init_and_connect(base_url: String, match_id: String, starting_state: Dictionary, player_id: String, headers: PackedStringArray = PackedStringArray(), mode: String = "story") -> void:
 	_base_url = base_url
 	_match_id = match_id
 	_player_id = player_id
@@ -42,9 +43,11 @@ func init_and_connect(base_url: String, match_id: String, starting_state: Dictio
 	add_child(http)
 	http.request_completed.connect(_on_init_done.bind(http))
 	# Auth is the gateway-validated User-Id header (== player_id); no signature.
+	# `mode` only selects the server's reward table — amounts derive from the
+	# validator's own validated state, never from anything the client reports.
 	var body := JSON.stringify({
 		"match_id": match_id, "starting_state": starting_state,
-		"player_id": player_id,
+		"player_id": player_id, "mode": mode,
 	})
 	var req_headers := PackedStringArray(["Content-Type: application/json"])
 	req_headers.append_array(headers)
@@ -96,10 +99,24 @@ func _process(_delta: float) -> void:
 func validate_action(index: int, action: Dictionary, state_hash: String) -> void:
 	var aid := _ack_id
 	_ack_id += 1
-	_pending[aid] = {"index": index}
+	_pending[aid] = {"kind": "action", "index": index}
 	_send("42%d%s" % [aid, JSON.stringify([
 		"validate_action", {"index": index, "action": action, "state_hash": state_hash},
 	])])
+
+
+## Settle the match (idempotent server-side): the validator computes currency
+## rewards from ITS validated state and awards them s2s. On the ack fires
+## match_completed({match_id, rewards, balances, granted}). Safe to call only
+## while connected; returns false otherwise so callers can skip waiting.
+func complete_match() -> bool:
+	if not _sio_connected:
+		return false
+	var aid := _ack_id
+	_ack_id += 1
+	_pending[aid] = {"kind": "complete"}
+	_send("42%d%s" % [aid, JSON.stringify(["complete_match", {}])])
+	return true
 
 
 func _handle_eio(pkt: String) -> void:
@@ -157,11 +174,18 @@ func _handle_ack(s: String) -> void:
 	var resp = arr[0] if (arr is Array and not arr.is_empty()) else null
 	if not _pending.has(aid):
 		return
-	var index: int = int(_pending[aid]["index"])
+	var pending: Dictionary = _pending[aid]
 	_pending.erase(aid)
 	if typeof(resp) != TYPE_DICTIONARY:
 		validator_error.emit("bad ack")
 		return
+	if str(pending.get("kind", "action")) == "complete":
+		if resp.has("error"):
+			validator_error.emit("complete_match %s: %s" % [str(resp["error"]), str(resp.get("message", ""))])
+		else:
+			match_completed.emit(resp)
+		return
+	var index: int = int(pending["index"])
 	if resp.has("error"):
 		validator_error.emit("validate_action %s: %s" % [str(resp["error"]), str(resp.get("message", ""))])
 	elif resp.has("state"):

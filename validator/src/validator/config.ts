@@ -26,6 +26,11 @@ export function loadConfig(): ValidatorConfig {
     connectionTokenTTL: getEnvNumber("CONNECTION_TOKEN_TTL", 300),
     matchSessionTTL: getEnvNumber("MATCH_SESSION_TTL", 3600),
     port: getEnvNumber("PORT", 3000),
+    snapserGatewayUrl: getEnvVar("SNAPSER_GATEWAY_URL", "https://gateway.snapser.com/c4n1awfs"),
+    snapserApiKey: process.env.SNAPSER_API_KEY || undefined,
+    // Platform-injected inside the snapend; absent in local dev.
+    inventoryInternalUrl: process.env.SNAPEND_INVENTORY_HTTP_URL || undefined,
+    internalHeader: process.env.SNAPEND_INTERNAL_HEADER || undefined,
   };
 }
 

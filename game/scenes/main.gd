@@ -47,6 +47,8 @@ var _match  # MbMatch (untyped to avoid class_name registration flakiness)
 var _board
 var _net
 var _auth   # MbSnapserAuth — anonymous Snapser session for the deployed validator
+var _mode := "infinite"   # this match's play mode (selects the validator's reward table)
+var _completing := false  # quit pressed; settling rewards with the validator
 var _score_val: Label
 var _moves_val: Label
 var _shards_val: Label
@@ -79,6 +81,7 @@ func _ready() -> void:
 	# Per-match config handed in by the shell's MatchState (or Endless default when
 	# this scene is launched standalone). Plain Dictionary, mirrors how state is passed.
 	var cfg: Dictionary = GameState.next_match if not GameState.next_match.is_empty() else {"mode": "infinite"}
+	_mode = str(cfg.get("mode", "infinite"))
 	_match = MbMatchS.new()
 	_build_ui()
 	_match.changed.connect(_on_changed)
@@ -315,13 +318,40 @@ func _show_lets_play() -> void:
 ## Leave the match: tell the shell (via match_exited) to pop back to Home. There is
 ## no engine game-over, so this button IS the match-end source. No-op when the scene
 ## runs standalone (no listener connected).
+##
+## When online, the quit first settles the match with the validator
+## (complete_match): the server computes currency rewards from ITS validated
+## state and awards them s2s, so the grant can't be inflated client-side. The
+## ack (or a short timeout, so a dead socket can't trap the player in the
+## match) is awaited before popping; granted balances merge into GameState for
+## an instant top-bar update, and the shell re-reads on resume as the fallback.
 func _on_home_pressed() -> void:
+	if _completing:
+		return
+	_completing = true
+	if _match.online and _net != null and _net.complete_match():
+		var done := [false]
+		var on_completed := func(resp: Dictionary) -> void:
+			done[0] = true
+			var balances = resp.get("balances", {})
+			if balances is Dictionary and not balances.is_empty():
+				GameState.merge_currencies(balances)
+		_net.match_completed.connect(on_completed, CONNECT_ONE_SHOT)
+		# Wait for the ack, but never trap the player on a dead socket.
+		var waited := 0.0
+		while not done[0] and waited < 2.0:
+			waited += get_process_delta_time()
+			await get_tree().process_frame
+		if not done[0]:
+			push_warning("Match settlement timed out — shell refresh will reconcile balances")
 	match_exited.emit({
 		"scenario": _match.scenario_name,
 		"score": int(_match.state.get("score", 0)),
 		"move_index": int(_match.state.get("moveIndex", 0)),
 		"reason": "quit",
 	})
+	# Standalone (no listener) the emit is a no-op — re-arm the button.
+	_completing = false
 
 
 ## Style the in-match Home button to match the game's surfaces: a dark rounded body
@@ -824,7 +854,7 @@ func _start_net(base_url: String, player_id: String, headers: PackedStringArray)
 	_net_player_id = player_id
 	_net_headers = headers
 	var match_id := "gd_%d" % (randi() % 1000000)
-	_net.init_and_connect(base_url, match_id, _match.state, player_id, headers)
+	_net.init_and_connect(base_url, match_id, _match.state, player_id, headers, _mode)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % base_url

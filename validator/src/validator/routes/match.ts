@@ -6,6 +6,7 @@ import type {
   StoredMatch,
   StateHistorySnapshot,
   StateHistoryFile,
+  MatchMode,
 } from "../types";
 import { getConfig } from "../config";
 import { generateConnectionId } from "../utils/crypto";
@@ -22,6 +23,7 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
     try {
       const body = (await c.req.json()) as ValidatorInitRequest;
       const { match_id, starting_state, player_id } = body;
+      const mode: MatchMode = body.mode === "pvp" || body.mode === "infinite" ? body.mode : "story";
 
       if (!match_id || !starting_state || !player_id) {
         return c.json(
@@ -58,17 +60,18 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
         current_state: starting_state,
         connection_id,
         player_id,
+        mode,
         created_at: now,
         last_action_at: now,
         action_count: 0,
         state_history,
+        rewards_granted: false,
       };
 
-      console.log(`Match initialized: ${match_id} for player ${player_id}`);
+      console.log(`Match initialized: ${match_id} for player ${player_id} (mode=${mode})`);
       console.log(`Starting state received:`, {
         tiles: starting_state.board.tiles.filter(t => !t.isEmpty),
         rngIndices: starting_state.rngIndices,
-        gameStatus: starting_state.gameStatus,
         moveIndex: starting_state.moveIndex,
       });
 
@@ -190,7 +193,7 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
         states.map(snapshot => [snapshot.moveIndex, snapshot.state])
       );
 
-      const startIndex = start_from_index ?? states[states.length - 1].moveIndex;
+      const startIndex = start_from_index ?? states[states.length - 1]!.moveIndex;
       const currentState = state_history.get(startIndex);
 
       if (!currentState) {
@@ -213,10 +216,12 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
         current_state: currentState,
         connection_id,
         player_id,
+        mode: "story",
         created_at: now,
         last_action_at: now,
         action_count: 0,
         state_history,
+        rewards_granted: false,
       };
 
       console.log(`Match initialized from history: ${match_id} for player ${player_id}`);
@@ -224,7 +229,6 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
       console.log(`Current state:`, {
         tiles: currentState.board.tiles.filter(t => !t.isEmpty),
         rngIndices: currentState.rngIndices,
-        gameStatus: currentState.gameStatus,
         moveIndex: currentState.moveIndex,
       });
 

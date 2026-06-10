@@ -10,11 +10,22 @@ import { createValidatorMCP } from "./mcp";
 import { getConfig } from "./config";
 import { signValidatorResponse } from "./utils/crypto";
 import { verifySnapserCaller } from "./utils/snapser-auth";
-import type { GameActionRequest, GameActionResponseMatch, GameActionResponseMismatch } from "./types";
+import { InventoryClient, resolveInventoryTransport } from "./snaps/inventory";
+import { computeMatchRewards } from "./rewards";
+import type {
+  CurrencyDeltas,
+  CurrencyName,
+  GameActionRequest,
+  GameActionResponseMatch,
+  GameActionResponseMismatch,
+  MatchRewardsResponse,
+} from "./types";
 
 const store = new InMemoryMatchStateStore();
 const historyStore = new FileSystemHistoryStore();
 const config = getConfig();
+const inventory = new InventoryClient(resolveInventoryTransport(config));
+console.log(`💰 Currency awards: ${inventory.enabled ? `enabled (${inventory.transportKind})` : "disabled (no s2s credentials)"}`);
 
 // The Snapser gateway forwards the full route prefix (e.g. /v1/byosnap-validator) to the
 // container without stripping it. Serve all routes under this base path so they match.
@@ -114,7 +125,6 @@ io.on("connection", async (socket) => {
         moveIndex: match.current_state.moveIndex,
         tiles: match.current_state.board.tiles.filter(t => !t.isEmpty),
         rngIndices: match.current_state.rngIndices,
-        gameStatus: match.current_state.gameStatus,
       });
 
       const rng = new RandomGenerator(
@@ -189,6 +199,62 @@ io.on("connection", async (socket) => {
     }
   });
 
+  // Match settlement. The engine has no game-over — the client's quit IS the
+  // match end — so completion is an explicit, idempotent event. The client only
+  // chooses WHEN to settle; rewards come from the validator's own validated
+  // state via the reward table, so the grant cannot be inflated.
+  socket.on("complete_match", async (_request: unknown, callback) => {
+    try {
+      const { match_id, player_id } = socket.data;
+
+      const match = await store.get(match_id);
+      if (!match) {
+        callback({ error: "MATCH_NOT_FOUND", message: "Match not found" });
+        return;
+      }
+
+      if (match.rewards_granted) {
+        const response: MatchRewardsResponse = {
+          match_id,
+          rewards: {},
+          balances: {},
+          granted: false,
+        };
+        callback(response);
+        return;
+      }
+
+      // Latch BEFORE the s2s calls so a racing duplicate completion can't
+      // double-grant; a failed upstream call costs the player the award rather
+      // than risking a dupe (acceptable for v1 — no retry queue).
+      match.rewards_granted = true;
+      await store.set(match_id, match, config.matchSessionTTL);
+
+      const rewards = computeMatchRewards(match.mode, match.current_state);
+      const balances: CurrencyDeltas = {};
+      if (inventory.enabled) {
+        for (const [currency, delta] of Object.entries(rewards)) {
+          const result = await inventory.incrementUserCurrency(player_id, currency as CurrencyName, delta);
+          if (result) {
+            balances[currency as CurrencyName] = result.current_balance_64;
+          }
+        }
+      }
+
+      const response: MatchRewardsResponse = {
+        match_id,
+        rewards,
+        balances,
+        granted: inventory.enabled,
+      };
+      console.log(`Match completed: ${match_id} (mode=${match.mode}, score=${match.current_state.score})`, { rewards, balances });
+      callback(response);
+    } catch (error) {
+      console.error("Error completing match:", error);
+      callback({ error: "COMPLETION_FAILED", message: "Failed to complete match" });
+    }
+  });
+
   socket.on("disconnect", async () => {
     console.log(`Client disconnected: ${socket.id}`);
   });
@@ -218,6 +284,8 @@ app.get("/api/status", (c) => {
     version: "0.1.0",
     uptime: process.uptime(),
     connections: io.engine.clientsCount,
+    // Which s2s transport the currency-award path resolved to (no secrets).
+    awards: inventory.enabled ? inventory.transportKind : "disabled",
   });
 });
 
