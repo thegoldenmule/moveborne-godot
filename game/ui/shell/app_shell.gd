@@ -10,7 +10,16 @@ const PlaceholderScene := preload("res://ui/screens/placeholder_tab.tscn")
 
 const HOME_INDEX := 2
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
+const TAB_ICONS: Array[Texture2D] = [
+	preload("res://assets/generated/icons/collections_icon.svg"),
+	preload("res://assets/generated/icons/leaderboard_ticon.svg"),
+	preload("res://assets/generated/icons/home_icon.svg"),
+	preload("res://assets/generated/icons/guilds_icon.svg"),
+	preload("res://assets/generated/icons/settings_icon.svg"),
+]
 const NAV_HEIGHT := 96.0
+const TAB_ICON_SIZE := 34
+const HOME_ICON_SIZE := 64
 
 @onready var _content: Control = $Content
 @onready var _nav_layer: CanvasLayer = $NavLayer
@@ -101,14 +110,22 @@ func _ready() -> void:
 		b.clip_text = true
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size = Vector2(0, 72)
-		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_font_size_override("font_size", 10)
+		b.icon = TAB_ICONS[i]
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.add_theme_constant_override("icon_max_width", TAB_ICON_SIZE)
 		_style_nav_button(b)
 		b.pressed.connect(_select_tab.bind(i))
 
-	# Emphasize the center Home tab: a wider share + a larger label.
+	# Emphasize the center Home tab: wider share, icon-only (no label), bigger icon,
+	# and a pulsing additive violet halo behind it.
 	var home_btn: Button = _tabs[HOME_INDEX]
 	home_btn.size_flags_stretch_ratio = 1.5
-	home_btn.add_theme_font_size_override("font_size", 18)
+	home_btn.text = ""
+	home_btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	home_btn.add_theme_constant_override("icon_max_width", HOME_ICON_SIZE)
+	_add_home_glow(home_btn)
 
 	_select_tab(HOME_INDEX)
 	home_btn.button_pressed = true
@@ -150,6 +167,43 @@ func _style_nav_button(b: Button) -> void:
 	b.add_theme_color_override("font_hover_color", MbStyle.TEXT)
 	b.add_theme_color_override("font_pressed_color", MbStyle.TEXT)
 	b.add_theme_color_override("font_hover_pressed_color", MbStyle.TEXT)
+	# Icons are pre-colored (violet-on-black art); dim via alpha when unselected.
+	b.add_theme_color_override("icon_normal_color", Color(1, 1, 1, 0.55))
+	b.add_theme_color_override("icon_hover_color", Color(1, 1, 1, 0.8))
+	b.add_theme_color_override("icon_pressed_color", Color.WHITE)
+	b.add_theme_color_override("icon_hover_pressed_color", Color.WHITE)
+
+
+## A soft violet halo behind the Home icon: oversized additive copies of the icon
+## texture, centered in the button, alpha-pulsing forever. Additive blend means they
+## only brighten, so draw order over the button's own icon doesn't matter.
+func _add_home_glow(btn: Button) -> void:
+	# [scale of the halo vs the icon, peak alpha, trough alpha]
+	for layer in [[1.25, 0.9, 0.45], [1.6, 0.5, 0.2]]:
+		var halo_size: float = HOME_ICON_SIZE * layer[0]
+		var glow := TextureRect.new()
+		glow.texture = TAB_ICONS[HOME_INDEX]
+		glow.stretch_mode = TextureRect.STRETCH_SCALE
+		glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var mat := CanvasItemMaterial.new()
+		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		glow.material = mat
+		glow.modulate = Color(MbStyle.PRIMARY, layer[2])
+		btn.add_child(glow)
+		glow.anchor_left = 0.5
+		glow.anchor_top = 0.5
+		glow.anchor_right = 0.5
+		glow.anchor_bottom = 0.5
+		glow.offset_left = -halo_size / 2.0
+		glow.offset_top = -halo_size / 2.0
+		glow.offset_right = halo_size / 2.0
+		glow.offset_bottom = halo_size / 2.0
+		var tw := glow.create_tween().set_loops()
+		tw.tween_property(glow, "modulate:a", layer[1], 1.1) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(glow, "modulate:a", layer[2], 1.1) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 ## Raise the nav bar above the device's bottom safe inset (iOS home indicator /

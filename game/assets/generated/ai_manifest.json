@@ -26,6 +26,19 @@
 			"sha256": "cd5f6f70978cc75169a7a49bba783c68b620aec4a80eb7fc046464eab2b87516",
 			"style_id": null
 		},
+		"res://assets/generated/icons/home_icon.svg": {
+			"gen_id": "g_1781117955_9b03",
+			"generated_at": "2026-06-10T18:59:15Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "spellbook glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-10T19:19:05Z",
+			"sha256": "c0ec91ed2006f8d2bc94375de455b9eb16b6b2d8de316ce4079354b4bc287d6d",
+			"style_id": null
+		},
 		"res://assets/generated/icons/icon_home_rune.svg": {
 			"gen_id": "g_1781102332_0845",
 			"generated_at": "2026-06-10T14:38:52Z",
