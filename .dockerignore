@@ -1,0 +1,7 @@
+# Repo-root build context exists only for metagame/Dockerfile, which needs
+# metagame/ plus the vendored snapser-pb/ Go module. Allowlist exactly those
+# so docker never uploads the game, art, or wiki trees as build context.
+# (validator/ builds from its own context and has its own .dockerignore.)
+*
+!metagame/**
+!snapser-pb/**
