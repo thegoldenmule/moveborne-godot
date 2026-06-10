@@ -1,0 +1,9 @@
+{
+	"style_id": "19f7542f-0727-4f6f-9d07-728c439fc583",
+	"fallback_style": "Line art",
+	"models": {
+		"vector": "recraftv3_vector",
+		"raster": "recraftv3"
+	},
+	"bridge_port": 4848
+}
