@@ -55,7 +55,39 @@ func _initialize() -> void:
 		print("FAIL mismatch guard: expected fill mismatch, got %s" % res_v["status"])
 		ok = false
 
-	# 5) Every committed generation parses under ThorVG.
+	# 5) Trim: a known off-center rect crops to its own bounds (±1 viewBox unit
+	# of raster slack), and the result re-rasterizes with content at the corner.
+	var trim_src := ("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\""
+		+ " height=\"100\" viewBox=\"0 0 100 100\"><rect x=\"20\" y=\"30\""
+		+ " width=\"40\" height=\"25\" fill=\"rgb(161,0,255)\"/></svg>")
+	var trim: Dictionary = svg_tools.trim_to_content(trim_src)
+	if trim["status"] != svg_tools.STATUS_TRIMMED:
+		print("FAIL trim: expected trimmed, got %s" % trim["status"])
+		ok = false
+	else:
+		var r: Rect2 = trim["rect"]
+		var want := Rect2(20, 30, 40, 25)
+		if r.position.distance_to(want.position) > 1.0 \
+				or r.size.distance_to(want.size) > 2.0:
+			print("FAIL trim: rect %s !~ %s" % [r, want])
+			ok = false
+		var timg := Image.new()
+		if timg.load_svg_from_string(trim["text"]) != OK:
+			print("FAIL trim: trimmed SVG did not rasterize")
+			ok = false
+		elif timg.get_pixel(timg.get_width() / 2, timg.get_height() / 2).a < 0.5:
+			print("FAIL trim: trimmed center should be opaque content")
+			ok = false
+
+	# 6) Trim refuses a fully transparent SVG instead of producing a 0-rect.
+	var empty_svg := ("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\""
+		+ " height=\"64\" viewBox=\"0 0 64 64\"></svg>")
+	var trim_empty: Dictionary = svg_tools.trim_to_content(empty_svg)
+	if trim_empty["status"] != svg_tools.STATUS_EMPTY:
+		print("FAIL trim empty: expected empty, got %s" % trim_empty["status"])
+		ok = false
+
+	# 7) Every committed generation parses under ThorVG.
 	var dir := DirAccess.open(base)
 	var parsed := 0
 	if dir == null:

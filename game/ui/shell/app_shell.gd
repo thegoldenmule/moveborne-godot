@@ -38,6 +38,7 @@ const HOME_ICON_SIZE := 64
 var _screens: Array = []
 var _tab_icons: Array = []   # TextureRect per side tab (null at HOME_INDEX)
 var _tab_labels: Array = []  # Label per side tab (null at HOME_INDEX)
+var _current_tab := HOME_INDEX
 var _bg: ColorRect
 
 
@@ -133,11 +134,14 @@ func _ready() -> void:
 	home_btn.add_theme_constant_override("icon_max_width", HOME_ICON_SIZE)
 	_add_home_glow(home_btn)
 
-	_select_tab(HOME_INDEX)
+	# Deferred: the icon tween targets read button sizes, which the HBoxContainer
+	# only resolves on its (queued) sort — selecting now would bake stale rects.
+	_select_tab.call_deferred(HOME_INDEX)
 	home_btn.button_pressed = true
 
 
 func _select_tab(index: int) -> void:
+	_current_tab = index
 	for i in range(_screens.size()):
 		_screens[i].visible = (i == index)
 	# Selected side tab: icon grows and pops up past the bar frame, label shows
@@ -176,7 +180,7 @@ func _select_tab(index: int) -> void:
 func _make_tab_icon(btn: Button, tex: Texture2D) -> TextureRect:
 	var ic := TextureRect.new()
 	ic.texture = tex
-	ic.stretch_mode = TextureRect.STRETCH_SCALE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ic.modulate = Color(1, 1, 1, 0.55)
@@ -262,7 +266,7 @@ func _add_home_glow(btn: Button) -> void:
 		var halo_size: float = HOME_ICON_SIZE * layer[0]
 		var glow := TextureRect.new()
 		glow.texture = TAB_ICONS[HOME_INDEX]
-		glow.stretch_mode = TextureRect.STRETCH_SCALE
+		glow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var mat := CanvasItemMaterial.new()
@@ -318,3 +322,5 @@ func _on_viewport_resized() -> void:
 		if is_instance_valid(s):
 			s.size = vp
 	_apply_safe_area()
+	# Re-derive icon rects once the nav buttons settle at their new widths.
+	_select_tab.call_deferred(_current_tab)
