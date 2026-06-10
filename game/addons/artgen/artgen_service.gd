@@ -143,7 +143,7 @@ func build_payload(opts: Dictionary) -> Dictionary:
 	}
 	# v4-family vector models take aspect-ratio sizes, not WxH — omit a pixel
 	# size so the API auto-selects instead of rejecting the request.
-	if caps.get("vector_size_is_aspect_ratio", false) and model.contains("_vector") \
+	if caps.get("vector_size_is_aspect_ratio", false) and model.ends_with("_vector") \
 			and _is_pixel_size(size):
 		payload.erase("size")
 
@@ -171,11 +171,14 @@ func model_supports_styles(model_kind: String) -> bool:
 	return _model_caps(model).get("supports_styles", true)
 
 
+# Longest matching prefix wins, so a future more-specific family entry
+# (e.g. "recraftv4_1" beside "recraftv4") can't be shadowed by insertion order.
 static func _model_caps(model: String) -> Dictionary:
+	var best := ""
 	for prefix in MODEL_CAPS:
-		if model.begins_with(prefix):
-			return MODEL_CAPS[prefix]
-	return {}
+		if model.begins_with(prefix) and prefix.length() > best.length():
+			best = prefix
+	return MODEL_CAPS.get(best, {})
 
 
 static func _is_pixel_size(size: String) -> bool:

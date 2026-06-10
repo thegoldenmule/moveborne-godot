@@ -324,6 +324,11 @@ func _on_generate() -> void:
 		if not generations.is_empty():
 			_select(str(generations[0]["id"]))
 	_refresh_status()
+	if not result.get("ok", false):
+		# after _refresh_status: pre-flight refusals (e.g. explicit style on
+		# v4.x) never emit generation_failed, and even emitted errors would be
+		# clobbered by the status rebuild above
+		_status_label.text = "error: " + str(result.get("error", "")).left(120)
 
 
 func _on_save() -> void:
@@ -450,7 +455,7 @@ func _update_model_note() -> void:
 	var show: bool = service != null and _model_option.selected > 0 \
 			and not service.model_supports_styles(
 				_model_option.get_item_text(_model_option.selected))
-	_model_note.text = "v4.x: custom styles ignored" if show else ""
+	_model_note.text = "custom styles ignored (v3-only)" if show else ""
 	_model_note.visible = show
 
 
