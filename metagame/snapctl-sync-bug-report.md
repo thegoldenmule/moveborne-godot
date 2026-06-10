@@ -112,16 +112,6 @@ and snapctl maps any 404 there to `Service ID is invalid.`
   so every failed sync orphans a tag in the customer ECR repo
   (here: `byosnap-metagame.v0.0.2-1781119952`, `byosnap-metagame.v0.0.3-1781120865`).
 
-## Suggested fixes (any of)
-
-1. In `sync()`, if the PATCH 404s on the version, fall back to `publish_version` (create it),
-   then retry — making sync work for new versions like the docs imply; or
-2. validate the version exists **before** `build_tag_push()` and fail fast with
-   `Version v0.0.3 of byosnap-metagame has not been published yet — run 'snapctl byosnap
-   publish' first or pass an existing version`; and
-3. fix the error mapping in `update_version()` so RESOURCE_NOT_FOUND reports the version,
-   not the BYOSnap, and in `get_composite_token()` so a 404 names the missing service id.
-
 ## Workaround we use
 
 First deploy and every new version: `publish` then `snapend update` (section 2 above).

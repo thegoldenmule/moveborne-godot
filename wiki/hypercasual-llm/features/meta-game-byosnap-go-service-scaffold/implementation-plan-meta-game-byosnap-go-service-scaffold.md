@@ -10,8 +10,8 @@
 - [x] Wire the Auth snap client from the snapser-pb auth package (aliased import) behind {base}/snap-check: one read-only RPC with internal auth, JSON envelope with snap, RPC name, round-trip duration and upstream status; 502 with gRPC status text on failure.
 - [x] Write the multi-stage Dockerfile (build context at repo root so metagame and snapser-pb are both visible; static linux/arm64 binary; scratch or distroless runtime) and snapser-byosnap-profile.json mirroring the validator: http 8080, readiness probe on /health, dev sizing 0.25 vCPU / 0.25 GB / 1 replica.
 - [x] Container smoke locally: docker build and run, health and ping respond from inside the container image.
-- [ ] Deploy to Snapser: snapctl publish the image as byosnap-metagame under app c4n1awfs, then update the snapend to attach it alongside byosnap-validator.
-- [ ] Gateway smoke verification: anonymous login via the snapser-validator skill pattern, GET ping with the session token expecting our own user id back, GET snap-check expecting a successful Auth snap round trip; confirm the readiness probe is green in the portal.
+- [x] Deploy to Snapser: snapctl publish the image as byosnap-metagame under app c4n1awfs, then update the snapend to attach it alongside byosnap-validator.
+- [x] Gateway smoke verification: anonymous login via the snapser-validator skill pattern, GET ping with the session token expecting our own user id back, GET snap-check expecting a successful Auth snap round trip; confirm the readiness probe is green in the portal.
 - [x] Write a short metagame README covering the local run loop and the deploy loop, and record the commits on the feature brief.
 
 ## Data models & interfaces

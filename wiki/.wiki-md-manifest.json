@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1327,
+    "version": 1340,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "844f43c25a741d057ee83700fa97442040dea61bbaa5c45f8920a5707aeef22e",
@@ -52,10 +52,10 @@
       "hypercasual-llm/.archived/feature-spec--mq88pnkv-000z-ix8ln1.md": "0fb4aac0e3da8cb67337ef7e6722932a35b67c16358ed272a8b8f7c357db0190",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
       "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md": "3c854df74f6d49677725c23d61d08ff0ffcec9d7fe55706d556b3bc1e2e92841",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md": "a389750b9729e251d9693502ba6863ae379c62748989c9bec8761d4e9cb6cc76",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md": "57b3d016fe380bea901de89310fa7cc74067201f6d899a03bd33bc6d711f8200",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md": "9e6373bde5f92e7901cc2f4cdd08b458126bf1db2f34523644e395b576fc3dad"
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md": "346bfe4d7385267ae15ef89e50b3bc46960683b9126fcad042a9300368059cbf",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md": "4029f79d3b300ad8ae7adde99d766bf8cf76e4e26274e37169a66b19fb2e3e48",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
+      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
