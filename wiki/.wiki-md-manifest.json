@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 903,
+    "version": 904,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "9fd3c922d3c6f1f06d326892f4b931a2a21c1b63ca62044b3e7cae1edd16affa",
+      "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
       "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "7f49a7e2a969c27aa089cee97e473eba44360e88e41db51cfefc37d20838c956",
       "hypercasual-llm/architecture/validator/index.md": "3d5f2aa68cd17abb55c31f825a75a9360f7ba41070a858ae0d5471d492f534e6",
@@ -34,11 +34,7 @@
       "hypercasual-llm/adrs/unify-all-player-input-as-messages-through-a-single-interface.md": "7b7d5bd860c8ae3878f07a0008c1dba63e50d2f233cd4f8b686637a18fdd6372",
       "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
       "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md": "795f3afea53a545e8182ea9992a9ac83a13a9f6990ef2fd34f55c953ab0098f6",
-      "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/index.md": "d302eb09219f22864c6c6d20ee07896f31af8a234a785e7132428dc597ac842b",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/implementation-plan-artgen-recraft-asset-generation.md": "386fbda85fb13609909cfbcff8048eadb5bfbf09de9ea934e78098874dcabc3e",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/testing-plan-artgen-recraft-asset-generation.md": "1a3aa6006a79cd78f220ba68b735863ea16a679cdc20ac80e02f7968d2cac5bf",
-      "hypercasual-llm/features/artgen-recraft-asset-generation/spec-artgen-recraft-asset-generation.md": "8f53be6491a2e5a311a9fbe31d398a642c24a505871ed401819ff9020493842a"
+      "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -73,11 +69,7 @@
       "decision-record:mq1ebtkg-0005-vfahik": "hypercasual-llm/adrs/unify-all-player-input-as-messages-through-a-single-interface.md",
       "decision-record:mq1ebvcb-0007-cmmi2x": "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md",
       "decision-record:mq74gj5v-000c-9ta022": "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md",
-      "decision-record:mq74gkil-000e-cwpjw6": "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md",
-      "feature-brief:mq74vbde-001h-e9169t": "hypercasual-llm/features/artgen-recraft-asset-generation/index.md",
-      "implementation-plan:mq74vbdf-001i-9e0oh9": "hypercasual-llm/features/artgen-recraft-asset-generation/implementation-plan-artgen-recraft-asset-generation.md",
-      "testing-plan:mq74vbdf-001j-ucf666": "hypercasual-llm/features/artgen-recraft-asset-generation/testing-plan-artgen-recraft-asset-generation.md",
-      "feature-spec:mq74vbdf-001k-o5zm7q": "hypercasual-llm/features/artgen-recraft-asset-generation/spec-artgen-recraft-asset-generation.md"
+      "decision-record:mq74gkil-000e-cwpjw6": "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md"
     }
   }
 }
