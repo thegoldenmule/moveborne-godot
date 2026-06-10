@@ -64,10 +64,53 @@ func _run() -> void:
 		"presets.json loads")
 	ok = _check(ok, str(service.config.get("models", {}).get("vector")) == "recraftv3_vector",
 		"config.json pins V3 vector")
+	ok = _check(ok, str(service.config.get("models", {}).get("vector_v41")) == "recraftv4_1_vector",
+		"config.json pins v4.1 vector kind")
+	ok = _check(ok, str(service.config.get("models", {}).get("raster_v41")) == "recraftv4_1",
+		"config.json pins v4.1 raster kind")
 
 	var bad: Dictionary = await service.generate({"preset": "nope", "subject": "x"})
 	ok = _check(ok, bad["ok"] == false and str(bad["error"]).contains("unknown preset"),
 		"unknown preset refused without API call")
+
+	# -- build_payload model-family rules (offline, pure) ------------------------
+	# the v3 default path must stay byte-identical to the pre-v4.1 construction
+	var p3: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "trophy"})
+	ok = _check(ok, p3 == {
+		"prompt": str(service.presets["icon-flat"]["prompt"]).replace("{subject}", "trophy"),
+		"model": "recraftv3_vector", "n": 1, "size": "1024x1024",
+		"response_format": "b64_json",
+		"style_id": "19f7542f-0727-4f6f-9d07-728c439fc583",
+		"controls": service.presets["icon-flat"]["controls"],
+	}, "v3 default payload unchanged")
+	var p3n: Dictionary = service.build_payload(
+		{"preset": "icon-flat", "subject": "trophy", "negative_prompt": "blurry"})
+	ok = _check(ok, p3n.get("negative_prompt") == "blurry", "v3 keeps negative_prompt")
+
+	# v4.1: inherited style + negative_prompt stripped, controls kept, WxH dropped (vector)
+	var p4: Dictionary = service.build_payload({"preset": "card-glyph",
+		"subject": "the tower", "model": "vector_v41", "negative_prompt": "blurry"})
+	ok = _check(ok, p4["model"] == "recraftv4_1_vector", "v4.1 vector kind resolves")
+	ok = _check(ok, not p4.has("style_id"), "v4.1 strips preset-inherited style_id")
+	ok = _check(ok, not p4.has("negative_prompt"), "v4.1 drops negative_prompt")
+	ok = _check(ok, p4["controls"] == service.presets["card-glyph"]["controls"],
+		"v4.1 keeps controls")
+	ok = _check(ok, not p4.has("size"), "v4.1 vector omits WxH size")
+
+	var p4e: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "x",
+		"model": "raster_v41", "style_id": "89aedef2-2411-42fc-aa8b-aec391b51bc7"})
+	ok = _check(ok, p4e.get("ok") == false and str(p4e.get("error")).contains("v2/v3-only"),
+		"explicit style on v4.1 refused pre-flight")
+
+	var p4r: Dictionary = service.build_payload(
+		{"preset": "icon-raster", "subject": "x", "model": "raster_v41"})
+	ok = _check(ok, p4r["model"] == "recraftv4_1" and p4r.get("size") == "1024x1024",
+		"v4.1 raster keeps WxH size")
+
+	var p4u: Dictionary = service.build_payload(
+		{"preset": "card-glyph", "subject": "x", "model": "recraftv4_1_utility"})
+	ok = _check(ok, p4u["model"] == "recraftv4_1_utility" and not p4u.has("style_id"),
+		"identity fallback gets v4-family caps")
 
 	# -- multipart ---------------------------------------------------------------
 	var mp: Dictionary = MultipartT.build(

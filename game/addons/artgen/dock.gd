@@ -14,6 +14,7 @@ var _advanced_toggle: CheckButton
 var _advanced_box: VBoxContainer
 var _prompt_override: TextEdit
 var _model_option: OptionButton
+var _model_note: Label
 var _style_id_edit: LineEdit
 var _parent_label: Label
 var _generate_btn: Button
@@ -61,6 +62,7 @@ func _ready() -> void:
 		service.generation_completed.connect(_on_generation_completed)
 		service.generation_failed.connect(_on_generation_failed)
 		_populate_presets()
+		_populate_models()
 		_refresh_gallery()
 		_refresh_status()
 
@@ -139,9 +141,12 @@ func _build_compose() -> Control:
 	_prompt_override.placeholder_text = "full prompt override (blank = preset template)"
 	_advanced_box.add_child(_label_wrap("Prompt", _prompt_override))
 	_model_option = OptionButton.new()
-	for kind in ["preset", "vector", "raster"]:
-		_model_option.add_item(kind)
+	_model_option.add_item("preset")  # real kinds come from config via _populate_models
+	_model_option.item_selected.connect(func(_i: int) -> void: _update_model_note())
 	_advanced_box.add_child(_label_wrap("Model", _model_option))
+	_model_note = Label.new()
+	_model_note.visible = false
+	_advanced_box.add_child(_model_note)
 	_style_id_edit = LineEdit.new()
 	_style_id_edit.placeholder_text = "style_id override / 'none'"
 	_advanced_box.add_child(_label_wrap("Style id", _style_id_edit))
@@ -373,6 +378,7 @@ func _on_discard() -> void:
 func _open_settings() -> void:
 	service.reload_config()  # pick up external presets.json/config.json edits
 	_populate_presets()
+	_populate_models()
 	_key_edit.text = ""
 	_key_status.text = "key configured" if service.status()["api_key_configured"] else "no key"
 	_settings.popup_centered()
@@ -422,6 +428,30 @@ func _populate_presets() -> void:
 	_category_option.clear()
 	for cat in service.SAVE_CATEGORIES:
 		_category_option.add_item(cat)
+
+
+## Model kinds come from config.json's models map (config order, v3 kinds
+## first), so new kinds reach the dropdown without touching the dock.
+func _populate_models() -> void:
+	var current := _model_option.get_item_text(_model_option.selected) \
+			if _model_option.selected >= 0 else "preset"
+	_model_option.clear()
+	_model_option.add_item("preset")
+	for kind in service.config.get("models", {}):
+		_model_option.add_item(str(kind))
+	for i in _model_option.item_count:
+		if _model_option.get_item_text(i) == current:
+			_model_option.selected = i
+			break
+	_update_model_note()
+
+
+func _update_model_note() -> void:
+	var show: bool = service != null and _model_option.selected > 0 \
+			and not service.model_supports_styles(
+				_model_option.get_item_text(_model_option.selected))
+	_model_note.text = "v4.x: custom styles ignored" if show else ""
+	_model_note.visible = show
 
 
 func _refresh_status() -> void:

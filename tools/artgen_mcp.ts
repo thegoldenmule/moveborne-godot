@@ -34,7 +34,9 @@ const TOOLS = [
       "Generate images via Recraft in the occult-arcade style. Returns ledger records " +
       "with abs_path for each image so they can be read straight off disk. " +
       "Presets: icon-flat (SVG, default custom style, bg stripped on save), icon-raster " +
-      "(PNG + removeBackground on save), card-glyph, card-illustrated, texture.",
+      "(PNG + removeBackground on save), card-glyph, card-illustrated, texture. " +
+      "All presets default to Recraft v3; pass model 'vector_v41'/'raster_v41' for " +
+      "Recraft v4.1 (custom styles + negative_prompt are v3-only and dropped on v4.x).",
     inputSchema: {
       type: "object",
       properties: {
@@ -43,8 +45,20 @@ const TOOLS = [
         n: { type: "integer", minimum: 1, maximum: 6, description: "variations (default 1)" },
         prompt: { type: "string", description: "full prompt override (optional)" },
         style_id: { type: "string", description: "style_id override or 'none' (optional)" },
-        model: { type: "string", description: "'vector' | 'raster' override (optional)" },
-        size: { type: "string", description: "WxH override, e.g. 1024x1024 (optional)" },
+        model: {
+          type: "string",
+          description:
+            "model kind from config.json models map: 'vector' | 'raster' (Recraft v3, " +
+            "supports custom styles) | 'vector_v41' | 'raster_v41' (Recraft v4.1 — " +
+            "explicit style_id refused, preset styles dropped); raw Recraft model ids " +
+            "also accepted (optional)",
+        },
+        size: {
+          type: "string",
+          description:
+            "WxH override, e.g. 1024x1024 (optional; v4.x VECTOR models use " +
+            "aspect-ratio sizes, so a WxH value is omitted and the API auto-selects)",
+        },
         parent_id: { type: "string", description: "lineage parent generation id (optional)" },
       },
       required: ["preset", "subject"],

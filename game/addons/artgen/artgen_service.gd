@@ -20,6 +20,20 @@ const MANIFEST_PATH := "res://assets/generated/ai_manifest.json"
 const SAVE_CATEGORIES := ["icons", "cards", "textures", "misc"]
 const THUMB_SIZE := 256
 
+# Model-family capabilities, keyed by model-id prefix. Per the Recraft docs
+# (api-reference/endpoints, /appendix, /styles): every v4-family variant
+# (recraftv4_1, *_pro, *_utility, *_vector) rejects style/style_id — custom
+# styles are v2/v3-only — and negative_prompt, and v4-family vector models
+# take aspect-ratio sizes ("1:1", …) where omitting size auto-selects.
+# Unlisted families (recraftv3/recraftv2) keep full current behavior.
+const MODEL_CAPS := {
+	"recraftv4": {
+		"supports_styles": false,
+		"supports_negative_prompt": false,
+		"vector_size_is_aspect_ratio": true,
+	},
+}
+
 signal history_changed
 signal generation_started(info: Dictionary)
 signal generation_completed(records: Array)
@@ -101,10 +115,11 @@ func set_api_key(key: String) -> void:
 
 # -- Generation ---------------------------------------------------------------
 
-## opts: {preset*, subject, n, prompt, model, size, style_id, negative_prompt,
-## parent_id}. prompt/model/size/style_id override the preset when present.
-## Returns {"ok": bool, "generations": [records]} or {"ok": false, "error": …}.
-func generate(opts: Dictionary) -> Dictionary:
+## Pure request construction (no I/O): resolves preset/overrides into the
+## /v1/images/generations body, applying MODEL_CAPS family rules. Returns the
+## payload, or {"ok": false, "error": …} when the request is invalid for the
+## resolved model (e.g. an explicit style_id on a v4.x model).
+func build_payload(opts: Dictionary) -> Dictionary:
 	var preset_name := str(opts.get("preset", ""))
 	if not presets.has(preset_name):
 		return {"ok": false, "error": "unknown preset '%s' (have: %s)" % [
@@ -117,6 +132,7 @@ func generate(opts: Dictionary) -> Dictionary:
 	var model_kind := str(opts.get("model", "")) if opts.get("model") else \
 			str(preset.get("model", "vector"))
 	var model: String = config.get("models", {}).get(model_kind, model_kind)
+	var caps := _model_caps(model)
 	var n := clampi(int(opts.get("n", 1)), 1, 6)
 	var size := str(opts.get("size", "")) if opts.get("size") else \
 			str(preset.get("size", "1024x1024"))
@@ -125,15 +141,59 @@ func generate(opts: Dictionary) -> Dictionary:
 		"prompt": prompt, "model": model, "n": n, "size": size,
 		"response_format": "b64_json",
 	}
+	# v4-family vector models take aspect-ratio sizes, not WxH — omit a pixel
+	# size so the API auto-selects instead of rejecting the request.
+	if caps.get("vector_size_is_aspect_ratio", false) and model.contains("_vector") \
+			and _is_pixel_size(size):
+		payload.erase("size")
+
 	var style_id: Variant = opts.get("style_id", preset.get("style_id"))
 	if style_id == null:
 		style_id = config.get("style_id")
 	if style_id != null and str(style_id) != "none" and str(style_id) != "":
-		payload["style_id"] = str(style_id)
+		if caps.get("supports_styles", true):
+			payload["style_id"] = str(style_id)
+		elif opts.get("style_id") != null:
+			return {"ok": false, "error": ("custom styles are v2/v3-only; %s rejects " +
+				"style_id (use a v3 model kind, or style_id 'none')") % model}
+		# else: preset/config-inherited style — silently omitted for v4.x
 	if preset.get("controls") != null:
 		payload["controls"] = preset["controls"]
-	if opts.get("negative_prompt"):
+	if opts.get("negative_prompt") and caps.get("supports_negative_prompt", true):
 		payload["negative_prompt"] = str(opts["negative_prompt"])
+	return payload
+
+
+## True when the resolved model for `model_kind` accepts custom styles —
+## drives the dock's "custom styles ignored" note for v4.x kinds.
+func model_supports_styles(model_kind: String) -> bool:
+	var model: String = config.get("models", {}).get(model_kind, model_kind)
+	return _model_caps(model).get("supports_styles", true)
+
+
+static func _model_caps(model: String) -> Dictionary:
+	for prefix in MODEL_CAPS:
+		if model.begins_with(prefix):
+			return MODEL_CAPS[prefix]
+	return {}
+
+
+static func _is_pixel_size(size: String) -> bool:
+	var parts := size.split("x")
+	return parts.size() == 2 and parts[0].is_valid_int() and parts[1].is_valid_int()
+
+
+## opts: {preset*, subject, n, prompt, model, size, style_id, negative_prompt,
+## parent_id}. prompt/model/size/style_id override the preset when present.
+## Returns {"ok": bool, "generations": [records]} or {"ok": false, "error": …}.
+func generate(opts: Dictionary) -> Dictionary:
+	var payload := build_payload(opts)
+	if payload.get("ok") == false:
+		return payload
+	var preset_name := str(opts.get("preset", ""))
+	var preset: Dictionary = presets[preset_name]
+	var subject := str(opts.get("subject", ""))
+	var n := int(payload["n"])
 
 	generating = true
 	generation_started.emit({"preset": preset_name, "subject": subject, "n": n})
@@ -145,9 +205,9 @@ func generate(opts: Dictionary) -> Dictionary:
 	var ts := _now_iso()
 	var base_event := {
 		"type": "generation", "id": "", "ts": ts, "provider": "recraft",
-		"model": model, "style_id": payload.get("style_id"), "style": null,
-		"preset": preset_name, "subject": subject, "prompt": prompt,
-		"negative_prompt": payload.get("negative_prompt"), "size": size,
+		"model": payload["model"], "style_id": payload.get("style_id"), "style": null,
+		"preset": preset_name, "subject": subject, "prompt": payload["prompt"],
+		"negative_prompt": payload.get("negative_prompt"), "size": payload.get("size"),
 		"n": n, "n_index": 0, "controls": payload.get("controls"),
 		"random_seed": null, "parent_id": opts.get("parent_id"), "image_id": null,
 		"file": null, "post": preset.get("post", []), "cost_units": 0, "status": "ok",

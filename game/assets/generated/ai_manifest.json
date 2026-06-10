@@ -12,6 +12,19 @@
 			"saved_at": "2026-06-10T14:38:52Z",
 			"sha256": "3cf06ec2a65ad804b0b658f06090859a3f5cbabf7bb9b738012a8c2f4e5f39a5",
 			"style_id": "19f7542f-0727-4f6f-9d07-728c439fc583"
+		},
+		"res://assets/generated/misc/v41_smoke_sigil.svg": {
+			"gen_id": "g_1781107690_325c",
+			"generated_at": "2026-06-10T16:08:10Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "test sigil glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-10T16:08:46Z",
+			"sha256": "a588091ec3a3192605d19bc1d0b636bc706e34c1b01f258e3c0b5fcea7731ce2",
+			"style_id": null
 		}
 	},
 	"version": 1.0

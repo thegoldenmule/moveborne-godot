@@ -3,7 +3,9 @@
 	"fallback_style": "Line art",
 	"models": {
 		"vector": "recraftv3_vector",
-		"raster": "recraftv3"
+		"raster": "recraftv3",
+		"vector_v41": "recraftv4_1_vector",
+		"raster_v41": "recraftv4_1"
 	},
 	"bridge_port": 4848
 }
