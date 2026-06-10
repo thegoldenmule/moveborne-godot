@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1204,
+    "version": 1216,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "f23e2120a1889643dd46d42236461c49f93198b932eae259bcd39badd95aa144",
@@ -35,12 +35,12 @@
       "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
       "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md": "795f3afea53a545e8182ea9992a9ac83a13a9f6990ef2fd34f55c953ab0098f6",
       "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f",
-      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/index.md": "e8495c3bb00a5d76189d081f105dc1b8df044d1584f06fac2fa025d537a1829b",
+      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/index.md": "9d9518b61c506380ec3c7cf6d67d3c9703484ffc6b757045fffe876658c9d2e5",
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/implementation-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "db1329a99905613f79879000876a3f4f1c7a7d37f07c8698cfe21be74422844b",
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "cd7726051e4bb8f6327d846cb92abddc431ea8dc4a0860a8064fdc664b8b6638",
       "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "3ef67745ed54e56c54f063df80baad208a8887421b6540340ca7e27e3bed8f9f",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
-      "hypercasual-llm/design/general.md": "4b5d801f97b501ac631acdea916fa1d901d7409bd6a8b121fbf4f6c2be782ec6"
+      "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",

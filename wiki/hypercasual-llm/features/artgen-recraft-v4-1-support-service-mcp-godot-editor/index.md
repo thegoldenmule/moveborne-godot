@@ -32,10 +32,9 @@ Add opt-in Recraft v4.1 generation to the shipped ArtGen pipeline while keeping 
 2. **Strictness of the style guard: the implementation errors on EXPLICIT opts.style_id + v4.1, and silently strips preset/config-INHERITED style_ids (recording style_id null in the ledger). Acceptable, or should preset-inherited style stripping also hard-fail (forcing users to pick a style-free preset for v4.1)?**
 3. **Should any v4.1-native presets be added (e.g. 'icon-flat-v41' with a prompt retuned to compensate for the lost custom style)? Without the v3 styles, v4.1 output will diverge from the established occult-arcade look — this is an art-direction decision (art/STYLE_GUIDE.md), not an engineering one. Out of scope for this feature unless requested.**
 4. **Config kind naming is committed surface area (config.json keys appear in dock UI, MCP docs, and muscle memory): default taken is 'vector_v41'/'raster_v41' (matches existing 'vector'/'raster' with a version suffix). OK, or prefer 'v41_vector'/'v41_raster' or a structured scheme?**
-5. **Should any preset default eventually flip to v4.1 (better short-prompt adherence, 10k-char prompts) despite losing custom styles? Recommend revisiting only after a side-by-side output comparison; defaulting now would silently change the game's shipped art style. Not part of this feature.**
 
 ## Resolved questions
-_None._
+1. **Should any preset default eventually flip to v4.1 (better short-prompt adherence, 10k-char prompts) despite losing custom styles? Recommend revisiting only after a side-by-side output comparison; defaulting now would silently change the game's shipped art style. Not part of this feature.** — _Decided by the user 2026-06-10: ALL presets now default to v4.1 (commit 085f0bb) — model kinds vector_v41/raster_v41 in presets.json. v3 + custom styles remain reachable via the per-generation model override ('vector'/'raster'). Dock Load resolves the style field to 'none' on style-less models so Load→Generate can't trip the explicit-style refusal. Verified live: default icon-flat lands on recraftv4_1_vector._
 
 ## References
 _None._

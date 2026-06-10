@@ -179,6 +179,53 @@ An in-game mailbox for mail from the devs — patch notes, event announcements, 
 - **Covers:** admin-to-user messages, including bulk sends to a user, friends, followers, or a guild; read/unread state; deletion.
 - **Gaps:** messages are text-only — no reward attachments, so a claimable gift must be composed as a message plus an Inventory grant keyed to it.
 
+---
+
+## Proposed Meta-Game Service (BYOSnap)
+
+The existing validator BYOSnap is strictly for gameplay validation. The Gaps above share a pattern: trusted custom logic that no snap provides and that does not belong in the validator. The proposal is a second BYOSnap — a meta-game service deployed the same way — that owns that logic, composing the snaps on the player's behalf. This is a scope statement only; no implementation details here. From this page, it needs to implement:
+
+- **Reward Screens** — verifying a rewarded-ad watch before granting the bonus.
+- **Starter Pack / Bundle Packs** — offer gating and presentation: one-time-per-player starter pack, time-limited windows, and rotating or personalizing which offers a player sees.
+- **Challenge of the Day** — selecting and publishing each day's challenge parameters (the deterministic puzzle itself stays in the rules engine).
+- **Daily Missions** — rotating the active mission set from the pool, keeping the anchor mission present, on the chosen midnight boundary.
+- **Achievements / Battle Pass** — resolving free versus premium reward lanes and orchestrating season rollover.
+- **Daily Login Bonus** — the escalating day-1-to-day-N reward calendar.
+- **Weekly Login Streak Bonus** — streak tracking with reset-on-miss or decay.
+- **Settings** — the one-time reward grant when a player links a social account.
+- **Randomized Rewards** — pity timers and duplicate protection layered over Inventory drop tables.
+- **Player Profile** — aggregating the best-achievements summary.
+- **Player Inbox** — claimable gifts: pairing a message with its Inventory grant and gating the claim.
+
+**Out of scope:** everything a snap already covers (the Covers bullets above) stays in that snap, and everything match-authoritative — action validation, in-match currency sinks (wagers, continues), and XP grants tied to match results — stays in the gameplay validator. See Validator.
+
+---
+
+## Authority Model — Client vs Server
+
+Snapser defaults to client-authoritative: with only a session token, a client can call the grant/score/progress write APIs on its own account. The Auth snap's User Auth Restrictions tool removes client access per API, leaving Api-Key and Internal (BYOSnap) callers only. The split below weighs each design area on three axes: ease of building it, load it puts on a BYOSnap, and what cheating could affect (blast radius).
+
+- **Weak-link rule:** a reward is only as trustworthy as its least-trusted input — a locked claim on a client-written counter is still cheatable. Prefer currency/item/trackable quest goals (trusted once mints are locked) over counter goals for quests that mint meaningful rewards.
+- **Mints vs exchanges:** unconditioned writes (`IncrementUserCurrency`, `GrantItemsToUser`, `GrantDropTable`, `SetScore`, `IncrementUserStatistic`) are the dangerous surface and must be locked. Conditioned exchanges (purchase, container open/unlock, conversion) deduct their cost atomically inside the snap and stay safely client-callable.
+- **Existing trusted writer:** the gameplay validator already sits in the match path — match-derived outcomes (scores, match XP, win/play statistics) become server-authoritative at near-zero marginal cost.
+- **Infinite is offline:** anything offline play feeds is client-trust by construction; keep offline results off shared surfaces (no leaderboard writes from Infinite).
+
+| Design area | Authority | If cheated, affects | Server load | Ease |
+| --- | --- | --- | --- | --- |
+| Leaderboard scores | Server — validator submits | everyone (competitive integrity) | none new — rides the match flow | low |
+| Match XP, win/play statistics | Server — validator writes | everything downstream: quests, pass, boards | none new | low |
+| Currency & item mints | Server-only — lock via User Auth Restrictions | the whole economy and revenue | zero — configuration, not code | trivial |
+| Store purchases (IAP receipts) | Snap-enforced — client-callable | revenue — but the signed store receipt is the proof | zero | trivial |
+| Virtual-currency purchases, container opens | Snap-enforced — client-callable | nothing — cost deducted atomically | zero | trivial |
+| Daily login bonus / streak claims | Snap-enforced — client-callable | bounded daily mint; the session is the login | zero | trivial |
+| Daily missions (counter goals) | Client at launch → validator-fed statistics later | bounded daily mint | none → small | low |
+| Rewarded-ad grants | Server — ad-network SSV endpoint (deferrable) | unbounded mint if forged | new endpoint, per ad watch | moderate |
+| Gacha pity / duplicate protection | Server — only if designed in | fairness and support load, not security | per pull | moderate |
+| Cloud save, profile, cosmetics, settings | Client | only the cheater's own account | zero | trivial |
+| Offer / starter-pack gating | Client + Remote Config | worst case: a player pays real money twice | zero | trivial |
+
+**Phasing implication:** launch-day server authority is nearly free — lock the mint APIs (configuration), let the validator write match outcomes (already deployed), and lean on snap-enforced conditions for everything else. The proposed meta-game service becomes load-bearing only when rewarded-ad verification, pity systems, or mission rotation beyond the Scheduler's reach arrive — and its player-facing volume is claims per day, not actions per move, so it stays small next to the validator.
+
 ## References
 _None._
 
