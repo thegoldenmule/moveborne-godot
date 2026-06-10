@@ -22,6 +22,7 @@ _No design notes._
 - [Match Controller](architecture:mq1c2vaw-000p-3fdst6)
 - [Validator Client](architecture:mq1c2wgh-000r-sjn10a)
 - [Presentation &amp; VFX](architecture:mq1c2xsl-000t-8j2hqc)
+- [Editor Tools](architecture:mq8hyn2w-000i-cryytk)
 
 ## Dependencies
 - **calls** → [Validator](architecture:mq1c2ixi-000h-kd018q) — Online play: validates every move against the Validator over Socket.IO (via net/).
