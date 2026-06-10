@@ -65,16 +65,13 @@ func test_v41_dock_and_service() -> void:
 	var grouped: Array = service.get_history_grouped({})
 	assert_eq(dock._gallery_list.get_child_count(), grouped.size(),
 		"one gallery block per batch")
-	var multi_total := 0
-	var multi_blocks := 0
+	var bad_headers := 0
 	for i in grouped.size():
-		var n: int = grouped[i]["records"].size()
+		var first: Dictionary = grouped[i]["records"][0]
 		var row: HFlowContainer = dock._gallery_list.get_child(i).get_child(1)
-		assert_eq(row.get_child_count(), n, "block thumbnail count matches batch")
-		if n > 1:
-			multi_total += 1
-			var head: Label = dock._gallery_list.get_child(i).get_child(0)
-			if head.text.contains("×%d" % n):
-				multi_blocks += 1
-	assert_true(multi_total > 0, "real ledger has multi-variation batches")
-	assert_eq(multi_blocks, multi_total, "multi-batch headers show the count")
+		assert_eq(row.get_child_count(), grouped[i]["records"].size(),
+			"block thumbnail count matches batch")
+		var head: Label = dock._gallery_list.get_child(i).get_child(0)
+		if head.text != "[%s] \"%s\"" % [first.get("preset"), str(first.get("subject", ""))]:
+			bad_headers += 1
+	assert_eq(bad_headers, 0, "headers are [preset] \"title\"")

@@ -484,11 +484,7 @@ func _refresh_gallery() -> void:
 		var first: Dictionary = records[0]
 		var block := VBoxContainer.new()
 		var head := Label.new()
-		var subject := str(first.get("subject", ""))
-		head.text = "%s — %s%s" % [
-			subject if not subject.is_empty() else "(no subject)",
-			first.get("preset"),
-			"  ×%d" % records.size() if records.size() > 1 else ""]
+		head.text = "[%s] \"%s\"" % [first.get("preset"), str(first.get("subject", ""))]
 		head.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
 		block.add_child(head)
 		var row := HFlowContainer.new()
