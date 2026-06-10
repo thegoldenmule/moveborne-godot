@@ -1,6 +1,6 @@
 # Implementation plan — ArtGen — Recraft v4.1 Support (service, MCP, Godot editor)
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] config.json (game/addons/artgen/config.json): extend the models dict additively — keep vector: recraftv3_vector and raster: recraftv3 untouched, add vector_v41: recraftv4_1_vector and raster_v41: recraftv4_1 (underscore identifiers verbatim from the Recraft endpoints docs). Do NOT change config style_id or any presets.json model field.

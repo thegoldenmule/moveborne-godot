@@ -1,6 +1,6 @@
 # Testing plan — ArtGen — Recraft v4.1 Support (service, MCP, Godot editor)
 
-**Status:** draft
+**Status:** ready
 
 ## Planned
 _None._
