@@ -142,7 +142,6 @@ func _build_compose() -> Control:
 
 	_prompt_override = TextEdit.new()
 	_prompt_override.custom_minimum_size.y = 60
-	_prompt_override.placeholder_text = "prompt template (blank = preset's; {subject} substitutes)"
 	_prompt_override.text_changed.connect(_update_prompt_preview)
 	box.add_child(_label_wrap("Prompt", _prompt_override))
 
