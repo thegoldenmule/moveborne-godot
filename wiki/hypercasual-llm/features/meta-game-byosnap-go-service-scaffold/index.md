@@ -1,6 +1,6 @@
 # Feature: Meta-Game BYOSnap — Go service scaffold
 
-**Status:** planning
+**Status:** building
 
 ## Summary
 Stand up the *meta-game service* proposed on Design > General as a deployed skeleton: a **Go** BYOSnap (`byosnap-metagame`) in a new top-level `metagame/` directory, reachable **through the Snapser gateway** with a player session token, and able to call other snaps over **gRPC** using the vendored stubs in `snapser-pb/`. Scope is strictly *creation and project setup*: the service exposes only enough surface to prove the two connectivity paths — (1) client → gateway → service, and (2) service → snap via internal auth — plus the platform health probe. No meta-game features (quests, economy, offers) ship in this feature. Deploying to Snapser (app `c4n1awfs`, alongside `byosnap-validator`) and smoke-testing through the gateway are part of the deliverable.
@@ -20,7 +20,7 @@ Stand up the *meta-game service* proposed on Design > General as a deployed skel
 5. Deploys as a second BYOSnap beside byosnap-validator; the validator and its deploy pipeline are untouched.
 
 ## Open questions
-_None._
+1. **Deploy authorization needed (blocks plan steps 8–9 and test cases: deployed readiness, gateway ping proof, gateway auth enforcement, snap path proof, validator regression). The agent session's permission layer denied running `snapctl byosnap sync` against snapend c4n1awfs, so the publish + snapend attach must be run by a human. Everything else is built, locally verified, and committed (3fb0905, 3156589, 83012a9). To deploy: stage a minimal context (cp -R metagame snapser-pb into an empty dir) and run `snapctl byosnap sync --byosnap-id byosnap-metagame --path <ctx> --resources-path <ctx>/metagame --version v0.0.1 --snapend-id c4n1awfs --blocking` (full loop documented in metagame/README.md §Deploy loop), then smoke through the gateway per §Gateway smoke.**
 
 ## Resolved questions
 1. **Which snap should the snap-check endpoint call to prove internal gRPC connectivity, given the snapend's current composition?** — _Target the Auth snap with a read-only call. Auth is the one snap guaranteed in the snapend today (anonymous login already powers the validator flow), and snapser-pb/auth ships its stubs. Inventory is the natural second target later, but adding snaps to the snapend is out of scope for this feature._
@@ -36,4 +36,6 @@ _None._
 - [Spec — Meta-Game BYOSnap — Go service scaffold](feature-spec:mq8ejxt1-005y-pgw5j3)
 
 ## Commits
-_None._
+- `3fb0905` feat(metagame): Go BYOSnap scaffold — gateway ping + Auth snap-check proofs
+- `3156589` docs(metagame): README — endpoints, env contract, local/container/deploy loops
+- `83012a9` refactor(metagame): review fixes — requireUser gate, server timeouts, base-path normalization
