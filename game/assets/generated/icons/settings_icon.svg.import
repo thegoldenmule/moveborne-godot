@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nsc4qfve6x3x"
-path="res://.godot/imported/leaderboard_trophy.svg-6e3e1703a7031aaca6d09805b3522ffe.ctex"
+uid="uid://cn1vpgd0ium1s"
+path="res://.godot/imported/settings_icon.svg-42c9447b946ce9512acad7345db7850f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/icons/leaderboard_trophy.svg"
-dest_files=["res://.godot/imported/leaderboard_trophy.svg-6e3e1703a7031aaca6d09805b3522ffe.ctex"]
+source_file="res://assets/generated/icons/settings_icon.svg"
+dest_files=["res://.godot/imported/settings_icon.svg-42c9447b946ce9512acad7345db7850f.ctex"]
 
 [params]
 
