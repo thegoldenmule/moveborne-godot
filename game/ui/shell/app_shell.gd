@@ -19,6 +19,8 @@ const TAB_ICONS: Array[Texture2D] = [
 ]
 const NAV_HEIGHT := 96.0
 const TAB_ICON_SIZE := 34
+const TAB_ICON_SELECTED_SCALE := 1.65
+const TAB_ICON_POP_Y := 16.0  # selected icon center, px below the bar's top edge
 const HOME_ICON_SIZE := 64
 
 @onready var _content: Control = $Content
@@ -34,6 +36,8 @@ const HOME_ICON_SIZE := 64
 ]
 
 var _screens: Array = []
+var _tab_icons: Array = []   # TextureRect per side tab (null at HOME_INDEX)
+var _tab_labels: Array = []  # Label per side tab (null at HOME_INDEX)
 var _bg: ColorRect
 
 
@@ -99,30 +103,32 @@ func _ready() -> void:
 		_screens.append(screen)
 
 	# Radio selection across the five tab buttons; each takes an equal share of the
-	# full bar width (Home a wider share), exactly one active.
+	# full bar width (Home a wider share), exactly one active. Side-tab icons are
+	# overlay TextureRects (not Button.icon) so the selected one can scale up and
+	# pop past the bar frame — a Button clamps its own icon inside its rect.
 	var group := ButtonGroup.new()
 	for i in range(5):
 		var b: Button = _tabs[i]
 		b.toggle_mode = true
 		b.button_group = group
 		b.focus_mode = Control.FOCUS_NONE
-		b.text = TAB_LABELS[i]
-		b.clip_text = true
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size = Vector2(0, 72)
-		b.add_theme_font_size_override("font_size", 10)
-		b.icon = TAB_ICONS[i]
-		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.add_theme_constant_override("icon_max_width", TAB_ICON_SIZE)
 		_style_nav_button(b)
 		b.pressed.connect(_select_tab.bind(i))
+		if i == HOME_INDEX:
+			_tab_icons.append(null)
+			_tab_labels.append(null)
+		else:
+			_tab_icons.append(_make_tab_icon(b, TAB_ICONS[i]))
+			_tab_labels.append(_make_tab_label(b, TAB_LABELS[i]))
 
 	# Emphasize the center Home tab: wider share, icon-only (no label), bigger icon,
 	# and a pulsing additive violet halo behind it.
 	var home_btn: Button = _tabs[HOME_INDEX]
 	home_btn.size_flags_stretch_ratio = 1.5
-	home_btn.text = ""
+	home_btn.icon = TAB_ICONS[HOME_INDEX]
+	home_btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	home_btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	home_btn.add_theme_constant_override("icon_max_width", HOME_ICON_SIZE)
 	_add_home_glow(home_btn)
@@ -134,16 +140,79 @@ func _ready() -> void:
 func _select_tab(index: int) -> void:
 	for i in range(_screens.size()):
 		_screens[i].visible = (i == index)
-	# Label only on the selected tab; unselected tabs are icon-only, re-centered.
+	# Selected side tab: icon grows and pops up past the bar frame, label shows
+	# beneath it. Unselected tabs collapse back to a centered base-size icon.
 	# (Home is always icon-only — its glow is the emphasis.)
+	var half := TAB_ICON_SIZE / 2.0
 	for i in range(_tabs.size()):
 		if i == HOME_INDEX:
 			continue
 		var b: Button = _tabs[i]
+		var ic: TextureRect = _tab_icons[i]
+		var lb: Label = _tab_labels[i]
 		var selected := (i == index)
-		b.text = TAB_LABELS[i] if selected else ""
-		b.vertical_icon_alignment = \
-			VERTICAL_ALIGNMENT_TOP if selected else VERTICAL_ALIGNMENT_CENTER
+		lb.visible = selected
+		var target_scale := Vector2.ONE * (TAB_ICON_SELECTED_SCALE if selected else 1.0)
+		var target_mod := Color.WHITE if selected else Color(1, 1, 1, 0.55)
+		# Anchors are all-center with a center pivot, so position is the icon's
+		# top-left and position + half is its visual center whatever the scale.
+		var center_y := TAB_ICON_POP_Y if selected else b.size.y * 0.5
+		var target_pos := Vector2(b.size.x * 0.5 - half, center_y - half)
+		var old: Tween = ic.get_meta("tw") if ic.has_meta("tw") else null
+		if old != null:
+			old.kill()
+		var tw := ic.create_tween().set_parallel(true) \
+			.set_trans(Tween.TRANS_BACK if selected else Tween.TRANS_SINE) \
+			.set_ease(Tween.EASE_OUT)
+		tw.tween_property(ic, "scale", target_scale, 0.18)
+		tw.tween_property(ic, "position", target_pos, 0.18)
+		tw.tween_property(ic, "modulate", target_mod, 0.18)
+		ic.set_meta("tw", tw)
+
+
+## Overlay icon for a side tab: center-anchored at base size with a center pivot,
+## so _select_tab can tween scale/position freely (incl. past the button rect —
+## neither the Button nor the NavBar clips children).
+func _make_tab_icon(btn: Button, tex: Texture2D) -> TextureRect:
+	var ic := TextureRect.new()
+	ic.texture = tex
+	ic.stretch_mode = TextureRect.STRETCH_SCALE
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ic.modulate = Color(1, 1, 1, 0.55)
+	btn.add_child(ic)
+	var half := TAB_ICON_SIZE / 2.0
+	ic.anchor_left = 0.5
+	ic.anchor_top = 0.5
+	ic.anchor_right = 0.5
+	ic.anchor_bottom = 0.5
+	ic.offset_left = -half
+	ic.offset_top = -half
+	ic.offset_right = half
+	ic.offset_bottom = half
+	ic.pivot_offset = Vector2(half, half)
+	return ic
+
+
+## Bottom-anchored label for a side tab; visible only while the tab is selected.
+func _make_tab_label(btn: Button, text: String) -> Label:
+	var lb := Label.new()
+	lb.text = text
+	lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lb.add_theme_font_size_override("font_size", 10)
+	lb.add_theme_color_override("font_color", MbStyle.TEXT)
+	lb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lb.visible = false
+	btn.add_child(lb)
+	lb.anchor_left = 0.0
+	lb.anchor_right = 1.0
+	lb.anchor_top = 1.0
+	lb.anchor_bottom = 1.0
+	lb.offset_left = 0.0
+	lb.offset_right = 0.0
+	lb.offset_top = -26.0
+	lb.offset_bottom = -8.0
+	return lb
 
 
 func _on_play_mode_selected(cfg: Dictionary) -> void:
