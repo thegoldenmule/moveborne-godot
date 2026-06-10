@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1307,
+    "version": 1308,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "6998693e610a6c25a927eecb3a59a38aa2fd0522a72750023a8df05f798309ab",
+      "hypercasual-llm/features/index.md": "844f43c25a741d057ee83700fa97442040dea61bbaa5c45f8920a5707aeef22e",
       "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "e7b8195647f880e17e564aae30098d2763ce10e3cbfa91f7604cab8c562aeb45",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
@@ -35,10 +35,6 @@
       "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md": "1ccefb5e62c304d3fa33cd407c25fa1b1c469bc9e5e00d2a8a1d9f2c76aadad1",
       "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md": "795f3afea53a545e8182ea9992a9ac83a13a9f6990ef2fd34f55c953ab0098f6",
       "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md": "b7544abd405d845c75dac1c9191f148a67bb676a28b01214890d3ab800f9148f",
-      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/index.md": "a769fe54da824733ffd775609bdc744e10241db4e370523dbbe19512c13de290",
-      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/implementation-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "0fcca547d7916327a7bcfa50c953b2496e3317478f0d16db91c074d17804eadc",
-      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "c2928dcaa9eff08a633932be6d2037244d35bf77d590f080067f641f73736291",
-      "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md": "0fb4aac0e3da8cb67337ef7e6722932a35b67c16358ed272a8b8f7c357db0190",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
       "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f",
       "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md": "0225ee5ef017e759401b42af20cdd4aa92d067dadb4dde675a0699afa294a0d2",
@@ -80,10 +76,6 @@
       "decision-record:mq1ebvcb-0007-cmmi2x": "hypercasual-llm/adrs/fun-first-test-the-deterministic-core-verify-the-game-by-playing-it.md",
       "decision-record:mq74gj5v-000c-9ta022": "hypercasual-llm/adrs/adopt-snapser-as-the-online-backend-replacing-nakama.md",
       "decision-record:mq74gkil-000e-cwpjw6": "hypercasual-llm/adrs/authenticate-byosnap-requests-by-trusting-gateway-stamped-user-id-not-signatures.md",
-      "feature-brief:mq88pnku-000w-svi43y": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/index.md",
-      "implementation-plan:mq88pnku-000x-77nvic": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/implementation-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md",
-      "testing-plan:mq88pnku-000y-7jmitx": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/testing-plan-artgen-recraft-v4-1-support-service-mcp-godot-editor.md",
-      "feature-spec:mq88pnkv-000z-ix8ln1": "hypercasual-llm/features/artgen-recraft-v4-1-support-service-mcp-godot-editor/spec-artgen-recraft-v4-1-support-service-mcp-godot-editor.md",
       "toc:mq88ua2j-0014-vaolwu": "hypercasual-llm/design/index.md",
       "document:mq88uf29-0016-f5qt06": "hypercasual-llm/design/general.md",
       "feature-brief:mq8ejxt1-005v-k2eu9f": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md",
