@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1356,
+    "version": 1357,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "844f43c25a741d057ee83700fa97442040dea61bbaa5c45f8920a5707aeef22e",
+      "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
       "hypercasual-llm/adrs/index.md": "47f99a72d7466f3380b50763a04785896d98ed602549e8d1374358f080b89301",
       "hypercasual-llm/architecture/client/index.md": "95a2150dc0773438d9ade2e3786017b38ed87b075cf41a343bf10851ad8f8437",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
@@ -52,10 +52,10 @@
       "hypercasual-llm/.archived/feature-spec--mq88pnkv-000z-ix8ln1.md": "0fb4aac0e3da8cb67337ef7e6722932a35b67c16358ed272a8b8f7c357db0190",
       "hypercasual-llm/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
       "hypercasual-llm/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md": "346bfe4d7385267ae15ef89e50b3bc46960683b9126fcad042a9300368059cbf",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md": "4029f79d3b300ad8ae7adde99d766bf8cf76e4e26274e37169a66b19fb2e3e48",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
-      "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51",
+      "hypercasual-llm/.archived/feature-brief--mq8ejxt1-005v-k2eu9f.md": "346bfe4d7385267ae15ef89e50b3bc46960683b9126fcad042a9300368059cbf",
+      "hypercasual-llm/.archived/implementation-plan--mq8ejxt1-005w-iw8mhf.md": "4029f79d3b300ad8ae7adde99d766bf8cf76e4e26274e37169a66b19fb2e3e48",
+      "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
+      "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51",
       "hypercasual-llm/architecture/client/editor-tools.md": "edc5201e39ae8e96c3de3f57587452b0c623bd9115cd96beb77ad3aeefa073d7"
     },
     "pages": {
@@ -109,10 +109,10 @@
       "feature-spec:mq88pnkv-000z-ix8ln1": "hypercasual-llm/.archived/feature-spec--mq88pnkv-000z-ix8ln1.md",
       "toc:mq88ua2j-0014-vaolwu": "hypercasual-llm/design/index.md",
       "document:mq88uf29-0016-f5qt06": "hypercasual-llm/design/general.md",
-      "feature-brief:mq8ejxt1-005v-k2eu9f": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/index.md",
-      "implementation-plan:mq8ejxt1-005w-iw8mhf": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/implementation-plan-meta-game-byosnap-go-service-scaffold.md",
-      "testing-plan:mq8ejxt1-005x-8qonc7": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/testing-plan-meta-game-byosnap-go-service-scaffold.md",
-      "feature-spec:mq8ejxt1-005y-pgw5j3": "hypercasual-llm/features/meta-game-byosnap-go-service-scaffold/spec-meta-game-byosnap-go-service-scaffold.md",
+      "feature-brief:mq8ejxt1-005v-k2eu9f": "hypercasual-llm/.archived/feature-brief--mq8ejxt1-005v-k2eu9f.md",
+      "implementation-plan:mq8ejxt1-005w-iw8mhf": "hypercasual-llm/.archived/implementation-plan--mq8ejxt1-005w-iw8mhf.md",
+      "testing-plan:mq8ejxt1-005x-8qonc7": "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md",
+      "feature-spec:mq8ejxt1-005y-pgw5j3": "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md",
       "architecture:mq8hyn2w-000i-cryytk": "hypercasual-llm/architecture/client/editor-tools.md"
     }
   }
