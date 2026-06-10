@@ -52,15 +52,33 @@ func _ready() -> void:
 	_checker_tex = _make_checkerboard()
 	_build_ui()
 	if service != null:
+		# method callables (not lambdas): they auto-disconnect when the dock is
+		# freed, so a late signal from an in-flight generation can't call into
+		# a freed control after the plugin is disabled
 		service.history_changed.connect(_refresh_gallery)
-		service.balance_changed.connect(func(_c: int) -> void: _refresh_status())
-		service.generation_started.connect(func(_i: Dictionary) -> void: _refresh_status())
-		service.generation_completed.connect(func(_r: Array) -> void: _refresh_status())
-		service.generation_failed.connect(func(err: String) -> void:
-			_status_label.text = "error: " + err.left(120))
+		service.balance_changed.connect(_on_balance_changed)
+		service.generation_started.connect(_on_generation_started)
+		service.generation_completed.connect(_on_generation_completed)
+		service.generation_failed.connect(_on_generation_failed)
 		_populate_presets()
 		_refresh_gallery()
 		_refresh_status()
+
+
+func _on_balance_changed(_credits: int) -> void:
+	_refresh_status()
+
+
+func _on_generation_started(_info: Dictionary) -> void:
+	_refresh_status()
+
+
+func _on_generation_completed(_records: Array) -> void:
+	_refresh_status()
+
+
+func _on_generation_failed(error: String) -> void:
+	_status_label.text = "error: " + error.left(120)
 
 
 # -- UI construction ----------------------------------------------------------
@@ -353,6 +371,8 @@ func _on_discard() -> void:
 
 
 func _open_settings() -> void:
+	service.reload_config()  # pick up external presets.json/config.json edits
+	_populate_presets()
 	_key_edit.text = ""
 	_key_status.text = "key configured" if service.status()["api_key_configured"] else "no key"
 	_settings.popup_centered()

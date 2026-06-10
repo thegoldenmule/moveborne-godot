@@ -11,9 +11,14 @@ static func append(path: String, event: Dictionary) -> void:
 	var f: FileAccess
 	if FileAccess.file_exists(path):
 		f = FileAccess.open(path, FileAccess.READ_WRITE)
-		f.seek_end()
+		if f != null:
+			f.seek_end()
 	else:
 		f = FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		push_error("ArtGen ledger: cannot open %s (err %d) — event dropped: %s" % [
+			path, FileAccess.get_open_error(), event.get("type", "?")])
+		return
 	f.store_line(JSON.stringify(event))
 	f.close()
 

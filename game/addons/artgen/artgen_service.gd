@@ -39,6 +39,7 @@ var balance := -1
 var generating := false
 
 var _index := {"generations": {}, "order": [], "styles": []}
+var _thumb_textures := {}
 
 
 # _enter_tree (not _ready): the dock is added straight into the live editor UI,
@@ -51,10 +52,7 @@ func _enter_tree() -> void:
 	thumbs_dir = gen_root.path_join(".thumbs")
 	DirAccess.make_dir_recursive_absolute(thumbs_dir)
 
-	_load_json_into("res://addons/artgen/config.json", config)
-	var pres := {}
-	_load_json_into("res://addons/artgen/presets.json", pres)
-	presets = pres.get("presets", {})
+	reload_config()
 
 	client = ClientT.new()
 	client.name = "RecraftClient"
@@ -63,6 +61,16 @@ func _enter_tree() -> void:
 
 	reload_history()
 	_refresh_balance.call_deferred()
+
+
+## Re-read config.json + presets.json (e.g. after an external edit) without
+## restarting the editor.
+func reload_config() -> void:
+	config = {}
+	_load_json_into("res://addons/artgen/config.json", config)
+	var pres := {}
+	_load_json_into("res://addons/artgen/presets.json", pres)
+	presets = pres.get("presets", {})
 
 
 # -- API key ------------------------------------------------------------------
@@ -135,18 +143,22 @@ func generate(opts: Dictionary) -> Dictionary:
 	generating = false
 
 	var ts := _now_iso()
+	var base_event := {
+		"type": "generation", "id": "", "ts": ts, "provider": "recraft",
+		"model": model, "style_id": payload.get("style_id"), "style": null,
+		"preset": preset_name, "subject": subject, "prompt": prompt,
+		"negative_prompt": payload.get("negative_prompt"), "size": size,
+		"n": n, "n_index": 0, "controls": payload.get("controls"),
+		"random_seed": null, "parent_id": opts.get("parent_id"), "image_id": null,
+		"file": null, "post": preset.get("post", []), "cost_units": 0, "status": "ok",
+	}
 	if not resp.get("ok", false):
 		var msg := str(resp.get("error", "unknown error"))
-		LedgerT.append(ledger_path, {
-			"type": "generation", "id": _new_gen_id(), "ts": ts, "provider": "recraft",
-			"model": model, "style_id": payload.get("style_id"), "style": null,
-			"preset": preset_name, "subject": subject, "prompt": prompt,
-			"negative_prompt": payload.get("negative_prompt"), "size": size,
-			"n": n, "n_index": 0, "controls": payload.get("controls"),
-			"random_seed": null, "parent_id": opts.get("parent_id"), "image_id": null,
-			"file": null, "post": preset.get("post", []),
-			"cost_units": 0, "status": "api_error", "error": msg.left(300),
-		})
+		var failed := base_event.duplicate()
+		failed["id"] = _new_gen_id()
+		failed["status"] = "api_error"
+		failed["error"] = msg.left(300)
+		LedgerT.append(ledger_path, failed)
 		reload_history()
 		generation_failed.emit(msg)
 		return {"ok": false, "error": msg, "code": resp.get("code", 0)}
@@ -165,21 +177,18 @@ func generate(opts: Dictionary) -> Dictionary:
 		var gid := _new_gen_id()
 		var slug := _slugify(subject if not subject.is_empty() else preset_name)
 		var rel := "art/generated/%s/%s-%s.%s" % [month, gid, slug, ext]
-		var abs := repo_root.path_join(rel)
-		var fa := FileAccess.open(abs, FileAccess.WRITE)
+		var fa := FileAccess.open(repo_root.path_join(rel), FileAccess.WRITE)
+		if fa == null:
+			generation_failed.emit("cannot write " + rel)
+			return {"ok": false, "error": "cannot write %s (err %d)" % [rel, FileAccess.get_open_error()]}
 		fa.store_buffer(raw)
 		fa.close()
-		var event := {
-			"type": "generation", "id": gid, "ts": ts, "provider": "recraft",
-			"model": model, "style_id": payload.get("style_id"), "style": null,
-			"preset": preset_name, "subject": subject, "prompt": prompt,
-			"negative_prompt": payload.get("negative_prompt"), "size": size,
-			"n": n, "n_index": i, "controls": payload.get("controls"),
-			"random_seed": null, "parent_id": opts.get("parent_id"),
-			"image_id": data[i].get("image_id"), "file": rel,
-			"post": preset.get("post", []),
-			"cost_units": int(float(cost) / data.size()), "status": "ok",
-		}
+		var event := base_event.duplicate()
+		event["id"] = gid
+		event["n_index"] = i
+		event["image_id"] = data[i].get("image_id")
+		event["file"] = rel
+		event["cost_units"] = int(float(cost) / data.size())
 		LedgerT.append(ledger_path, event)
 		records.append(event)
 
@@ -227,7 +236,10 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 					var rb: Dictionary = await client.remove_background(bytes)
 					if not rb.get("ok", false):
 						return {"ok": false, "error": "removeBackground failed: " + str(rb.get("error"))}
-					bytes = Marshalls.base64_to_raw(str(rb["data"]["image"]["b64_json"]))
+					var b64: Variant = rb.get("data", {}).get("image", {}).get("b64_json")
+					if b64 == null:
+						return {"ok": false, "error": "removeBackground returned an unexpected shape"}
+					bytes = Marshalls.base64_to_raw(str(b64))
 					applied.append("removeBackground")
 
 	var dest := "res://assets/generated/%s/%s.%s" % [category, asset_name, ext]
@@ -235,6 +247,8 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 		return {"ok": false, "error": "asset already exists: " + dest}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
 	var fa := FileAccess.open(dest, FileAccess.WRITE)
+	if fa == null:
+		return {"ok": false, "error": "cannot write %s (err %d)" % [dest, FileAccess.get_open_error()]}
 	fa.store_buffer(bytes)
 	fa.close()
 
@@ -336,25 +350,27 @@ func get_styles() -> Array:
 # -- Thumbnails ---------------------------------------------------------------
 
 func thumbnail(gen_id: String) -> Texture2D:
+	if _thumb_textures.has(gen_id):
+		return _thumb_textures[gen_id]
 	var rec: Dictionary = _index["generations"].get(gen_id, {})
 	if rec.is_empty() or rec.get("file") == null:
 		return null
 	var cached := thumbs_dir.path_join(gen_id + ".png")
 	var img := Image.new()
-	if FileAccess.file_exists(cached):
-		if img.load(cached) == OK:
-			return ImageTexture.create_from_image(img)
-	var abs := repo_root.path_join(str(rec["file"]))
-	if str(rec["file"]).ends_with(".svg"):
-		var scale := float(THUMB_SIZE) / 1024.0
-		if img.load_svg_from_string(FileAccess.get_file_as_string(abs), scale) != OK:
-			return null
-	else:
-		if img.load(abs) != OK:
-			return null
-		img.resize(THUMB_SIZE, THUMB_SIZE, Image.INTERPOLATE_LANCZOS)
-	img.save_png(cached)
-	return ImageTexture.create_from_image(img)
+	if not (FileAccess.file_exists(cached) and img.load(cached) == OK):
+		var abs_path := repo_root.path_join(str(rec["file"]))
+		if str(rec["file"]).ends_with(".svg"):
+			var scale := float(THUMB_SIZE) / 1024.0
+			if img.load_svg_from_string(FileAccess.get_file_as_string(abs_path), scale) != OK:
+				return null
+		else:
+			if img.load(abs_path) != OK:
+				return null
+			img.resize(THUMB_SIZE, THUMB_SIZE, Image.INTERPOLATE_LANCZOS)
+		img.save_png(cached)
+	var tex := ImageTexture.create_from_image(img)
+	_thumb_textures[gen_id] = tex
+	return tex
 
 
 ## Full-size preview with the generation's post steps applied in memory
@@ -426,6 +442,9 @@ func _store_manifest(manifest: Dictionary) -> void:
 	DirAccess.make_dir_recursive_absolute(
 		ProjectSettings.globalize_path(MANIFEST_PATH.get_base_dir()))
 	var fa := FileAccess.open(MANIFEST_PATH, FileAccess.WRITE)
+	if fa == null:
+		push_error("ArtGen: cannot write %s (err %d)" % [MANIFEST_PATH, FileAccess.get_open_error()])
+		return
 	fa.store_string(JSON.stringify(manifest, "\t") + "\n")
 	fa.close()
 

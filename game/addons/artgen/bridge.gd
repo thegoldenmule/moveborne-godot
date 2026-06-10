@@ -86,7 +86,7 @@ func _handle(conn: Dictionary) -> void:
 			result = service.status()
 		["GET", "/history"]:
 			var records: Array = service.get_history(query)
-			var limit := int(query.get("limit", "50"))
+			var limit := clampi(int(str(query.get("limit", "50"))), 1, 1000)
 			result = {"ok": true, "generations": _abs_files(records.slice(0, limit))}
 		["GET", "/get"]:
 			var rec: Dictionary = service.get_generation(str(query.get("id", "")))
