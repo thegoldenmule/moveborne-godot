@@ -18,10 +18,11 @@ const TAB_ICONS: Array[Texture2D] = [
 	preload("res://assets/generated/icons/settings_icon.svg"),
 ]
 const NAV_HEIGHT := 96.0
-const TAB_ICON_SIZE := 34
+const TAB_ICON_SIZE := 60
 const TAB_ICON_SELECTED_SCALE := 1.65
 const TAB_ICON_POP_Y := 16.0  # selected icon center, px below the bar's top edge
-const HOME_ICON_SIZE := 64
+const HOME_ICON_SIZE := 112
+const HOME_ICON_LIFT := 11.0  # home icon center, px above the button's center
 
 @onready var _content: Control = $Content
 @onready var _nav_layer: CanvasLayer = $NavLayer
@@ -124,14 +125,18 @@ func _ready() -> void:
 			_tab_icons.append(_make_tab_icon(b, TAB_ICONS[i]))
 			_tab_labels.append(_make_tab_label(b, TAB_LABELS[i]))
 
-	# Emphasize the center Home tab: wider share, icon-only (no label), bigger icon,
-	# and a pulsing additive violet halo behind it.
+	# Emphasize the center Home tab: wider share, icon-only (no label), an
+	# oversized overlay icon lifted to break the bar frame (a Button.icon would be
+	# clamped inside the button rect), and a pulsing additive violet halo behind it.
 	var home_btn: Button = _tabs[HOME_INDEX]
 	home_btn.size_flags_stretch_ratio = 1.5
-	home_btn.icon = TAB_ICONS[HOME_INDEX]
-	home_btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	home_btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
-	home_btn.add_theme_constant_override("icon_max_width", HOME_ICON_SIZE)
+	var home_ic := _make_tab_icon(home_btn, TAB_ICONS[HOME_INDEX])
+	home_ic.modulate = Color.WHITE
+	var hh := HOME_ICON_SIZE / 2.0
+	home_ic.offset_left = -hh
+	home_ic.offset_right = hh
+	home_ic.offset_top = -hh - HOME_ICON_LIFT
+	home_ic.offset_bottom = hh - HOME_ICON_LIFT
 	_add_home_glow(home_btn)
 
 	# Deferred: the icon tween targets read button sizes, which the HBoxContainer
@@ -250,11 +255,6 @@ func _style_nav_button(b: Button) -> void:
 	b.add_theme_color_override("font_hover_color", MbStyle.TEXT)
 	b.add_theme_color_override("font_pressed_color", MbStyle.TEXT)
 	b.add_theme_color_override("font_hover_pressed_color", MbStyle.TEXT)
-	# Icons are pre-colored (violet-on-black art); dim via alpha when unselected.
-	b.add_theme_color_override("icon_normal_color", Color(1, 1, 1, 0.55))
-	b.add_theme_color_override("icon_hover_color", Color(1, 1, 1, 0.8))
-	b.add_theme_color_override("icon_pressed_color", Color.WHITE)
-	b.add_theme_color_override("icon_hover_pressed_color", Color.WHITE)
 
 
 ## A soft violet halo behind the Home icon: oversized additive copies of the icon
@@ -279,9 +279,9 @@ func _add_home_glow(btn: Button) -> void:
 		glow.anchor_right = 0.5
 		glow.anchor_bottom = 0.5
 		glow.offset_left = -halo_size / 2.0
-		glow.offset_top = -halo_size / 2.0
+		glow.offset_top = -halo_size / 2.0 - HOME_ICON_LIFT
 		glow.offset_right = halo_size / 2.0
-		glow.offset_bottom = halo_size / 2.0
+		glow.offset_bottom = halo_size / 2.0 - HOME_ICON_LIFT
 		var tw := glow.create_tween().set_loops()
 		tw.tween_property(glow, "modulate:a", layer[1], 1.1) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
