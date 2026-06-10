@@ -18,12 +18,12 @@ config/icon="res://icon.svg"
 [autoload]
 
 Vfx="*res://scenes/vfx.gd"
-_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Anim="*res://scenes/anim.gd"
 Quality="*res://scenes/quality.gd"
 MbDebug="*res://game/mcp_game_api.gd"
 GameState="*res://ui/game_state.gd"
 UiRouter="*res://ui/router/app_router.gd"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
 
