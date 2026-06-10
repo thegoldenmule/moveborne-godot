@@ -440,6 +440,10 @@ func _on_load_preset() -> void:
 	var style: Variant = preset.get("style_id")
 	if style == null:
 		style = service.config.get("style_id")
+	# fill what generate() would actually send: an explicit style UUID on a
+	# style-less model (v4.x) would be refused, so resolve to "none" there
+	if not service.model_supports_styles(kind):
+		style = "none"
 	_style_id_edit.text = str(style) if style != null else ""
 	_size_edit.text = str(preset.get("size", "1024x1024"))
 	_controls_edit.text = JSON.stringify(preset["controls"]) \

@@ -56,7 +56,11 @@ func test_v41_dock_and_service() -> void:
 	assert_eq(str(p4.get("model")), "recraftv4_1_vector")
 	assert_false(p4.has("style_id"), "inherited style stripped on v4.1")
 	assert_false(p4.has("size"), "WxH size omitted for v4.1 vector")
-	var p3: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "tower"})
+	var pd: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "tower"})
+	assert_eq(str(pd.get("model")), "recraftv4_1_vector", "presets default to v4.1")
+	assert_false(pd.has("style_id"), "v4.1 default drops the style pin")
+	var p3: Dictionary = service.build_payload(
+		{"preset": "icon-flat", "subject": "tower", "model": "vector"})
 	assert_eq(str(p3.get("model")), "recraftv3_vector")
 	assert_eq(str(p3.get("style_id")), "19f7542f-0727-4f6f-9d07-728c439fc583")
 
@@ -70,10 +74,10 @@ func test_v41_dock_and_service() -> void:
 	dock._preset_option.selected = 0  # icon-flat (presets.json order)
 	dock._on_load_preset()
 	assert_eq(dock._prompt_override.text, str(icon_flat["prompt"]), "load fills prompt template")
-	assert_eq(dock._model_option.get_item_text(dock._model_option.selected), "vector",
+	assert_eq(dock._model_option.get_item_text(dock._model_option.selected), "vector_v41",
 		"load selects the preset's model kind")
-	assert_eq(dock._style_id_edit.text, "19f7542f-0727-4f6f-9d07-728c439fc583",
-		"load resolves the config default style")
+	assert_eq(dock._style_id_edit.text, "none",
+		"load resolves style to 'none' on a style-less (v4.x) model")
 	assert_eq(dock._size_edit.text, "1024x1024", "load fills size")
 	assert_eq(JSON.parse_string(dock._controls_edit.text), icon_flat["controls"],
 		"load fills controls JSON")

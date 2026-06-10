@@ -2,7 +2,7 @@
 	"version": 1,
 	"presets": {
 		"icon-flat": {
-			"model": "vector",
+			"model": "vector_v41",
 			"style_id": null,
 			"size": "1024x1024",
 			"prompt": "{subject} glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
@@ -13,7 +13,7 @@
 			"post": ["strip_bg_rect"]
 		},
 		"icon-raster": {
-			"model": "raster",
+			"model": "raster_v41",
 			"style_id": "none",
 			"size": "1024x1024",
 			"prompt": "{subject} glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
@@ -24,7 +24,7 @@
 			"post": ["removeBackground"]
 		},
 		"card-glyph": {
-			"model": "vector",
+			"model": "vector_v41",
 			"style_id": "89aedef2-2411-42fc-aa8b-aec391b51bc7",
 			"size": "1024x1024",
 			"prompt": "tarot card design, {subject}, single wireframe glyph inside a rounded-rectangle card frame with a name banner, flat violet line art on black, occult acid graphics style, no gradients, no glow, no shading",
@@ -35,7 +35,7 @@
 			"post": []
 		},
 		"card-illustrated": {
-			"model": "vector",
+			"model": "vector_v41",
 			"style_id": "89aedef2-2411-42fc-aa8b-aec391b51bc7",
 			"size": "1024x1024",
 			"prompt": "illustrated tarot card, {subject}, ornamental border and roman numeral header, flat violet line art on black, occult memento mori skeleton tarot pastiche, no gradients, no glow, no shading",
@@ -46,7 +46,7 @@
 			"post": []
 		},
 		"texture": {
-			"model": "raster",
+			"model": "raster_v41",
 			"style_id": "none",
 			"size": "1024x1024",
 			"prompt": "{subject} seamless dark grunge screen-print texture, near-black with subtle dust, press streaks and paper scuffs, monochrome, no gradients, no recognizable objects",

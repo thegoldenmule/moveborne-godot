@@ -33,10 +33,11 @@ const TOOLS = [
     description:
       "Generate images via Recraft in the occult-arcade style. Returns ledger records " +
       "with abs_path for each image so they can be read straight off disk. " +
-      "Presets: icon-flat (SVG, default custom style, bg stripped on save), icon-raster " +
+      "Presets: icon-flat (SVG, bg stripped on save), icon-raster " +
       "(PNG + removeBackground on save), card-glyph, card-illustrated, texture. " +
-      "All presets default to Recraft v3; pass model 'vector_v41'/'raster_v41' for " +
-      "Recraft v4.1 (custom styles + negative_prompt are v3-only and dropped on v4.x).",
+      "All presets default to Recraft v4.1; pass model 'vector'/'raster' for v3, " +
+      "which is required for custom styles (v3-only; preset style pins are dropped " +
+      "on v4.x, as is negative_prompt).",
     inputSchema: {
       type: "object",
       properties: {

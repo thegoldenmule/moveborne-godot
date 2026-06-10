@@ -92,17 +92,22 @@ func _run() -> void:
 		"unknown preset refused without API call")
 
 	# -- build_payload model-family rules (offline, pure) ------------------------
-	# the v3 default path must stay byte-identical to the pre-v4.1 construction
-	var p3: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "trophy"})
+	# presets default to v4.1: style + WxH size dropped for the vector model
+	var pd: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "trophy"})
+	ok = _check(ok, pd["model"] == "recraftv4_1_vector" and not pd.has("style_id")
+		and not pd.has("size"), "presets default to v4.1")
+	# the v3 path (explicit kind) must stay byte-identical to the pre-v4.1 construction
+	var p3: Dictionary = service.build_payload(
+		{"preset": "icon-flat", "subject": "trophy", "model": "vector"})
 	ok = _check(ok, p3 == {
 		"prompt": str(service.presets["icon-flat"]["prompt"]).replace("{subject}", "trophy"),
 		"model": "recraftv3_vector", "n": 1, "size": "1024x1024",
 		"response_format": "b64_json",
 		"style_id": "19f7542f-0727-4f6f-9d07-728c439fc583",
 		"controls": service.presets["icon-flat"]["controls"],
-	}, "v3 default payload unchanged")
-	var p3n: Dictionary = service.build_payload(
-		{"preset": "icon-flat", "subject": "trophy", "negative_prompt": "blurry"})
+	}, "v3 payload (explicit kind) unchanged")
+	var p3n: Dictionary = service.build_payload({"preset": "icon-flat",
+		"subject": "trophy", "model": "vector", "negative_prompt": "blurry"})
 	ok = _check(ok, p3n.get("negative_prompt") == "blurry", "v3 keeps negative_prompt")
 
 	# overrides: prompt substitutes {subject}; controls beats the preset's
