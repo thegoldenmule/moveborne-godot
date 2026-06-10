@@ -95,6 +95,8 @@ func test_v41_dock_and_service() -> void:
 	dock._subject_edit.text = ""
 	dock._update_prompt_preview()
 
+	assert_true(dock._reveal_btn.disabled, "Reveal disabled without a selection")
+
 	var bad_headers := 0
 	for i in grouped.size():
 		var first: Dictionary = grouped[i]["records"][0]

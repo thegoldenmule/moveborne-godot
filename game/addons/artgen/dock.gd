@@ -37,6 +37,7 @@ var _name_edit: LineEdit
 var _save_btn: Button
 var _iterate_btn: Button
 var _more_btn: Button
+var _reveal_btn: Button
 var _discard_btn: Button
 
 var _settings: AcceptDialog
@@ -274,6 +275,11 @@ func _build_detail() -> Control:
 	_more_btn.text = "More variations"
 	_more_btn.pressed.connect(_on_more_variations)
 	action_row.add_child(_more_btn)
+	_reveal_btn = Button.new()
+	_reveal_btn.text = "Reveal"
+	_reveal_btn.tooltip_text = "show the generated file in Finder"
+	_reveal_btn.pressed.connect(_on_reveal)
+	action_row.add_child(_reveal_btn)
 	_discard_btn = Button.new()
 	_discard_btn.text = "Discard"
 	_discard_btn.pressed.connect(_on_discard)
@@ -414,6 +420,15 @@ func _on_more_variations() -> void:
 	_status_label.text = "generating…"
 	await service.generate(opts)
 	_refresh_status()
+
+
+func _on_reveal() -> void:
+	if _selected_id.is_empty():
+		return
+	var rec: Dictionary = service.get_generation(_selected_id)
+	if rec.get("file") == null:
+		return
+	OS.shell_show_in_file_manager(service.repo_root.path_join(str(rec["file"])), true)
 
 
 func _on_discard() -> void:
@@ -629,7 +644,7 @@ func _refresh_detail() -> void:
 
 
 func _set_detail_enabled(enabled: bool) -> void:
-	for btn in [_save_btn, _iterate_btn, _more_btn, _discard_btn]:
+	for btn in [_save_btn, _iterate_btn, _more_btn, _reveal_btn, _discard_btn]:
 		btn.disabled = not enabled
 
 
