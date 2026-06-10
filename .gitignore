@@ -1,4 +1,5 @@
 .DS_Store
+.env
 
 # Source PSDs are too large for git (531 MB)
 art/*.psd
