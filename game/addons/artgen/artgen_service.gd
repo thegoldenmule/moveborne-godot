@@ -207,7 +207,8 @@ func generate(opts: Dictionary) -> Dictionary:
 
 	var ts := _now_iso()
 	var base_event := {
-		"type": "generation", "id": "", "ts": ts, "provider": "recraft",
+		"type": "generation", "id": "", "batch_id": _new_id("b"), "ts": ts,
+		"provider": "recraft",
 		"model": payload["model"], "style_id": payload.get("style_id"), "style": null,
 		"preset": preset_name, "subject": subject, "prompt": payload["prompt"],
 		"negative_prompt": payload.get("negative_prompt"), "size": payload.get("size"),
@@ -563,7 +564,13 @@ func _load_json_into(path: String, target: Dictionary) -> void:
 
 
 func _new_gen_id() -> String:
-	return "g_%d_%s" % [
+	return _new_id("g")
+
+
+## One batch_id is stamped per generate() call (all n variation records share
+## it), which is what the gallery groups on.
+func _new_id(prefix: String) -> String:
+	return "%s_%d_%s" % [prefix,
 		int(Time.get_unix_time_from_system()),
 		Crypto.new().generate_random_bytes(2).hex_encode()]
 

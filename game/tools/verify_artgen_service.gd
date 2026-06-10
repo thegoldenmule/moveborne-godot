@@ -23,12 +23,12 @@ func _run() -> void:
 		DirAccess.remove_absolute(tmp_ledger)
 
 	# -- fold ------------------------------------------------------------------
-	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_1", "ts": "t1",
-		"preset": "icon-flat", "subject": "trophy", "prompt": "p1", "status": "ok",
-		"parent_id": null, "file": "art/generated/x/g_1.svg", "post": []})
-	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_2", "ts": "t2",
-		"preset": "icon-flat", "subject": "gear", "prompt": "p2", "status": "ok",
-		"parent_id": "g_1", "file": "art/generated/x/g_2.svg", "post": []})
+	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_1", "batch_id": "b_1",
+		"ts": "t1", "preset": "icon-flat", "subject": "trophy", "prompt": "p1",
+		"status": "ok", "parent_id": null, "file": "art/generated/x/g_1.svg", "post": []})
+	LedgerT.append(tmp_ledger, {"type": "generation", "id": "g_2", "batch_id": "b_2",
+		"ts": "t2", "preset": "icon-flat", "subject": "gear", "prompt": "p2",
+		"status": "ok", "parent_id": "g_1", "file": "art/generated/x/g_2.svg", "post": []})
 	LedgerT.append(tmp_ledger, {"type": "save", "gen_id": "g_1", "ts": "t3",
 		"dest": "res://assets/generated/icons/trophy.svg", "sha256": "abc"})
 	LedgerT.append(tmp_ledger, {"type": "discard", "gen_id": "g_2", "ts": "t4"})
@@ -41,6 +41,7 @@ func _run() -> void:
 	ok = _check(ok, idx["generations"]["g_1"]["dest"] == "res://assets/generated/icons/trophy.svg",
 		"g_1 carries dest")
 	ok = _check(ok, idx["generations"]["g_2"]["state"] == "discarded", "g_2 folds to discarded")
+	ok = _check(ok, idx["generations"]["g_1"]["batch_id"] == "b_1", "batch_id folds through")
 	ok = _check(ok, idx["styles"].size() == 1 and idx["styles"][0]["style_id"] == "s-1",
 		"style event folds")
 
