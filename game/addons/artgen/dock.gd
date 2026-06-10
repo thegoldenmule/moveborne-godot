@@ -31,7 +31,10 @@ var _detail_box: VBoxContainer
 var _preview_panel: PanelContainer
 var _preview_rect: TextureRect
 var _checker_toggle: CheckButton
-var _meta_label: RichTextLabel
+var _usage_label: Label
+var _params_toggle: Button
+var _params_label: RichTextLabel
+var _save_row: HBoxContainer
 var _category_option: OptionButton
 var _name_edit: LineEdit
 var _save_btn: Button
@@ -247,24 +250,39 @@ func _build_detail() -> Control:
 	_checker_toggle.toggled.connect(func(_on: bool) -> void: _refresh_detail())
 	_detail_box.add_child(_checker_toggle)
 
-	_meta_label = RichTextLabel.new()
-	_meta_label.fit_content = true
-	_meta_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_meta_label.selection_enabled = true
-	_detail_box.add_child(_meta_label)
+	_usage_label = Label.new()
+	_usage_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail_box.add_child(_usage_label)
 
-	var save_row := HBoxContainer.new()
+	_params_toggle = Button.new()
+	_params_toggle.toggle_mode = true
+	_params_toggle.flat = true
+	_params_toggle.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_params_toggle.text = "▸ Parameters"
+	_params_toggle.toggled.connect(func(on: bool) -> void:
+		_params_label.visible = on
+		_params_toggle.text = "▾ Parameters" if on else "▸ Parameters")
+	_detail_box.add_child(_params_toggle)
+
+	_params_label = RichTextLabel.new()
+	_params_label.selection_enabled = true
+	_params_label.visible = false
+	_params_label.custom_minimum_size.y = 80
+	_params_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_detail_box.add_child(_params_label)
+
+	_save_row = HBoxContainer.new()
 	_category_option = OptionButton.new()
-	save_row.add_child(_category_option)
+	_save_row.add_child(_category_option)
 	_name_edit = LineEdit.new()
 	_name_edit.placeholder_text = "asset name"
 	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	save_row.add_child(_name_edit)
+	_save_row.add_child(_name_edit)
 	_save_btn = Button.new()
 	_save_btn.text = "Save"
 	_save_btn.pressed.connect(_on_save)
-	save_row.add_child(_save_btn)
-	_detail_box.add_child(save_row)
+	_save_row.add_child(_save_btn)
+	_detail_box.add_child(_save_row)
 
 	var action_row := HBoxContainer.new()
 	_iterate_btn = Button.new()
@@ -628,17 +646,31 @@ func _refresh_detail() -> void:
 	var img: Image = service.preview_image(_selected_id, _checker_toggle.button_pressed)
 	_preview_rect.texture = ImageTexture.create_from_image(img) if img != null else null
 
+	var saved := str(rec.get("state")) == "saved"
+	if saved:
+		_usage_label.text = "in game → " + str(rec.get("dest"))
+		_usage_label.add_theme_color_override("font_color", Color(0.75, 0.55, 1.0))
+	else:
+		_usage_label.text = "not used in game"
+		_usage_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	_save_row.visible = not saved
+
 	var lineage_text := ""
 	for parent in rec.get("lineage", []):
 		lineage_text += " ← " + str(parent["id"])
-	_meta_label.text = (
-		"[b]%s[/b]  (%s)\npreset: %s   model: %s\nsubject: %s\nprompt: %s\n"
-		+ "cost: %s units   post: %s%s%s") % [
-		rec["id"], rec.get("state"), rec.get("preset"), rec.get("model"),
-		rec.get("subject"), str(rec.get("prompt")).left(220),
-		rec.get("cost_units"), str(rec.get("post")),
-		("\nsaved → " + str(rec.get("dest"))) if rec.get("state") == "saved" else "",
-		("\nlineage: " + lineage_text.trim_prefix(" ← ")) if not lineage_text.is_empty() else ""]
+	var lines := PackedStringArray()
+	lines.append("state: %s" % rec.get("state"))
+	lines.append("preset: %s" % rec.get("preset"))
+	lines.append("model: %s" % rec.get("model"))
+	lines.append("subject: %s" % rec.get("subject"))
+	lines.append("prompt: %s" % rec.get("prompt"))
+	lines.append("style: %s" % (rec.get("style_id") if rec.get("style_id") != null else "none"))
+	lines.append("size: %s" % (rec.get("size") if rec.get("size") != null else "auto"))
+	lines.append("cost: %s units" % rec.get("cost_units"))
+	lines.append("post: %s" % str(rec.get("post")))
+	if not lineage_text.is_empty():
+		lines.append("lineage: " + lineage_text.trim_prefix(" ← "))
+	_params_label.text = "\n".join(lines)
 	if _name_edit.text.is_empty():
 		_name_edit.text = str(rec.get("subject", "")).replace(" ", "_")
 

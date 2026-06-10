@@ -97,6 +97,22 @@ func test_v41_dock_and_service() -> void:
 
 	assert_true(dock._reveal_btn.disabled, "Reveal disabled without a selection")
 
+	# detail pane: usage line + save row visibility track the saved state;
+	# parameters start collapsed
+	var saved_recs: Array = service.get_history({"state": "saved"})
+	assert_true(saved_recs.size() > 0, "ledger has a saved generation")
+	dock._select(str(saved_recs[0]["id"]))
+	assert_false(dock._params_label.visible, "parameters default collapsed")
+	assert_true(dock._usage_label.text.begins_with("in game → res://"),
+		"saved record shows in-game path")
+	assert_false(dock._save_row.visible, "save controls hidden when already saved")
+	var fresh: Array = service.get_history({"state": "generated"})
+	assert_true(fresh.size() > 0, "ledger has an unsaved generation")
+	dock._select(str(fresh[0]["id"]))
+	assert_eq(dock._usage_label.text, "not used in game", "unsaved record marked not in game")
+	assert_true(dock._save_row.visible, "save controls shown when unsaved")
+	dock._selected_id = ""
+
 	var bad_headers := 0
 	for i in grouped.size():
 		var first: Dictionary = grouped[i]["records"][0]
