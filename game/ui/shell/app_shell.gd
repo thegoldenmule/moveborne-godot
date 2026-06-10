@@ -134,6 +134,16 @@ func _ready() -> void:
 func _select_tab(index: int) -> void:
 	for i in range(_screens.size()):
 		_screens[i].visible = (i == index)
+	# Label only on the selected tab; unselected tabs are icon-only, re-centered.
+	# (Home is always icon-only — its glow is the emphasis.)
+	for i in range(_tabs.size()):
+		if i == HOME_INDEX:
+			continue
+		var b: Button = _tabs[i]
+		var selected := (i == index)
+		b.text = TAB_LABELS[i] if selected else ""
+		b.vertical_icon_alignment = \
+			VERTICAL_ALIGNMENT_TOP if selected else VERTICAL_ALIGNMENT_CENTER
 
 
 func _on_play_mode_selected(cfg: Dictionary) -> void:
