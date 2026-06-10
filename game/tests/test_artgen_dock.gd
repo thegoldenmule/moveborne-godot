@@ -65,6 +65,32 @@ func test_v41_dock_and_service() -> void:
 	var grouped: Array = service.get_history_grouped({})
 	assert_eq(dock._gallery_list.get_child_count(), grouped.size(),
 		"one gallery block per batch")
+	# Load fills every compose field from the preset; preview tracks subject
+	var icon_flat: Dictionary = service.presets["icon-flat"]
+	dock._preset_option.selected = 0  # icon-flat (presets.json order)
+	dock._on_load_preset()
+	assert_eq(dock._prompt_override.text, str(icon_flat["prompt"]), "load fills prompt template")
+	assert_eq(dock._model_option.get_item_text(dock._model_option.selected), "vector",
+		"load selects the preset's model kind")
+	assert_eq(dock._style_id_edit.text, "19f7542f-0727-4f6f-9d07-728c439fc583",
+		"load resolves the config default style")
+	assert_eq(dock._size_edit.text, "1024x1024", "load fills size")
+	assert_eq(JSON.parse_string(dock._controls_edit.text), icon_flat["controls"],
+		"load fills controls JSON")
+	assert_eq(dock._post_edit.text, "strip_bg_rect", "load fills post steps")
+	dock._subject_edit.text = "crystal ball"
+	dock._update_prompt_preview()
+	assert_eq(dock._prompt_preview.text,
+		str(icon_flat["prompt"]).replace("{subject}", "crystal ball"),
+		"live preview substitutes the subject")
+	dock._prompt_override.text = "custom {subject} prompt"
+	dock._update_prompt_preview()
+	assert_eq(dock._prompt_preview.text, "custom crystal ball prompt",
+		"preview follows an edited prompt template")
+	dock._prompt_override.text = ""
+	dock._subject_edit.text = ""
+	dock._update_prompt_preview()
+
 	var bad_headers := 0
 	for i in grouped.size():
 		var first: Dictionary = grouped[i]["records"][0]

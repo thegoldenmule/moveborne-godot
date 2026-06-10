@@ -10,12 +10,14 @@ var service: Node
 var _preset_option: OptionButton
 var _subject_edit: LineEdit
 var _n_spin: SpinBox
-var _advanced_toggle: CheckButton
-var _advanced_box: VBoxContainer
 var _prompt_override: TextEdit
+var _prompt_preview: Label
 var _model_option: OptionButton
 var _model_note: Label
 var _style_id_edit: LineEdit
+var _size_edit: LineEdit
+var _controls_edit: LineEdit
+var _post_edit: LineEdit
 var _parent_label: Label
 var _generate_btn: Button
 var _status_label: Label
@@ -63,6 +65,7 @@ func _ready() -> void:
 		service.generation_failed.connect(_on_generation_failed)
 		_populate_presets()
 		_populate_models()
+		_update_prompt_preview()
 		_refresh_gallery()
 		_refresh_status()
 
@@ -102,8 +105,12 @@ func _build_ui() -> void:
 
 
 func _build_compose() -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size.x = 300
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var box := VBoxContainer.new()
-	box.custom_minimum_size.x = 300
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(box)
 
 	var title_row := HBoxContainer.new()
 	var title := Label.new()
@@ -116,12 +123,57 @@ func _build_compose() -> Control:
 	title_row.add_child(gear)
 	box.add_child(title_row)
 
+	var preset_row := HBoxContainer.new()
 	_preset_option = OptionButton.new()
-	box.add_child(_label_wrap("Preset", _preset_option))
+	_preset_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_preset_option.item_selected.connect(func(_i: int) -> void: _update_prompt_preview())
+	preset_row.add_child(_preset_option)
+	var load_btn := Button.new()
+	load_btn.text = "Load"
+	load_btn.tooltip_text = "fill every field below from the preset; edit anything before generating"
+	load_btn.pressed.connect(_on_load_preset)
+	preset_row.add_child(load_btn)
+	box.add_child(_label_wrap("Preset", preset_row))
 
 	_subject_edit = LineEdit.new()
 	_subject_edit.placeholder_text = "e.g. leaderboard trophy"
+	_subject_edit.text_changed.connect(func(_t: String) -> void: _update_prompt_preview())
 	box.add_child(_label_wrap("Subject", _subject_edit))
+
+	_prompt_override = TextEdit.new()
+	_prompt_override.custom_minimum_size.y = 60
+	_prompt_override.placeholder_text = "prompt template (blank = preset's; {subject} substitutes)"
+	_prompt_override.text_changed.connect(_update_prompt_preview)
+	box.add_child(_label_wrap("Prompt", _prompt_override))
+
+	_prompt_preview = Label.new()
+	_prompt_preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_prompt_preview.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
+	box.add_child(_label_wrap("Full prompt", _prompt_preview))
+
+	_model_option = OptionButton.new()
+	_model_option.add_item("preset")  # real kinds come from config via _populate_models
+	_model_option.item_selected.connect(func(_i: int) -> void: _update_model_note())
+	box.add_child(_label_wrap("Model", _model_option))
+	_model_note = Label.new()
+	_model_note.visible = false
+	box.add_child(_model_note)
+
+	_style_id_edit = LineEdit.new()
+	_style_id_edit.placeholder_text = "style_id override / 'none'"
+	box.add_child(_label_wrap("Style id", _style_id_edit))
+
+	_size_edit = LineEdit.new()
+	_size_edit.placeholder_text = "WxH, blank = preset"
+	box.add_child(_label_wrap("Size", _size_edit))
+
+	_controls_edit = LineEdit.new()
+	_controls_edit.placeholder_text = "controls JSON, blank = preset"
+	box.add_child(_label_wrap("Controls", _controls_edit))
+
+	_post_edit = LineEdit.new()
+	_post_edit.placeholder_text = "post steps, comma-separated, blank = preset"
+	box.add_child(_label_wrap("Post", _post_edit))
 
 	_n_spin = SpinBox.new()
 	_n_spin.min_value = 1
@@ -129,31 +181,9 @@ func _build_compose() -> Control:
 	_n_spin.value = 2
 	box.add_child(_label_wrap("Variations", _n_spin))
 
-	_advanced_toggle = CheckButton.new()
-	_advanced_toggle.text = "Advanced"
-	_advanced_toggle.toggled.connect(func(on: bool) -> void: _advanced_box.visible = on)
-	box.add_child(_advanced_toggle)
-
-	_advanced_box = VBoxContainer.new()
-	_advanced_box.visible = false
-	_prompt_override = TextEdit.new()
-	_prompt_override.custom_minimum_size.y = 60
-	_prompt_override.placeholder_text = "full prompt override (blank = preset template)"
-	_advanced_box.add_child(_label_wrap("Prompt", _prompt_override))
-	_model_option = OptionButton.new()
-	_model_option.add_item("preset")  # real kinds come from config via _populate_models
-	_model_option.item_selected.connect(func(_i: int) -> void: _update_model_note())
-	_advanced_box.add_child(_label_wrap("Model", _model_option))
-	_model_note = Label.new()
-	_model_note.visible = false
-	_advanced_box.add_child(_model_note)
-	_style_id_edit = LineEdit.new()
-	_style_id_edit.placeholder_text = "style_id override / 'none'"
-	_advanced_box.add_child(_label_wrap("Style id", _style_id_edit))
 	_parent_label = Label.new()
 	_parent_label.text = ""
-	_advanced_box.add_child(_parent_label)
-	box.add_child(_advanced_box)
+	box.add_child(_parent_label)
 
 	_generate_btn = Button.new()
 	_generate_btn.text = "Generate"
@@ -164,7 +194,7 @@ func _build_compose() -> Control:
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status_label.text = ""
 	box.add_child(_status_label)
-	return box
+	return scroll
 
 
 func _build_gallery() -> Control:
@@ -311,6 +341,20 @@ func _on_generate() -> void:
 		opts["model"] = _model_option.get_item_text(_model_option.selected)
 	if not _style_id_edit.text.strip_edges().is_empty():
 		opts["style_id"] = _style_id_edit.text.strip_edges()
+	if not _size_edit.text.strip_edges().is_empty():
+		opts["size"] = _size_edit.text.strip_edges()
+	if not _controls_edit.text.strip_edges().is_empty():
+		var controls: Variant = JSON.parse_string(_controls_edit.text)
+		if typeof(controls) != TYPE_DICTIONARY:
+			_status_label.text = "error: controls must be a JSON object"
+			return
+		opts["controls"] = controls
+	if not _post_edit.text.strip_edges().is_empty():
+		var steps: Array = []
+		for step in _post_edit.text.split(","):
+			if not step.strip_edges().is_empty():
+				steps.append(step.strip_edges())
+		opts["post"] = steps
 	if not _parent_id.is_empty():
 		opts["parent_id"] = _parent_id
 
@@ -351,13 +395,12 @@ func _on_iterate() -> void:
 	var rec: Dictionary = service.get_generation(_selected_id)
 	_parent_id = _selected_id
 	_parent_label.text = "iterating on " + _selected_id
-	_advanced_toggle.button_pressed = true
-	_advanced_box.visible = true
 	_prompt_override.text = str(rec.get("prompt", ""))
 	_subject_edit.text = str(rec.get("subject", ""))
 	for i in _preset_option.item_count:
 		if _preset_option.get_item_text(i) == str(rec.get("preset", "")):
 			_preset_option.selected = i
+	_update_prompt_preview()
 
 
 func _on_more_variations() -> void:
@@ -379,6 +422,44 @@ func _on_discard() -> void:
 		return
 	service.discard_generation(_selected_id)
 	_refresh_detail()
+
+
+## Fill every compose field from the selected preset (style_id resolves the
+## config default so the actual UUID is visible); all stay editable.
+func _on_load_preset() -> void:
+	var preset_name := _preset_option.get_item_text(_preset_option.selected)
+	var preset: Dictionary = service.presets.get(preset_name, {})
+	if preset.is_empty():
+		return
+	_prompt_override.text = str(preset.get("prompt", ""))
+	var kind := str(preset.get("model", "vector"))
+	for i in _model_option.item_count:
+		if _model_option.get_item_text(i) == kind:
+			_model_option.selected = i
+			break
+	var style: Variant = preset.get("style_id")
+	if style == null:
+		style = service.config.get("style_id")
+	_style_id_edit.text = str(style) if style != null else ""
+	_size_edit.text = str(preset.get("size", "1024x1024"))
+	_controls_edit.text = JSON.stringify(preset["controls"]) \
+			if preset.get("controls") != null else ""
+	var steps := PackedStringArray()
+	for step in preset.get("post", []):
+		steps.append(str(step))
+	_post_edit.text = ", ".join(steps)
+	_update_model_note()
+	_update_prompt_preview()
+
+
+## Live render of the prompt that will actually be sent: the prompt field
+## (or the preset template when blank) with {subject} substituted.
+func _update_prompt_preview() -> void:
+	var template := _prompt_override.text.strip_edges()
+	if template.is_empty() and service != null and _preset_option.selected >= 0:
+		var preset_name := _preset_option.get_item_text(_preset_option.selected)
+		template = str(service.presets.get(preset_name, {}).get("prompt", "{subject}"))
+	_prompt_preview.text = template.replace("{subject}", _subject_edit.text)
 
 
 func _open_settings() -> void:

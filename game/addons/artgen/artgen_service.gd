@@ -127,8 +127,10 @@ func build_payload(opts: Dictionary) -> Dictionary:
 	var preset: Dictionary = presets[preset_name]
 
 	var subject := str(opts.get("subject", ""))
-	var prompt := str(opts.get("prompt", "")) if opts.get("prompt") else \
-			str(preset.get("prompt", "{subject}")).replace("{subject}", subject)
+	# {subject} substitutes in overridden prompts too, so a preset template
+	# loaded into the dock's prompt field keeps its placeholder live
+	var prompt := (str(opts.get("prompt", "")) if opts.get("prompt") else \
+			str(preset.get("prompt", "{subject}"))).replace("{subject}", subject)
 	var model_kind := str(opts.get("model", "")) if opts.get("model") else \
 			str(preset.get("model", "vector"))
 	var model: String = config.get("models", {}).get(model_kind, model_kind)
@@ -157,8 +159,9 @@ func build_payload(opts: Dictionary) -> Dictionary:
 			return {"ok": false, "error": ("custom styles are v2/v3-only; %s rejects " +
 				"style_id (use a v3 model kind, or style_id 'none')") % model}
 		# else: preset/config-inherited style — silently omitted for v4.x
-	if preset.get("controls") != null:
-		payload["controls"] = preset["controls"]
+	var controls: Variant = opts.get("controls", preset.get("controls"))
+	if controls != null:
+		payload["controls"] = controls
 	if opts.get("negative_prompt") and caps.get("supports_negative_prompt", true):
 		payload["negative_prompt"] = str(opts["negative_prompt"])
 	return payload
@@ -214,7 +217,8 @@ func generate(opts: Dictionary) -> Dictionary:
 		"negative_prompt": payload.get("negative_prompt"), "size": payload.get("size"),
 		"n": n, "n_index": 0, "controls": payload.get("controls"),
 		"random_seed": null, "parent_id": opts.get("parent_id"), "image_id": null,
-		"file": null, "post": preset.get("post", []), "cost_units": 0, "status": "ok",
+		"file": null, "post": opts.get("post", preset.get("post", [])),
+		"cost_units": 0, "status": "ok",
 	}
 	if not resp.get("ok", false):
 		var msg := str(resp.get("error", "unknown error"))

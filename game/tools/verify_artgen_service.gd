@@ -105,6 +105,15 @@ func _run() -> void:
 		{"preset": "icon-flat", "subject": "trophy", "negative_prompt": "blurry"})
 	ok = _check(ok, p3n.get("negative_prompt") == "blurry", "v3 keeps negative_prompt")
 
+	# overrides: prompt substitutes {subject}; controls beats the preset's
+	var po: Dictionary = service.build_payload(
+		{"preset": "icon-flat", "subject": "orb", "prompt": "make a {subject} now"})
+	ok = _check(ok, po["prompt"] == "make a orb now", "override prompt substitutes subject")
+	var co: Dictionary = service.build_payload({"preset": "icon-flat", "subject": "orb",
+		"controls": {"background_color": {"rgb": [10, 20, 30]}}})
+	ok = _check(ok, co["controls"] == {"background_color": {"rgb": [10, 20, 30]}},
+		"controls override beats preset controls")
+
 	# v4.1: inherited style + negative_prompt stripped, controls kept, WxH dropped (vector)
 	var p4: Dictionary = service.build_payload({"preset": "card-glyph",
 		"subject": "the tower", "model": "vector_v41", "negative_prompt": "blurry"})
