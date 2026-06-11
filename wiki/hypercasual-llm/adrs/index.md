@@ -27,3 +27,4 @@ The remaining records cover backend scope, the presentation and rendering approa
 - **Ungrouped**
   - [Adopt Snapser as the online backend, replacing Nakama](decision-record:mq74gj5v-000c-9ta022)
   - [Authenticate BYOSnap requests by trusting gateway-stamped User-Id, not signatures](decision-record:mq74gkil-000e-cwpjw6)
+  - [Script-driven multi-platform export; commit presets, defer CI](decision-record:mq9lly17-00a5-ljnwnw)

@@ -14,7 +14,7 @@ Deliver the full Moveborne single-player experience natively in Godot while pres
 The port is organized so logic never depends on the scene tree: `input → action → engine (pure) → new state + hash → scenes render`, with `net/` confirming each move against the validator when online.
 
 ## Design notes
-_No design notes._
+Packaging the client for distribution (committed export presets plus a tools/build.sh driver that builds any one platform, any subset, or all five) is documented in the Build and Distribution subsystem page.
 
 ## Components
 - [Determinism Primitives](architecture:mq1c2syb-000l-6okg54)
@@ -23,10 +23,12 @@ _No design notes._
 - [Validator Client](architecture:mq1c2wgh-000r-sjn10a)
 - [Presentation &amp; VFX](architecture:mq1c2xsl-000t-8j2hqc)
 - [Editor Tools](architecture:mq8hyn2w-000i-cryytk)
+- [Build &amp; Distribution](architecture:mq9llv7f-00a3-c5f96m)
 
 ## Dependencies
 - **calls** → [Validator](architecture:mq1c2ixi-000h-kd018q) — Online play: validates every move against the Validator over Socket.IO (via net/).
 - **depends-on** → [Server](architecture:mq1c2nid-000j-6cf0hr) — Nakama match creation / authoritative submission — omitted in this single-player port (DEV_MODE).
+- **owns** → [Build &amp; Distribution](architecture:mq9llv7f-00a3-c5f96m) — Build & Distribution — export presets + build.sh for macOS/Windows/Web/iOS/Android.
 
 ## Code references
 - class `MbEngine` in `game/logic/engine.gd`
