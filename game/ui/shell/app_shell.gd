@@ -22,12 +22,73 @@ const TAB_ICONS: Array[Texture2D] = [
 	preload("res://assets/generated/icons/guilds_icon.svg"),
 	preload("res://assets/generated/icons/settings_icon.svg"),
 ]
-const NAV_HEIGHT := 96.0
-const TAB_ICON_SIZE := 60
-const TAB_ICON_SELECTED_SCALE := 1.65
-const TAB_ICON_POP_Y := 16.0  # selected icon center, px below the bar's top edge
-const HOME_ICON_SIZE := 112
-const HOME_ICON_LIFT := 11.0  # home icon center, px above the button's center
+# Layout/look knobs are @export so they can be tuned in the Inspector at edit time
+# and live in the Remote scene tree while the game runs. Each setter re-applies its
+# effect immediately (guarded so it no-ops before the nav is built), so dragging a
+# value in the Remote inspector reflows the bar/icons/halo without a restart.
+
+@export_group("Nav Bar")
+@export var nav_height: float = 96.0:
+	set(value):
+		nav_height = value
+		if is_node_ready():
+			_apply_safe_area()
+			_layout_content()
+
+@export_group("Side Tabs")
+## Base (unselected) side-tab icon size, in px.
+@export var tab_icon_size: int = 60:
+	set(value):
+		tab_icon_size = value
+		if is_node_ready():
+			_apply_tab_icon_geometry()
+			_select_tab(_current_tab)
+## How much the selected side-tab icon grows (1.0 = no growth).
+@export var tab_icon_selected_scale: float = 1.65:
+	set(value):
+		tab_icon_selected_scale = value
+		if is_node_ready():
+			_select_tab(_current_tab)
+## Selected side-tab icon center, px below the bar's top edge (the upward "pop").
+@export var tab_icon_pop_y: float = 16.0:
+	set(value):
+		tab_icon_pop_y = value
+		if is_node_ready():
+			_select_tab(_current_tab)
+
+@export_group("Home Tab")
+## Home icon size when selected, in px.
+@export var home_icon_size: int = 96:
+	set(value):
+		home_icon_size = value
+		_apply_home_icon_geometry()
+		if is_node_ready():
+			_select_tab(_current_tab)
+## Home icon center, px above the button's center (the upward "pop" when selected).
+@export var home_icon_lift: float = 11.0:
+	set(value):
+		home_icon_lift = value
+		_apply_home_icon_geometry()
+		if is_node_ready():
+			_select_tab(_current_tab)
+## Unselected Home shrinks to this fraction of home_icon_size (~side-tab size at 0.62).
+@export var home_icon_base_scale: float = 0.62:
+	set(value):
+		home_icon_base_scale = value
+		if is_node_ready():
+			_select_tab(_current_tab)
+
+@export_group("Home Glow")
+## Inner halo extent as a multiple of the home icon size.
+@export var home_glow_inner_spread: float = 1.25:
+	set(value):
+		home_glow_inner_spread = value
+		_apply_home_icon_geometry()
+## Outer halo extent as a multiple of the home icon size.
+@export var home_glow_outer_spread: float = 1.6:
+	set(value):
+		home_glow_outer_spread = value
+		_apply_home_icon_geometry()
 
 @onready var _content: Control = $Content
 @onready var _nav_layer: CanvasLayer = $NavLayer
@@ -46,6 +107,8 @@ var _tab_icons: Array = []   # TextureRect per side tab (null at HOME_INDEX)
 var _tab_labels: Array = []  # Label per side tab (null at HOME_INDEX)
 var _current_tab := HOME_INDEX
 var _bg: ColorRect
+var _home_icon: TextureRect       # center Home overlay icon (size driven by home_icon_size)
+var _home_glows: Array = []       # [{node: TextureRect, scale: float}] halo layers behind it
 var _auth: MbSnapserAuth
 var _leaderboards: Node  # MbLeaderboardsClient (preloaded — fresh class_name globals need a full editor scan)
 var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the nav)
@@ -161,19 +224,17 @@ func _ready() -> void:
 			_tab_icons.append(_make_tab_icon(b, TAB_ICONS[i]))
 			_tab_labels.append(_make_tab_label(b, TAB_LABELS[i]))
 
-	# Emphasize the center Home tab: wider share, icon-only (no label), an
-	# oversized overlay icon lifted to break the bar frame (a Button.icon would be
-	# clamped inside the button rect), and a pulsing additive violet halo behind it.
+	# The center Home tab: wider share, icon-only (no label), an overlay icon that —
+	# like the side tabs — grows to full size and lifts past the bar frame when
+	# selected (a Button.icon would be clamped inside the rect), backed by a pulsing
+	# additive violet halo that lights up only while selected. _tween_home_icon drives
+	# the selected/unselected states; _apply_home_icon_geometry sizes the resting pose.
 	var home_btn: Button = _tabs[HOME_INDEX]
 	home_btn.size_flags_stretch_ratio = 1.5
 	var home_ic := _make_tab_icon(home_btn, TAB_ICONS[HOME_INDEX])
-	home_ic.modulate = Color.WHITE
-	var hh := HOME_ICON_SIZE / 2.0
-	home_ic.offset_left = -hh
-	home_ic.offset_right = hh
-	home_ic.offset_top = -hh - HOME_ICON_LIFT
-	home_ic.offset_bottom = hh - HOME_ICON_LIFT
+	_home_icon = home_ic
 	_add_home_glow(home_btn)
+	_apply_home_icon_geometry()
 
 	# Deferred: the icon tween targets read button sizes, which the HBoxContainer
 	# only resolves on its (queued) sort — selecting now would bake stale rects.
@@ -189,23 +250,24 @@ func _select_tab(index: int) -> void:
 	var shown: Control = _screens[index] if index < _screens.size() else null
 	if shown != null and shown.has_method("refresh"):
 		shown.refresh()
-	# Selected side tab: icon grows and pops up past the bar frame, label shows
-	# beneath it. Unselected tabs collapse back to a centered base-size icon.
-	# (Home is always icon-only — its glow is the emphasis.)
-	var half := TAB_ICON_SIZE / 2.0
+	# Selected tab: icon grows and pops up past the bar frame, label shows beneath it.
+	# Unselected tabs collapse back to a centered base-size icon. Home follows the same
+	# rule (it's icon-only, and its halo lights up only while selected).
+	var half := tab_icon_size / 2.0
 	for i in range(_tabs.size()):
-		if i == HOME_INDEX:
-			continue
 		var b: Button = _tabs[i]
+		var selected := (i == index)
+		if i == HOME_INDEX:
+			_tween_home_icon(b, selected)
+			continue
 		var ic: TextureRect = _tab_icons[i]
 		var lb: Label = _tab_labels[i]
-		var selected := (i == index)
 		lb.visible = selected
-		var target_scale := Vector2.ONE * (TAB_ICON_SELECTED_SCALE if selected else 1.0)
+		var target_scale := Vector2.ONE * (tab_icon_selected_scale if selected else 1.0)
 		var target_mod := Color.WHITE if selected else Color(1, 1, 1, 0.55)
 		# Anchors are all-center with a center pivot, so position is the icon's
 		# top-left and position + half is its visual center whatever the scale.
-		var center_y := TAB_ICON_POP_Y if selected else b.size.y * 0.5
+		var center_y := tab_icon_pop_y if selected else b.size.y * 0.5
 		var target_pos := Vector2(b.size.x * 0.5 - half, center_y - half)
 		var old: Tween = ic.get_meta("tw") if ic.has_meta("tw") else null
 		if old != null:
@@ -219,6 +281,36 @@ func _select_tab(index: int) -> void:
 		ic.set_meta("tw", tw)
 
 
+## Home icon selection, mirroring the side-tab tween: dim + shrunk to base scale when
+## unselected, growing to full home_icon_size (lifted past the bar) + white + halo-lit
+## when selected. The icon's center pivot (set in _apply_home_icon_geometry) keeps it
+## centered through the scale. The halo is gated via self_modulate so its alpha pulse
+## (which owns modulate.a) keeps running underneath.
+func _tween_home_icon(b: Button, selected: bool) -> void:
+	if not is_instance_valid(_home_icon):
+		return
+	var hhalf := home_icon_size / 2.0
+	var center_y := (b.size.y * 0.5 - home_icon_lift) if selected else b.size.y * 0.5
+	var target_pos := Vector2(b.size.x * 0.5 - hhalf, center_y - hhalf)
+	var target_scale := Vector2.ONE if selected else Vector2.ONE * home_icon_base_scale
+	var target_mod := Color.WHITE if selected else Color(1, 1, 1, 0.55)
+	var old: Tween = _home_icon.get_meta("tw") if _home_icon.has_meta("tw") else null
+	if old != null:
+		old.kill()
+	var tw := _home_icon.create_tween().set_parallel(true) \
+		.set_trans(Tween.TRANS_BACK if selected else Tween.TRANS_SINE) \
+		.set_ease(Tween.EASE_OUT)
+	tw.tween_property(_home_icon, "scale", target_scale, 0.18)
+	tw.tween_property(_home_icon, "position", target_pos, 0.18)
+	tw.tween_property(_home_icon, "modulate", target_mod, 0.18)
+	_home_icon.set_meta("tw", tw)
+	for g in _home_glows:
+		var node: TextureRect = g["node"]
+		if not is_instance_valid(node):
+			continue
+		node.create_tween().tween_property(node, "self_modulate:a", 1.0 if selected else 0.0, 0.18)
+
+
 ## Overlay icon for a side tab: center-anchored at base size with a center pivot,
 ## so _select_tab can tween scale/position freely (incl. past the button rect —
 ## neither the Button nor the NavBar clips children).
@@ -230,7 +322,7 @@ func _make_tab_icon(btn: Button, tex: Texture2D) -> TextureRect:
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ic.modulate = Color(1, 1, 1, 0.55)
 	btn.add_child(ic)
-	var half := TAB_ICON_SIZE / 2.0
+	var half := tab_icon_size / 2.0
 	ic.anchor_left = 0.5
 	ic.anchor_top = 0.5
 	ic.anchor_right = 0.5
@@ -312,9 +404,10 @@ func _style_nav_button(b: Button) -> void:
 ## texture, centered in the button, alpha-pulsing forever. Additive blend means they
 ## only brighten, so draw order over the button's own icon doesn't matter.
 func _add_home_glow(btn: Button) -> void:
-	# [scale of the halo vs the icon, peak alpha, trough alpha]
-	for layer in [[1.25, 0.9, 0.45], [1.6, 0.5, 0.2]]:
-		var halo_size: float = HOME_ICON_SIZE * layer[0]
+	# Two halo layers, [peak alpha, trough alpha] each (inner first, then outer).
+	# Their size (the "spread") is exported and applied by _apply_home_icon_geometry;
+	# _home_glows preserves this inner→outer order so the spreads map by index.
+	for layer in [[0.9, 0.45], [0.5, 0.2]]:
 		var glow := TextureRect.new()
 		glow.texture = TAB_ICONS[HOME_INDEX]
 		glow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -323,21 +416,61 @@ func _add_home_glow(btn: Button) -> void:
 		var mat := CanvasItemMaterial.new()
 		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 		glow.material = mat
-		glow.modulate = Color(MbStyle.PRIMARY, layer[2])
+		glow.modulate = Color(MbStyle.PRIMARY, layer[1])
 		btn.add_child(glow)
 		glow.anchor_left = 0.5
 		glow.anchor_top = 0.5
 		glow.anchor_right = 0.5
 		glow.anchor_bottom = 0.5
-		glow.offset_left = -halo_size / 2.0
-		glow.offset_top = -halo_size / 2.0 - HOME_ICON_LIFT
-		glow.offset_right = halo_size / 2.0
-		glow.offset_bottom = halo_size / 2.0 - HOME_ICON_LIFT
+		_home_glows.append({"node": glow})
 		var tw := glow.create_tween().set_loops()
+		tw.tween_property(glow, "modulate:a", layer[0], 1.1) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tw.tween_property(glow, "modulate:a", layer[1], 1.1) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tw.tween_property(glow, "modulate:a", layer[2], 1.1) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+## Re-fit the center Home icon and its halo layers to the current home_icon_size /
+## home_icon_lift. Called once on build and again from the @export setters, so the
+## values can be tuned live (editor or Remote inspector) and update immediately.
+## No-ops until the icon exists (the setters fire during property init, pre-_ready).
+func _apply_home_icon_geometry() -> void:
+	if not is_instance_valid(_home_icon):
+		return
+	var hh := home_icon_size / 2.0
+	_home_icon.offset_left = -hh
+	_home_icon.offset_right = hh
+	_home_icon.offset_top = -hh - home_icon_lift
+	_home_icon.offset_bottom = hh - home_icon_lift
+	# Pivot at the icon's center so _tween_home_icon's scale grows/shrinks in place.
+	_home_icon.pivot_offset = Vector2(hh, hh)
+	# Halo spreads map to the inner→outer order _add_home_glow appended them in.
+	var spreads := [home_glow_inner_spread, home_glow_outer_spread]
+	for i in range(_home_glows.size()):
+		var node: TextureRect = _home_glows[i]["node"]
+		if not is_instance_valid(node):
+			continue
+		var spread: float = spreads[i] if i < spreads.size() else home_glow_outer_spread
+		var halo: float = home_icon_size * spread
+		node.offset_left = -halo / 2.0
+		node.offset_top = -halo / 2.0 - home_icon_lift
+		node.offset_right = halo / 2.0
+		node.offset_bottom = halo / 2.0 - home_icon_lift
+
+
+## Re-fit each side-tab icon's base (unselected) rect + center pivot to tab_icon_size,
+## so a live size change reflows them before _select_tab re-tweens scale/position.
+## Skips HOME_INDEX (null in _tab_icons — the Home icon is sized by home_icon_size).
+func _apply_tab_icon_geometry() -> void:
+	var half := tab_icon_size / 2.0
+	for ic in _tab_icons:
+		if not is_instance_valid(ic):
+			continue
+		ic.offset_left = -half
+		ic.offset_top = -half
+		ic.offset_right = half
+		ic.offset_bottom = half
+		ic.pivot_offset = Vector2(half, half)
 
 
 ## Raise the nav bar above the device's bottom safe inset (iOS home indicator /
@@ -346,8 +479,8 @@ func _add_home_glow(btn: Button) -> void:
 func _apply_safe_area() -> void:
 	var vp := get_viewport_rect().size
 	var pad := _bottom_safe_inset()
-	_nav_bar.size = Vector2(vp.x, NAV_HEIGHT)
-	_nav_bar.position = Vector2(0.0, vp.y - NAV_HEIGHT - pad)
+	_nav_bar.size = Vector2(vp.x, nav_height)
+	_nav_bar.position = Vector2(0.0, vp.y - nav_height - pad)
 
 
 func _bottom_safe_inset() -> float:
@@ -371,7 +504,7 @@ func _layout_content() -> void:
 	var top_chrome := 0.0
 	if is_instance_valid(_currency_bar):
 		top_chrome = _currency_bar.occupied_height()
-	var bottom_chrome := NAV_HEIGHT + _bottom_safe_inset()
+	var bottom_chrome := nav_height + _bottom_safe_inset()
 	_content.position = Vector2(0.0, top_chrome)
 	_content.size = Vector2(vp.x, maxf(0.0, vp.y - top_chrome - bottom_chrome))
 	for s in _screens:
