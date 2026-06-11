@@ -6,4 +6,4 @@
 Tracked bugs for the Moveborne client + validator. Each entry is a bug-report page with repro, expected vs observed, and (on close) the fix commit(s).
 
 ## Contents
-- [Web build can't connect to validator: gateway rejects header-less WebSocket upgrade](bug-report:mq9n2iah-0003-954t8)
+- [Deployed currency grant latches granted=true but never credits the Inventory wallet (balances empty)](bug-report:mq9v48kl-006b-xxqhck)

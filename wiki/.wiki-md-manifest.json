@@ -1,19 +1,19 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1593,
+    "version": 1761,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
-      "hypercasual-llm/adrs/index.md": "02dde19db374238d6e660ae36898226f548539e259e3246795e86a5a68e27f8d",
+      "hypercasual-llm/adrs/index.md": "a1dfba097b4a8ac4afa2d6954841b1432bed20464fbc8184dbb208dd0201875b",
       "hypercasual-llm/architecture/client/index.md": "1aeeb9b8b09c16f16118e841defd41f3d0401760ab58fad4e388bd5473c29af4",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
       "hypercasual-llm/architecture/server.md": "b47f08254d30da732e5d6a72cd923150ca3710b891d7224eeefce3de273c183e",
       "hypercasual-llm/architecture/client/determinism-primitives.md": "3563ffeeb934060df2546cfbae94e8564008b26455294b1f9f6647b9aa71e01d",
       "hypercasual-llm/architecture/client/rules-engine.md": "49bb2cb52ebc5644fddeaa55a5cbb17233a7f4bbbde66b39c6da09e266f7fccf",
       "hypercasual-llm/architecture/client/match-controller.md": "16f60cac52864a3bcd7541523e706d5fa05ddfe9e34433c956f002f7152c65d2",
-      "hypercasual-llm/architecture/client/validator-client.md": "e1bd4361b62e2a1a0b26e71afb66ad6de6f7b6d74cf7c07fd75ff4fc1d6c6e78",
+      "hypercasual-llm/architecture/client/validator-client.md": "c1d3c234a543b6ceb6565054190f1ea6e8203c067aa4d9234a6ddd54b5eab11f",
       "hypercasual-llm/architecture/client/presentation-amp-vfx.md": "368a07b7d797f071a4f542a71b972f6eef265d3d9abc7a794e772468fec71a01",
-      "hypercasual-llm/architecture/validator/realtime-gateway.md": "93965d6fa91b73e2f6cba4a8b2e4216f8ebe6b69cd555c1e3bddd6cdc6f6c559",
+      "hypercasual-llm/architecture/validator/realtime-gateway.md": "87dad6da218adb65586817fa43f58ec80e6badb5e0a3d9c604e9aa43753fb39e",
       "hypercasual-llm/architecture/validator/match-state-store.md": "1357cfd4af83cf2975d1021ad3673562426713518147e3e5152c697abb4a3112",
       "hypercasual-llm/architecture/validator/history-replay-store.md": "4e3ed3c4b2977285553bee73ce19cc51c47ecc7aaeeb9bf03c7b755a50c7ac82",
       "hypercasual-llm/architecture/validator/crypto-amp-signing.md": "3691c8bc8617345ff4d1e041182922bd7c112f9d28a8b21905a1d15a538ff3d6",
@@ -67,8 +67,16 @@
       "hypercasual-llm/.archived/feature-spec--mq8ja3dj-001k-urfpez.md": "0bf19dab06c11396202f28afb690afeb0d7dd2b3c879bfc071d8a7b3732ee1c3",
       "hypercasual-llm/architecture/client/build-amp-distribution.md": "b58353243172bbacb5be5314be2636b9479ad03826838c739a20b858922c629e",
       "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md": "3874436e2f23d4c71310776be0fc2125be4a64c75b4101563355cab1a943ae3c",
-      "hypercasual-llm/bugs/index.md": "1dc7c8c164fb48d5b7a2aea2a5944123b0d28f3bcad7ba33e87ef757de1a7f44",
-      "hypercasual-llm/bugs/web-build-can-t-connect-to-validator-gateway-rejects-header-less-websocket-upgrade.md": "5d6e8574e6e9ee8db20eb7df42076e69207af40e38cf950f8717f2e8e3e38030"
+      "hypercasual-llm/bugs/index.md": "28a01b2a45c2635c43ce765bc953528fd39deede51a6686729f67d079c5e8619",
+      "hypercasual-llm/.archived/bug-report--mq9n2iah-0003-954t8.md": "5d6e8574e6e9ee8db20eb7df42076e69207af40e38cf950f8717f2e8e3e38030",
+      "hypercasual-llm/.archived/feature-brief--mq9q3pab-0001-uyrd8q.md": "ab136d031a60eea7d39bab65fe405796280d2794bd08d578fb134cd287a6cf8f",
+      "hypercasual-llm/.archived/implementation-plan--mq9q3pab-0002-ibven5.md": "3a7cb752abc0011249249ff371e34e6d1f25d9ba7d8125eccbbb04e053ec7f08",
+      "hypercasual-llm/.archived/testing-plan--mq9q3pab-0003-oii8kq.md": "6a56feed6c864747a6aa8824806803cf0f8d1f4413363ed8f2dbf634fb009207",
+      "hypercasual-llm/.archived/feature-spec--mq9q3pab-0004-r5ckc6.md": "ae8f84cf2da98ede2fd9b4dde9112cf4d382b920238934cad9ba9ece90448b7b",
+      "hypercasual-llm/adrs/protobuf-as-the-validator-wire-contract-game-state-rides-as-canonical-json-strings.md": "34bffab26f2a5d471af0dd0646152c1092a9bea9e7d354c6a90a93c047921bb8",
+      "hypercasual-llm/adrs/grpc-over-snapser-hermes-as-the-validator-transport-replacing-http-init-socket-io.md": "8da2ef78dc43b4cddc4f69ae433d4da85f03a38c42100ee362ce15c5a6639b53",
+      "hypercasual-llm/adrs/generate-sdks-and-swagger-from-the-committed-protos-godobuf-protobufjs-descriptor-code-defined-openapi.md": "7363cbe9d863342aad38a5ce041c733ebe3dc29d17826b20ad01f11113229106",
+      "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md": "8a5d4283a1c7677ebe65d6b006b0a9700dc01cbc3245143d1abc13f078dfcb13"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -137,7 +145,15 @@
       "architecture:mq9llv7f-00a3-c5f96m": "hypercasual-llm/architecture/client/build-amp-distribution.md",
       "decision-record:mq9lly17-00a5-ljnwnw": "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md",
       "toc:mq9n2eia-0001-arqxs5": "hypercasual-llm/bugs/index.md",
-      "bug-report:mq9n2iah-0003-954t8": "hypercasual-llm/bugs/web-build-can-t-connect-to-validator-gateway-rejects-header-less-websocket-upgrade.md"
+      "bug-report:mq9n2iah-0003-954t8": "hypercasual-llm/.archived/bug-report--mq9n2iah-0003-954t8.md",
+      "feature-brief:mq9q3pab-0001-uyrd8q": "hypercasual-llm/.archived/feature-brief--mq9q3pab-0001-uyrd8q.md",
+      "implementation-plan:mq9q3pab-0002-ibven5": "hypercasual-llm/.archived/implementation-plan--mq9q3pab-0002-ibven5.md",
+      "testing-plan:mq9q3pab-0003-oii8kq": "hypercasual-llm/.archived/testing-plan--mq9q3pab-0003-oii8kq.md",
+      "feature-spec:mq9q3pab-0004-r5ckc6": "hypercasual-llm/.archived/feature-spec--mq9q3pab-0004-r5ckc6.md",
+      "decision-record:mq9uhegw-004p-9a7guj": "hypercasual-llm/adrs/protobuf-as-the-validator-wire-contract-game-state-rides-as-canonical-json-strings.md",
+      "decision-record:mq9uhhiv-004r-mrr6kt": "hypercasual-llm/adrs/grpc-over-snapser-hermes-as-the-validator-transport-replacing-http-init-socket-io.md",
+      "decision-record:mq9uhk7h-004t-fnf1k4": "hypercasual-llm/adrs/generate-sdks-and-swagger-from-the-committed-protos-godobuf-protobufjs-descriptor-code-defined-openapi.md",
+      "bug-report:mq9v48kl-006b-xxqhck": "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md"
     }
   }
 }

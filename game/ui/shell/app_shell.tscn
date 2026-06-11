@@ -1,13 +1,18 @@
 [gd_scene format=3 uid="uid://bn8b4q6nijb2b"]
 
 [ext_resource type="Theme" uid="uid://b0j3nse8nno5p" path="res://ui/theme/moveborne_ui.tres" id="1_blmq1"]
-[ext_resource type="Script" path="res://ui/shell/app_shell.gd" id="2_xul7i"]
+[ext_resource type="Script" uid="uid://cep3ogj1pkdhj" path="res://ui/shell/app_shell.gd" id="2_xul7i"]
 
 [node name="AppShell" type="Control" unique_id=818173518]
 layout_mode = 3
 anchors_preset = 0
 theme = ExtResource("1_blmq1")
 script = ExtResource("2_xul7i")
+tab_icon_size = 40
+home_icon_size = 70
+home_icon_lift = 24.0
+home_glow_inner_spread = 1.15
+home_glow_outer_spread = 1.3
 
 [node name="Content" type="Control" parent="." unique_id=740549220]
 anchors_preset = 0
