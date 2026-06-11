@@ -3,7 +3,7 @@
   "info": {
     "title": "Validator Service",
     "version": "0.2.3",
-    "description": "Real-time game-action validation service (BYOSnap). Game-facing match RPCs (InitMatch, ValidateAction, CompleteMatch) are a gRPC service (moveborne.validator.v1.ValidatorService, container port 8081) defined in validator/protos/, reached in production through the Snapser Hermes WebSocket (MESSAGE_TYPE_SNAP_API_PROXY) and locally through the validator's own Hermes-emulation endpoint (GET /hermes/ws?token=<player-id>, WebSocket upgrade). The HTTP surface below carries the platform probe, status, state-history debug tooling, and the MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public \u2014 the gateway does not require a session token. The validator binds user-context requests to the gateway-validated User-Id header (must match player_id / the match owner); the same binding applies to gRPC metadata."
+    "description": "Real-time game-action validation service (BYOSnap). Game-facing match RPCs (InitMatch, ValidateAction, CompleteMatch) are a gRPC service (moveborne.validator.v1.ValidatorService, container gRPC port 8081) defined in validator/protos/, reached in production through the Snapser Hermes WebSocket (MESSAGE_TYPE_SNAP_API_PROXY) and locally through the validator's own Hermes-emulation endpoint (GET /hermes/ws?token=<player-id>, WebSocket upgrade). The HTTP surface below carries the platform probe, status, state-history debug tooling, and the MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public — the gateway does not require a session token. The validator binds user-context requests to the gateway-validated User-Id header (must match player_id / the match owner); the same binding applies to gRPC metadata."
   },
   "servers": [
     {
@@ -68,7 +68,7 @@
           "Service"
         ],
         "summary": "Health check",
-        "description": "Liveness/readiness probe. Always returns 200 with a timestamp when the process is up. Used as the BYOSnap readiness probe path.",
+        "description": "Liveness/readiness probe. Always returns 200 with a timestamp when the process is up. Used as the BYOSnap readiness probe path (answered unprefixed for the platform probe).",
         "operationId": "getHealth",
         "responses": {
           "200": {
@@ -96,7 +96,7 @@
           "Service"
         ],
         "summary": "Runtime status",
-        "description": "Reports server name, version, process uptime, and current Socket.IO connection count.",
+        "description": "Reports server name, version, process uptime, the active transport, and the resolved currency-award transport.",
         "operationId": "getStatus",
         "responses": {
           "200": {
@@ -330,7 +330,7 @@
           "Debug"
         ],
         "summary": "MCP JSON-RPC endpoint",
-        "description": "Model Context Protocol (StreamableHTTP) endpoint for inspecting and debugging match state. Exposes tools: list_matches, get_match_state, get_state_history, simulate_action, clear_match. Requires `Accept: application/json, text/event-stream`. NOT public \u2014 keep behind authentication, as it can mutate match state.",
+        "description": "Model Context Protocol (StreamableHTTP) endpoint for inspecting and debugging match state. Exposes tools: list_matches, get_match_state, get_state_history, simulate_action, clear_match. Requires `Accept: application/json, text/event-stream`. NOT public — keep behind authentication, as it can mutate match state.",
         "operationId": "mcpJsonRpc",
         "requestBody": {
           "required": true,
@@ -366,7 +366,7 @@
           "Realtime"
         ],
         "summary": "Hermes-envelope WebSocket (local dev emulation)",
-        "description": "WebSocket upgrade carrying binary protobuf hermes.ClientMessage/ServerMessage frames \u2014 the same envelope the Snapser Hermes endpoint speaks. snap_api_request payloads are dispatched to the ValidatorService RPC handlers. The ?token= query param is the self-stamped player id locally (gateway headers win when present). Not meaningfully reachable through the gateway (use the real Hermes endpoint there); only partially describable in OpenAPI.",
+        "description": "WebSocket upgrade carrying binary protobuf hermes.ClientMessage/ServerMessage frames — the same envelope the Snapser Hermes endpoint speaks. snap_api_request payloads are dispatched to the ValidatorService RPC handlers. The ?token= query param is the self-stamped player id. LOCAL DEV ONLY: this route is mounted only when there is no gateway prefix; deployed, the game uses the real gateway Hermes endpoint (wss://<gateway>/v1/hermes/ws) instead. Only partially describable in OpenAPI.",
         "operationId": "hermesWs",
         "x-snapser-auth-types": [
           "user",
@@ -432,8 +432,9 @@
             "example": {
               "health": "/health",
               "status": "/api/status",
-              "matchInit": "/api/match/init",
-              "socketio": "/socket.io/"
+              "hermesWs": "/hermes/ws?token=<player-or-session>",
+              "grpc": ":8081 (moveborne.validator.v1.ValidatorService)",
+              "mcp": "/mcp"
             }
           }
         }
@@ -465,23 +466,28 @@
           },
           "version": {
             "type": "string",
-            "example": "0.1.0"
+            "example": "0.2.3"
           },
           "uptime": {
             "type": "number",
             "format": "double",
             "description": "Process uptime in seconds"
           },
-          "connections": {
-            "type": "integer",
-            "description": "Active Socket.IO client count"
+          "transport": {
+            "type": "string",
+            "example": "grpc+hermes"
+          },
+          "awards": {
+            "type": "string",
+            "description": "Resolved currency-award s2s transport, or 'disabled'",
+            "example": "internal"
           }
         },
         "required": [
           "server",
           "version",
           "uptime",
-          "connections"
+          "transport"
         ]
       },
       "Tile": {
@@ -512,7 +518,7 @@
       },
       "SynchronizedGameState": {
         "type": "object",
-        "description": "Deterministic, hashable game state shared between client and validator. Defined by @spyre-io/moveborne-logic; only the fields the validator reads are described here and additional fields are allowed.",
+        "description": "Deterministic, hashable game state shared between client and validator. Defined by @spyre-io/moveborne-logic; only the fields the validator reads are described here and additional fields are allowed. On the wire it travels as a canonical-JSON string inside the proto messages, so the determinism hash domain is preserved.",
         "additionalProperties": true,
         "properties": {
           "moveIndex": {

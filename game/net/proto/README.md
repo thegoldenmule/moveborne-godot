@@ -11,7 +11,16 @@ for every message that crosses the game ⇄ validator boundary.
 | `validator_pb.gd` | `validator/protos/moveborne/validator/v1/validator_messages.proto` (InitMatch/ValidateAction/CompleteMatch messages) |
 
 **Do not edit the `*_pb.gd` files by hand.** After changing a proto, regenerate
-(from the repo root; `--input` must be an OS path, not `res://`):
+everything derived from the protos (these bindings, the validator's JS SDK
+descriptor, and `swagger.json`) with the one tool at the repo root:
+
+```bash
+tools/gen-protos.sh                  # all three (needs the Godot binary)
+GODOT=/path/to/Godot tools/gen-protos.sh
+```
+
+To regenerate just these GDScript bindings (the raw godobuf invocation the
+tool wraps; `--input` must be an OS path, not `res://`):
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game \

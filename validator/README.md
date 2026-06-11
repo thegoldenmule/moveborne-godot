@@ -36,8 +36,31 @@ validator/
 `src/validator` depends on `src/logic` via the `workspace:*` protocol; Bun links
 it automatically on `bun install`. `src/logic/dist` is committed so the service
 runs without a build step (rebuild with `bun run build` when the logic changes).
-The protos are loaded at runtime (protobufjs / @grpc/proto-loader) — no codegen
-step on the service side either.
+
+### Regenerating from the protos
+
+`validator/protos/` is the single source of truth. Three artifacts are generated
+from it and committed; regenerate them all whenever a `.proto` changes:
+
+```bash
+tools/gen-protos.sh            # from the repo root (needs the Godot binary)
+tools/gen-protos.sh --skip-gdscript   # JS SDK + swagger only, no Godot
+```
+
+It produces:
+1. **JS SDK** — `src/validator/proto-gen/validator-descriptor.json`, the compiled
+   protobufjs descriptor the validator loads at runtime (`proto.ts`, via
+   `Root.fromJSON` — no `.proto` text parse at startup). Regenerate alone with
+   `bun run gen:sdk`.
+2. **swagger.json** — the OpenAPI spec Snapser uploads on `byosnap publish`
+   (powers the API Explorer, SDK generation, and the gateway's per-route auth).
+   Version is pulled from `package.json`. Regenerate alone with `bun run gen:swagger`.
+   After regenerating, redeploy so Snapser picks it up (`snapctl byosnap publish` + `sync`).
+3. **GDScript bindings** — `game/net/proto/*_pb.gd` (godobuf); see
+   `game/net/proto/README.md`.
+
+`grpc.ts` still reads `validator.proto` via `@grpc/proto-loader` for the gRPC
+*service definition* (which the message descriptor does not carry).
 
 ## Setup
 

@@ -1,0 +1,302 @@
+{
+  "nested": {
+    "hermes": {
+      "nested": {
+        "MessageType": {
+          "values": {
+            "MESSAGE_TYPE_UNSPECIFIED": 0,
+            "MESSAGE_TYPE_SNAP_API_PROXY": 4,
+            "MESSAGE_TYPE_ERROR": 5,
+            "MESSAGE_TYPE_PINGPONG": 7,
+            "MESSAGE_TYPE_SNAP_EVENT": 8,
+            "MESSAGE_TYPE_PRESENCE": 9,
+            "MESSAGE_TYPE_USER_NOTIFICATION": 10,
+            "MESSAGE_TYPE_USER_PRESENCE_UPDATE": 11
+          }
+        },
+        "Message_Ping": {
+          "fields": {}
+        },
+        "Message_Pong": {
+          "fields": {}
+        },
+        "Message_Error": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "error_message": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "Message_SnapApiRequest": {
+          "fields": {
+            "api_method": {
+              "type": "string",
+              "id": 1
+            },
+            "payload": {
+              "type": "bytes",
+              "id": 2
+            }
+          }
+        },
+        "SnapApiError": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "error_message": {
+              "type": "string",
+              "id": 2
+            },
+            "details": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "Message_SnapApiResponse": {
+          "oneofs": {
+            "_error": {
+              "oneof": [
+                "error"
+              ]
+            }
+          },
+          "fields": {
+            "caller_method": {
+              "type": "string",
+              "id": 1
+            },
+            "caller_time": {
+              "type": "int64",
+              "id": 2
+            },
+            "payload": {
+              "type": "bytes",
+              "id": 3
+            },
+            "is_error": {
+              "type": "bool",
+              "id": 4
+            },
+            "error": {
+              "type": "SnapApiError",
+              "id": 5,
+              "options": {
+                "proto3_optional": true
+              }
+            }
+          }
+        },
+        "ClientMessage": {
+          "oneofs": {
+            "msg": {
+              "oneof": [
+                "ping",
+                "snap_api_request"
+              ]
+            }
+          },
+          "fields": {
+            "mid": {
+              "type": "string",
+              "id": 1
+            },
+            "message_type": {
+              "type": "MessageType",
+              "id": 2
+            },
+            "timestamp": {
+              "type": "int64",
+              "id": 3
+            },
+            "recipients": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 4
+            },
+            "ping": {
+              "type": "Message_Ping",
+              "id": 10
+            },
+            "snap_api_request": {
+              "type": "Message_SnapApiRequest",
+              "id": 50
+            }
+          }
+        },
+        "ServerMessage": {
+          "oneofs": {
+            "msg": {
+              "oneof": [
+                "pong",
+                "error",
+                "api_response"
+              ]
+            }
+          },
+          "fields": {
+            "mid": {
+              "type": "string",
+              "id": 1
+            },
+            "message_type": {
+              "type": "MessageType",
+              "id": 2
+            },
+            "timestamp": {
+              "type": "int64",
+              "id": 3
+            },
+            "recipients": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 4
+            },
+            "sender": {
+              "type": "string",
+              "id": 5
+            },
+            "pong": {
+              "type": "Message_Pong",
+              "id": 10
+            },
+            "error": {
+              "type": "Message_Error",
+              "id": 11
+            },
+            "api_response": {
+              "type": "Message_SnapApiResponse",
+              "id": 50
+            }
+          }
+        }
+      }
+    },
+    "moveborne": {
+      "nested": {
+        "validator": {
+          "nested": {
+            "v1": {
+              "nested": {
+                "InitMatchRequest": {
+                  "fields": {
+                    "match_id": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "starting_state_json": {
+                      "type": "string",
+                      "id": 2
+                    },
+                    "player_id": {
+                      "type": "string",
+                      "id": 3
+                    },
+                    "mode": {
+                      "type": "string",
+                      "id": 4
+                    }
+                  }
+                },
+                "InitMatchResponse": {
+                  "fields": {
+                    "match_id": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "current_state_json": {
+                      "type": "string",
+                      "id": 2
+                    },
+                    "expires_at": {
+                      "type": "int64",
+                      "id": 3
+                    }
+                  }
+                },
+                "ValidateActionRequest": {
+                  "fields": {
+                    "match_id": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "index": {
+                      "type": "uint32",
+                      "id": 2
+                    },
+                    "action_json": {
+                      "type": "string",
+                      "id": 3
+                    },
+                    "state_hash": {
+                      "type": "string",
+                      "id": 4
+                    }
+                  }
+                },
+                "ValidateActionResponse": {
+                  "fields": {
+                    "index": {
+                      "type": "uint32",
+                      "id": 1
+                    },
+                    "matched": {
+                      "type": "bool",
+                      "id": 2
+                    },
+                    "state_json": {
+                      "type": "string",
+                      "id": 3
+                    },
+                    "signature": {
+                      "type": "string",
+                      "id": 4
+                    }
+                  }
+                },
+                "CompleteMatchRequest": {
+                  "fields": {
+                    "match_id": {
+                      "type": "string",
+                      "id": 1
+                    }
+                  }
+                },
+                "CompleteMatchResponse": {
+                  "fields": {
+                    "match_id": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "rewards": {
+                      "keyType": "string",
+                      "type": "string",
+                      "id": 2
+                    },
+                    "balances": {
+                      "keyType": "string",
+                      "type": "string",
+                      "id": 3
+                    },
+                    "granted": {
+                      "type": "bool",
+                      "id": 4
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

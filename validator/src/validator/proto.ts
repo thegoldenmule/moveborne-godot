@@ -1,18 +1,23 @@
 /**
- * Runtime protobuf registry. Loads the committed .proto sources (no codegen
- * step — mirrors how the logic package ships a prebuilt dist) and exposes the
- * message types both the Hermes envelope and the validator RPCs need.
+ * Runtime protobuf registry. Loads the committed, pre-compiled JSON descriptor
+ * (the "JS SDK") emitted from validator/protos/ by tools/gen-protos.sh, and
+ * exposes the message types both the Hermes envelope and the validator RPCs
+ * need. Loading the descriptor (Root.fromJSON) avoids re-parsing the .proto
+ * text at startup; regenerate it whenever the protos change.
  *
  * keepCase keeps snake_case field names so decoded objects line up with the
  * service's wire interfaces (and with what @grpc/proto-loader produces for
- * the gRPC transport).
+ * the gRPC transport in grpc.ts, which still reads the .proto for the service
+ * definition protobufjs descriptors don't carry).
  */
 import protobuf from "protobufjs";
 import { join } from "node:path";
+import validatorDescriptor from "./proto-gen/validator-descriptor.json" with { type: "json" };
 
 export const PROTO_DIR = join(import.meta.dir, "..", "..", "protos");
+// grpc.ts still reads this .proto via @grpc/proto-loader for the gRPC service
+// definition (which the protobufjs message descriptor does not carry).
 export const VALIDATOR_PROTO = join(PROTO_DIR, "moveborne", "validator", "v1", "validator.proto");
-export const HERMES_PROTO = join(PROTO_DIR, "hermes", "hermes_envelope.proto");
 
 // Single owner of the service-routing fact, so the gRPC transport and the
 // Hermes-emulation dispatcher cannot drift (a name registered by one but not
@@ -44,11 +49,8 @@ let cached: ProtoRegistry | null = null;
 export function getProtoRegistry(): ProtoRegistry {
   if (cached) return cached;
 
-  const root = new protobuf.Root();
-  // Resolve imports relative to the protos directory.
-  root.resolvePath = (_origin, target) => (target.startsWith("/") ? target : join(PROTO_DIR, target));
-  loadSyncKeepCase(root, HERMES_PROTO);
-  loadSyncKeepCase(root, VALIDATOR_PROTO);
+  // Load the pre-compiled descriptor (keepCase was baked in at generation time).
+  const root = protobuf.Root.fromJSON(validatorDescriptor as protobuf.INamespace);
 
   const v1 = "moveborne.validator.v1";
   cached = {
@@ -68,11 +70,6 @@ export function getProtoRegistry(): ProtoRegistry {
     },
   };
   return cached;
-}
-
-function loadSyncKeepCase(root: protobuf.Root, file: string): void {
-  // Root.loadSync accepts parse options; keepCase preserves declared names.
-  root.loadSync(file, { keepCase: true });
 }
 
 /** Decode `bytes` as `type`, returning a plain object with snake_case keys. */

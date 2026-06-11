@@ -11,9 +11,13 @@
     "start": "cd src/validator && bun run start",
     "build": "cd src/logic && bun run build",
     "test": "cd src/logic && bun run test",
-    "type-check": "cd src/validator && bun run type-check"
+    "type-check": "cd src/validator && bun run type-check",
+    "gen:sdk": "pbjs -t json --keep-case -o src/validator/proto-gen/validator-descriptor.json protos/hermes/hermes_envelope.proto protos/moveborne/validator/v1/validator_messages.proto",
+    "gen:swagger": "cd src/validator && bun run tools/gen-swagger.ts",
+    "gen:proto": "bun run gen:sdk && bun run gen:swagger"
   },
   "devDependencies": {
+    "protobufjs-cli": "^2.5.4",
     "typescript": "^5"
   }
 }
