@@ -78,6 +78,162 @@
 			"sha256": "95f07a12110d0a4f4f4a74c70ef27941ff4681c2702cf9f54aee6f2a7cc63699",
 			"style_id": null
 		},
+		"res://assets/generated/icons/skull_avatar_01.svg": {
+			"gen_id": "g_1781209009_5ed8",
+			"generated_at": "2026-06-11T20:16:48Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:39Z",
+			"sha256": "f3083da4ea7940ca40dc119a4f7a56d5d91373715c2be2673391c784cd0fa605",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_02.svg": {
+			"gen_id": "g_1781209009_041e",
+			"generated_at": "2026-06-11T20:16:48Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:42Z",
+			"sha256": "39e938277813f0998e2f058e1c3c9c8a89d388e5c8c3d48a983a4eb4450b7154",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_03.svg": {
+			"gen_id": "g_1781209037_64bd",
+			"generated_at": "2026-06-11T20:17:17Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:44Z",
+			"sha256": "769e5d5626a34e1d72f3bc78a974bc9e3b00a1f6c2aa0c3da1393a79328ae2df",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_04.svg": {
+			"gen_id": "g_1781209037_c6c1",
+			"generated_at": "2026-06-11T20:17:17Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:46Z",
+			"sha256": "0a7815d900119c6c4bfdf791268d5399485a853bb904d64597ed24024d147f94",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_05.svg": {
+			"gen_id": "g_1781209193_35ed",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:48Z",
+			"sha256": "c86da418e75feb0c586dd9189af8222dfe3b1ffc1304c3a9c62e2a96e5a63876",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_06.svg": {
+			"gen_id": "g_1781209193_f266",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:50Z",
+			"sha256": "9859d2780e7c8aae00abf482d1f579039b16cd769bfb2b3c1e1ee67d3f680c44",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_07.svg": {
+			"gen_id": "g_1781209193_f2e3",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:55Z",
+			"sha256": "46e565a5dfce2f9aa3958a28aee97e391271850941b77c4687c08e6a9019dcf9",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_08.svg": {
+			"gen_id": "g_1781209193_199e",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:57Z",
+			"sha256": "4946df6420b22ef17206cddebd3d4570fdfa675ca5206ab671d0147b67956bcc",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_09.svg": {
+			"gen_id": "g_1781209193_08dd",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:20:58Z",
+			"sha256": "3ed2f9759686bd8f93ab657efbd354d7b7944590c55d8934325d89f3011c2db1",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_10.svg": {
+			"gen_id": "g_1781209193_a625",
+			"generated_at": "2026-06-11T20:19:53Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:21:00Z",
+			"sha256": "90455a40bc64d5a2d23a2cc160897707ec2c135433f5b0052e174a854fe8aa18",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_11.svg": {
+			"gen_id": "g_1781209209_7469",
+			"generated_at": "2026-06-11T20:20:08Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:21:03Z",
+			"sha256": "fb35cd343aea02e43baa735bf3ebdc069c3a0f884ef5dbe31baea284f4e3a7cd",
+			"style_id": null
+		},
+		"res://assets/generated/icons/skull_avatar_12.svg": {
+			"gen_id": "g_1781209209_42f2",
+			"generated_at": "2026-06-11T20:20:08Z",
+			"generator": "recraft/recraftv4_1_vector",
+			"modified_after_save": false,
+			"post": [
+				"strip_bg_rect"
+			],
+			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
+			"saved_at": "2026-06-11T20:21:04Z",
+			"sha256": "4f6c3839ab9104c1778644236bc71357da4f35bbc3ac08a790c420bae27107dc",
+			"style_id": null
+		},
 		"res://assets/generated/misc/v41_smoke_sigil.svg": {
 			"gen_id": "g_1781107690_325c",
 			"generated_at": "2026-06-10T16:08:10Z",

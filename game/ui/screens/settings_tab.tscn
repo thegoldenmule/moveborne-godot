@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Theme" uid="uid://b0j3nse8nno5p" path="res://ui/theme/moveborne_ui.tres" id="1_settheme"]
+[ext_resource type="Script" path="res://ui/screens/settings_tab.gd" id="2_settab"]
+
+[node name="SettingsTab" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_settheme")
+script = ExtResource("2_settab")

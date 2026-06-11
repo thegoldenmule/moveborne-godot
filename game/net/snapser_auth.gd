@@ -19,6 +19,7 @@ var user_id := ""
 var session_token := ""
 var _expires_at := 0     # unix seconds
 var _username := ""
+var _profile_name := ""  # canonical handle from the Profiles snap (overrides username)
 var _loaded := false
 
 
@@ -27,10 +28,29 @@ func auth_headers() -> PackedStringArray:
 	return PackedStringArray(["Token: " + session_token, "User-Id: " + user_id])
 
 
-## The persisted anon username — the only human-readable handle this account has
-## (leaderboards stash it in user_metadata as the display name).
+## The persisted anon username — the bootstrap handle generated on first login
+## (godot-XXXXXXXX). The display name seeds from this on first profile creation.
 func username() -> String:
 	return _username
+
+
+## The canonical handle the player sees and shares: the Profiles-snap display
+## name once known, falling back to the anon username (no profile / offline).
+## Leaderboard submissions stash THIS in user_metadata.name.
+func display_name() -> String:
+	return resolve_display_name(_profile_name, _username)
+
+
+## Cache the loaded/edited profile display name so display_name() (and thus
+## leaderboard submissions) reflect it. "" clears back to the username fallback.
+func set_profile_name(name: String) -> void:
+	_profile_name = name
+
+
+## Canonical-handle resolution (static: unit-testable). Profile name wins when
+## non-empty, else the bootstrap fallback.
+static func resolve_display_name(profile_name: String, fallback: String) -> String:
+	return profile_name if profile_name != "" else fallback
 
 
 ## Ensure a live session (cached or fresh anonymous login). Coroutine — await it:
@@ -75,6 +95,20 @@ func _login() -> bool:
 	_expires_at = int(Time.get_unix_time_from_system()) + (ttl if ttl > 0 else 3600)
 	_save()
 	return user_id != "" and session_token != ""
+
+
+## Drop this device's anonymous identity: clear the session + cached handle and
+## delete the persisted file, so the next ensure_session() mints a fresh anon
+## user. (Anonymous accounts have no credential to re-attach, so "sign out" =
+## start over.)
+func sign_out() -> void:
+	user_id = ""
+	session_token = ""
+	_expires_at = 0
+	_username = ""
+	_profile_name = ""
+	if FileAccess.file_exists(SAVE_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 
 
 func _load() -> void:

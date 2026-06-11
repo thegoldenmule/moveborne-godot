@@ -54,7 +54,8 @@ static func score_url(board: String, user_id: String) -> String:
 	return "%s/%s/users/%s/score" % [BASE, board.uri_encode(), user_id.uri_encode()]
 
 
-## SetScore body. The anon username rides along as the display name.
+## SetScore body. The caller's canonical handle rides along as the display name
+## (MbSnapserAuth.display_name() — profile name, else the anon username).
 static func score_body(score: int, display_name: String) -> String:
 	return JSON.stringify({"score": score, "user_metadata": {"name": display_name}})
 
@@ -112,7 +113,7 @@ func submit_score(board: String, score: int) -> Dictionary:
 	if not await _auth.ensure_session():
 		return {"ok": false, "error": "not signed in"}
 	var resp := await _request(score_url(board, _auth.user_id),
-		HTTPClient.METHOD_PUT, score_body(score, _auth.username()))
+		HTTPClient.METHOD_PUT, score_body(score, _auth.display_name()))
 	if int(resp.get("code", 0)) != 200:
 		return {"ok": false, "error": _error_text(resp)}
 	var data = resp.get("data")

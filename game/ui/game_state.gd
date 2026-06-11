@@ -34,3 +34,35 @@ func merge_currencies(partial: Dictionary) -> void:
 		if currencies.has(name):
 			currencies[name] = int(partial[name])
 	currencies_changed.emit(currencies)
+
+
+## Cached player profile from the Snapser Profiles snap. Account data — like
+## currencies, NOT part of SynchronizedGameState, never hashed. The settings
+## screen fills this on load/save; display_name is the canonical handle that
+## feeds the leaderboard (see MbSnapserAuth.display_name()).
+## Shape: { "display_name": String, "avatar_id": String, "title": String }.
+var profile: Dictionary = {"display_name": "", "avatar_id": "", "title": ""}
+
+signal profile_changed(profile: Dictionary)
+
+
+## Replace the cached profile from a fetched/saved attribute dict.
+func set_profile(attrs: Dictionary) -> void:
+	profile["display_name"] = str(attrs.get("display_name", ""))
+	profile["avatar_id"] = str(attrs.get("avatar_id", ""))
+	profile["title"] = str(attrs.get("title", ""))
+	profile_changed.emit(profile)
+
+
+## Partial update — merge only the provided keys (a PATCH echoes just the changed
+## attribute), mirroring merge_currencies.
+func merge_profile(partial: Dictionary) -> void:
+	for k in partial:
+		if profile.has(k):
+			profile[k] = partial[k]
+	profile_changed.emit(profile)
+
+
+## The canonical handle, or "" when no profile is loaded.
+func profile_handle() -> String:
+	return str(profile.get("display_name", ""))

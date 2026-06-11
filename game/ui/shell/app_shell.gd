@@ -10,10 +10,14 @@ const PlaceholderScene := preload("res://ui/screens/placeholder_tab.tscn")
 const LeaderboardScene := preload("res://ui/screens/leaderboard_tab.tscn")
 const SnapserAuthS := preload("res://net/snapser_auth.gd")
 const LeaderboardsClientS := preload("res://net/leaderboards_client.gd")
+const ProfileClientS := preload("res://net/profile_client.gd")
+const SettingsScene := preload("res://ui/screens/settings_tab.tscn")
+const LocalSettingsS := preload("res://ui/local_settings.gd")
 const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 
 const HOME_INDEX := 2
 const LEADERBOARD_INDEX := 1
+const SETTINGS_INDEX := 4
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
 const TAB_ICONS: Array[Texture2D] = [
 	preload("res://assets/generated/icons/collections_icon.svg"),
@@ -111,10 +115,14 @@ var _home_icon: TextureRect       # center Home overlay icon (size driven by hom
 var _home_glows: Array = []       # [{node: TextureRect, scale: float}] halo layers behind it
 var _auth: MbSnapserAuth
 var _leaderboards: Node  # MbLeaderboardsClient (preloaded — fresh class_name globals need a full editor scan)
+var _profiles: Node  # MbProfileClient (Settings tab; shares the shell session)
 var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the nav)
 
 
 func _ready() -> void:
+	# Apply saved local prefs (audio buses) at boot, before any sound plays.
+	LocalSettingsS.apply_audio(LocalSettingsS.load_settings())
+
 	# Wire the brand font into the shared menu theme (theme_manage can't set it).
 	if theme != null:
 		theme.default_font = load(MbStyle.FONT_PATH)
@@ -172,6 +180,9 @@ func _ready() -> void:
 	_leaderboards = LeaderboardsClientS.new(_auth)
 	_leaderboards.name = "LeaderboardsClient"
 	add_child(_leaderboards)
+	_profiles = ProfileClientS.new(_auth)
+	_profiles.name = "ProfileClient"
+	add_child(_profiles)
 
 	# Persistent top currency bar (coins/souls/gems), sharing the shell session.
 	# (It names itself "CurrencyLayer" in its own _ready.)
@@ -192,6 +203,9 @@ func _ready() -> void:
 		elif i == LEADERBOARD_INDEX:
 			screen = LeaderboardScene.instantiate()
 			screen.setup(_auth, _leaderboards)
+		elif i == SETTINGS_INDEX:
+			screen = SettingsScene.instantiate()
+			screen.setup(_auth, _profiles)
 		else:
 			screen = PlaceholderScene.instantiate()
 			screen.set_title(TAB_LABELS[i])
