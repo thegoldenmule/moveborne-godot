@@ -27,6 +27,7 @@ var _fetch_id := 0
 var _col: VBoxContainer
 var _profile_box: VBoxContainer
 var _avatar_btn: TextureButton
+var _avatar_modal: CanvasLayer
 var _avatar_grid: GridContainer
 var _name_edit: LineEdit
 var _profile_status: Label
@@ -110,16 +111,6 @@ func _build_profile_section() -> void:
 	_profile_status = _dim_label("", 12)
 	name_col.add_child(_profile_status)
 
-	# Avatar picker grid — collapsed until the tile is tapped.
-	_avatar_grid = GridContainer.new()
-	_avatar_grid.columns = AVATAR_COLS
-	_avatar_grid.add_theme_constant_override("h_separation", 8)
-	_avatar_grid.add_theme_constant_override("v_separation", 8)
-	_avatar_grid.visible = false
-	for id in AvatarsS.IDS:
-		_avatar_grid.add_child(_make_avatar_pick(id))
-	_profile_box.add_child(_avatar_grid)
-
 	_identity = _dim_label("", 12)
 	_profile_box.add_child(_identity)
 
@@ -127,6 +118,80 @@ func _build_profile_section() -> void:
 	_offline_note = _dim_label("Sign-in unavailable — profile hidden.", 14)
 	_offline_note.visible = false
 	_col.add_child(_offline_note)
+
+	# The avatar picker is a modal overlay (built once, hidden until the tile is
+	# tapped) — not inline, so it never reflows the page or adds a scrollbar.
+	_build_avatar_modal()
+
+
+## A centered modal panel of avatar choices on a dimmed full-screen backdrop, on
+## its own CanvasLayer above the nav/currency chrome. Tapping the backdrop or a
+## choice closes it; it also auto-closes if the Settings tab is hidden.
+func _build_avatar_modal() -> void:
+	_avatar_modal = CanvasLayer.new()
+	_avatar_modal.layer = 20
+	_avatar_modal.visible = false
+	add_child(_avatar_modal)
+	visibility_changed.connect(func() -> void:
+		if not visible:
+			_hide_avatar_modal())
+
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_avatar_modal.add_child(root)
+
+	# Dimmed backdrop; a tap anywhere off the panel dismisses.
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.66)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dim.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			_hide_avatar_modal())
+	root.add_child(dim)
+
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(center)
+
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = MbStyle.BOARD
+	sb.border_color = MbStyle.PRIMARY
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(20)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 14)
+	panel.add_child(box)
+	var h := Label.new()
+	h.text = "CHOOSE AVATAR"
+	h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	h.add_theme_font_size_override("font_size", 16)
+	h.add_theme_color_override("font_color", MbStyle.PRIMARY)
+	box.add_child(h)
+
+	_avatar_grid = GridContainer.new()
+	_avatar_grid.columns = AVATAR_COLS
+	_avatar_grid.add_theme_constant_override("h_separation", 10)
+	_avatar_grid.add_theme_constant_override("v_separation", 10)
+	for id in AvatarsS.IDS:
+		_avatar_grid.add_child(_make_avatar_pick(id))
+	box.add_child(_avatar_grid)
+
+
+func _show_avatar_modal() -> void:
+	_highlight_picked()
+	_avatar_modal.visible = true
+
+
+func _hide_avatar_modal() -> void:
+	if _avatar_modal != null:
+		_avatar_modal.visible = false
 
 
 func _make_avatar_pick(id: String) -> TextureButton:
@@ -141,13 +206,13 @@ func _make_avatar_pick(id: String) -> TextureButton:
 
 
 func _on_avatar_tile_pressed() -> void:
-	_avatar_grid.visible = not _avatar_grid.visible
+	_show_avatar_modal()
 
 
 func _on_avatar_pick(id: String) -> void:
 	_avatar_id = id
 	_avatar_btn.texture_normal = AvatarsS.texture(id)
-	_avatar_grid.visible = false
+	_hide_avatar_modal()
 	_highlight_picked()
 	await _persist({ProfileClientS.ATTR_AVATAR: id}, "Avatar saved.")
 
