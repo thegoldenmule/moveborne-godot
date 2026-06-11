@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1761,
+    "version": 2017,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
+      "hypercasual-llm/features/index.md": "5e6ae6ace88f1b513c63e289425579c3117ad0dcacc820863136c77b5aec3b7a",
       "hypercasual-llm/adrs/index.md": "a1dfba097b4a8ac4afa2d6954841b1432bed20464fbc8184dbb208dd0201875b",
       "hypercasual-llm/architecture/client/index.md": "1aeeb9b8b09c16f16118e841defd41f3d0401760ab58fad4e388bd5473c29af4",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
@@ -76,7 +76,24 @@
       "hypercasual-llm/adrs/protobuf-as-the-validator-wire-contract-game-state-rides-as-canonical-json-strings.md": "34bffab26f2a5d471af0dd0646152c1092a9bea9e7d354c6a90a93c047921bb8",
       "hypercasual-llm/adrs/grpc-over-snapser-hermes-as-the-validator-transport-replacing-http-init-socket-io.md": "8da2ef78dc43b4cddc4f69ae433d4da85f03a38c42100ee362ce15c5a6639b53",
       "hypercasual-llm/adrs/generate-sdks-and-swagger-from-the-committed-protos-godobuf-protobufjs-descriptor-code-defined-openapi.md": "7363cbe9d863342aad38a5ce041c733ebe3dc29d17826b20ad01f11113229106",
-      "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md": "8a5d4283a1c7677ebe65d6b006b0a9700dc01cbc3245143d1abc13f078dfcb13"
+      "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md": "52ffcb1186670790140452a2610dee295de32806d27f1d2f92b86a253b61c0f8",
+      "hypercasual-llm/.archived/bug-report--mq9wjxlx-007x-rdflmv.md": "676520a2b92dd88ebcd888507c57d2ea24907bb47d6a543825e4427bdfb37114",
+      "hypercasual-llm/features/daily-login-bonus/index.md": "f2d1dfea64a0b6601b0b34c362ab1dab57c5bab27b402d127cbbb5cfe5d91b9f",
+      "hypercasual-llm/features/daily-login-bonus/implementation-plan-daily-login-bonus.md": "dc1c8a21ce29cd2f48ce263f24bd9d13cc9f1606803da17b58f40aaca33a2d18",
+      "hypercasual-llm/features/daily-login-bonus/testing-plan-daily-login-bonus.md": "c87133c5166c0105070effed424ddd403edb0a72160d9824f18e8e9c69213d35",
+      "hypercasual-llm/features/daily-login-bonus/spec-daily-login-bonus.md": "34c4dcb6f2838d0ecce94cf76b345be69491a263ea2023c3578ab2f78051f69b",
+      "hypercasual-llm/features/daily-missions/index.md": "89f6d7c81bc8ce52e10f29108178f3dc7d970bdaa2fe1338d8831488c1dad352",
+      "hypercasual-llm/features/daily-missions/implementation-plan-daily-missions.md": "df1b5e811d501cbadf185bbcd162d95c80c16e48ec82163379874894df8ad48a",
+      "hypercasual-llm/features/daily-missions/testing-plan-daily-missions.md": "d829057a576f67e487289232d2d244d7c5b7fba538b8491942b2f6017ddb5202",
+      "hypercasual-llm/features/daily-missions/spec-daily-missions.md": "4d5b8bbd7ac76237d8ec20fa8632a8dc732f244aad943e056871055e5a69107e",
+      "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/index.md": "6f0aa5fdbe8e5d6535dc42902d8a9ec3a8a11f5482cae10ebf0ad2036930eaa6",
+      "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "2e7e98cdacda2cbb9e1cb8d321fa2da68b380bddb07cb832cb94794c6f8ec8c8",
+      "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "88eb9c1eab13c8ae3f36e87bbdae0cea57f56375a10cd9056ac2968c0879360b",
+      "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/spec-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "d11557982c510e28f19fcc8892fddd751c01f81f659055fd0191c976f47f0e3a",
+      "hypercasual-llm/features/player-profile-amp-settings-screen/index.md": "6d81e17e5c85ef10a919b44e0b28d00f810233bdc801091ff260df1f376f576c",
+      "hypercasual-llm/features/player-profile-amp-settings-screen/implementation-plan-player-profile-amp-settings-screen.md": "27854f5a0a323400c56f26f09c10512fb511d3e494582851d76234c096857702",
+      "hypercasual-llm/features/player-profile-amp-settings-screen/testing-plan-player-profile-amp-settings-screen.md": "c6f834febd09b79f46ee37949a7f92412c972ea1acae8d566158ff1e6f9c2955",
+      "hypercasual-llm/features/player-profile-amp-settings-screen/spec-player-profile-amp-settings-screen.md": "490753bab59276cc1158adc7a826fb14767241b868ece9c37c094080207a493c"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -153,7 +170,24 @@
       "decision-record:mq9uhegw-004p-9a7guj": "hypercasual-llm/adrs/protobuf-as-the-validator-wire-contract-game-state-rides-as-canonical-json-strings.md",
       "decision-record:mq9uhhiv-004r-mrr6kt": "hypercasual-llm/adrs/grpc-over-snapser-hermes-as-the-validator-transport-replacing-http-init-socket-io.md",
       "decision-record:mq9uhk7h-004t-fnf1k4": "hypercasual-llm/adrs/generate-sdks-and-swagger-from-the-committed-protos-godobuf-protobufjs-descriptor-code-defined-openapi.md",
-      "bug-report:mq9v48kl-006b-xxqhck": "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md"
+      "bug-report:mq9v48kl-006b-xxqhck": "hypercasual-llm/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md",
+      "bug-report:mq9wjxlx-007x-rdflmv": "hypercasual-llm/.archived/bug-report--mq9wjxlx-007x-rdflmv.md",
+      "feature-brief:mq9xf7gd-0083-x03ikc": "hypercasual-llm/features/daily-login-bonus/index.md",
+      "implementation-plan:mq9xf7gd-0084-1du6pg": "hypercasual-llm/features/daily-login-bonus/implementation-plan-daily-login-bonus.md",
+      "testing-plan:mq9xf7gd-0085-v1nsqi": "hypercasual-llm/features/daily-login-bonus/testing-plan-daily-login-bonus.md",
+      "feature-spec:mq9xf7gd-0086-uo1jpm": "hypercasual-llm/features/daily-login-bonus/spec-daily-login-bonus.md",
+      "feature-brief:mq9xf8xd-008b-e1w9qn": "hypercasual-llm/features/daily-missions/index.md",
+      "implementation-plan:mq9xf8xd-008c-jpg7kq": "hypercasual-llm/features/daily-missions/implementation-plan-daily-missions.md",
+      "testing-plan:mq9xf8xe-008d-lwizqu": "hypercasual-llm/features/daily-missions/testing-plan-daily-missions.md",
+      "feature-spec:mq9xf8xe-008e-5xkugp": "hypercasual-llm/features/daily-missions/spec-daily-missions.md",
+      "feature-brief:mq9xfhki-008j-79ql1c": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/index.md",
+      "implementation-plan:mq9xfhki-008k-36hi2b": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
+      "testing-plan:mq9xfhki-008l-6m9iq5": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
+      "feature-spec:mq9xfhki-008m-11y4hq": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/spec-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
+      "feature-brief:mq9xkeg0-00a0-qazkfq": "hypercasual-llm/features/player-profile-amp-settings-screen/index.md",
+      "implementation-plan:mq9xkeg0-00a1-kxfcm8": "hypercasual-llm/features/player-profile-amp-settings-screen/implementation-plan-player-profile-amp-settings-screen.md",
+      "testing-plan:mq9xkeg0-00a2-hpm89g": "hypercasual-llm/features/player-profile-amp-settings-screen/testing-plan-player-profile-amp-settings-screen.md",
+      "feature-spec:mq9xkeg0-00a3-jcbof5": "hypercasual-llm/features/player-profile-amp-settings-screen/spec-player-profile-amp-settings-screen.md"
     }
   }
 }

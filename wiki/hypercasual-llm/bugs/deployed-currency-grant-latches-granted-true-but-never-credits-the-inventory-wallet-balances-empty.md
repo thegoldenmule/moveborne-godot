@@ -1,6 +1,6 @@
 # Bug: Deployed currency grant latches granted=true but never credits the Inventory wallet (balances empty)
 
-**Status:** open
+**Status:** closed
 
 ## Report
 - **Component:** Validator → Inventory snap (currency awards, snap-to-snap)
@@ -21,10 +21,10 @@ On the deployed snapend, completing a match settles the reward correctly (Comple
 After CompleteMatch with granted=true, the player's Inventory wallet reflects the granted currency: GET .../currencies shows currencies_64.coins incremented by the reward amount, and the CompleteMatchResponse.balances map carries current_balance_64 per granted currency (incrementUserCurrency returns the new balance, which completeMatch copies into balances).
 
 ## Observed result
-The wallet stays empty and balances is {}. incrementUserCurrency is returning null, which means the internal PUT to the Inventory snap either returned non-2xx or threw. The actual cause is in the deployed container log line `[inventory] increment coins for <userId> failed: HTTP <status> <body>` (or the catch-branch error) — TRIAGE STEP: read that line from the byosnap-validator pod logs. Leading hypotheses to check against that log: (a) the "coins"/"souls"/"gems" currencies are not provisioned in the snapend's Inventory snap config, so the PUT 404s/400s; (b) the internal endpoint path or body shape is wrong for this Inventory snap version (expected PUT /v1/inventory/users/{id}/currencies/{currency} with {delta_64}); (c) the internal-auth `Gateway: <SNAPEND_INTERNAL_HEADER>` header is not what the Inventory snap accepts for an internal s2s write (it may require api-key, gRPC metadata, or a different header). Secondary fix regardless of root cause: make CompleteMatch's `granted` reflect whether the grant actually succeeded (incrementUserCurrency returned non-null), not merely that the transport is enabled, so the client/HUD can tell a real grant from a silent failure.
+The wallet stays empty and balances is {}. incrementUserCurrency is returning null (non-2xx from the Inventory snap), which the validator logs and deliberately swallows. ROOT CAUSE CONFIRMED (2026-06-11): the snapend's Inventory snap has NO currencies provisioned — the live manifest (snapctl snapend download --category snapend-manifest --snapend-id c4n1awfs) shows applied_configuration → settings[inventory].data.currencies = [] — so every PUT /v1/inventory/users/{id}/currencies/coins fails. Hypotheses (b) and (c) are ruled out: the endpoint path, {delta_64} body, and internal auth type were verified against the vendored inventory swagger (IncrementUserCurrency, x-snapser-auth-types includes "internal"; the docs' intra-snapend example passes SNAPEND_INTERNAL_HEADER as the gateway header, exactly what InventoryClient sends). FIX 1 (config, pending): provision coins/souls/gems in the Inventory snap config (manifest settings[inventory].data.currencies = [{name, display_name}…] + snapctl snapend apply). FIX 2 (code, committed 94f3a0f, v0.2.5): CompleteMatch granted now reflects whether every reward actually credited (any incrementUserCurrency null flips granted=false) instead of merely "transport enabled". SIDE FINDING for hardening: IncrementUserCurrency also accepts plain user auth (x-snapser-auth-types: user/api-key/internal), so any logged-in client can self-grant currency through the gateway — should be restricted via the Auth snap's user_auth_restrictions for a server-authoritative economy.
 
 ## Resolution
-_None._
+- `94f3a0fcc99fd0049b3f36bca6672c046ff839fd` fix(validator): CompleteMatch granted=true only when the Inventory credit actually lands (v0.2.5). Root cause was config, not code: snapend c4n1awfs had currencies:[] in the Inventory snap — provisioned coins/souls/gems via snapctl snapend apply. Deployed E2E verified 2026-06-11: CompleteMatch → rewards {coins:25}, granted=true, balances {coins:25}, wallet REST read-back 25 (regression test game/tools/test_snapser_grant.gd, commit b500fdb).
 
 ## References
 _None._

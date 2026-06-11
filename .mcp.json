@@ -17,7 +17,7 @@
         "args": [
           "-y",
           "@snapser/mcp-server-snapser@latest",
-          "--application-id=c4n1awfs"
+          "--application-id=06885582-43e0-4d67-a3c6-0c6df783eb16"
         ],
         "env": {
           "SNAPSER_API_KEY": "${SNAPSER_API_KEY}"
