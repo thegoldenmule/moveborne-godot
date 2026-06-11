@@ -34,7 +34,7 @@ The validator supports initializing matches from saved state histories via `POST
 
 One of `history_file_id` or `history_data` must be provided.
 
-**Response:** Same as `/init` endpoint (connection_id, expires_at)
+**Response:** `{match_id, state_count, current_move_index, expires_at}`
 
 **Example:**
 ```bash

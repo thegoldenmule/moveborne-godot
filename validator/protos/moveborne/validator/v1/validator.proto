@@ -1,0 +1,38 @@
+// Moveborne validator wire protocol — the single source of truth for every
+// message that crosses the game ⇄ validator boundary.
+//
+// Transport: production is the Snapser Hermes WSS endpoint
+// (wss://gateway.snapser.com/<snapend>/v1/hermes/ws?token=<session>) carrying
+// MESSAGE_TYPE_SNAP_API_PROXY ClientMessages whose snap_api_request holds
+// {method: "/moveborne.validator.v1.ValidatorService/<Rpc>", payload: <request
+// proto bytes>}; Hermes forwards to this service gRPC port. Local dev speaks
+// the identical envelope to the validator-local /hermes/ws emulation endpoint.
+//
+// SynchronizedGameState and GameAction travel as canonical-JSON strings, NOT
+// proto messages: the determinism state hash is computed over canonical JSON
+// (byte-for-byte parity between the TS logic dist and the GDScript port), so
+// the wire format must not re-model them.
+syntax = "proto3";
+
+package moveborne.validator.v1;
+
+import "moveborne/validator/v1/validator_messages.proto";
+
+// Pure request/response validation service. There is no connection lifecycle:
+// requests are correlated by match_id, and the caller identity is bound by
+// the gateway (User-Id) — never by anything the client self-reports.
+service ValidatorService {
+  // Register a match and its starting state. Replaces the old HTTP
+  // /api/match/init + Socket.IO ready-event pair: the response carries the
+  // authoritative current state directly.
+  rpc InitMatch(InitMatchRequest) returns (InitMatchResponse);
+
+  // Validate one optimistic client action. The validator executes the action
+  // against its own state and compares hashes; on mismatch the authoritative
+  // state is returned for the client to adopt.
+  rpc ValidateAction(ValidateActionRequest) returns (ValidateActionResponse);
+
+  // Settle the match (idempotent): rewards are computed from the validator-
+  // validated state and granted s2s; repeats return granted=false.
+  rpc CompleteMatch(CompleteMatchRequest) returns (CompleteMatchResponse);
+}

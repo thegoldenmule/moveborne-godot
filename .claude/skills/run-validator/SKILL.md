@@ -74,7 +74,7 @@ Load and replay saved game states:
 ## Important Notes
 
 - The validator runs with `bun run --watch` for automatic hot-reload on file changes
-- Runs on port 5555 — HTTP, Socket.IO, and the MCP interface (`/mcp`) all share it (the start script sets `PORT=5555`)
+- Runs on port 5555 — HTTP, the Hermes-emulation WebSocket (`/hermes/ws`), and the MCP interface (`/mcp`) share it (the start script sets `PORT=5555`); the gRPC ValidatorService listens on 8081
 - MCP server provides JSON-RPC interface for programmatic access
 - State history is persisted in-memory per match session
 - Validator uses deterministic RNG for reproducible game logic

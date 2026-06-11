@@ -285,25 +285,16 @@ Parameters:
 
 ## HTTP API Endpoints
 
-### POST /api/match/init
+### Match RPCs (gRPC / Hermes — not HTTP)
 
-Initialize a new match.
-
-**Request Body:**
-```json
-{
-  "player_id": "player-123",
-  "signature": "auth-signature"
-}
-```
-
-**Response:**
-```json
-{
-  "connection_id": "conn-uuid",
-  "expires_at": "2025-01-15T12:00:00Z"
-}
-```
+Game-facing match calls (InitMatch, ValidateAction, CompleteMatch) are a gRPC
+service (`moveborne.validator.v1.ValidatorService`, protos in `validator/protos/`),
+reached locally through the Hermes-emulation WebSocket
+(`ws://localhost:5555/hermes/ws?token=<player-id>`, binary protobuf
+ClientMessage/ServerMessage frames) or directly via gRPC on `localhost:8081`.
+There is no HTTP init endpoint and no connection_id lifecycle anymore; use the
+MCP tools below (or `game/tools/test_validator_client.gd`) to create and drive
+matches when testing.
 
 ### POST /api/match/init-from-history
 
@@ -370,18 +361,21 @@ Loaded automatically by Bun from `validator/src/validator/.env`:
 ```bash
 VALIDATOR_SHARED_SECRET=dev-shared-secret-change-me
 PORT=5555
-CONNECTION_TOKEN_TTL=300
+GRPC_PORT=8081
 MATCH_SESSION_TTL=3600
 ```
 
-Auth has no bypass switch: match-init and the Socket.IO handshake require a
-`User-Id` header equal to `player_id` (the Snapser gateway sets it in prod; local
-callers self-stamp it). Direct `curl`/MCP probes must send `-H "User-Id: <player_id>"`.
+Auth has no bypass switch: every RPC binds the gateway-validated identity to the
+match owner (`player_id`). Locally the Hermes-emulation WS takes the self-stamped
+player id as its `?token=` query param; HTTP history routes still take a
+`User-Id` header; api-key/internal callers pass unbound.
 
 ### Port Configuration
 
-- **5555**: HTTP server, Socket.IO, and the MCP JSON-RPC interface (`/mcp`)
-  all share the single `PORT` value.
+- **5555** (`PORT`): HTTP (health/status/history), the Hermes-emulation
+  WebSocket (`/hermes/ws`), and the MCP JSON-RPC interface (`/mcp`).
+- **8081** (`GRPC_PORT`): the gRPC ValidatorService (same port deployed; HTTP
+  stays on 8080 behind the gateway).
 
 Change the port by modifying the `.env` file. Restart required after changing env vars.
 
@@ -593,10 +587,8 @@ Tool: mcp__validator__list_matches
 Check created_at and last_action_at timestamps
 
 **Clear and restart:**
-```bash
-curl -X POST http://localhost:5555/api/match/init \
-  -H "Content-Type: application/json" \
-  -d '{"player_id":"test","signature":"test"}'
+```typescript
+Tool: mcp__validator__clear_match   // then re-init from the game or test script
 ```
 
 ## Performance Considerations
@@ -628,12 +620,8 @@ curl -X POST http://localhost:5555/api/match/init \
    cd validator/src/validator && bun run dev
    ```
 
-2. Initialize match (from game client or API)
-   ```bash
-   curl -X POST http://localhost:5555/api/match/init \
-     -H "Content-Type: application/json" \
-     -d '{"player_id":"dev","signature":"dev"}'
-   ```
+2. Initialize a match (from the game: press V; or headless:
+   `godot --headless --path game --script res://tools/test_validator_client.gd`)
 
 3. Play game and monitor state
    ```typescript

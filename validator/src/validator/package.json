@@ -1,6 +1,6 @@
 {
   "name": "@moveborne/validator",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -8,21 +8,21 @@
     "dev": "bun run --watch index.ts",
     "start": "bun run index.ts",
     "type-check": "tsc --noEmit",
-    "client": "bun run client-example.ts"
+    "test": "bun test"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "socket.io-client": "^4.8.1"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.12.0",
+    "@grpc/proto-loader": "^0.7.13",
     "@hono/mcp": "^0.1.5",
     "@modelcontextprotocol/sdk": "^1.20.2",
-    "@socket.io/bun-engine": "^0.0.3",
     "@spyre-io/moveborne-logic": "workspace:*",
     "hono": "^4.10.4",
-    "socket.io": "^4.8.1"
+    "protobufjs": "^7.4.0"
   }
 }

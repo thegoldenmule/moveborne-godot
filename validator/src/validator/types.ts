@@ -2,71 +2,31 @@ import type { SynchronizedGameState, GameAction } from "@spyre-io/moveborne-logi
 
 export type { GameAction };
 
-export interface ValidatorInitRequest {
-  match_id: string;
-  starting_state: SynchronizedGameState;
-  player_id: string;
-  /** Which play mode this match settles rewards for. Defaults to "story".
-   *  Self-reported by the client, but it only selects the reward TABLE —
-   *  reward amounts come from the validator's own validated state. */
-  mode?: MatchMode;
-  /** Legacy Nakama HMAC field — ignored; auth is the Snapser gateway's
-   *  validated User-Id header (see utils/snapser-auth.ts). */
-  signature?: string;
-}
-
-export interface ValidatorInitResponse {
-  connection_id: string;
-  expires_at: number;
-}
-
-export interface GameActionRequest {
-  index: number;
-  action: GameAction;
-  state_hash: string;
-}
-
-export interface GameActionResponseMatch {
-  index: number;
-  signature: string;
-}
-
-export interface GameActionResponseMismatch {
-  index: number;
-  state: SynchronizedGameState;
-  signature: string;
-}
-
-export type GameActionResponse = GameActionResponseMatch | GameActionResponseMismatch;
+// The game ⇄ validator wire types live in protos/moveborne/validator/v1/
+// validator.proto (single source of truth) — see service.ts for the decoded
+// request/response shapes. This module keeps server-internal types only.
 
 export interface StoredMatch {
   match_id: string;
   current_state: SynchronizedGameState;
-  connection_id: string;
   player_id: string;
   mode: MatchMode;
   created_at: number;
   last_action_at: number;
   action_count: number;
   state_history: Map<number, SynchronizedGameState>;
-  /** Idempotency latch for currency awards: set on the first complete_match so
+  /** Idempotency latch for currency awards: set on the first CompleteMatch so
    *  reconnects / repeated completions never double-grant. */
   rewards_granted: boolean;
 }
 
-export interface ConnectionToken {
-  connection_id: string;
-  match_id: string;
-  player_id: string;
-  issued_at: number;
-  expires_at: number;
-}
-
 export interface ValidatorConfig {
   sharedSecret: string;
-  connectionTokenTTL: number;
   matchSessionTTL: number;
   port: number;
+  /** Port the gRPC ValidatorService listens on (Hermes proxies to it inside
+   *  the snapend; declared as the BYOSnap profile's internal "grpc" port). */
+  grpcPort: number;
   /** Public gateway base (https://gateway.snapser.com/<snapend>) — the api-key
    *  transport for Inventory s2s calls when running outside the snapend. */
   snapserGatewayUrl: string;
@@ -94,20 +54,6 @@ export type CurrencyName = "coins" | "souls" | "gems";
  *  Snapser *_64 convention; only non-zero entries are present. */
 export type CurrencyDeltas = Partial<Record<CurrencyName, string>>;
 
-/** Ack payload for the `complete_match` Socket.IO event. */
-export interface MatchRewardsResponse {
-  match_id: string;
-  /** Deltas the reward table produced for this match (empty if none or if the
-   *  match was already settled). */
-  rewards: CurrencyDeltas;
-  /** current_balance_64 per granted currency, when the Inventory snap call
-   *  succeeded; empty when awards are disabled (no s2s credentials). */
-  balances: CurrencyDeltas;
-  /** False when this completion did not settle (already settled earlier, or
-   *  s2s awards are disabled in this environment). */
-  granted: boolean;
-}
-
 /** PUT /v1/inventory/users/{user_id}/currencies/{currency_name} — body. */
 export interface IncrementUserCurrencyRequest {
   delta_64: string;
@@ -122,19 +68,6 @@ export interface IncrementUserCurrencyResponse {
 /** GET /v1/inventory/users/{user_id}/currencies (inventoryGetUserCurrenciesResponse). */
 export interface GetUserCurrenciesResponse {
   currencies_64: Record<string, string>;
-}
-
-export type ValidatorErrorCode =
-  | "UNAUTHORIZED"
-  | "MATCH_NOT_FOUND"
-  | "INVALID_TOKEN"
-  | "TOKEN_EXPIRED"
-  | "INVALID_ACTION"
-  | "PLAYER_MISMATCH";
-
-export interface ValidatorError {
-  code: ValidatorErrorCode;
-  message: string;
 }
 
 export interface StateHistorySnapshot {

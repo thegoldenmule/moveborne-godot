@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Validator Service",
-    "version": "0.1.0",
-    "description": "Real-time game-action validation service (BYOSnap). Provides HTTP endpoints for match lifecycle plus a Socket.IO transport for live action validation and an MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public — the gateway does not require a session token. Public operations: service info, health, status, match init, init-from-history, and the Socket.IO transport. save-history, load-history, and /mcp require api-key/internal auth. The validator additionally binds requests to the gateway-validated User-Id header (must match player_id) on match init and the Socket.IO handshake."
+    "version": "0.2.0",
+    "description": "Real-time game-action validation service (BYOSnap). Game-facing match RPCs (InitMatch, ValidateAction, CompleteMatch) are a gRPC service (moveborne.validator.v1.ValidatorService, container port 8080) defined in validator/protos/, reached in production through the Snapser Hermes WebSocket (MESSAGE_TYPE_SNAP_API_PROXY) and locally through the validator's own Hermes-emulation endpoint (GET /hermes/ws?token=<player-id>, WebSocket upgrade). The HTTP surface below carries the platform probe, status, state-history debug tooling, and the MCP debugging endpoint.\n\nAuthentication: each operation declares `x-snapser-auth-types` (user|api-key|internal). Operations that also set `x-snapser-auth-passthrough: true` are public \u2014 the gateway does not require a session token. The validator binds user-context requests to the gateway-validated User-Id header (must match player_id / the match owner); the same binding applies to gRPC metadata."
   },
   "servers": [
     {
@@ -26,7 +26,7 @@
     },
     {
       "name": "Realtime",
-      "description": "Socket.IO transport for live validation"
+      "description": "Hermes-envelope WebSocket (local emulation of the gateway's Hermes endpoint)"
     },
     {
       "name": "Debug",
@@ -118,74 +118,6 @@
         "x-snapser-auth-passthrough": true
       }
     },
-    "/api/match/init": {
-      "post": {
-        "tags": [
-          "Match"
-        ],
-        "summary": "Initialize a match",
-        "description": "Registers a new match with its starting synchronized state and returns a short-lived connection token used to open the Socket.IO connection. The gateway-validated `User-Id` header must match `player_id` (api-key/internal callers are accepted without user binding).",
-        "operationId": "initMatch",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidatorInitRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Match initialized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidatorInitResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing required fields",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Caller not authorized for this player_id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "x-snapser-auth-types": [
-          "user",
-          "api-key",
-          "internal"
-        ],
-        "x-snapser-auth-passthrough": true
-      }
-    },
     "/api/match/init-from-history": {
       "post": {
         "tags": [
@@ -206,11 +138,26 @@
         },
         "responses": {
           "200": {
-            "description": "Match initialized from history",
+            "description": "Match registered from history",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidatorInitResponse"
+                  "type": "object",
+                  "properties": {
+                    "match_id": {
+                      "type": "string"
+                    },
+                    "state_count": {
+                      "type": "integer"
+                    },
+                    "current_move_index": {
+                      "type": "integer"
+                    },
+                    "expires_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
                 }
               }
             }
@@ -377,122 +324,6 @@
         ]
       }
     },
-    "/socket.io/": {
-      "get": {
-        "tags": [
-          "Realtime"
-        ],
-        "summary": "Socket.IO transport (handshake / poll / WebSocket upgrade)",
-        "description": "Engine.IO/Socket.IO transport endpoint. Clients first GET to obtain a session id, then upgrade to WebSocket. The handshake `auth` payload must include `connection_id` (from /api/match/init) and `player_id`. After connection the server emits `ready`; clients emit `validate_action` ({ index, action, state_hash }) and receive a signed match/mismatch response. This endpoint is a real-time transport and is only partially describable in OpenAPI.",
-        "operationId": "socketIoTransportGet",
-        "parameters": [
-          {
-            "name": "EIO",
-            "in": "query",
-            "required": false,
-            "description": "Engine.IO protocol version",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "transport",
-            "in": "query",
-            "required": false,
-            "description": "Transport type (polling or websocket)",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "polling",
-                "websocket"
-              ]
-            }
-          },
-          {
-            "name": "sid",
-            "in": "query",
-            "required": false,
-            "description": "Engine.IO session id (after handshake)",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Engine.IO transport response (handshake or polling payload)"
-          },
-          "101": {
-            "description": "Switching Protocols (WebSocket upgrade)"
-          }
-        },
-        "x-snapser-auth-types": [
-          "user",
-          "api-key",
-          "internal"
-        ],
-        "x-snapser-auth-passthrough": true
-      },
-      "post": {
-        "tags": [
-          "Realtime"
-        ],
-        "summary": "Socket.IO transport (polling write)",
-        "description": "Engine.IO polling-transport write channel. Used by the long-polling fallback to send client packets.",
-        "operationId": "socketIoTransportPost",
-        "parameters": [
-          {
-            "name": "EIO",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "transport",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "polling",
-                "websocket"
-              ]
-            }
-          },
-          {
-            "name": "sid",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Acknowledged"
-          }
-        },
-        "x-snapser-auth-types": [
-          "user",
-          "api-key",
-          "internal"
-        ],
-        "x-snapser-auth-passthrough": true
-      }
-    },
     "/mcp": {
       "post": {
         "tags": [
@@ -527,6 +358,41 @@
           "api-key",
           "internal"
         ]
+      }
+    },
+    "/hermes/ws": {
+      "get": {
+        "tags": [
+          "Realtime"
+        ],
+        "summary": "Hermes-envelope WebSocket (local dev emulation)",
+        "description": "WebSocket upgrade carrying binary protobuf hermes.ClientMessage/ServerMessage frames \u2014 the same envelope the Snapser Hermes endpoint speaks. snap_api_request payloads are dispatched to the ValidatorService RPC handlers. The ?token= query param is the self-stamped player id locally (gateway headers win when present). Not meaningfully reachable through the gateway (use the real Hermes endpoint there); only partially describable in OpenAPI.",
+        "operationId": "hermesWs",
+        "x-snapser-auth-types": [
+          "user",
+          "api-key",
+          "internal"
+        ],
+        "x-snapser-auth-passthrough": true,
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Local self-stamped player id (the deployed Hermes endpoint takes the session token here)."
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols (WebSocket upgrade)"
+          },
+          "401": {
+            "description": "Missing token / gateway identity"
+          }
+        }
       }
     }
   },
@@ -699,47 +565,6 @@
         "required": [
           "moveIndex",
           "state"
-        ]
-      },
-      "ValidatorInitRequest": {
-        "type": "object",
-        "properties": {
-          "match_id": {
-            "type": "string"
-          },
-          "starting_state": {
-            "$ref": "#/components/schemas/SynchronizedGameState"
-          },
-          "player_id": {
-            "type": "string"
-          },
-          "signature": {
-            "type": "string",
-            "description": "Legacy Nakama HMAC field — ignored; auth is the gateway-validated User-Id header"
-          }
-        },
-        "required": [
-          "match_id",
-          "starting_state",
-          "player_id"
-        ]
-      },
-      "ValidatorInitResponse": {
-        "type": "object",
-        "properties": {
-          "connection_id": {
-            "type": "string",
-            "description": "Token used in the Socket.IO handshake auth"
-          },
-          "expires_at": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Token expiry, epoch milliseconds"
-          }
-        },
-        "required": [
-          "connection_id",
-          "expires_at"
         ]
       },
       "ValidatorInitFromHistoryRequest": {

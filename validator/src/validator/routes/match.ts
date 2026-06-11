@@ -1,15 +1,15 @@
+// Debug/tooling HTTP routes: state-history replay (init-from-history /
+// save-history / load-history). Game-facing match RPCs (InitMatch /
+// ValidateAction / CompleteMatch) live on the gRPC + Hermes transports —
+// see service.ts and protos/moveborne/validator/v1/validator.proto.
 import { Hono } from "hono";
 import type {
-  ValidatorInitRequest,
-  ValidatorInitResponse,
   ValidatorInitFromHistoryRequest,
   StoredMatch,
   StateHistorySnapshot,
   StateHistoryFile,
-  MatchMode,
 } from "../types";
 import { getConfig } from "../config";
-import { generateConnectionId } from "../utils/crypto";
 import { verifySnapserCaller } from "../utils/snapser-auth";
 import type { MatchStateStore } from "../store/match-state";
 import type { IHistoryStore } from "../store/history-store";
@@ -18,82 +18,6 @@ import { join } from "node:path";
 
 export function createMatchRoutes(store: MatchStateStore, historyStore: IHistoryStore) {
   const app = new Hono();
-
-  app.post("/init", async (c) => {
-    try {
-      const body = (await c.req.json()) as ValidatorInitRequest;
-      const { match_id, starting_state, player_id } = body;
-      const mode: MatchMode = body.mode === "pvp" || body.mode === "infinite" ? body.mode : "story";
-
-      if (!match_id || !starting_state || !player_id) {
-        return c.json(
-          {
-            error: "VALIDATION_ERROR",
-            message: "Missing required fields: match_id, starting_state, player_id",
-          },
-          400,
-        );
-      }
-
-      const config = getConfig();
-
-      const auth = verifySnapserCaller(c.req.header(), player_id);
-      if (!auth.ok) {
-        return c.json(
-          {
-            error: "UNAUTHORIZED",
-            message: auth.reason,
-          },
-          401,
-        );
-      }
-
-      const connection_id = generateConnectionId();
-      const now = Date.now();
-      const expires_at = now + config.connectionTokenTTL * 1000;
-
-      const state_history = new Map<number, typeof starting_state>();
-      state_history.set(starting_state.moveIndex, starting_state);
-
-      const storedMatch: StoredMatch = {
-        match_id,
-        current_state: starting_state,
-        connection_id,
-        player_id,
-        mode,
-        created_at: now,
-        last_action_at: now,
-        action_count: 0,
-        state_history,
-        rewards_granted: false,
-      };
-
-      console.log(`Match initialized: ${match_id} for player ${player_id} (mode=${mode})`);
-      console.log(`Starting state received:`, {
-        tiles: starting_state.board.tiles.filter(t => !t.isEmpty),
-        rngIndices: starting_state.rngIndices,
-        moveIndex: starting_state.moveIndex,
-      });
-
-      await store.set(match_id, storedMatch, config.matchSessionTTL);
-
-      const response: ValidatorInitResponse = {
-        connection_id,
-        expires_at,
-      };
-
-      return c.json(response, 200);
-    } catch (error) {
-      console.error("Error initializing match:", error);
-      return c.json(
-        {
-          error: "INTERNAL_ERROR",
-          message: "Failed to initialize match",
-        },
-        500,
-      );
-    }
-  });
 
   app.post("/init-from-history", async (c) => {
     try {
@@ -110,7 +34,7 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
         );
       }
 
-      // Same caller check as /init.
+      // Same caller check as the InitMatch RPC.
       const auth = verifySnapserCaller(c.req.header(), player_id);
       if (!auth.ok) {
         return c.json(
@@ -207,14 +131,11 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
       }
 
       const config = getConfig();
-      const connection_id = generateConnectionId();
       const now = Date.now();
-      const expires_at = now + config.connectionTokenTTL * 1000;
 
       const storedMatch: StoredMatch = {
         match_id,
         current_state: currentState,
-        connection_id,
         player_id,
         mode: "story",
         created_at: now,
@@ -226,20 +147,15 @@ export function createMatchRoutes(store: MatchStateStore, historyStore: IHistory
 
       console.log(`Match initialized from history: ${match_id} for player ${player_id}`);
       console.log(`Loaded ${states.length} states, starting from moveIndex ${startIndex}`);
-      console.log(`Current state:`, {
-        tiles: currentState.board.tiles.filter(t => !t.isEmpty),
-        rngIndices: currentState.rngIndices,
-        moveIndex: currentState.moveIndex,
-      });
 
       await store.set(match_id, storedMatch, config.matchSessionTTL);
 
-      const response: ValidatorInitResponse = {
-        connection_id,
-        expires_at,
-      };
-
-      return c.json(response, 200);
+      return c.json({
+        match_id,
+        state_count: states.length,
+        current_move_index: startIndex,
+        expires_at: now + config.matchSessionTTL * 1000,
+      }, 200);
     } catch (error) {
       console.error("Error initializing match from history:", error);
       return c.json(

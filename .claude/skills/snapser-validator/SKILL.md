@@ -1,6 +1,6 @@
 ---
 name: snapser-validator
-description: Authenticate against the Snapser gateway (anonymous login) and call the validator BYOSnap. Use when you need to smoke-test or hit validator endpoints (/health, /api/status, /api/match/init, /socket.io) through the gateway, which requires a session token. Handles login, token caching in a dotfile, and authenticated requests.
+description: Authenticate against the Snapser gateway (anonymous login) and call the validator BYOSnap. Use when you need to smoke-test validator endpoints (/health, /api/status) through the gateway, or to obtain a session token for the Hermes WSS endpoint (wss://gateway.snapser.com/<snapend>/v1/hermes/ws?token=...), which carries the gRPC match RPCs. Handles login, token caching in a dotfile, and authenticated requests.
 ---
 
 # Snapser Validator Client
@@ -39,7 +39,8 @@ python3 .claude/skills/snapser-validator/scripts/client.py smoke      # login + 
 python3 .claude/skills/snapser-validator/scripts/client.py login      # anon login, cache token
 python3 .claude/skills/snapser-validator/scripts/client.py token      # print cached session token
 python3 .claude/skills/snapser-validator/scripts/client.py call GET /health
-python3 .claude/skills/snapser-validator/scripts/client.py call POST /api/match/init --body '{"match_id":"m1","player_id":"<your user_id>","starting_state":{...}}'
+# Match RPCs are gRPC via Hermes WSS, not HTTP — get a token for the WS URL with:
+python3 .claude/skills/snapser-validator/scripts/client.py token
 ```
 
 `call` auto-logs-in if there is no cached token and retries once if the token is stale.
@@ -48,8 +49,11 @@ It targets `<gateway><snap_prefix><path>`, so pass app-relative paths like `/hea
 ## Notes
 
 - Auth-types per endpoint live in `validator/swagger.json`. `/health`, `/api/status`, `/`,
-  `/api/match/init`, `/api/match/init-from-history`, and `/socket.io/` accept user tokens
-  (passthrough). `/mcp`, `/api/match/save-history`, `/api/match/load-history` are
-  api-key/internal only and will 401/400 for a user session token (by design).
-- For WebSocket (`/socket.io/`) the client passes the same session token plus the validator's
-  own `connection_id` (from `/api/match/init`) in the Socket.IO handshake `auth`.
+  and `/api/match/init-from-history` accept user tokens (passthrough). `/mcp`,
+  `/api/match/save-history`, `/api/match/load-history` are api-key/internal only and will
+  401/400 for a user session token (by design).
+- Game-facing match RPCs (InitMatch/ValidateAction/CompleteMatch) are gRPC
+  (`moveborne.validator.v1.ValidatorService`, protos in `validator/protos/`) reached through
+  the Hermes WSS endpoint with the cached session token as the `?token=` query param —
+  binary protobuf ClientMessage/ServerMessage frames (MESSAGE_TYPE_SNAP_API_PROXY). See
+  `game/tools/test_snapser_client.gd` for a working end-to-end example.

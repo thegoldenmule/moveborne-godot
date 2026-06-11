@@ -23,9 +23,9 @@ function getEnvNumber(name: string, defaultValue: number): number {
 export function loadConfig(): ValidatorConfig {
   return {
     sharedSecret: getEnvVar("VALIDATOR_SHARED_SECRET"),
-    connectionTokenTTL: getEnvNumber("CONNECTION_TOKEN_TTL", 300),
     matchSessionTTL: getEnvNumber("MATCH_SESSION_TTL", 3600),
     port: getEnvNumber("PORT", 3000),
+    grpcPort: getEnvNumber("GRPC_PORT", 8081),
     snapserGatewayUrl: getEnvVar("SNAPSER_GATEWAY_URL", "https://gateway.snapser.com/c4n1awfs"),
     snapserApiKey: process.env.SNAPSER_API_KEY || undefined,
     // Platform-injected inside the snapend; absent in local dev.

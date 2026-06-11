@@ -1,6 +1,6 @@
 {
   "name": "byosnap-validator",
-  "description": "Real-time game-action validation service",
+  "description": "Real-time game-action validation service (gRPC + Hermes transport)",
   "platform": "linux/arm64",
   "language": "node",
   "prefix": "/v1",
@@ -9,7 +9,12 @@
       "name": "http",
       "port": 8080
     },
-    "internal_ports": []
+    "internal_ports": [
+      {
+        "name": "grpc",
+        "port": 8081
+      }
+    ]
   },
   "readiness_probe_config": {
     "initial_delay_seconds": 5,
@@ -31,8 +36,8 @@
         "value": "8080"
       },
       {
-        "key": "CONNECTION_TOKEN_TTL",
-        "value": "300"
+        "key": "GRPC_PORT",
+        "value": "8081"
       },
       {
         "key": "MATCH_SESSION_TTL",
@@ -65,8 +70,8 @@
         "value": "8080"
       },
       {
-        "key": "CONNECTION_TOKEN_TTL",
-        "value": "300"
+        "key": "GRPC_PORT",
+        "value": "8081"
       },
       {
         "key": "MATCH_SESSION_TTL",
@@ -99,8 +104,8 @@
         "value": "8080"
       },
       {
-        "key": "CONNECTION_TOKEN_TTL",
-        "value": "300"
+        "key": "GRPC_PORT",
+        "value": "8081"
       },
       {
         "key": "MATCH_SESSION_TTL",

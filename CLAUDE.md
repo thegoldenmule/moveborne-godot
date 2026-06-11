@@ -11,7 +11,7 @@ Godot 4.6 port of the originally TypeScript/PixiJS client. The top-level directo
 | Dir | Project | Toolchain |
 |---|---|---|
 | `game/` | The Godot 4.6 (GDScript) game client + pure rules engine | Godot 4.6.3 |
-| `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + Socket.IO |
+| `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + gRPC (protos in `validator/protos/`) |
 | `wiki/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
 | `snapser-docs/` | Vendored Snapser platform docs + swagger (reference only, not built) | — |
 | `art/` | Source art (`MoveBorne.psd`), extracted renders (`extracted/`), and the visual style guide | — |
@@ -35,7 +35,7 @@ Don't restate the architecture here — read the canonical pages:
 | Driving the game via MCP (the `MbDebug` autoload) | `game/MCP_GAME_API.md` |
 | Native VFX mapping | `game/VFX_MAPPING.md` |
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
-| Running the validator, its HTTP/Socket.IO/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
+| Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
 | Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
 
@@ -67,7 +67,7 @@ a `.gd` file, `filesystem_manage reimport` the changed paths. See `game/CLAUDE.m
 ```bash
 cd validator
 bun install            # installs deps + links the src/logic workspace
-bun run dev            # hot-reload (bun --watch); HTTP + Socket.IO + MCP on :5555
+bun run dev            # hot-reload (bun --watch); HTTP + Hermes WS + MCP on :5555, gRPC on :8081
 bun run build          # rebuild src/logic/dist from its TS source (only when logic changes)
 bun run test           # run the logic package's tests
 bun run type-check     # tsc --noEmit on the validator
@@ -88,16 +88,22 @@ e.g. `/v1/byosnap-validator`) without stripping it, so routes are served under t
 
 Two targets, same `validator/` code:
 
-- **Story (and PvP)** sign in to Snapser anonymously and validate against the **deployed
-  BYOSnap** (gateway + `/v1/byosnap-validator`); **Infinite is always offline**. See
-  `game/net/snapser_auth.gd` + `_connect_snapser()` in `game/scenes/main.gd`.
+- **Story (and PvP)** sign in to Snapser anonymously and validate through the **Snapser Hermes
+  WSS endpoint** (`wss://gateway.snapser.com/c4n1awfs/v1/hermes/ws?token=<session>`, protobuf
+  envelope → the BYOSnap's gRPC service); **Infinite is always offline**. See
+  `game/net/snapser_auth.gd` + `_connect_snapser()` in `game/scenes/main.gd`. The token-in-query
+  auth also works from web exports (browsers can't set WS upgrade headers).
 - **Local dev:** start `tools/run_validator.sh` (one-shot) **or** `cd validator && bun run dev`
   **or** the `run-validator` skill (all serve `:5555`), then press **`V`** in-game
-  (`main.gd` → `LOCAL_VALIDATOR_URL`). The HUD shows `validator: ✓ move N`; on a hash mismatch
-  the client snaps to authoritative state.
-- **Auth has no bypass switch.** Match-init + the Socket.IO handshake bind the gateway-validated
-  `User-Id` header to `player_id`. Locally there's no gateway, so callers self-stamp a matching
-  `User-Id` (the game and `run_validator.sh` do this). api-key/internal callers pass unbound.
+  (`main.gd` → `LOCAL_VALIDATOR_WS`, the validator's Hermes-emulation endpoint — same envelope,
+  same client codepath). The HUD shows `validator: ✓ move N`; on a hash mismatch the client
+  snaps to authoritative state.
+- **Auth has no bypass switch.** Every RPC binds the gateway-validated identity to the match
+  owner (`player_id`). Locally there's no gateway, so the Hermes-emulation endpoint's `?token=`
+  query param IS the self-stamped player id. api-key/internal callers pass unbound.
+- **Wire format:** all message types are protobuf (`validator/protos/`); game state/actions stay
+  canonical-JSON strings inside proto fields (the determinism hash domain). GDScript bindings are
+  godobuf-generated into `game/net/proto/` — regenerate per its README when protos change.
 
 ## MCP servers & skills
 

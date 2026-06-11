@@ -24,7 +24,11 @@ COPY . .
 # Run the validator from its package dir so process.cwd()-relative paths match local.
 WORKDIR /app/src/validator
 
+# HTTP on :8080 (gateway ingress + platform probe, as the original deploy);
+# the gRPC ValidatorService is additive on the internal :8081 port.
 ENV PORT=8080
+ENV GRPC_PORT=8081
 EXPOSE 8080
+EXPOSE 8081
 
 CMD ["bun", "run", "index.ts"]

@@ -160,7 +160,7 @@ Three things must be reproduced **byte-for-byte**:
 
 ### Phase 3 — Networking
 **Validator integration ✅ (2026-06-03) — Nakama omitted per owner.**
-- [x] **Validator client** — `net/validator_client.gd` (`MbValidatorClient`): hand-rolled **Engine.IO v4 / Socket.IO v5 over `WebSocketPeer`** + `HTTPRequest`. HTTP `POST /api/match/init` → Socket.IO CONNECT (auth `{connection_id, player_id}`) → `ready` → `validate_action` emits with ack; match → keep optimistic, mismatch → adopt corrected state.
+- [x] **Validator client** — `net/hermes_client.gd` (`MbHermesClient`): **protobuf Hermes envelope over `WebSocketPeer`** (godobuf bindings in `net/proto/`). One codepath for both targets: local validator's Hermes-emulation WS or the deployed gateway Hermes WSS (`?token=` auth). InitMatch → ready, ValidateAction (mid-correlated) → match keeps optimistic / mismatch adopts authoritative state, CompleteMatch settles rewards. (Replaced the original hand-rolled Engine.IO/Socket.IO client.)
 - [x] **Wired into the game** — `match_controller.gd` sends a `validate_action` per committed swipe/card/totem; `main.gd` `V` connects, status label shows ✓/✗ per move.
 - [x] **Run the validator** locally (no gateway; the client self-stamps the `User-Id` the validator binds to): `tools/run_validator.sh` wraps this repo's self-contained `validator/` (Bun workspace; the `workspace:*` logic dep satisfied via the committed prebuilt dist). Health on `:5555`.
 - [x] **Live parity verified**: the validator confirmed the running Godot game's moves with `hash_match=true` (moves 0/1/2); UI shows "validator: ✓ move N ok". The byte-exact engine means the optimistic fast-path hits every move.

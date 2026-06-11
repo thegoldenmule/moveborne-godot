@@ -1,0 +1,60 @@
+{
+  "generated_by": "validator/src/validator/tools/generate-hermes-golden.ts",
+  "cases": {
+    "client_init": {
+      "description": "ClientMessage snap_api_request(InitMatch)",
+      "type": "ClientMessage",
+      "bytes": "0a03672d3110041880e9abd10692038e010a322f6d6f7665626f726e652e76616c696461746f722e76312e56616c696461746f72536572766963652f496e69744d6174636812580a0c676f6c64656e2d6d6174636812327b2273636f7265223a302c226d6f7665496e646578223a302c226e6f7465223a22c3bc6ec3af63c3b664c3a920e29c93227d1a0d676f6c64656e2d706c61796572220573746f7279",
+      "expect": {
+        "mid": "g-1",
+        "message_type": 4,
+        "timestamp": 1781200000
+      },
+      "payload_expect": {
+        "match_id": "golden-match",
+        "player_id": "golden-player",
+        "mode": "story",
+        "starting_state_json": "{\"score\":0,\"moveIndex\":0,\"note\":\"ünïcödé ✓\"}"
+      }
+    },
+    "server_validate_mismatch": {
+      "description": "ServerMessage api_response(ValidateActionResponse mismatch)",
+      "type": "ServerMessage",
+      "bytes": "0a03672d3210041881e9abd106920397010a372f6d6f7665626f726e652e76616c696461746f722e76312e56616c696461746f72536572766963652f56616c6964617465416374696f6e1081e9abd1061a54080710001a0c7b2273636f7265223a38307d2240616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261622000",
+      "payload_expect": {
+        "index": 7,
+        "matched": false,
+        "state_json": "{\"score\":80}"
+      }
+    },
+    "server_complete_maps": {
+      "description": "ServerMessage api_response(CompleteMatchResponse with maps)",
+      "type": "ServerMessage",
+      "bytes": "0a03672d3310041882e9abd106920389010a362f6d6f7665626f726e652e76616c696461746f722e76312e56616c696461746f72536572766963652f436f6d706c6574654d617463681082e9abd1061a470a0c676f6c64656e2d6d61746368120b0a05636f696e7312023132120a0a05736f756c731201311a1c0a05636f696e7312133930303030303030303030303030303030303020012000",
+      "payload_expect": {
+        "match_id": "golden-match",
+        "rewards": {
+          "coins": "12",
+          "souls": "1"
+        },
+        "balances": {
+          "coins": "9000000000000000000"
+        },
+        "granted": true
+      }
+    },
+    "server_error": {
+      "description": "ServerMessage error (invalid service, code 500)",
+      "type": "ServerMessage",
+      "bytes": "0a03672d3410051883e9abd1065a1408f403120f696e76616c69642073657276696365",
+      "expect": {
+        "mid": "g-4",
+        "message_type": 5
+      },
+      "error_expect": {
+        "code": 500,
+        "error_message": "invalid service"
+      }
+    }
+  }
+}

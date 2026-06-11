@@ -4,7 +4,6 @@ export interface MatchStateStore {
   get(key: string): Promise<StoredMatch | null>;
   set(key: string, match: StoredMatch, ttlSeconds: number): Promise<void>;
   delete(key: string): Promise<void>;
-  getByConnectionId(connectionId: string): Promise<StoredMatch | null>;
   getAll(): Promise<StoredMatch[]>;
 }
 
@@ -15,7 +14,6 @@ interface CacheEntry {
 
 export class InMemoryMatchStateStore implements MatchStateStore {
   private matchCache: Map<string, CacheEntry> = new Map();
-  private connectionToMatchCache: Map<string, string> = new Map();
   private cleanupInterval: Timer | null = null;
 
   constructor() {
@@ -35,7 +33,6 @@ export class InMemoryMatchStateStore implements MatchStateStore {
     for (const [key, entry] of this.matchCache.entries()) {
       if (entry.expiresAt < now) {
         expiredKeys.push(key);
-        this.connectionToMatchCache.delete(entry.match.connection_id);
       }
     }
 
@@ -52,7 +49,6 @@ export class InMemoryMatchStateStore implements MatchStateStore {
 
     if (entry.expiresAt < Date.now()) {
       this.matchCache.delete(matchId);
-      this.connectionToMatchCache.delete(entry.match.connection_id);
       return null;
     }
 
@@ -66,24 +62,10 @@ export class InMemoryMatchStateStore implements MatchStateStore {
       match,
       expiresAt,
     });
-
-    this.connectionToMatchCache.set(match.connection_id, matchId);
   }
 
   async delete(matchId: string): Promise<void> {
-    const entry = this.matchCache.get(matchId);
-    if (entry) {
-      this.connectionToMatchCache.delete(entry.match.connection_id);
-    }
     this.matchCache.delete(matchId);
-  }
-
-  async getByConnectionId(connectionId: string): Promise<StoredMatch | null> {
-    const matchId = this.connectionToMatchCache.get(connectionId);
-    if (!matchId) {
-      return null;
-    }
-    return this.get(matchId);
   }
 
   async getAll(): Promise<StoredMatch[]> {

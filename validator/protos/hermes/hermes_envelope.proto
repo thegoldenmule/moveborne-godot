@@ -1,0 +1,97 @@
+// Snapser Hermes WebSocket envelope — reconstructed from the platform's
+// generated Go stubs (snapser-pb/hermes_types.pb.go). Field numbers and enum
+// values are LOAD-BEARING: they must match what the deployed Hermes service
+// speaks. Only the subset the validator/game actually exchange is modeled
+// (snap-api proxy + ping/pong + error); unknown server fields are skipped by
+// any conformant proto3 decoder.
+//
+// Live-verified against wss://gateway.snapser.com/c4n1awfs/v1/hermes/ws
+// (2026-06-11): snap_api_request → api_response round-trips with mid
+// correlation; unknown services answer MESSAGE_TYPE_ERROR{500,"invalid
+// service"}. NOTE: sending Message_Ping caused the live endpoint to drop the
+// connection — clients must not initiate pings; rely on WS protocol-level
+// keepalive instead.
+syntax = "proto3";
+
+package hermes;
+
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TYPE_SNAP_API_PROXY = 4;
+  MESSAGE_TYPE_ERROR = 5;
+  MESSAGE_TYPE_PINGPONG = 7;
+  MESSAGE_TYPE_SNAP_EVENT = 8;
+  MESSAGE_TYPE_PRESENCE = 9;
+  MESSAGE_TYPE_USER_NOTIFICATION = 10;
+  MESSAGE_TYPE_USER_PRESENCE_UPDATE = 11;
+}
+
+message Message_Ping {}
+message Message_Pong {}
+
+message Message_Error {
+  // Declared as ErrorCode (0 OK, 1 INTERNAL, 2 INVALID_ARGUMENT, 3 NOT_FOUND,
+  // 4 ALREADY_EXISTS, 5 BUFFER_FULL, 6 PERMISSION_DENIED) in the platform
+  // proto, but the live service also sends values outside that enum (observed:
+  // 500 for "invalid service"). Modeled as int32 — wire-compatible varint —
+  // so out-of-range values round-trip cleanly.
+  int32 code = 1;
+  // Named `message` in the platform proto; renamed here (and in SnapApiError)
+  // because field names are not on the wire and godobuf cannot parse a field
+  // named `message`.
+  string error_message = 2;
+}
+
+message Message_SnapApiRequest {
+  // Full gRPC method path, e.g.
+  // "/moveborne.validator.v1.ValidatorService/ValidateAction".
+  // Named `method` in the platform proto; renamed (wire-safe — names are not
+  // encoded) because godobuf generates has_method(), colliding with Godot
+  // Object.has_method().
+  string api_method = 1;
+  // Request message, serialized as protobuf bytes.
+  bytes payload = 2;
+}
+
+message SnapApiError {
+  // gRPC status code (e.g. 5 NOT_FOUND, 7 PERMISSION_DENIED, 16 UNAUTHENTICATED).
+  int32 code = 1;
+  string error_message = 2;  // `message` in the platform proto (godobuf keyword)
+  repeated string details = 3;
+}
+
+message Message_SnapApiResponse {
+  string caller_method = 1;
+  int64 caller_time = 2;
+  // Response message, serialized as protobuf bytes (empty on error).
+  bytes payload = 3;
+  bool is_error = 4;
+  optional SnapApiError error = 5;
+}
+
+message ClientMessage {
+  // Message id — the ServerMessage response echoes it (request correlation).
+  string mid = 1;
+  MessageType message_type = 2;
+  // Client time when the message was sent.
+  int64 timestamp = 3;
+  // Relay recipients (unused for snap-api proxy).
+  repeated string recipients = 4;
+  oneof msg {
+    Message_Ping ping = 10;
+    Message_SnapApiRequest snap_api_request = 50;
+  }
+}
+
+message ServerMessage {
+  string mid = 1;
+  MessageType message_type = 2;
+  int64 timestamp = 3;
+  repeated string recipients = 4;
+  string sender = 5;
+  oneof msg {
+    Message_Pong pong = 10;
+    Message_Error error = 11;
+    Message_SnapApiResponse api_response = 50;
+  }
+}

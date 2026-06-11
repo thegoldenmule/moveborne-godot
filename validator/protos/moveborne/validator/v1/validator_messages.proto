@@ -1,0 +1,73 @@
+// Message types for the Moveborne validator wire protocol. Split from the
+// service declaration (validator.proto) because godobuf — the GDScript
+// binding generator — parses messages but not service blocks.
+//
+// SynchronizedGameState and GameAction travel as canonical-JSON strings, NOT
+// proto messages: the determinism state hash is computed over canonical JSON
+// (byte-for-byte parity between the TS logic dist and the GDScript port), so
+// the wire format must not re-model them.
+syntax = "proto3";
+
+package moveborne.validator.v1;
+
+message InitMatchRequest {
+  string match_id = 1;
+  // Canonical SynchronizedGameState JSON.
+  string starting_state_json = 2;
+  // Must match the gateway-bound identity (User-Id) for user callers.
+  string player_id = 3;
+  // "story" | "pvp" | "infinite" — selects the reward TABLE only; amounts
+  // always derive from the validator-validated state.
+  string mode = 4;
+}
+
+message InitMatchResponse {
+  string match_id = 1;
+  // Authoritative state as registered (canonical JSON).
+  string current_state_json = 2;
+  // Match session expiry, ms since epoch.
+  int64 expires_at = 3;
+}
+
+message ValidateActionRequest {
+  string match_id = 1;
+  // Client moveIndex before the action.
+  uint32 index = 2;
+  // Canonical GameAction JSON.
+  string action_json = 3;
+  // The client post-action state-hash claim.
+  string state_hash = 4;
+}
+
+message ValidateActionResponse {
+  uint32 index = 1;
+  // True when the client hash matched (keep the optimistic state).
+  bool matched = 2;
+  // Authoritative post-action state (canonical JSON) — set only on mismatch.
+  string state_json = 3;
+  // HMAC-SHA256 over {match_id, index, action, state_hash} with the
+  // validator shared secret (state_hash = the validator-computed hash).
+  string signature = 4;
+}
+
+message CompleteMatchRequest {
+  string match_id = 1;
+}
+
+message CompleteMatchResponse {
+  string match_id = 1;
+  // Currency deltas granted by the reward table (int64-as-string, Snapser
+  // *_64 convention); empty when already settled or awards disabled.
+  map<string, string> rewards = 2;
+  // current_balance_64 per granted currency when the Inventory s2s call
+  // succeeded.
+  map<string, string> balances = 3;
+  // False when this completion did not settle (already settled, or s2s
+  // awards disabled in this environment).
+  bool granted = 4;
+}
+
+// Failures use standard gRPC status codes (also carried in the Hermes
+// SnapApiError envelope): NOT_FOUND (unknown/expired match),
+// PERMISSION_DENIED (caller is not the match owner), INVALID_ARGUMENT
+// (malformed request or action execution failed), INTERNAL.

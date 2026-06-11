@@ -1,15 +1,15 @@
 extends SceneTree
 
 ## Headless end-to-end check of the SNAPSER online path (real network):
-## anonymous gateway login (MbSnapserAuth) -> POST /api/match/init through the
-## gateway with Token/User-Id -> Socket.IO over wss -> validate_action -> MATCH.
+## anonymous gateway login (MbSnapserAuth) -> Hermes WSS with the session token
+## as ?token= query param -> InitMatch -> ValidateAction -> MATCH.
 ##   godot --headless --path . --script res://tools/test_snapser_client.gd
 
 const AuthS := preload("res://net/snapser_auth.gd")
-const ClientS := preload("res://net/validator_client.gd")
+const ClientS := preload("res://net/hermes_client.gd")
 const MbEngineS := preload("res://logic/engine.gd")
 
-const SNAPSER_VALIDATOR_URL := AuthS.GATEWAY + "/v1/byosnap-validator"
+const SNAPSER_HERMES_WS := "wss://gateway.snapser.com/c4n1awfs/v1/hermes/ws"
 
 var _auth
 var _client
@@ -35,8 +35,8 @@ func _start() -> void:
 	_client.ready_received.connect(func(_cur): _on_ready(starting))
 	_client.action_validated.connect(_on_validated)
 	_client.validator_error.connect(func(m): _fail("validator_error: " + m))
-	_client.init_and_connect(SNAPSER_VALIDATOR_URL, "gd_e2e_%d" % (randi() % 1000000),
-		starting, _auth.user_id, _auth.auth_headers())
+	_client.init_and_connect(SNAPSER_HERMES_WS + "?token=" + _auth.session_token,
+		"gd_e2e_%d" % (randi() % 1000000), starting, _auth.user_id)
 
 
 func _on_ready(starting: Dictionary) -> void:

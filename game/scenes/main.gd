@@ -6,7 +6,7 @@ extends Control
 
 const MbMatchS := preload("res://game/match_controller.gd")
 const BoardViewS := preload("res://scenes/board_view.gd")
-const MbValidatorClientS := preload("res://net/validator_client.gd")
+const MbHermesClientS := preload("res://net/hermes_client.gd")
 const MbSnapserAuthS := preload("res://net/snapser_auth.gd")
 const Style := preload("res://scenes/style.gd")
 const CountdownS := preload("res://scenes/countdown.gd")
@@ -14,11 +14,12 @@ const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 
-## Local dev validator (the V-key debug shortcut; tools/run_validator.sh).
-const LOCAL_VALIDATOR_URL := "http://localhost:5555"
-## Snapser-deployed validator BYOSnap: gateway + snap prefix. The validator serves
-## all routes (incl. /socket.io) under this base path, so the client just appends.
-const SNAPSER_VALIDATOR_URL := MbSnapserAuthS.GATEWAY + "/v1/byosnap-validator"
+## Local dev validator (the V-key debug shortcut; tools/run_validator.sh): the
+## validator's Hermes-emulation WS endpoint — same envelope as the gateway.
+const LOCAL_VALIDATOR_WS := "ws://localhost:5555/hermes/ws"
+## Snapser Hermes WSS endpoint: auth is the ?token= query param (session token),
+## so this also works from web exports, where WS upgrade headers are blocked.
+const SNAPSER_HERMES_WS := "wss://gateway.snapser.com/c4n1awfs/v1/hermes/ws"
 
 ## Horizontal breathing room from the screen edges for the HUD (and a guard against
 ## the bottom nav / device notches eating UI). Logical px (canvas_items stretch).
@@ -171,7 +172,7 @@ func _build_ui() -> void:
 	_net_label.visible = false
 	add_child(_net_label)
 
-	_net = MbValidatorClientS.new()
+	_net = MbHermesClientS.new()
 	add_child(_net)
 	_match.validator = _net
 	_net.ready_received.connect(_on_net_ready)
@@ -788,7 +789,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					_match.online = false
 					_match.new_game()
 					_cancel_target()
-					_start_net(_net_base_url, _net_player_id, _net_headers)
+					_start_net(_net_ws_url, _net_player_id, _net_token)
 				else:
 					_cancel_target()
 					_match.new_game()
@@ -824,10 +825,10 @@ func _connect_validator() -> void:
 	_match.online = false
 	_match.new_game()
 	_cancel_target()
-	# No gateway in front of the local validator, so self-stamp the User-Id it now
-	# requires (== player_id). Locally this is just a consistency check, not real auth.
+	# No gateway in front of the local validator, so the ?token= param IS the
+	# self-stamped player id. Locally this is a consistency check, not real auth.
 	var player_id := "player_%d" % (randi() % 1000000)
-	_start_net(LOCAL_VALIDATOR_URL, player_id, PackedStringArray(["User-Id: " + player_id]))
+	_start_net(LOCAL_VALIDATOR_WS, player_id, player_id)
 
 
 ## Story/PvP: anonymous Snapser sign-in, then register the CURRENT match state with
@@ -841,23 +842,23 @@ func _connect_snapser() -> void:
 	if not ok:
 		_on_net_error("Snapser sign-in failed")
 		return
-	_start_net(SNAPSER_VALIDATOR_URL, _auth.user_id, _auth.auth_headers())
+	_start_net(SNAPSER_HERMES_WS, _auth.user_id, _auth.session_token)
 
 
-var _net_base_url := ""          # last validator target, so R can re-register
+var _net_ws_url := ""            # last validator target, so R can re-register
 var _net_player_id := ""
-var _net_headers := PackedStringArray()
+var _net_token := ""
 
 
-func _start_net(base_url: String, player_id: String, headers: PackedStringArray) -> void:
-	_net_base_url = base_url
+func _start_net(ws_url: String, player_id: String, token: String) -> void:
+	_net_ws_url = ws_url
 	_net_player_id = player_id
-	_net_headers = headers
+	_net_token = token
 	var match_id := "gd_%d" % (randi() % 1000000)
-	_net.init_and_connect(base_url, match_id, _match.state, player_id, headers, _mode)
+	_net.init_and_connect(ws_url + "?token=" + token, match_id, _match.state, player_id, _mode)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
-	_toast.text = "Connecting to validator at %s …" % base_url
+	_toast.text = "Connecting to validator at %s …" % ws_url
 
 
 func _on_net_ready(_current_state: Dictionary) -> void:

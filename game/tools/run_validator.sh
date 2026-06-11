@@ -26,8 +26,8 @@ fi
 cd "$VALIDATOR"
 [ -d node_modules ] || bun install
 
-# No gateway in front locally, so callers self-stamp the User-Id the validator
-# requires (== player_id) — see scenes/main.gd / test_validator_client.gd.
+# No gateway in front locally, so the Hermes-emulation WS takes the self-stamped
+# player id as its ?token= param — see scenes/main.gd / test_validator_client.gd.
 echo "Starting in-repo validator on :$PORT"
 exec env \
   VALIDATOR_SHARED_SECRET="${VALIDATOR_SHARED_SECRET:-dev-secret}" \

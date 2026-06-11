@@ -22,7 +22,7 @@ no server changes.
 | 0 | Determinism primitives (seedrandom ARC4, custom hash, canonical JSON) | ✅ byte-exact |
 | 1 | Full deterministic engine (swipe + cards + totems + effects + events) | ✅ byte-exact |
 | 2 | Playable single-player (board, HUD, hand, cards, totems, scenarios) | ✅ |
-| 3 | Validator integration (Socket.IO over WebSocket) | ✅ — Nakama omitted |
+| 3 | Validator integration (gRPC via Hermes WSS, protobuf envelope) | ✅ — Nakama omitted |
 
 ## Requirements
 
@@ -76,7 +76,7 @@ logic/        Pure deterministic rules engine (no scene/Node deps). The core por
 game/
   match_controller.gd   MbMatch — owns game state, drives the engine, sends validations
 net/
-  validator_client.gd   hand-rolled Engine.IO/Socket.IO client over WebSocketPeer
+  hermes_client.gd      Hermes protobuf envelope over WebSocketPeer (godobuf bindings in net/proto/)
 scenes/
   main.gd / main.tscn   the playable scene (HUD, hand, targeting, scenarios, status)
   board_view.gd         board rendering + input + spawn/merge tweens

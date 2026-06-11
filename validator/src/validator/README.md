@@ -1,6 +1,6 @@
 # Moveborne Validator Service
 
-A high-performance real-time validation service for the Moveborne TCG platform, built with Bun, Hono, and Socket.IO.
+A high-performance real-time validation service for the Moveborne TCG platform, built with Bun, Hono, and gRPC (reached in production through the Snapser Hermes WebSocket; protos in `../../protos/`).
 
 ## Quick Start
 
@@ -29,10 +29,15 @@ The Validator service provides real-time validation for:
 
 This service uses:
 - **[Bun](https://bun.sh/)** - Fast JavaScript runtime (3-4x faster than Node.js)
-- **[Hono](https://hono.dev/)** - Lightweight web framework
-- **[Socket.IO](https://socket.io/)** - Real-time bidirectional communication
+- **[Hono](https://hono.dev/)** - Lightweight web framework (health/status/history/MCP routes)
+- **[@grpc/grpc-js](https://www.npmjs.com/package/@grpc/grpc-js)** - the game-facing
+  `moveborne.validator.v1.ValidatorService` (InitMatch / ValidateAction / CompleteMatch)
+- **[protobufjs](https://www.npmjs.com/package/protobufjs)** - runtime proto loading + the
+  Hermes ClientMessage/ServerMessage envelope served at `/hermes/ws` (local emulation of the
+  Snapser Hermes WSS endpoint, so the game client has one codepath)
 
-The implementation follows the pattern described in the [Socket.IO Bun Engine blog post](https://socket.io/blog/bun-engine/).
+Transports: gRPC on `GRPC_PORT` (Hermes proxies to it in the snapend), the Hermes-emulation
+WebSocket and HTTP on `PORT`. The transport-agnostic handlers live in `service.ts`.
 
 ## Configuration
 
@@ -51,8 +56,7 @@ cp .env.example .env
   - For development: Use the provided default in `.env`
   - For production: Generate a strong secret with `openssl rand -hex 32`
 
-- `CONNECTION_TOKEN_TTL` - Optional. Connection token time-to-live in seconds (default: 300)
-  - How long a connection token remains valid after `/api/match/init`
+- `GRPC_PORT` - Optional. gRPC ValidatorService port (default: 8081)
 
 - `MATCH_SESSION_TTL` - Optional. Match session time-to-live in seconds (default: 3600)
   - How long match state is retained after the last action

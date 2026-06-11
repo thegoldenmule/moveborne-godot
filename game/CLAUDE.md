@@ -28,7 +28,8 @@ logic/   pure rules engine (no Node/scene deps). class_name Mb* + static funcs.
           powercards.gd, validation.gd, tile_effects.gd, totems.gd, events.gd, scenarios.gd
 game/     match_controller.gd (MbMatch): state + new_game/swipe/play_card/spawn_totem,
           optional validator hookup.
-net/      validator_client.gd (MbValidatorClient): Engine.IO/Socket.IO over WebSocketPeer.
+net/      hermes_client.gd (MbHermesClient): protobuf Hermes envelope over WebSocketPeer;
+          proto/ holds the godobuf-generated bindings (see proto/README.md to regenerate).
 scenes/   main.gd/.tscn (playable scene), board_view.gd (render + input + tweens).
 tests/    McpTestSuite parity tests; tests/golden/ holds vectors + the *.mjs generators.
 tools/    verify_*.gd (headless parity), smoke_*.gd, run_validator.sh.

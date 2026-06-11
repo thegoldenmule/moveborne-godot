@@ -4,9 +4,9 @@ import type { ValidatorConfig } from "../types";
 
 const baseConfig: ValidatorConfig = {
   sharedSecret: "x",
-  connectionTokenTTL: 300,
   matchSessionTTL: 3600,
   port: 5555,
+  grpcPort: 8081,
   snapserGatewayUrl: "https://gateway.snapser.com/c4n1awfs",
 };
 

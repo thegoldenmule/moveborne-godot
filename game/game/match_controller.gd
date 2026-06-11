@@ -20,7 +20,7 @@ signal tiles_destroyed(destroyed)
 var state: Dictionary = {}
 var scenario_name: String = "Endless"
 
-# Optional online validation: when `online` and `validator` (an MbValidatorClient
+# Optional online validation: when `online` and `validator` (an MbHermesClient
 # Node) are set, each committed move is sent to the validator for confirmation.
 var validator = null
 var online: bool = false
