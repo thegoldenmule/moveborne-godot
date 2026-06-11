@@ -62,8 +62,10 @@ message CompleteMatchResponse {
   // current_balance_64 per granted currency when the Inventory s2s call
   // succeeded.
   map<string, string> balances = 3;
-  // False when this completion did not settle (already settled, or s2s
-  // awards disabled in this environment).
+  // True only when every reward in `rewards` was actually credited to the
+  // Inventory wallet (each appears in `balances`). False when already
+  // settled, awards disabled in this environment, or any Inventory s2s
+  // credit failed.
   bool granted = 4;
 }
 

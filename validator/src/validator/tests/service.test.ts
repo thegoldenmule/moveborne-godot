@@ -119,6 +119,48 @@ describe("ValidatorService", () => {
     expect(second.granted).toBe(false);
   });
 
+  test("completeMatch: granted reflects the actual Inventory credit, not transport availability", async () => {
+    const { initial, steps } = await golden();
+    const step = steps[0];
+
+    const serviceWithInventory = (status: number, body: unknown) => {
+      const fetchFn = (async () =>
+        new Response(JSON.stringify(body), { status })) as unknown as typeof fetch;
+      const inventory = new InventoryClient(
+        { kind: "internal", baseUrl: "http://service-inventory:8090", header: "internal-secret" },
+        fetchFn,
+      );
+      return new ValidatorService(new InMemoryMatchStateStore(), inventory);
+    };
+
+    const play = async (service: ValidatorService, matchId: string) => {
+      await service.initMatch(
+        { match_id: matchId, starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "story" },
+        USER_HEADERS,
+      );
+      await service.validateAction(
+        { match_id: matchId, index: initial.moveIndex, action_json: swipe(step.dir), state_hash: step.hash },
+        USER_HEADERS,
+      );
+      return service.completeMatch({ match_id: matchId }, USER_HEADERS);
+    };
+
+    // Upstream failure (e.g. currency not provisioned in the snapend's
+    // Inventory config) -> rewards reported but granted=false, no balances.
+    const failed = await play(serviceWithInventory(404, { message: "currency not found" }), "m5");
+    expect(failed.rewards.coins).toBe(String(Math.floor(step.state.score / 10)));
+    expect(failed.balances).toEqual({});
+    expect(failed.granted).toBe(false);
+
+    // Successful credit -> granted=true with the new balance surfaced.
+    const ok = await play(
+      serviceWithInventory(200, { previous_balance_64: "0", current_balance_64: "8" }),
+      "m6",
+    );
+    expect(ok.balances.coins).toBe("8");
+    expect(ok.granted).toBe(true);
+  });
+
   test("identity binding: callers that are not the match owner are rejected", async () => {
     const { initial } = await golden();
     const service = makeService();

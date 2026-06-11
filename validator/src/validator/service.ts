@@ -262,6 +262,11 @@ export class ValidatorService {
 
     const rewards = computeMatchRewards(match.mode, match.current_state);
     const balances: CurrencyDeltas = {};
+    // granted must mean "every computed reward was actually credited" — not
+    // merely "the awards transport is enabled". A swallowed s2s failure
+    // (e.g. a currency missing from the snapend's Inventory config) would
+    // otherwise report success while the wallet stays empty.
+    let granted = this.inventory.enabled;
     if (this.inventory.enabled) {
       for (const [currency, delta] of Object.entries(rewards)) {
         const result = await this.inventory.incrementUserCurrency(
@@ -271,20 +276,22 @@ export class ValidatorService {
         );
         if (result) {
           balances[currency as CurrencyName] = result.current_balance_64;
+        } else {
+          granted = false;
         }
       }
     }
 
     console.log(
       `Match completed: ${match_id} (mode=${match.mode}, score=${match.current_state.score})`,
-      { rewards, balances },
+      { rewards, balances, granted },
     );
 
     return {
       match_id,
       rewards: rewards as Record<string, string>,
       balances: balances as Record<string, string>,
-      granted: this.inventory.enabled,
+      granted,
     };
   }
 }
