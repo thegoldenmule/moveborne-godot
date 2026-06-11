@@ -24,6 +24,7 @@ import { signValidatorResponse } from "./utils/crypto";
 import { verifySnapserCaller } from "./utils/snapser-auth";
 import { computeMatchRewards } from "./rewards";
 import type { InventoryClient } from "./snaps/inventory";
+import type { RpcName } from "./proto";
 
 /** Gateway-stamped caller headers (lowercased keys), regardless of transport:
  *  HTTP headers, gRPC metadata, or the local WS emulation's token mapping. */
@@ -101,6 +102,17 @@ export class ValidatorService {
       throw new ServiceError(GrpcStatus.PERMISSION_DENIED, auth.reason);
     }
 
+    // A match_id is owned by its first initializer. Reject a re-init by anyone
+    // else: match ids are a small client-chosen space, so without this guard an
+    // authenticated user could clobber a victim's in-progress match (resetting
+    // its state, history, and the rewards latch). The old Socket.IO handshake
+    // enforced this owner binding; the gRPC/Hermes init path must too. Same-owner
+    // re-init stays allowed (the game always mints a fresh id, so this is benign).
+    const existing = await this.store.get(match_id);
+    if (existing && existing.player_id !== player_id) {
+      throw new ServiceError(GrpcStatus.PERMISSION_DENIED, "match_id already owned by another player");
+    }
+
     let starting_state: SynchronizedGameState;
     try {
       starting_state = JSON.parse(starting_state_json);
@@ -153,6 +165,20 @@ export class ValidatorService {
     const auth = verifySnapserCaller(caller, match.player_id);
     if (!auth.ok) {
       throw new ServiceError(GrpcStatus.PERMISSION_DENIED, auth.reason);
+    }
+
+    // The action must apply to the move the server is actually on. In honest
+    // sequential play the client's pre-action moveIndex always equals the
+    // server's current moveIndex (a hash mismatch still leaves the indices
+    // equal — the client adopts the authoritative state and resumes from its
+    // moveIndex). Rejecting any other index closes a replay/dup-frame vector:
+    // proto3 decodes an omitted index as 0, which would otherwise re-execute an
+    // early action against late-game state and clobber state_history[0..].
+    if (index !== match.current_state.moveIndex) {
+      throw new ServiceError(
+        GrpcStatus.INVALID_ARGUMENT,
+        `stale action index ${index} (current moveIndex is ${match.current_state.moveIndex})`,
+      );
     }
 
     let action: GameAction;
@@ -261,4 +287,16 @@ export class ValidatorService {
       granted: this.inventory.enabled,
     };
   }
+}
+
+/** The RPC name → handler map every transport dispatches through, so the gRPC
+ *  server and the Hermes emulation can never bind a different set of methods. */
+export function rpcHandlers(
+  service: ValidatorService,
+): Record<RpcName, (req: any, caller: CallerHeaders) => Promise<unknown>> {
+  return {
+    InitMatch: (req, caller) => service.initMatch(req, caller),
+    ValidateAction: (req, caller) => service.validateAction(req, caller),
+    CompleteMatch: (req, caller) => service.completeMatch(req, caller),
+  };
 }

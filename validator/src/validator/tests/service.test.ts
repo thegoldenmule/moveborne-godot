@@ -162,4 +162,56 @@ describe("ValidatorService", () => {
       expect((e as ServiceError).code).toBe(GrpcStatus.NOT_FOUND);
     }
   });
+
+  test("re-init by a different owner is rejected (no clobber); same owner may re-init", async () => {
+    const { initial } = await golden();
+    const service = makeService();
+    await service.initMatch(
+      { match_id: "m5", starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "story" },
+      USER_HEADERS,
+    );
+    // A different authenticated user cannot seize match m5.
+    try {
+      await service.initMatch(
+        { match_id: "m5", starting_state_json: JSON.stringify(initial), player_id: "someone-else", mode: "story" },
+        OTHER_HEADERS,
+      );
+      expect.unreachable("should have thrown");
+    } catch (e) {
+      expect((e as ServiceError).code).toBe(GrpcStatus.PERMISSION_DENIED);
+    }
+    // The original owner still owns it.
+    const resp = await service.completeMatch({ match_id: "m5" }, USER_HEADERS);
+    expect(resp.match_id).toBe("m5");
+    // Same-owner re-init is allowed (the game always mints a fresh id anyway).
+    await service.initMatch(
+      { match_id: "m5", starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "story" },
+      USER_HEADERS,
+    );
+  });
+
+  test("stale action index is rejected (proto3 omitted index decodes to 0)", async () => {
+    const { initial, steps } = await golden();
+    const service = makeService();
+    await service.initMatch(
+      { match_id: "m6", starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "story" },
+      USER_HEADERS,
+    );
+    // Advance one move so current moveIndex != 0.
+    const step = steps[0];
+    await service.validateAction(
+      { match_id: "m6", index: initial.moveIndex, action_json: swipe(step.dir), state_hash: step.hash },
+      USER_HEADERS,
+    );
+    // A replayed/omitted index (0) no longer matches the current moveIndex.
+    try {
+      await service.validateAction(
+        { match_id: "m6", index: 0, action_json: swipe("down"), state_hash: "x" },
+        USER_HEADERS,
+      );
+      expect.unreachable("should have thrown");
+    } catch (e) {
+      expect((e as ServiceError).code).toBe(GrpcStatus.INVALID_ARGUMENT);
+    }
+  });
 });

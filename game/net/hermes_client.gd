@@ -38,7 +38,7 @@ signal match_completed(response: Dictionary)   # CompleteMatch: {match_id, rewar
 signal validator_error(message: String)
 signal connected()
 
-var _ws := WebSocketPeer.new()
+var _ws: WebSocketPeer = null
 var _polling := false
 var _opened := false
 var _ready_ok := false
@@ -61,6 +61,11 @@ func init_and_connect(ws_url: String, match_id: String, starting_state: Dictiona
 	_opened = false
 	_ready_ok = false
 	_pending.clear()
+	# Fresh peer every connect: WebSocketPeer.connect_to_url returns
+	# ERR_ALREADY_IN_USE unless the peer is CLOSED, so reusing one breaks
+	# re-connects (R-key re-register, or V after a Snapser session). A new peer
+	# also drops any stale buffered frames bound to the previous ?token= identity.
+	_ws = WebSocketPeer.new()
 	var err := _ws.connect_to_url(ws_url)
 	if err != OK:
 		validator_error.emit("WS connect failed: %d" % err)
@@ -85,6 +90,12 @@ func _process(_delta: float) -> void:
 		WebSocketPeer.STATE_CLOSED:
 			_polling = false
 			set_process(false)
+			# Drop readiness so complete_match() honors its "returns false when not
+			# ready" contract instead of send()-ing on a dead socket; clear pending
+			# so a later reconnect can't match a stale mid.
+			_opened = false
+			_ready_ok = false
+			_pending.clear()
 			validator_error.emit("WS closed: %d %s" % [_ws.get_close_code(), _ws.get_close_reason()])
 
 

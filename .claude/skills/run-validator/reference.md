@@ -23,7 +23,7 @@ cd validator/src/validator && bun run dev
 **What happens:**
 - Starts Bun server with `--watch` flag
 - Loads environment variables from `.env`
-- Initializes Socket.io for game connections
+- Serves the Hermes-emulation WebSocket (`/hermes/ws`) + gRPC (:8081) for game validation
 - Starts MCP server on port 5555
 - Monitors file changes for automatic reload
 

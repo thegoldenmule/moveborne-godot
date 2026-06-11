@@ -1,13 +1,5 @@
-import { createHmac, randomBytes, timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { canonicalStringify } from "@spyre-io/moveborne-logic";
-
-export function generateConnectionId(): string {
-  return randomBytes(32).toString("hex");
-}
-
-export function generateUUID(): string {
-  return randomBytes(16).toString("hex");
-}
 
 export function computeHmacSignature(data: unknown, secret: string): string {
   const canonical = canonicalStringify(data);

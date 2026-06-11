@@ -855,7 +855,9 @@ func _start_net(ws_url: String, player_id: String, token: String) -> void:
 	_net_player_id = player_id
 	_net_token = token
 	var match_id := "gd_%d" % (randi() % 1000000)
-	_net.init_and_connect(ws_url + "?token=" + token, match_id, _match.state, player_id, _mode)
+	# uri_encode the token: a Snapser session token can carry URL-reserved chars
+	# (+ / =), which would otherwise corrupt the ?token= value at the gateway.
+	_net.init_and_connect(ws_url + "?token=" + token.uri_encode(), match_id, _match.state, player_id, _mode)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % ws_url

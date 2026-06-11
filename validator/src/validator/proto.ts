@@ -14,6 +14,23 @@ export const PROTO_DIR = join(import.meta.dir, "..", "..", "protos");
 export const VALIDATOR_PROTO = join(PROTO_DIR, "moveborne", "validator", "v1", "validator.proto");
 export const HERMES_PROTO = join(PROTO_DIR, "hermes", "hermes_envelope.proto");
 
+// Single owner of the service-routing fact, so the gRPC transport and the
+// Hermes-emulation dispatcher cannot drift (a name registered by one but not
+// the other silently breaks local-vs-deployed parity).
+//
+// CANONICAL_PACKAGE is the proto package. ALIAS_PACKAGES are the extra spellings
+// Snapser Hermes routes a BYOSnap by: it resolves the method string's package
+// segment to a snap id, so the deployed game sends "/byosnap-validator…" — the
+// gRPC server registers all of these as aliases, and the emulation accepts them.
+export const CANONICAL_PACKAGE = "moveborne.validator.v1";
+export const ALIAS_PACKAGES = ["byosnap-validator", "byosnap_validator", "byosnapvalidator"];
+export const SERVICE_NAME = "ValidatorService";
+/** Full "/<package>.ValidatorService" routing names the dispatcher accepts. */
+export const SERVICE_PATHS = [CANONICAL_PACKAGE, ...ALIAS_PACKAGES].map((p) => `${p}.${SERVICE_NAME}`);
+/** The three RPCs, in one place — handler tables key off these. */
+export const RPC_NAMES = ["InitMatch", "ValidateAction", "CompleteMatch"] as const;
+export type RpcName = (typeof RPC_NAMES)[number];
+
 export interface ProtoRegistry {
   root: protobuf.Root;
   ClientMessage: protobuf.Type;

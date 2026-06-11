@@ -84,7 +84,7 @@ Load and replay saved game states:
 This skill integrates with:
 - Bun runtime for server execution
 - MCP protocol for tool access
-- Socket.io for real-time game connections
+- gRPC + the Hermes-envelope WebSocket (`/hermes/ws`) for real-time game validation
 - State history replay system
 - Game logic package (`@spyre-io/moveborne-logic`)
 

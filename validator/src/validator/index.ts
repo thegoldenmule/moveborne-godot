@@ -51,7 +51,7 @@ app.get("/health", (c) => {
 app.get("/api/status", (c) => {
   return c.json({
     server: "validator",
-    version: "0.2.2",
+    version: "0.2.3",
     uptime: process.uptime(),
     transport: "grpc+hermes",
     // Which s2s transport the currency-award path resolved to (no secrets).
@@ -79,7 +79,15 @@ app.route("/api/match", matchRoutes);
 const mcpServer = createValidatorMCP(store);
 app.route("/mcp", mcpServer);
 
-const HERMES_WS_PATHS = new Set([`${BASE_PATH}/hermes/ws`, "/hermes/ws"]);
+// The Hermes-emulation WebSocket exists ONLY for local dev: it stands in for the
+// Snapser Hermes service so the game has one client codepath. Deployed, the game
+// reaches the gRPC service through the real gateway Hermes (which stamps the
+// gateway-validated identity as gRPC metadata) — the BYOSnap never serves this
+// route in the snapend. We therefore mount it only when there is NO gateway
+// prefix (local dev), so the token→self-stamped-identity trust (correct only
+// when nothing but the local process can reach the port) cannot exist in
+// deployed code at all. (BASE_PATH is set in every deployed template.)
+const HERMES_WS_LOCAL_ONLY = BASE_PATH === "";
 
 interface WsData {
   caller: CallerHeaders;
@@ -91,7 +99,11 @@ export default {
   // Bind all interfaces so the container accepts traffic from the Snapser gateway
   // (Bun's default hostname is not guaranteed across environments).
   hostname: "0.0.0.0",
-  idleTimeout: 30,
+  // The Hermes envelope has no client-initiated keepalive (the live gateway drops
+  // the connection on client pings), so an idle local-emulation socket relies on
+  // this timeout window. Use Bun's max so paused local matches don't drop mid-play;
+  // the DEPLOYED path's keepalive is the managed Hermes service's responsibility.
+  idleTimeout: 255,
 
   fetch(req: Request, server: any) {
     const url = new URL(req.url);
@@ -104,7 +116,7 @@ export default {
     }
 
     // Hermes-envelope WebSocket (local-dev emulation of the gateway endpoint).
-    if (HERMES_WS_PATHS.has(url.pathname)) {
+    if (HERMES_WS_LOCAL_ONLY && url.pathname === "/hermes/ws") {
       const caller = upgradeCallerHeaders(req.headers, url);
       if (!caller["user-id"]) {
         return Response.json(

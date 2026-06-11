@@ -11,14 +11,8 @@
  */
 import * as grpc from "@grpc/grpc-js";
 import * as loader from "@grpc/proto-loader";
-import { ServiceError, type CallerHeaders, type ValidatorService as Service } from "./service";
-import { PROTO_DIR, VALIDATOR_PROTO } from "./proto";
-
-const CANONICAL_PACKAGE = "moveborne.validator.v1";
-/** Hermes routes the package segment by BYOSnap id (live-verified:
- *  "/byosnap-validator.ValidatorService/..." reaches this server through the
- *  gateway Hermes; it also normalizes the underscore spelling). */
-const ALIAS_PACKAGES = ["byosnap-validator", "byosnap_validator", "byosnapvalidator"];
+import { ServiceError, rpcHandlers, type CallerHeaders, type ValidatorService as Service } from "./service";
+import { ALIAS_PACKAGES, CANONICAL_PACKAGE, PROTO_DIR, VALIDATOR_PROTO } from "./proto";
 
 function metadataToHeaders(metadata: grpc.Metadata): CallerHeaders {
   const headers: CallerHeaders = {};
@@ -27,8 +21,6 @@ function metadataToHeaders(metadata: grpc.Metadata): CallerHeaders {
   }
   return headers;
 }
-
-type Handler = (req: any, caller: CallerHeaders) => Promise<unknown>;
 
 export function startGrpcServer(service: Service, port: number): Promise<grpc.Server> {
   const def = loader.loadSync(VALIDATOR_PROTO, {
@@ -41,19 +33,15 @@ export function startGrpcServer(service: Service, port: number): Promise<grpc.Se
   const pkg = grpc.loadPackageDefinition(def) as any;
   const serviceDef: grpc.ServiceDefinition = pkg.moveborne.validator.v1.ValidatorService.service;
 
-  const handlers: Record<string, Handler> = {
-    InitMatch: (req, caller) => service.initMatch(req, caller),
-    ValidateAction: (req, caller) => service.validateAction(req, caller),
-    CompleteMatch: (req, caller) => service.completeMatch(req, caller),
-  };
+  const handlers = rpcHandlers(service);
 
   const implementation: grpc.UntypedServiceImplementation = {};
-  for (const name of Object.keys(handlers)) {
+  for (const name of Object.keys(handlers) as (keyof typeof handlers)[]) {
     implementation[name] = (
       call: grpc.ServerUnaryCall<any, any>,
       callback: grpc.sendUnaryData<any>,
     ) => {
-      handlers[name]!(call.request, metadataToHeaders(call.metadata))
+      handlers[name](call.request, metadataToHeaders(call.metadata))
         .then((resp) => callback(null, resp))
         .catch((err) => {
           const code = err instanceof ServiceError ? err.code : grpc.status.INTERNAL;

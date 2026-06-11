@@ -10,8 +10,8 @@
  * User-Id header). When real gateway headers are present on the upgrade
  * (deployed direct-WS callers), those win.
  */
-import { GrpcStatus, ServiceError, type CallerHeaders, type ValidatorService } from "./service";
-import { decodeMessage, encodeMessage, getProtoRegistry } from "./proto";
+import { GrpcStatus, ServiceError, rpcHandlers, type CallerHeaders, type ValidatorService } from "./service";
+import { SERVICE_PATHS, decodeMessage, encodeMessage, getProtoRegistry } from "./proto";
 
 const MESSAGE_TYPE_SNAP_API_PROXY = 4;
 const MESSAGE_TYPE_ERROR = 5;
@@ -19,13 +19,6 @@ const MESSAGE_TYPE_PINGPONG = 7;
 
 /** Hermes's observed error for a method it cannot route. */
 const INVALID_SERVICE_CODE = 500;
-
-const SERVICE_NAMES = [
-  "moveborne.validator.v1.ValidatorService",
-  "byosnap-validator.ValidatorService", // what the game sends (Hermes routes by BYOSnap id)
-  "byosnap_validator.ValidatorService",
-  "byosnapvalidator.ValidatorService",
-];
 
 interface DecodedClientMessage {
   mid: string;
@@ -42,19 +35,17 @@ export class HermesDispatcher {
 
   constructor(service: ValidatorService) {
     const { rpcTypes } = getProtoRegistry();
-    const impls: Record<string, (req: any, caller: CallerHeaders) => Promise<unknown>> = {
-      InitMatch: (req, caller) => service.initMatch(req, caller),
-      ValidateAction: (req, caller) => service.validateAction(req, caller),
-      CompleteMatch: (req, caller) => service.completeMatch(req, caller),
-    };
+    const impls = rpcHandlers(service);
     for (const [rpc, [reqType, respType]] of Object.entries(rpcTypes)) {
-      const impl = impls[rpc]!;
+      const impl = impls[rpc as keyof typeof impls];
       const bound = async (payload: Uint8Array, caller: CallerHeaders): Promise<Uint8Array> => {
         const request = decodeMessage<any>(reqType, payload);
         const response = await impl(request, caller);
         return encodeMessage(respType, response as Record<string, unknown>);
       };
-      for (const svc of SERVICE_NAMES) {
+      // Accept the method under the canonical package + every BYOSnap-id alias
+      // Hermes may route by (one shared list — keeps emulation and gRPC in lockstep).
+      for (const svc of SERVICE_PATHS) {
         this.methods.set(`/${svc}/${rpc}`, bound);
       }
     }
