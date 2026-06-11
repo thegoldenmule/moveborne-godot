@@ -1,6 +1,6 @@
 # Testing plan — Leaderboards — Daily, Weekly, Monthly (Global)
 
-**Status:** draft
+**Status:** ready
 
 ## Planned
 _None._

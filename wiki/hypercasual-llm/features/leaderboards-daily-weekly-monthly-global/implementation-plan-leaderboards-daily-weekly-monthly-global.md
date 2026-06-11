@@ -1,6 +1,6 @@
 # Implementation plan — Leaderboards — Daily, Weekly, Monthly (Global)
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] SNAPEND CONFIG — The leaderboards snap v1.8.0 is already on snapend c4n1awfs (verified live: gateway probe returns the snap's error 9000 'Leaderboard not found'). Add the three board definitions to the manifest settings block (settings[id=leaderboards].data.leaderboards): moveborne-daily / moveborne-weekly / moveborne-monthly — type=global, behavior=maximum, sort=descending, scope=external, recurring with duration 1 day/week/month, start_time anchored at UTC midnight (daily 2026-06-10, weekly Mon 2026-06-08, monthly 2026-06-01). Apply with snapctl snapend apply — platform-side validation confirms the exact enum strings (correct and re-apply if rejected). Commit the manifest in-repo as IaC.

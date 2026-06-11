@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1518,
+    "version": 1538,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "2cfb7a6432f63cee29f939d8ac82250b6dece6c16d0499230757fb4e514cecaf",
@@ -57,14 +57,14 @@
       "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
       "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51",
       "hypercasual-llm/architecture/client/editor-tools.md": "edc5201e39ae8e96c3de3f57587452b0c623bd9115cd96beb77ad3aeefa073d7",
-      "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md": "9436914f5c0d7b9fddb691bcfba9f6ca39b3a4b3788c98c01091e2abaafb605c",
-      "hypercasual-llm/features/virtual-currency-coins-souls-gems/implementation-plan-virtual-currency-coins-souls-gems.md": "e1a36d0515e52f6cca658a4d6b8082df0d795562edd5168c36550c1d67f11f59",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md": "746559c4ec5ce66a410dc21c0f10c572f56dd165786094b7c5cd3a29405a9c20",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/implementation-plan-virtual-currency-coins-souls-gems.md": "84d2abf199b0bce2073a9b8e9a8393503a67539b7d22606d3a2ef21c92a2b1f4",
       "hypercasual-llm/features/virtual-currency-coins-souls-gems/testing-plan-virtual-currency-coins-souls-gems.md": "010436569ae9e86da610d5c5c91141ed49bcc06dfa9e3003c64e1fae95b7862f",
       "hypercasual-llm/features/virtual-currency-coins-souls-gems/spec-virtual-currency-coins-souls-gems.md": "85ddbdbb4e1c3c698b622f8a107523cf0da0dcba3b2191a73bdf546de5ba7225",
-      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/index.md": "8c9c91e11ad85a746acb5ded7a428b315064a45f9825605f3b637a814077cd57",
-      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/implementation-plan-leaderboards-daily-weekly-monthly-global.md": "b3c377565dff47cd597bd9f6449ecf980267116fb09bacae5b61753e9fc6a5cc",
-      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/testing-plan-leaderboards-daily-weekly-monthly-global.md": "a4c6f07500abc8f7c03a69613a68c2bc53a42726b2f139937fa45bcf853f3d46",
-      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/spec-leaderboards-daily-weekly-monthly-global.md": "38f99d7c46afbb42a4f30dc7736f837f172481c7ad1169e24d11ef71abf16762"
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/index.md": "e310b94966859e190e7b2bddc437a5a9a7c96278411131f7aa529d43b4bad0c4",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/implementation-plan-leaderboards-daily-weekly-monthly-global.md": "7a0f3bf295072f3b2344bf67dcccc66dda2415be3d794561eefe08660e1fba90",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/testing-plan-leaderboards-daily-weekly-monthly-global.md": "62d3bea8628828c3dfc56479801e69a0543e21317357c87093e8d4a4bfe0c339",
+      "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/spec-leaderboards-daily-weekly-monthly-global.md": "0bf19dab06c11396202f28afb690afeb0d7dd2b3c879bfc071d8a7b3732ee1c3"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",

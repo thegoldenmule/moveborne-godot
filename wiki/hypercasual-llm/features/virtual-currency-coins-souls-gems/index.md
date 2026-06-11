@@ -1,6 +1,6 @@
 # Feature: Virtual Currency — Coins, Souls, Gems
 
-**Status:** building
+**Status:** review
 
 ## Summary
 Add three virtual currencies to Moveborne — coins (soft), souls (PvP), gems (hard) — backed by the Snapser Inventory snap on app c4n1awfs, which already exposes the needed REST surface (verified in snapser-docs/swagger/inventory.swagger3.json): GET /v1/inventory/users/{user_id}/currencies returns a currencies_64 map (currency_name → int64 string) and PUT /v1/inventory/users/{user_id}/currencies/{currency_name} increments via {delta_64}, both with x-snapser-auth-types [user, api-key, internal]. The Godot client reads balances with its existing anonymous-session headers (MbSnapserAuth.auth_headers() → Token + User-Id, gateway-validated 'user' auth) and displays them in a new persistent top bar in the app shell (game/ui/shell/app_shell.gd, mirroring the bottom NavLayer CanvasLayer-5 pattern), cached in the GameState autoload — whose own comment reserves currencies as the intended extension point. Awards are server-authoritative: the validator BYOSnap detects terminal gameStatus (gameover/victory) in its validate_action pipeline, computes mode-based rewards, and makes an s2s HTTP PUT to the Inventory snap as a trusted non-user caller (api-key or internal — the same trust classes its own verifySnapserCaller() accepts without player binding), then emits a match_rewards Socket.IO event so the client updates the bar immediately. The increment endpoint is locked down on the Snapser platform side so 'user' callers cannot self-award; clients keep read access via the normal inventory GET endpoints.
@@ -50,3 +50,4 @@ _None._
 
 ## Commits
 - `644612c` feat(currency): coins/souls/gems — validator-awarded via Inventory snap s2s, client top bar
+- `3006840` virtual currency and lb spec updates
