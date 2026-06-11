@@ -10,6 +10,7 @@ import { ValidatorService } from "./service";
 import { startGrpcServer } from "./grpc";
 import { HermesDispatcher, upgradeCallerHeaders } from "./hermes-ws";
 import type { CallerHeaders } from "./service";
+import pkg from "./package.json" with { type: "json" };
 
 const store = new InMemoryMatchStateStore();
 const historyStore = new FileSystemHistoryStore();
@@ -51,7 +52,7 @@ app.get("/health", (c) => {
 app.get("/api/status", (c) => {
   return c.json({
     server: "validator",
-    version: "0.2.3",
+    version: pkg.version,
     uptime: process.uptime(),
     transport: "grpc+hermes",
     // Which s2s transport the currency-award path resolved to (no secrets).
