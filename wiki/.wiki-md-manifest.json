@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1579,
+    "version": 1593,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "e830754a156947631b6e8d29c98876b0b14e70cca6d4f786597ed034816661da",
@@ -66,7 +66,9 @@
       "hypercasual-llm/.archived/testing-plan--mq8ja3dj-001j-ghgqgx.md": "62d3bea8628828c3dfc56479801e69a0543e21317357c87093e8d4a4bfe0c339",
       "hypercasual-llm/.archived/feature-spec--mq8ja3dj-001k-urfpez.md": "0bf19dab06c11396202f28afb690afeb0d7dd2b3c879bfc071d8a7b3732ee1c3",
       "hypercasual-llm/architecture/client/build-amp-distribution.md": "b58353243172bbacb5be5314be2636b9479ad03826838c739a20b858922c629e",
-      "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md": "3874436e2f23d4c71310776be0fc2125be4a64c75b4101563355cab1a943ae3c"
+      "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md": "3874436e2f23d4c71310776be0fc2125be4a64c75b4101563355cab1a943ae3c",
+      "hypercasual-llm/bugs/index.md": "1dc7c8c164fb48d5b7a2aea2a5944123b0d28f3bcad7ba33e87ef757de1a7f44",
+      "hypercasual-llm/bugs/web-build-can-t-connect-to-validator-gateway-rejects-header-less-websocket-upgrade.md": "5d6e8574e6e9ee8db20eb7df42076e69207af40e38cf950f8717f2e8e3e38030"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -133,7 +135,9 @@
       "testing-plan:mq8ja3dj-001j-ghgqgx": "hypercasual-llm/.archived/testing-plan--mq8ja3dj-001j-ghgqgx.md",
       "feature-spec:mq8ja3dj-001k-urfpez": "hypercasual-llm/.archived/feature-spec--mq8ja3dj-001k-urfpez.md",
       "architecture:mq9llv7f-00a3-c5f96m": "hypercasual-llm/architecture/client/build-amp-distribution.md",
-      "decision-record:mq9lly17-00a5-ljnwnw": "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md"
+      "decision-record:mq9lly17-00a5-ljnwnw": "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md",
+      "toc:mq9n2eia-0001-arqxs5": "hypercasual-llm/bugs/index.md",
+      "bug-report:mq9n2iah-0003-954t8": "hypercasual-llm/bugs/web-build-can-t-connect-to-validator-gateway-rejects-header-less-websocket-upgrade.md"
     }
   }
 }
