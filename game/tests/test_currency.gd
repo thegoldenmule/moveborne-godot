@@ -36,8 +36,10 @@ func test_parse_balances_malformed_payload() -> void:
 
 
 func test_game_state_set_and_merge_emit() -> void:
-	var gs = Engine.get_main_loop().root.get_node_or_null("GameState")
-	assert_true(gs != null, "GameState autoload present")
+	# The GameState autoload only exists in a running game, not the editor tree —
+	# instantiate the script directly so the suite runs in-editor.
+	var gs: Node = load("res://ui/game_state.gd").new()
+	gs.name = "_McpTestGameState"
 	var seen: Array = []
 	var handler := func(balances: Dictionary) -> void:
 		seen.append(balances.duplicate())
@@ -49,4 +51,4 @@ func test_game_state_set_and_merge_emit() -> void:
 	assert_eq(int(gs.currencies["souls"]), 2, "merge leaves other balances alone")
 	assert_eq(seen.size(), 2, "currencies_changed emitted per update")
 	gs.currencies_changed.disconnect(handler)
-	gs.set_currencies({})  # restore zeros for other suites
+	gs.free()

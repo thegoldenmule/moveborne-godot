@@ -1,6 +1,6 @@
 # Spec — Virtual Currency — Coins, Souls, Gems
 
-**Status:** drafting
+**Status:** sealed
 
 ## Overview
 Three virtual currencies — coins (soft), souls (PvP), gems (hard) — backed by the Snapser Inventory snap on c4n1awfs. Clients READ balances with their normal anonymous-session user auth and render them in a persistent top bar in the app shell. WRITES are server-authoritative: the increment endpoint is locked away from user auth (User Auth Exemptions), and only the validator BYOSnap awards currency, over the snapend-internal s2s route, with amounts computed from its own validated match state.
@@ -48,6 +48,8 @@ Settlement on quit via an explicit idempotent complete-match event — the quit 
 Offline play earns nothing: Infinite never connects and the local validator runs with the disabled transport. No client-side pending-grant queue. Offline earnings: Infinite is always offline and local-validator play has no credentials — plan default is zero earnings offline (client-side queued grants would be a trust hole). Flag if offline earnings are wanted.
 
 Balances display shell-only (typical F2P top bar); the in-match HUD keeps its existing MOVES/SCORE/SHARDS band untouched. Should balances also appear inside the match HUD (its top band is already tight with MOVES/SCORE/SHARDS), or shell-only as planned?
+
+v1 reward economy ships with the placeholder values: Story awards floor(score/10) coins computed from the validator's own validated state, PvP awards 1 soul on a win (nothing on loss), and gems are never validator-awarded (reserved for IAP/manual grants). Real economy numbers remain a game-design tuning task; retuning is a pure-table change in the validator rewards module plus a BYOSnap redeploy. Reward economy numbers: coins per Story result (flat or score-scaled?), souls per PvP win (and loss?), and whether gems are validator-awardable at all in v1 or reserved for IAP/manual grants. Pure game design — implementation proceeds with placeholder values (score-derived coins for Story, flat souls for PvP win, no gem awards) that are trivial to retune in rewards.ts.
 
 ## References
 _None._

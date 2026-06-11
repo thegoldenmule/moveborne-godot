@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 1538,
+    "version": 1548,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "2cfb7a6432f63cee29f939d8ac82250b6dece6c16d0499230757fb4e514cecaf",
@@ -57,10 +57,10 @@
       "hypercasual-llm/.archived/testing-plan--mq8ejxt1-005x-8qonc7.md": "c1bef4678845400ff44220a6fa5b6f12fc1f2a4cc0a1654aa179b748720ad4b7",
       "hypercasual-llm/.archived/feature-spec--mq8ejxt1-005y-pgw5j3.md": "50ab2b52665c8bae5068cb28eeeb385dd03533f3c7a4a00679987809fb671c51",
       "hypercasual-llm/architecture/client/editor-tools.md": "edc5201e39ae8e96c3de3f57587452b0c623bd9115cd96beb77ad3aeefa073d7",
-      "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md": "746559c4ec5ce66a410dc21c0f10c572f56dd165786094b7c5cd3a29405a9c20",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/index.md": "ea7c50f2fbf43fe689e828b7132a0bd23864eb4f146aff23090f7d5bf06b13b7",
       "hypercasual-llm/features/virtual-currency-coins-souls-gems/implementation-plan-virtual-currency-coins-souls-gems.md": "84d2abf199b0bce2073a9b8e9a8393503a67539b7d22606d3a2ef21c92a2b1f4",
-      "hypercasual-llm/features/virtual-currency-coins-souls-gems/testing-plan-virtual-currency-coins-souls-gems.md": "010436569ae9e86da610d5c5c91141ed49bcc06dfa9e3003c64e1fae95b7862f",
-      "hypercasual-llm/features/virtual-currency-coins-souls-gems/spec-virtual-currency-coins-souls-gems.md": "85ddbdbb4e1c3c698b622f8a107523cf0da0dcba3b2191a73bdf546de5ba7225",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/testing-plan-virtual-currency-coins-souls-gems.md": "35987eb7be359efa53e71d89cf58335bcf0757ea1e41b4dc76dd8b58a37eb30e",
+      "hypercasual-llm/features/virtual-currency-coins-souls-gems/spec-virtual-currency-coins-souls-gems.md": "0f133f78d546bc0b90c4c89bf41b4ea249e1b3f179bf9146ed14b7a61d0283f7",
       "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/index.md": "e310b94966859e190e7b2bddc437a5a9a7c96278411131f7aa529d43b4bad0c4",
       "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/implementation-plan-leaderboards-daily-weekly-monthly-global.md": "7a0f3bf295072f3b2344bf67dcccc66dda2415be3d794561eefe08660e1fba90",
       "hypercasual-llm/features/leaderboards-daily-weekly-monthly-global/testing-plan-leaderboards-daily-weekly-monthly-global.md": "62d3bea8628828c3dfc56479801e69a0543e21317357c87093e8d4a4bfe0c339",
