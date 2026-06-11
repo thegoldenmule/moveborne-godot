@@ -391,7 +391,6 @@ func _style_nav_button(b: Button) -> void:
 	b.add_theme_stylebox_override("hover", hover)
 	var sel := StyleBoxFlat.new()
 	sel.bg_color = Color(MbStyle.PRIMARY, 0.20)
-	sel.set_corner_radius_all(10)
 	b.add_theme_stylebox_override("pressed", sel)
 	b.add_theme_stylebox_override("hover_pressed", sel)
 	b.add_theme_color_override("font_color", MbStyle.DIM)
