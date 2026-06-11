@@ -8,6 +8,7 @@ extends Control
 ## full editor scan, which scenes must not depend on.
 const LbClientS := preload("res://net/leaderboards_client.gd")
 const ScreenScaffoldS := preload("res://ui/screen_scaffold.gd")
+const Reg := preload("res://ui/mcp_ui_reg.gd")
 
 const TOP_COUNT := 10
 const PERIODS := [
@@ -15,6 +16,8 @@ const PERIODS := [
 	["Weekly", LbClientS.BOARD_WEEKLY],
 	["Monthly", LbClientS.BOARD_MONTHLY],
 ]
+## MbUi ids for the period toggles, aligned with PERIODS.
+const PERIOD_IDS := ["daily", "weekly", "monthly"]
 
 @onready var _vbox: VBoxContainer = $VBox
 @onready var _title: Label = $VBox/Title
@@ -71,6 +74,8 @@ func _ready() -> void:
 		b.custom_minimum_size = Vector2(88, 40)
 		b.add_theme_font_size_override("font_size", 14)
 		b.pressed.connect(_on_period_pressed.bind(i))
+		# MbUi: the period toggles register as leaderboard.daily / .weekly / .monthly.
+		Reg.adopt(b, PERIOD_IDS[i])
 	(_period_btns[0] as Button).button_pressed = true
 
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL

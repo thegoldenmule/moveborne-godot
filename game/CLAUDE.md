@@ -80,6 +80,12 @@ verifier/suite — never hand-write expected values.
 - **Drive the game by game concepts** (swipe / read board / play card): use the
   `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
   analog of the TS `window.__moveborne`. Full reference: **`MCP_GAME_API.md`**.
+- **Drive the UI by screen + button** (navigate screens / press any control / run
+  deterministic sequences): use the `MbUi` autoload via `game_eval` (e.g.
+  `await MbUi.goto("settings")`, `MbUi.actions()`, `await MbUi.run([...])`). New
+  actionable controls register themselves via `MbUiReg` (`ui/mcp_ui_reg.gd`) as a
+  byproduct of construction. Full reference: **`MCP_UI_API.md`**. Headless smoke:
+  `--script res://tools/verify_ui_driver.gd`.
 - **Validator:** `tools/run_validator.sh` (`:5555`) wraps this repo's
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
   dist), or `cd ../validator && bun run dev`. Endpoints + the MCP debug tools are in

@@ -14,11 +14,16 @@ const ProfileClientS := preload("res://net/profile_client.gd")
 const SettingsScene := preload("res://ui/screens/settings_tab.tscn")
 const LocalSettingsS := preload("res://ui/local_settings.gd")
 const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
+## MbUi control registry (preloaded, not the class_name global, so the headless
+## verifier that instances the shell doesn't depend on a full editor scan).
+const Reg := preload("res://ui/mcp_ui_reg.gd")
 
 const HOME_INDEX := 2
 const LEADERBOARD_INDEX := 1
 const SETTINGS_INDEX := 4
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
+## Stable screen ids (MbUi), aligned by index with TAB_LABELS / _tabs.
+const SCREEN_IDS := ["collection", "leaderboard", "home", "guilds", "settings"]
 const TAB_ICONS: Array[Texture2D] = [
 	preload("res://assets/generated/icons/collections_icon.svg"),
 	preload("res://assets/generated/icons/leaderboard_ticon.svg"),
@@ -120,6 +125,9 @@ var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the
 
 
 func _ready() -> void:
+	# Discoverable by the MbUi driver (game/mcp_ui_api.gd) — the shell is the
+	# navigation hub: tab selection + match launch route through its mcp_* methods.
+	add_to_group("mcp_shell")
 	# Apply saved local prefs (audio buses) at boot, before any sound plays.
 	LocalSettingsS.apply_audio(LocalSettingsS.load_settings())
 
@@ -170,6 +178,9 @@ func _ready() -> void:
 	_nav_bar.add_theme_stylebox_override("panel", nav_sb)
 	_row.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_row.add_theme_constant_override("separation", 0)
+	# The bottom nav is its own MbUi "screen": its tab buttons register as
+	# nav.<screen id> (see the tab-config loop below).
+	Reg.screen(_nav_bar, "nav")
 
 	# Snapser session + leaderboards client, owned by the shell so they survive
 	# match-scene teardown. Sign-in is lazy (first leaderboards call), so offline
@@ -212,6 +223,9 @@ func _ready() -> void:
 		# Name each screen host after its tab so the tree stays legible (placeholder
 		# instances otherwise collide on their shared scene-root name).
 		screen.name = "%sTab" % TAB_LABELS[i]
+		# Mark it as an MbUi screen root; its own controls (home launchers, settings
+		# widgets, …) register themselves under this id via MbUiReg.
+		Reg.screen(screen, SCREEN_IDS[i])
 		_content.add_child(screen)
 		screen.position = Vector2.ZERO
 		screen.size = _content.size
@@ -231,6 +245,8 @@ func _ready() -> void:
 		b.custom_minimum_size = Vector2(0, 72)
 		_style_nav_button(b)
 		b.pressed.connect(_select_tab.bind(i))
+		# MbUi: pressing nav.<screen id> selects that tab.
+		Reg.adopt(b, SCREEN_IDS[i])
 		if i == HOME_INDEX:
 			_tab_icons.append(null)
 			_tab_labels.append(null)
@@ -536,3 +552,34 @@ func _on_viewport_resized() -> void:
 	_layout_content()
 	# Re-derive icon rects once the nav buttons settle at their new widths.
 	_select_tab.call_deferred(_current_tab)
+
+
+# ── MbUi control surface ──────────────────────────────────────────────────────
+# Thin, semantic entry points for the MbUi driver (game/mcp_ui_api.gd). They
+# reuse the same paths a real tap takes — the nav radio + _select_tab, and the
+# play-mode launcher — so automation drives the shell exactly as a player does.
+
+
+## Switch to the tab with the given screen id ("home"/"settings"/…). Sets the
+## nav radio (keeps the bottom-bar highlight in sync) and runs the tab swap.
+## Returns false for an unknown id.
+func mcp_select_tab(id: String) -> bool:
+	var index := SCREEN_IDS.find(id)
+	if index < 0:
+		return false
+	# Set the radio visual (ButtonGroup unselects the others); _select_tab does the
+	# actual screen swap + refresh (button_pressed alone doesn't emit `pressed`).
+	(_tabs[index] as Button).button_pressed = true
+	_select_tab(index)
+	return true
+
+
+## The screen id of the currently selected tab.
+func mcp_current_tab_id() -> String:
+	return SCREEN_IDS[_current_tab] if _current_tab < SCREEN_IDS.size() else ""
+
+
+## Launch a play mode (pushes a MatchState via the router), same path as tapping
+## a Home launcher. `cfg` is the match config dict, e.g. {"mode":"story","scenario_id":0}.
+func mcp_start_match(cfg: Dictionary) -> void:
+	_on_play_mode_selected(cfg)

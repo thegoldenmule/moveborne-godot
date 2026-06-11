@@ -12,6 +12,10 @@ animate exactly as they do for a human player.
 - **Parity-safe:** nothing under `logic/` is touched; `MbDebug` only calls the
   already-tested `MbMatch` / `main.gd` paths. See `CLAUDE.md` for the parity rules.
 
+> **For driving the menus** (navigate screens, press buttons, run scripted UI
+> sequences) use `MbUi`, the navigation analog of `MbDebug` — see **`MCP_UI_API.md`**.
+> `MbDebug` owns in-match board/cards; `MbUi` owns everything around the match.
+
 ---
 
 ## How to invoke

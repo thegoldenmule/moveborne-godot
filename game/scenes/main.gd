@@ -13,6 +13,7 @@ const CountdownS := preload("res://scenes/countdown.gd")
 const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
+const Reg := preload("res://ui/mcp_ui_reg.gd")
 
 ## Local dev validator (the V-key debug shortcut; tools/run_validator.sh): the
 ## validator's Hermes-emulation WS endpoint — same envelope as the gateway.
@@ -79,6 +80,10 @@ func _ready() -> void:
 	# Joined so MbDebug._scene() can resolve us via group lookup once the app shell
 	# (not this match) owns current_scene. See game/mcp_game_api.gd.
 	add_to_group("mb_match")
+	# Also an MbUi screen ("match"): its exit button registers as match.exit, and
+	# the driver reports screen "match" while a match is live. Freed on quit, so it
+	# drops out of the registry automatically.
+	Reg.screen(self, "match")
 	# Per-match config handed in by the shell's MatchState (or Endless default when
 	# this scene is launched standalone). Plain Dictionary, mirrors how state is passed.
 	var cfg: Dictionary = GameState.next_match if not GameState.next_match.is_empty() else {"mode": "infinite"}
@@ -248,6 +253,7 @@ func _build_ui() -> void:
 	home_btn.add_theme_font_size_override("font_size", 15)
 	_style_home_button(home_btn)
 	home_btn.pressed.connect(_on_home_pressed)
+	Reg.adopt(home_btn, "exit")  # MbUi: match.exit (quit back to the shell)
 	add_child(home_btn)
 
 
@@ -904,6 +910,12 @@ func _key_swipe(direction: String) -> void:
 ## The live match controller (MbMatch), for read access + history binding.
 func mcp_match():
 	return _match
+
+## Leave the match the same way the in-match Home/Quit button does (awaitable, so
+## the MbUi driver can settle the async validator completion + router pop before
+## reporting the player is back on the shell).
+func mcp_exit() -> void:
+	await _on_home_pressed()
 
 ## Swipe a direction. Cancels any pending card selection first (an automated driver
 ## shouldn't get wedged mid-target). Returns {ok, moved, move_index}.

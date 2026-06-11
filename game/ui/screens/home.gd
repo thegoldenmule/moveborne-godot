@@ -8,6 +8,7 @@ signal play_mode_selected(cfg: Dictionary)
 ## narrow screens rather than running to the edge.
 const SCREEN_MARGIN := 24.0
 const MAX_BUTTON_WIDTH := 360.0
+const Reg := preload("res://ui/mcp_ui_reg.gd")
 
 @onready var _center: CenterContainer = $Center
 @onready var _vbox: VBoxContainer = $Center/VBox
@@ -46,6 +47,11 @@ func _ready() -> void:
 
 	_story.pressed.connect(_launch.bind({"mode": "story", "scenario_id": 0}))
 	_infinite.pressed.connect(_launch.bind({"mode": "infinite"}))
+
+	# MbUi: the .tscn-built launchers register as home.story / home.infinite / home.pvp.
+	Reg.adopt(_story, "story")
+	Reg.adopt(_infinite, "infinite")
+	Reg.adopt(_pvp, "pvp")
 
 
 func _style_play(b: Button, label: String, width: float) -> void:

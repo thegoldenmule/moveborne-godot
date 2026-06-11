@@ -53,6 +53,15 @@ func stack_depth() -> int:
 	return _stack.size()
 
 
+## The state names from the bottom of the stack up (e.g. ["ShellState", "MatchState"]).
+## The MbUi driver maps these to its route summary.
+func route_names() -> Array:
+	var names: Array = []
+	for s in _stack:
+		names.append(s.state_name())
+	return names
+
+
 func push(state, params: Dictionary = {}) -> void:
 	if _busy:
 		return
