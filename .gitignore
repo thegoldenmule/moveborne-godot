@@ -6,3 +6,6 @@ art/*.psd
 
 # ArtGen thumbnail cache (rasterized previews, regenerable)
 art/generated/.thumbs/
+
+# Client build artifacts
+build/

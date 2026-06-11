@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="LLM Workflow"
+config/name="Moveborne"
 run/main_scene="res://ui/boot.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -46,3 +46,4 @@ enabled=PackedStringArray("res://addons/artgen/plugin.cfg", "res://addons/godot_
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
