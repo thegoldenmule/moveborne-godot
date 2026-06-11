@@ -14,8 +14,9 @@ const PERIODS := [
 	["Weekly", LbClientS.BOARD_WEEKLY],
 	["Monthly", LbClientS.BOARD_MONTHLY],
 ]
-## Keep clear of the bottom nav bar (NAV_HEIGHT + breathing room).
-const BOTTOM_CLEARANCE := 112.0
+## The shell insets the content host between the top band and bottom nav, so the
+## screen only needs its own breathing room from those edges.
+const EDGE_PADDING := 16.0
 const SIDE_MARGIN := 24.0
 
 @onready var _vbox: VBoxContainer = $VBox
@@ -42,13 +43,13 @@ func setup(auth: MbSnapserAuth, client: Node) -> void:
 
 
 func _ready() -> void:
-	# Root size comes from the shell; the VBox fills it minus margins, stopping
-	# above the nav bar.
+	# Root size comes from the shell (already inset clear of the top band and
+	# bottom nav); the VBox fills it minus a little edge padding.
 	_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_vbox.offset_left = SIDE_MARGIN
 	_vbox.offset_right = -SIDE_MARGIN
-	_vbox.offset_top = 28.0
-	_vbox.offset_bottom = -BOTTOM_CLEARANCE
+	_vbox.offset_top = EDGE_PADDING
+	_vbox.offset_bottom = -EDGE_PADDING
 	_vbox.add_theme_constant_override("separation", 14)
 
 	# Grammara is wide: 24px is the biggest "LEADERBOARD" that fits the narrow

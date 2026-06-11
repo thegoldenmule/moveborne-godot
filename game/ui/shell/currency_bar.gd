@@ -40,10 +40,13 @@ func _ready() -> void:
 	if _auth == null:
 		_auth = MbSnapserAuthS.new()
 		add_child(_auth)
+	name = "CurrencyLayer"
 	_inventory = MbInventoryS.new()
+	_inventory.name = "InventoryClient"
 	add_child(_inventory)
 
 	_bar = PanelContainer.new()
+	_bar.name = "Bar"
 	add_child(_bar)
 	# A Control under a CanvasLayer has no Control parent, so the shell's theme
 	# (and its brand font) doesn't propagate — set our own.
@@ -59,6 +62,7 @@ func _ready() -> void:
 	_bar.add_theme_stylebox_override("panel", sb)
 
 	var row := HBoxContainer.new()
+	row.name = "Row"
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 36)
 	_bar.add_child(row)
@@ -76,13 +80,16 @@ func _ready() -> void:
 ## One icon+amount pair. The glyph Label stands in for a generated icon.
 func _make_slot(slot: Dictionary) -> Control:
 	var box := HBoxContainer.new()
+	box.name = "Slot_%s" % slot["name"]
 	box.add_theme_constant_override("separation", 6)
 	var icon := Label.new()
+	icon.name = "Icon"
 	icon.text = slot["glyph"]
 	icon.add_theme_font_size_override("font_size", 18)
 	icon.add_theme_color_override("font_color", slot["color"])
 	box.add_child(icon)
 	var value := Label.new()
+	value.name = "Value"
 	value.text = "0"
 	value.add_theme_font_size_override("font_size", 16)
 	value.add_theme_color_override("font_color", MbStyle.TEXT)
@@ -107,6 +114,13 @@ func refresh() -> void:
 func _on_currencies_changed(balances: Dictionary) -> void:
 	for name in _labels:
 		_labels[name].text = str(int(balances.get(name, 0)))
+
+
+## Total vertical space the band occupies from the top of the viewport (safe
+## inset + bar height). The shell reads this to inset its content host so tab
+## screens lay out *below* the band instead of under it.
+func occupied_height() -> float:
+	return _top_safe_inset() + BAR_HEIGHT
 
 
 ## Pin the band full-width below the top safe inset (notch/status bar).

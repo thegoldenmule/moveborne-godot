@@ -65,12 +65,14 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	position = Vector2.ZERO
 	size = vp
+	# The content host is inset into the gap between the top currency band and the
+	# bottom nav bar by _layout_content() (called once the chrome exists below);
+	# screens parented here then simply fill that safe region.
 	_content.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_content.position = Vector2.ZERO
-	_content.size = vp
 
 	# Dark app background behind the content (the brand near-black).
 	_bg = ColorRect.new()
+	_bg.name = "Background"
 	_bg.color = MbStyle.BG
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bg)
@@ -102,13 +104,20 @@ func _ready() -> void:
 	# match-scene teardown. Sign-in is lazy (first leaderboards call), so offline
 	# players incur no network on launch.
 	_auth = SnapserAuthS.new()
+	_auth.name = "SnapserAuth"
 	add_child(_auth)
 	_leaderboards = LeaderboardsClientS.new(_auth)
+	_leaderboards.name = "LeaderboardsClient"
 	add_child(_leaderboards)
 
 	# Persistent top currency bar (coins/souls/gems), sharing the shell session.
+	# (It names itself "CurrencyLayer" in its own _ready.)
 	_currency_bar = CurrencyBarS.new(_auth)
 	add_child(_currency_bar)
+
+	# Now that both chrome layers exist, inset the content host into the gap
+	# between them so every screen lays out clear of the top band and bottom nav.
+	_layout_content()
 
 	# Build the five tab screens into the content host (Home + Leaderboard are
 	# real; the rest stubs).
@@ -123,9 +132,12 @@ func _ready() -> void:
 		else:
 			screen = PlaceholderScene.instantiate()
 			screen.set_title(TAB_LABELS[i])
+		# Name each screen host after its tab so the tree stays legible (placeholder
+		# instances otherwise collide on their shared scene-root name).
+		screen.name = "%sTab" % TAB_LABELS[i]
 		_content.add_child(screen)
 		screen.position = Vector2.ZERO
-		screen.size = vp
+		screen.size = _content.size
 		_screens.append(screen)
 
 	# Radio selection across the five tab buttons; each takes an equal share of the
@@ -350,16 +362,31 @@ func _bottom_safe_inset() -> float:
 	return phys_bottom * get_viewport_rect().size.y / float(win.y)
 
 
+## Position the content host in the gap between the top currency band and the
+## bottom nav bar, and size every tab screen to fill it. This is the single
+## place chrome insets are accounted for — screens never compensate themselves,
+## so nothing slides under the band or the nav. Recomputed on viewport resize.
+func _layout_content() -> void:
+	var vp := get_viewport_rect().size
+	var top_chrome := 0.0
+	if is_instance_valid(_currency_bar):
+		top_chrome = _currency_bar.occupied_height()
+	var bottom_chrome := NAV_HEIGHT + _bottom_safe_inset()
+	_content.position = Vector2(0.0, top_chrome)
+	_content.size = Vector2(vp.x, maxf(0.0, vp.y - top_chrome - bottom_chrome))
+	for s in _screens:
+		if is_instance_valid(s):
+			s.position = Vector2.ZERO
+			s.size = _content.size
+
+
 ## Re-fill on viewport resize (aspect=expand changes the logical size per device).
 func _on_viewport_resized() -> void:
 	var vp := get_viewport_rect().size
 	size = vp
-	_content.size = vp
 	if is_instance_valid(_bg):
 		_bg.size = vp
-	for s in _screens:
-		if is_instance_valid(s):
-			s.size = vp
 	_apply_safe_area()
+	_layout_content()
 	# Re-derive icon rects once the nav buttons settle at their new widths.
 	_select_tab.call_deferred(_current_tab)
