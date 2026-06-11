@@ -7,6 +7,7 @@ extends Control
 ## Preloaded (not the class_name global): fresh class_name registration needs a
 ## full editor scan, which scenes must not depend on.
 const LbClientS := preload("res://net/leaderboards_client.gd")
+const ScreenScaffoldS := preload("res://ui/screen_scaffold.gd")
 
 const TOP_COUNT := 10
 const PERIODS := [
@@ -14,10 +15,6 @@ const PERIODS := [
 	["Weekly", LbClientS.BOARD_WEEKLY],
 	["Monthly", LbClientS.BOARD_MONTHLY],
 ]
-## The shell insets the content host between the top band and bottom nav, so the
-## screen only needs its own breathing room from those edges.
-const EDGE_PADDING := 16.0
-const SIDE_MARGIN := 24.0
 
 @onready var _vbox: VBoxContainer = $VBox
 @onready var _title: Label = $VBox/Title
@@ -43,13 +40,15 @@ func setup(auth: MbSnapserAuth, client: Node) -> void:
 
 
 func _ready() -> void:
-	# Root size comes from the shell (already inset clear of the top band and
-	# bottom nav); the VBox fills it minus a little edge padding.
-	_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_vbox.offset_left = SIDE_MARGIN
-	_vbox.offset_right = -SIDE_MARGIN
-	_vbox.offset_top = EDGE_PADDING
-	_vbox.offset_bottom = -EDGE_PADDING
+	# Reparent the page column into the shared scaffold so the screen gets the
+	# same padding + centered max-width as Settings (and future tabs). The @onready
+	# child refs were already resolved, so they survive the move.
+	remove_child(_vbox)
+	var scaffold := ScreenScaffoldS.new()
+	add_child(scaffold)
+	scaffold.add_child(_vbox)
+	_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_vbox.add_theme_constant_override("separation", 14)
 
 	# Grammara is wide: 24px is the biggest "LEADERBOARD" that fits the narrow

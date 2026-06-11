@@ -9,11 +9,11 @@ extends Control
 const ProfileClientS := preload("res://net/profile_client.gd")
 const AvatarsS := preload("res://ui/avatars.gd")
 const LocalSettingsS := preload("res://ui/local_settings.gd")
+const ScreenScaffoldS := preload("res://ui/screen_scaffold.gd")
 
-const SIDE_MARGIN := 24.0
-const EDGE_PADDING := 16.0
-const AVATAR_TILE := 96
-const AVATAR_PICK := 64
+const AVATAR_TILE := 64
+const AVATAR_PICK := 56
+const AVATAR_COLS := 4
 
 var _auth: MbSnapserAuth
 var _profiles: Node  # MbProfileClient
@@ -47,21 +47,18 @@ func _ready() -> void:
 
 
 func _build() -> void:
+	# Shared padded, max-width frame (same as Leaderboard); a scroll fills it and
+	# the content column scrolls within.
+	var scaffold := ScreenScaffoldS.new()
+	add_child(scaffold)
 	var scroll := ScrollContainer.new()
-	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
+	scaffold.add_child(scroll)
 
 	_col = VBoxContainer.new()
 	_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_col.add_theme_constant_override("separation", 16)
-	_col.offset_left = SIDE_MARGIN
-	_col.offset_right = -SIDE_MARGIN
-	_col.offset_top = EDGE_PADDING
-	_col.offset_bottom = -EDGE_PADDING
 	scroll.add_child(_col)
-	# Fill the scroll viewport width so rows lay out edge-to-edge.
-	_col.custom_minimum_size = Vector2(maxf(0.0, size.x - 2.0 * SIDE_MARGIN), 0)
 
 	_add_title("SETTINGS")
 	_build_profile_section()
@@ -115,7 +112,7 @@ func _build_profile_section() -> void:
 
 	# Avatar picker grid — collapsed until the tile is tapped.
 	_avatar_grid = GridContainer.new()
-	_avatar_grid.columns = 6
+	_avatar_grid.columns = AVATAR_COLS
 	_avatar_grid.add_theme_constant_override("h_separation", 8)
 	_avatar_grid.add_theme_constant_override("v_separation", 8)
 	_avatar_grid.visible = false
