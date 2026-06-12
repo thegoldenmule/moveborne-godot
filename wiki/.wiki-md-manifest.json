@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2062,
+    "version": 2074,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -65,7 +65,7 @@
       "hypercasual-llm/.archived/implementation-plan--mq8ja3dj-001i-rpjbng.md": "7a0f3bf295072f3b2344bf67dcccc66dda2415be3d794561eefe08660e1fba90",
       "hypercasual-llm/.archived/testing-plan--mq8ja3dj-001j-ghgqgx.md": "62d3bea8628828c3dfc56479801e69a0543e21317357c87093e8d4a4bfe0c339",
       "hypercasual-llm/.archived/feature-spec--mq8ja3dj-001k-urfpez.md": "0bf19dab06c11396202f28afb690afeb0d7dd2b3c879bfc071d8a7b3732ee1c3",
-      "hypercasual-llm/architecture/client/build-amp-distribution.md": "b58353243172bbacb5be5314be2636b9479ad03826838c739a20b858922c629e",
+      "hypercasual-llm/architecture/client/build-amp-distribution.md": "bb036cbfb0144708c2a42733ed47e8fb3b1bb914daaa34226fe6549468f62a63",
       "hypercasual-llm/adrs/script-driven-multi-platform-export-commit-presets-defer-ci.md": "3874436e2f23d4c71310776be0fc2125be4a64c75b4101563355cab1a943ae3c",
       "hypercasual-llm/bugs/index.md": "28a01b2a45c2635c43ce765bc953528fd39deede51a6686729f67d079c5e8619",
       "hypercasual-llm/.archived/bug-report--mq9n2iah-0003-954t8.md": "5d6e8574e6e9ee8db20eb7df42076e69207af40e38cf950f8717f2e8e3e38030",
