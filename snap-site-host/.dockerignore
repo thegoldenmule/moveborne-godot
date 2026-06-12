@@ -1,0 +1,9 @@
+# Keep the image lean and avoid copying repo/tooling cruft into ./site.
+.git
+README.md
+sync-build.sh
+snapser-byosnap-profile.json
+swagger.json
+site/.gitkeep
+site/.gitignore
+**/.DS_Store

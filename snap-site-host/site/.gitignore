@@ -1,0 +1,6 @@
+# The site payload is a per-game web build synced in at deploy time (see ../sync-build.sh).
+# Keep it OUT of git so this host stays reusable and the repo doesn't carry a duplicate build.
+# Committed state of site/ is empty (just .gitkeep + this file).
+*
+!.gitignore
+!.gitkeep

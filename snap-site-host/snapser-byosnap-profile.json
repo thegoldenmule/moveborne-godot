@@ -1,0 +1,54 @@
+{
+  "name": "byosnap-site-host",
+  "description": "Generic static-site host (stock nginx). Serves a web build dropped into ./site under the snap's gateway base path. Game-agnostic and reusable.",
+  "platform": "linux/arm64",
+  "language": "node",
+  "prefix": "/v1",
+  "ingress": {
+    "external_port": {
+      "name": "http",
+      "port": 8080
+    },
+    "internal_ports": []
+  },
+  "readiness_probe_config": {
+    "initial_delay_seconds": 3,
+    "path": "/health"
+  },
+  "dev_template": {
+    "cpu": 100,
+    "memory": 0.125,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "BASE_PATH", "value": "/v1/byosnap-site-host" },
+      { "key": "LISTEN_PORT", "value": "8080" }
+    ],
+    "hpa": null
+  },
+  "stage_template": {
+    "cpu": 100,
+    "memory": 0.125,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "BASE_PATH", "value": "/v1/byosnap-site-host" },
+      { "key": "LISTEN_PORT", "value": "8080" }
+    ],
+    "hpa": null
+  },
+  "prod_template": {
+    "cpu": 250,
+    "memory": 0.25,
+    "min_replicas": 1,
+    "cmd": "",
+    "args": [],
+    "env_params": [
+      { "key": "BASE_PATH", "value": "/v1/byosnap-site-host" },
+      { "key": "LISTEN_PORT", "value": "8080" }
+    ],
+    "hpa": null
+  }
+}

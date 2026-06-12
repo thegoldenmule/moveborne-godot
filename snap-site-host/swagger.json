@@ -1,0 +1,46 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Static Site Host",
+    "version": "1.0.0",
+    "description": "Stock nginx serving a static web build under the snap base path. Routing is prefix-based (the gateway forwards the full prefix to the container); this spec exists only to (a) mark the surface as PUBLIC via x-snapser-auth-passthrough so the gateway does not require a session token, and (b) satisfy SDK/API-Explorer generation. Only THIS snap's routes are affected — other snaps in the snapend keep full auth.\n\nOpenAPI path templating matches a single segment, so {path} below does not literally enumerate nested files (e.g. /assets/foo.wasm). The same-snapend smoke test answers whether the gateway honors passthrough prefix-wide for unenumerated nested paths; if it does not, fall back to a dedicated Auth-less snapend (see README)."
+  },
+  "paths": {
+    "/v1/byosnap-site-host/": {
+      "get": {
+        "tags": ["Site"],
+        "summary": "Site APIs",
+        "description": "Serves the site index (index.html). Public — no session token required.",
+        "operationId": "GetSiteIndex",
+        "responses": {
+          "200": { "description": "The site index HTML." }
+        },
+        "x-snapser-auth-types": ["user"],
+        "x-snapser-auth-passthrough": true
+      }
+    },
+    "/v1/byosnap-site-host/{path}": {
+      "get": {
+        "tags": ["Site"],
+        "summary": "Site APIs",
+        "description": "Serves a static asset by path. Public — no session token required.",
+        "operationId": "GetSiteAsset",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "description": "Path to the static asset under the site root.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "The requested static asset." },
+          "404": { "description": "Asset not found." }
+        },
+        "x-snapser-auth-types": ["user"],
+        "x-snapser-auth-passthrough": true
+      }
+    }
+  }
+}

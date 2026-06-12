@@ -1,0 +1,61 @@
+# Rendered by the official nginx image's envsubst step at container start.
+# Only ${BASE_PATH} and ${LISTEN_PORT} are substituted (see NGINX_ENVSUBST_FILTER); every
+# other $-token is a live nginx variable.
+
+# Cache policy, mirroring the Amplify customHttp.yml. Godot web exports use STABLE, un-hashed
+# filenames (index.wasm.br, index.pck.br, …), so engine/code assets must revalidate every load
+# (max-age=0 + nginx's default ETag → cheap 304s, full re-fetch after a new build). Only images
+# are safely long-cached. `map` lives at http context — conf.d/*.conf is included there.
+map $uri $mb_cache_control {
+    default          "public, max-age=0, must-revalidate";
+    ~*/index\.html$  "no-store, must-revalidate";
+    ~*\.png$         "public, max-age=86400";
+}
+
+server {
+    listen      ${LISTEN_PORT} default_server;
+    listen      [::]:${LISTEN_PORT} default_server;
+    server_name _;
+
+    # Platform readiness probe. Answered UNPREFIXED: the Snapser probe hits the container
+    # directly (not through the gateway), so it must not sit behind BASE_PATH.
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Bare base path with no trailing slash → normalize to the slashed form.
+    location = ${BASE_PATH} {
+        return 301 ${BASE_PATH}/;
+    }
+
+    # The static site. The gateway forwards the full prefix unstripped, so we alias the
+    # whole BASE_PATH onto the html root.
+    location ${BASE_PATH}/ {
+        alias /usr/share/nginx/html/;
+        index index.html;
+
+        # Revalidation policy for the stable un-hashed Godot filenames (see map above).
+        add_header Cache-Control $mb_cache_control always;
+
+        # Serve a sibling .gz transparently when present + accepted (stock nginx ships
+        # gzip_static). NOTE: brotli (.br) precompression needs the ngx_brotli module, which
+        # is NOT in stock nginx — Godot's "client-side brotli" build decompresses in JS, so
+        # the server just hands .br files over as opaque blobs, which works as-is.
+        gzip_static on;
+
+        # SPA-friendly fallback. The final arg is a URI (not a file path), so nginx does an
+        # internal redirect back into this location and serves index.html — this also sidesteps
+        # the classic alias+try_files file-path bug. Harmless for Godot (its requests are all
+        # real files), useful if this host is reused for a client-routed SPA.
+        try_files $uri $uri/ ${BASE_PATH}/index.html;
+
+        # --- Optional, OFF by default ---
+        # Godot 4 web exports built WITH threads need cross-origin isolation for
+        # SharedArrayBuffer. Uncomment if (and only if) your build uses threads; enabling COEP
+        # can block cross-origin subresources that aren't CORP/CORS-tagged.
+        # add_header Cross-Origin-Opener-Policy   same-origin   always;
+        # add_header Cross-Origin-Embedder-Policy require-corp  always;
+    }
+}
