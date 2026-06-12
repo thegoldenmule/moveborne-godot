@@ -1,0 +1,38 @@
+# customHttp.yml — response headers for the AWS Amplify-hosted web build.
+#
+# NOTE: Compression is handled CLIENT-SIDE (see tools/web/mb_brotli_boot.js), not
+# via Content-Encoding — Amplify rejects Content-Encoding as a read-only header,
+# so the engine's .wasm/.pck ship as brotli'd `.br` blobs that JS decompresses in
+# the browser. These headers therefore only handle caching + content types.
+#
+# Caching: the Godot export uses STABLE, un-hashed filenames (index.wasm.br, …),
+# so we must revalidate on every load (max-age=0 + ETag → cheap 304 when nothing
+# changed, full re-download after a new build is pushed). Do NOT mark these
+# `immutable` unless the filenames become content-hashed.
+customHeaders:
+  - pattern: '/index.html'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-store, must-revalidate'
+  - pattern: '**/*.br'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=0, must-revalidate'
+      - key: 'Content-Type'
+        value: 'application/octet-stream'
+  - pattern: '**/*.wasm'
+    headers:
+      # Only the vendored brotli decoder ships as a raw .wasm; the engine wasm is
+      # served as index.wasm.br. application/wasm lets the decoder stream-compile.
+      - key: 'Content-Type'
+        value: 'application/wasm'
+      - key: 'Cache-Control'
+        value: 'public, max-age=0, must-revalidate'
+  - pattern: '**/*.js'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=0, must-revalidate'
+  - pattern: '**/*.png'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=86400'

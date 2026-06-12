@@ -1,0 +1,18 @@
+# amplify.yml — AWS Amplify Hosting build spec for the Moveborne web client.
+#
+# The web build is produced LOCALLY by tools/build_web.sh and committed under
+# web-dist/, so Amplify performs no build step — it just publishes the prebuilt
+# artifacts. To update the deployed game: run tools/build_web.sh, commit web-dist/,
+# and push to the Amplify-connected branch.
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "Publishing committed prebuilt web-dist/ (no build step)."
+  artifacts:
+    baseDirectory: web-dist
+    files:
+      - '**/*'
+  cache:
+    paths: []
