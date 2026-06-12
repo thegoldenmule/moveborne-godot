@@ -902,7 +902,7 @@ func _key_swipe(direction: String) -> void:
 
 # ──────────────────────────────────────────────────────────────────────────────
 # MCP / LLM control surface (game-semantic). These public wrappers are driven by
-# the MbDebug autoload (game/mcp_game_api.gd) — see MCP_GAME_API.md. They reuse the
+# the MbDebug autoload (game/mcp_game_api.gd) — see the Game Control API (MbDebug) wiki page. They reuse the
 # exact targeting state machine the player uses (TARGET / _select_card /
 # _on_cell_tapped / _play), so plays animate the board, hand, and VFX normally.
 # ──────────────────────────────────────────────────────────────────────────────

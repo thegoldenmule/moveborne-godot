@@ -32,7 +32,7 @@ Don't restate the architecture here — read the canonical pages:
 | Overview, controls, project layout | `game/README.md` |
 | Architecture, phase status, per-subsystem source-of-truth map | `game/GODOT_PORT_PLAN.md` |
 | Godot/GDScript working notes + hard-won gotchas + parity-test loop | `game/CLAUDE.md` |
-| Driving the game via MCP (the `MbDebug` autoload) | `game/MCP_GAME_API.md` |
+| Driving the game (MbDebug) + UI/menus (MbUi) via MCP | `wiki/…/architecture/client/game-control-api-mbdebug.md` + `…/ui-control-api-mbui.md` |
 | Native VFX mapping | `game/VFX_MAPPING.md` |
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |

@@ -15,7 +15,8 @@ extends Node
 ## (`scenes/main.gd`'s `mcp_*` methods), which reuse the exact targeting state
 ## machine the player uses — so plays animate the board, hand, and VFX normally.
 ## All reads come off the live `MbMatch.state`. Nothing here touches `engine/`, so
-## determinism parity is unaffected. See MCP_GAME_API.md for the full reference.
+## determinism parity is unaffected. Full reference: the Game Control API (MbDebug)
+## wiki page (wiki/hypercasual-llm/architecture/client/game-control-api-mbdebug.md).
 
 const NOT_READY := {"ok": false, "reason": "not_ready",
 	"message": "no live match — open the main scene (project_run) first"}
@@ -251,7 +252,7 @@ func inspect() -> Dictionary:
 
 ## Human-readable list of the available commands.
 func help() -> String:
-	return """MbDebug — game-semantic control (call via godot-ai game_eval). See MCP_GAME_API.md.
+	return """MbDebug — game-semantic control (call via godot-ai game_eval). See the Game Control API (MbDebug) wiki page.
   readiness : is_ready()
   movement  : up() down() left() right() swipe(dir)
   reads     : get_state() get_board() get_cards() get_playable_cards() get_tile(r,c)

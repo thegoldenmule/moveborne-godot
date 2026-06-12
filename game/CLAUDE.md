@@ -79,12 +79,14 @@ verifier/suite — never hand-write expected values.
   `position`. `get_ui_elements` returns exact rects for clicking.
 - **Drive the game by game concepts** (swipe / read board / play card): use the
   `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
-  analog of the TS `window.__moveborne`. Full reference: **`MCP_GAME_API.md`**.
+  analog of the TS `window.__moveborne`. Full reference: the **Game Control API
+  (MbDebug)** wiki page (`../wiki/hypercasual-llm/architecture/client/game-control-api-mbdebug.md`).
 - **Drive the UI by screen + button** (navigate screens / press any control / run
   deterministic sequences): use the `MbUi` autoload via `game_eval` (e.g.
   `await MbUi.goto("settings")`, `MbUi.actions()`, `await MbUi.run([...])`). New
   actionable controls register themselves via `MbUiReg` (`ui/mcp_ui_reg.gd`) as a
-  byproduct of construction. Full reference: **`MCP_UI_API.md`**. Headless smoke:
+  byproduct of construction. Full reference: the **UI Control API (MbUi)** wiki page
+  (`../wiki/hypercasual-llm/architecture/client/ui-control-api-mbui.md`). Headless smoke:
   `--script res://tools/verify_ui_driver.gd`.
 - **Validator:** `tools/run_validator.sh` (`:5555`) wraps this repo's
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt

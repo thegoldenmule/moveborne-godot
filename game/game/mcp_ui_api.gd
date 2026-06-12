@@ -24,7 +24,8 @@ extends Node
 ## actionable controls through it, which records each on the live tree. MbUi walks
 ## that live tree to build its catalog — self-cleaning, no central state.
 ##
-## See MCP_UI_API.md for the full reference.
+## Full reference: the UI Control API (MbUi) wiki page
+## (wiki/hypercasual-llm/architecture/client/ui-control-api-mbui.md).
 
 const MbUiReg := preload("res://ui/mcp_ui_reg.gd")
 const AvatarsS := preload("res://ui/avatars.gd")
@@ -510,10 +511,10 @@ func _wait_seconds(secs: float) -> void:
 # ── utility ───────────────────────────────────────────────────────────────────
 
 func help() -> String:
-	return """MbUi — semantic UI/navigation control (call via godot-ai game_eval). See MCP_UI_API.md.
+	return """MbUi — semantic UI/navigation control (call via godot-ai game_eval). See the UI Control API (MbUi) wiki page.
   reads     : state() screens() actions(all=false) is_ready()
   navigate  : await goto(target)   # tabs: %s ; modes: %s ; or 'shell'/'back'
   controls  : press(id) toggle(id,on) set_value(id,v) set_text(id,s,submit=false)
   sequence  : await run([steps], opts)  # steps: \"goto:settings\" \"press:home.story\" \"exit\" \"swipe:up\" \"wait:0.5\" \"flow:start_story\" / {set=\"settings.music\",to=0.3}
   flows     : await flow(name, params)  # start_story start_infinite open_settings open_leaderboard exit_match sign_out set_avatar{id} rename{name} set_volume{music,sfx}
-  gameplay  : in a match, drive the board/cards via MbDebug (see MCP_GAME_API.md)""" % [str(TAB_IDS), str(MODE_CFG.keys())]
+  gameplay  : in a match, drive the board/cards via MbDebug (see the Game Control API wiki page)""" % [str(TAB_IDS), str(MODE_CFG.keys())]

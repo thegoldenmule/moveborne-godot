@@ -7,7 +7,7 @@ extends SceneTree
 ## catalog / actions / press / set_value / toggle / set_text / visibility filter on
 ## a HAND-BUILT control tree — no autoloads, no real scenes, so it runs cleanly
 ## headless. The async navigation surface (goto/run/flow against the live router)
-## is covered by the in-editor driven session (see MCP_UI_API.md), not here.
+## is covered by the in-editor driven session (see the UI Control API (MbUi) wiki page), not here.
 
 const Reg := preload("res://ui/mcp_ui_reg.gd")
 const Driver := preload("res://game/mcp_ui_api.gd")
