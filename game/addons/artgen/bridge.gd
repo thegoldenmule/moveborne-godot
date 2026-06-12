@@ -17,6 +17,12 @@ var _conns: Array = []
 
 
 func _ready() -> void:
+	# The bridge only serves a live editor's MCP shim. Headless invocations
+	# (web export, verifier scripts) load this @tool plugin too — skip binding
+	# so they don't collide with an already-open editor holding the port.
+	if DisplayServer.get_name() == "headless":
+		set_process(false)
+		return
 	var env_port := OS.get_environment("ARTGEN_BRIDGE_PORT")
 	if not env_port.is_empty():
 		port = env_port.to_int()
