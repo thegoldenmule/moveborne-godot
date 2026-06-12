@@ -35,6 +35,7 @@ var _usage_label: Label
 var _params_toggle: Button
 var _params_label: RichTextLabel
 var _save_row: HBoxContainer
+var _swap_row: HFlowContainer
 var _category_option: OptionButton
 var _name_edit: LineEdit
 var _save_btn: Button
@@ -284,6 +285,11 @@ func _build_detail() -> Control:
 	_save_row.add_child(_save_btn)
 	_detail_box.add_child(_save_row)
 
+	# Swap-into buttons, one per already-promoted ref in this generation's batch
+	# (populated in _refresh_detail). Re-points that ref at the selected variant.
+	_swap_row = HFlowContainer.new()
+	_detail_box.add_child(_swap_row)
+
 	var action_row := HBoxContainer.new()
 	_iterate_btn = Button.new()
 	_iterate_btn.text = "Iterate"
@@ -409,6 +415,13 @@ func _on_save() -> void:
 	_save_btn.disabled = false
 	_status_label.text = ("saved → " + str(result.get("dest"))) if result.get("ok", false) \
 			else "save failed: " + str(result.get("error"))
+	_refresh_detail()
+
+
+func _on_swap(ref_path: String, gen_id: String) -> void:
+	var result: Dictionary = await service.swap_permutation(ref_path, gen_id)
+	_status_label.text = ("swapped → " + str(result.get("dest"))) if result.get("ok", false) \
+			else "swap failed: " + str(result.get("error"))
 	_refresh_detail()
 
 
@@ -646,14 +659,40 @@ func _refresh_detail() -> void:
 	var img: Image = service.preview_image(_selected_id, _checker_toggle.button_pressed)
 	_preview_rect.texture = ImageTexture.create_from_image(img) if img != null else null
 
-	var saved := str(rec.get("state")) == "saved"
-	if saved:
-		_usage_label.text = "in game → " + str(rec.get("dest"))
+	# Which ref (if any) this exact variant currently powers, and which refs in
+	# its batch point at a *sibling* (swap candidates). Sourced from the manifest,
+	# which tracks swaps; the ledger's per-gen "saved" state does not.
+	var rec_batch := str(rec.get("batch_id", _selected_id))
+	var powering := ""
+	var swap_targets: Array = []
+	for r in service.saved_refs():
+		if str(r["gen_id"]) == _selected_id:
+			powering = str(r["ref_path"])
+		elif not str(r["batch_id"]).is_empty() and str(r["batch_id"]) == rec_batch:
+			swap_targets.append(r)
+
+	if not powering.is_empty():
+		_usage_label.text = "in game → " + powering
 		_usage_label.add_theme_color_override("font_color", Color(0.75, 0.55, 1.0))
+	elif not swap_targets.is_empty():
+		_usage_label.text = "a sibling is in game — swap this variant in below, or save a new ref"
+		_usage_label.add_theme_color_override("font_color", Color(0.7, 0.65, 0.5))
 	else:
 		_usage_label.text = "not used in game"
 		_usage_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	_save_row.visible = not saved
+	# Can still save a fresh ref even when siblings exist; only hide save once
+	# this exact variant already powers a ref.
+	_save_row.visible = powering.is_empty()
+
+	for child in _swap_row.get_children():
+		child.queue_free()
+	for r in swap_targets:
+		var ref_path := str(r["ref_path"])
+		var btn := Button.new()
+		btn.text = "⇄ swap into " + ref_path.get_file()
+		btn.tooltip_text = "Re-point %s at %s (every consumer follows)" % [ref_path, _selected_id]
+		btn.pressed.connect(_on_swap.bind(ref_path, _selected_id))
+		_swap_row.add_child(btn)
 
 	var lineage_text := ""
 	for parent in rec.get("lineage", []):

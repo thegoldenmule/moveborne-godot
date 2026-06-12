@@ -404,6 +404,24 @@ func swap_permutation(ref_path: String, gen_id: String) -> Dictionary:
 	return result
 
 
+## The promoted GenTexture refs, from the manifest (the authoritative record of
+## which generation each ref currently resolves to — swaps move this, the ledger
+## fold's per-gen "saved" state does not). Returns [{ref_path, uid, gen_id,
+## batch_id}].
+func saved_refs() -> Array:
+	var manifest := _load_manifest()
+	var out: Array = []
+	for key in manifest["assets"]:
+		var e: Dictionary = manifest["assets"][key]
+		out.append({
+			"ref_path": str(e.get("ref_path", key)),
+			"uid": str(key) if str(key).begins_with("uid://") else "",
+			"gen_id": str(e.get("gen_id", "")),
+			"batch_id": str(e.get("batch_id", "")),
+		})
+	return out
+
+
 ## Sibling permutations of a generation (same batch, n_index order) — the
 ## candidates for swap_permutation. Returns the batch's records (or just the one
 ## record for pre-batch ledgers).
