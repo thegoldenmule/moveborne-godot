@@ -41,6 +41,23 @@ const MODE_CFG := {
 	"infinite": {"mode": "infinite"},
 }
 
+## The named-flow catalog: the single source of truth for flows() + help(). Each
+## flow is an ordered run() script that `_expand_flow` builds (interpolating the
+## listed params; a "?" suffix marks an optional param). Keep these names in
+## lockstep with _expand_flow's match — verify_ui_driver asserts every entry here
+## expands to non-null steps.
+const FLOWS := [
+	{"name": "start_story", "params": [], "summary": "Launch a Story match."},
+	{"name": "start_infinite", "params": [], "summary": "Launch an Infinite match."},
+	{"name": "open_settings", "params": [], "summary": "Switch to the Settings tab."},
+	{"name": "open_leaderboard", "params": [], "summary": "Switch to the Leaderboard tab."},
+	{"name": "exit_match", "params": [], "summary": "Leave the current match, back to the shell."},
+	{"name": "sign_out", "params": [], "summary": "Settings -> Sign out."},
+	{"name": "set_avatar", "params": ["id"], "summary": "Open Settings and pick avatar <id> (e.g. skull_avatar_05)."},
+	{"name": "rename", "params": ["name"], "summary": "Set the display name to <name> and save."},
+	{"name": "set_volume", "params": ["music?", "sfx?"], "summary": "Set the music and/or sfx volume sliders."},
+]
+
 
 # ── scene/shell/autoload resolution ───────────────────────────────────────────
 # Autoloads are resolved by node path (not the global identifier) so this script
@@ -432,9 +449,22 @@ func _all_ok(trace: Array) -> bool:
 
 # ── named flows ───────────────────────────────────────────────────────────────
 
-## Expand + run a named flow. Names: start_story, start_infinite, open_settings,
-## open_leaderboard, exit_match, sign_out, set_avatar{id}, rename{name},
-## set_volume{music?, sfx?}. Returns the run() trace.
+## The catalog of named flows — the discovery surface for flow(), as screens() is
+## for goto() and actions() is for press(). Each entry: {name, params, summary,
+## steps} where `steps` is the expansion with default/empty params (a shape
+## preview); pass the listed params to flow(name, params).
+func flows() -> Array:
+	var out: Array = []
+	for f in FLOWS:
+		out.append({
+			"name": f["name"],
+			"params": f["params"],
+			"summary": f["summary"],
+			"steps": _expand_flow(str(f["name"]), {}),
+		})
+	return out
+
+## Expand + run a named flow (see the FLOWS catalog / flows()). Returns the run() trace.
 func flow(name: String, params: Dictionary = {}) -> Array:
 	var steps = _expand_flow(name, params)
 	if steps == null:
@@ -511,10 +541,13 @@ func _wait_seconds(secs: float) -> void:
 # ── utility ───────────────────────────────────────────────────────────────────
 
 func help() -> String:
+	var flow_names: Array = []
+	for f in FLOWS:
+		flow_names.append(str(f["name"]))
 	return """MbUi — semantic UI/navigation control (call via godot-ai game_eval). See the UI Control API (MbUi) wiki page.
-  reads     : state() screens() actions(all=false) is_ready()
+  reads     : state() screens() actions(all=false) flows() is_ready()
   navigate  : await goto(target)   # tabs: %s ; modes: %s ; or 'shell'/'back'
   controls  : press(id) toggle(id,on) set_value(id,v) set_text(id,s,submit=false)
   sequence  : await run([steps], opts)  # steps: \"goto:settings\" \"press:home.story\" \"exit\" \"swipe:up\" \"wait:0.5\" \"flow:start_story\" / {set=\"settings.music\",to=0.3}
-  flows     : await flow(name, params)  # start_story start_infinite open_settings open_leaderboard exit_match sign_out set_avatar{id} rename{name} set_volume{music,sfx}
-  gameplay  : in a match, drive the board/cards via MbDebug (see the Game Control API wiki page)""" % [str(TAB_IDS), str(MODE_CFG.keys())]
+  flows     : await flow(name, params)  # catalog via flows(): %s
+  gameplay  : in a match, drive the board/cards via MbDebug (see the Game Control API wiki page)""" % [str(TAB_IDS), str(MODE_CFG.keys()), " ".join(flow_names)]

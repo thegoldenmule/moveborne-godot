@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2061,
+    "version": 2062,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -95,7 +95,7 @@
       "hypercasual-llm/.archived/testing-plan--mq9xkeg0-00a2-hpm89g.md": "1f5478c00b53b4b6419299858e09a4b29dc1e6273f6242f47db3c22f4bc8afe9",
       "hypercasual-llm/.archived/feature-spec--mq9xkeg0-00a3-jcbof5.md": "07598f7227ce87f14ffd8dab87ef8da417984d0fd93eecfa63c867ae47b08273",
       "hypercasual-llm/architecture/client/game-control-api-mbdebug.md": "21ab412137fc6825d865a0d358f1037a3736c60f8ff49417cf46630a033cadaa",
-      "hypercasual-llm/architecture/client/ui-control-api-mbui.md": "2f98ea177ef61d2c094ea778ee79a1dfe1334cb96144e38f38125f571f2170ba"
+      "hypercasual-llm/architecture/client/ui-control-api-mbui.md": "47cf998dc133f2da5f1d37bf132dfa5daf40565d46eeed415b42bc87de917af1"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",

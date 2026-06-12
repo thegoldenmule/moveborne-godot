@@ -106,6 +106,16 @@ func _run() -> void:
 	var unk: Dictionary = d.press("settings.nope")
 	_check("unknown id → error", not bool(unk.get("ok", true)) and str(unk.get("reason", "")) == "unknown_id")
 
+	# flows() is the named-flow catalog; every FLOWS entry must expand (guards drift
+	# between the FLOWS catalog and _expand_flow's match), and an unknown flow is null.
+	var fl: Array = d.flows()
+	var every_expands := fl.size() == Driver.FLOWS.size()
+	for f in fl:
+		if not (f.has("steps") and f["steps"] != null and f.has("params") and f.has("summary")):
+			every_expands = false
+	_check("flows() catalog complete + every entry expands", every_expands)
+	_check("unknown flow → null", d._expand_flow("nope", {}) == null)
+
 	# Visibility filter: hiding the screen drops its controls from actions() (the
 	# self-cleaning live-tree walk) but resolve()/press() still find them by id.
 	screen.visible = false

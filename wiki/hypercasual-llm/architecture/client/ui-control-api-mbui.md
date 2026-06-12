@@ -74,10 +74,11 @@ Every call goes through the godot-ai MCP `game_eval`. Navigation is **async** �
 | `is_ready()` | bool — true when the shell is mounted |
 | `state()` | `{busy, route:[…], route_depth, tab, screen, modal, match_ready}` — the one situational read |
 | `screens()` | static catalog of `goto` targets (`tabs`, `modes`, `surfaces`) |
-| `actions(all=false)` | **the discovery surface**: every pressable thing on the live screen, by id |
+| `actions(all=false)` | **the discovery surface** for `press`: every pressable thing on the live screen, by id |
+| `flows()` | **the named-flow catalog** for `flow`: `{name, params, summary, steps}` per flow |
 | `help()` | command summary |
 
-`actions()` returns, per control, `{id, kind, enabled, visible, + value/on/text}` with `kind ∈ button \| toggle \| slider \| text \| texture_button`, filtered to visible+in-tree unless `all`. **Never guess an id — read it from `actions()`.**
+`actions()` returns, per control, `{id, kind, enabled, visible, + value/on/text}` with `kind ∈ button \| toggle \| slider \| text \| texture_button`, filtered to visible+in-tree unless `all`. **Never guess an id — read it from `actions()`.** Likewise, **never guess a flow — read it from `flows()`** (each entry carries its `params` and a `steps` preview).
 
 ### Navigation (awaited)
 | Method | Returns |
@@ -100,7 +101,7 @@ Every call goes through the godot-ai MCP `game_eval`. Navigation is **async** �
 | Method | Returns |
 | --- | --- |
 | `run(steps, opts={})` | run an ordered list of steps; returns a per-step trace |
-| `flow(name, params={})` | expand + run a named flow; returns the `run` trace |
+| `flow(name, params={})` | expand + run a named flow (see `flows()`); returns the `run` trace |
 
 `run` stops on the first failed step unless `opts.continue_on_error`. Each trace entry is `{ok, step, result/sub, screen_after}`.
 
@@ -118,7 +119,7 @@ Every call goes through the godot-ai MCP `game_eval`. Navigation is **async** �
 | `"wait:0.5"` | `{wait:0.5}` | sleep N seconds |
 | `"flow:start_story"` | `{flow:"set_avatar", params:{id:"skull_avatar_03"}}` | run a named flow |
 
-**Named flows:** `start_story`, `start_infinite`, `open_settings`, `open_leaderboard`, `exit_match`, `sign_out`, `set_avatar{id}`, `rename{name}`, `set_volume{music?, sfx?}`.
+**Named flows** (call `flows()` for the live catalog): `start_story`, `start_infinite`, `open_settings`, `open_leaderboard`, `exit_match`, `sign_out`, `set_avatar{id}`, `rename{name}`, `set_volume{music?, sfx?}`.
 
 ### Screen & id catalog
 Ids are `"<screen>.<control>"`. The live set always comes from `actions()`; this is the map of what exists.
