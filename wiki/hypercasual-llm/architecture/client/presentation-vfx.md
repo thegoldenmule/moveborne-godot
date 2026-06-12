@@ -1,4 +1,4 @@
-# Presentation &amp; VFX
+# Presentation & VFX
 
 **Status:** current
 

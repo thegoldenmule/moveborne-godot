@@ -1,4 +1,4 @@
-# Crypto &amp; Signing
+# Crypto & Signing
 
 **Status:** current
 

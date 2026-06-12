@@ -1,4 +1,4 @@
-# Implementation plan — Player Profile &amp; Settings Screen
+# Implementation plan — Player Profile & Settings Screen
 
 **Status:** ready
 

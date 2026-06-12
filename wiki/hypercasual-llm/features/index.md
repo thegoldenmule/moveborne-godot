@@ -9,3 +9,4 @@ All feature specs and feature pages belong under here.
 - [Daily Login Bonus](feature-brief:mq9xf7gd-0083-x03ikc)
 - [Daily Missions](feature-brief:mq9xf8xd-008b-e1w9qn)
 - [Server-authoritative hardening — lock mint APIs + validator-submitted scores](feature-brief:mq9xfhki-008j-79ql1c)
+- [Story Mode — worlds, level maps, star goals & progression](feature-brief:mqb9ay72-001m-oot9x5)

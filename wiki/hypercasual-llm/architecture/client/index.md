@@ -21,16 +21,16 @@ Packaging the client for distribution (committed export presets plus a tools/bui
 - [Rules Engine](architecture:mq1c2u50-000n-gspuzp)
 - [Match Controller](architecture:mq1c2vaw-000p-3fdst6)
 - [Validator Client](architecture:mq1c2wgh-000r-sjn10a)
-- [Presentation &amp; VFX](architecture:mq1c2xsl-000t-8j2hqc)
+- [Presentation & VFX](architecture:mq1c2xsl-000t-8j2hqc)
 - [Editor Tools](architecture:mq8hyn2w-000i-cryytk)
-- [Build &amp; Distribution](architecture:mq9llv7f-00a3-c5f96m)
+- [Build & Distribution](architecture:mq9llv7f-00a3-c5f96m)
 - [Game Control API (MbDebug)](architecture:mqay9c1u-0013-wu1lcn)
 - [UI Control API (MbUi)](architecture:mqayf7o4-001y-dyr6k0)
 
 ## Dependencies
 - **calls** → [Validator](architecture:mq1c2ixi-000h-kd018q) — Online play: validates every move against the Validator over Socket.IO (via net/).
 - **depends-on** → [Server](architecture:mq1c2nid-000j-6cf0hr) — Nakama match creation / authoritative submission — omitted in this single-player port (DEV_MODE).
-- **owns** → [Build &amp; Distribution](architecture:mq9llv7f-00a3-c5f96m) — Build & Distribution — export presets + build.sh for macOS/Windows/Web/iOS/Android.
+- **owns** → [Build & Distribution](architecture:mq9llv7f-00a3-c5f96m) — Build & Distribution — export presets + build.sh for macOS/Windows/Web/iOS/Android.
 
 ## Code references
 - class `MbEngine` in `game/logic/engine.gd`

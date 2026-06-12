@@ -1,4 +1,4 @@
-# Build &amp; Distribution
+# Build & Distribution
 
 **Status:** current
 

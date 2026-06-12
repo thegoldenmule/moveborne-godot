@@ -20,7 +20,7 @@ _No design notes._
 - [Realtime Gateway](architecture:mq1c2z0y-000v-v2bzv9)
 - [Match State Store](architecture:mq1c31rb-000x-6l2ehj)
 - [History Replay Store](architecture:mq1c3370-000z-l7ivsv)
-- [Crypto &amp; Signing](architecture:mq1c351c-0011-gtfyxx)
+- [Crypto & Signing](architecture:mq1c351c-0011-gtfyxx)
 - [MCP Debug Interface](architecture:mq1c366g-0013-odkry1)
 
 ## Dependencies

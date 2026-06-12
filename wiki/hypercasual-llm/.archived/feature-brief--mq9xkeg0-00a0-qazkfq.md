@@ -51,9 +51,9 @@ _None._
 _None._
 
 ## Child pages
-- [Implementation plan — Player Profile &amp; Settings Screen](implementation-plan:mq9xkeg0-00a1-kxfcm8)
-- [Testing plan — Player Profile &amp; Settings Screen](testing-plan:mq9xkeg0-00a2-hpm89g)
-- [Spec — Player Profile &amp; Settings Screen](feature-spec:mq9xkeg0-00a3-jcbof5)
+- [Implementation plan — Player Profile & Settings Screen](implementation-plan:mq9xkeg0-00a1-kxfcm8)
+- [Testing plan — Player Profile & Settings Screen](testing-plan:mq9xkeg0-00a2-hpm89g)
+- [Spec — Player Profile & Settings Screen](feature-spec:mq9xkeg0-00a3-jcbof5)
 
 ## Commits
 - `4f30c74fb04495829fb17d175d4374c9a0628563` feat(ui): Player Profile in a real Settings screen (Profiles snap)

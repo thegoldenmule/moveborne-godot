@@ -47,7 +47,7 @@ _None._
 ## References
 - extends (demotes main.tscn to the match screen) → [Match Controller](architecture:mq1c2vaw-000p-3fdst6)
 - uses for the gated PvP path → [Validator Client](architecture:mq1c2wgh-000r-sjn10a)
-- extends the presentation layer (reuses Vfx/Anim/Quality) → [Presentation &amp; VFX](architecture:mq1c2xsl-000t-8j2hqc)
+- extends the presentation layer (reuses Vfx/Anim/Quality) → [Presentation & VFX](architecture:mq1c2xsl-000t-8j2hqc)
 - preserves (mb_match group fallback) → [MCP Debug Interface](architecture:mq1c366g-0013-odkry1)
 - honors (PvP gated coming-soon) → [Defer Nakama; ship local-authoritative single-player first](decision-record:mq1clpji-0007-t9abfq)
 - honors (never touches logic/) → [Hard wall between deterministic logic and presentation](decision-record:mq1cloi4-0005-d7fpa8)

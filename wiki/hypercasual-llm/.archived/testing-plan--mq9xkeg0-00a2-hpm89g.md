@@ -1,4 +1,4 @@
-# Testing plan — Player Profile &amp; Settings Screen
+# Testing plan — Player Profile & Settings Screen
 
 **Status:** ready
 

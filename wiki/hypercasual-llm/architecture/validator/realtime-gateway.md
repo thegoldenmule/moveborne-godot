@@ -18,7 +18,7 @@ _No design notes._
 _No components._
 
 ## Dependencies
-- **depends-on** → [Crypto &amp; Signing](architecture:mq1c351c-0011-gtfyxx) — Verifies the Snapser gateway caller (User-Id binding) on init + the Socket.IO handshake, and signs each validation response.
+- **depends-on** → [Crypto & Signing](architecture:mq1c351c-0011-gtfyxx) — Verifies the Snapser gateway caller (User-Id binding) on init + the Socket.IO handshake, and signs each validation response.
 - **depends-on** → [Match State Store](architecture:mq1c31rb-000x-6l2ehj) — Reads/writes match state keyed by match_id (the connection_id index is gone).
 
 ## Code references

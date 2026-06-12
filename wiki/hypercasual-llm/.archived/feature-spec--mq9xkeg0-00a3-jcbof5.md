@@ -1,4 +1,4 @@
-# Spec — Player Profile &amp; Settings Screen
+# Spec — Player Profile & Settings Screen
 
 **Status:** sealed
 
