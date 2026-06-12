@@ -16,7 +16,13 @@ const LedgerT := preload("res://addons/artgen/ledger.gd")
 const SvgT := preload("res://addons/artgen/svg_tools.gd")
 const ClientT := preload("res://addons/artgen/recraft_client.gd")
 
+const GenTextureT := preload("res://assets/gen_texture.gd")
+
 const MANIFEST_PATH := "res://assets/generated/ai_manifest.json"
+# Baked, post-processed pixels live here, named by gen_id and referenced from a
+# GenTexture .tres by uid — opaque, deduped, GC-able. The human-named .tres refs
+# are what scenes bind to. See assets/gen_texture.gd.
+const POOL_DIR := "res://assets/generated/_pool"
 const SAVE_CATEGORIES := ["icons", "cards", "textures", "misc"]
 const THUMB_SIZE := 256
 
@@ -279,20 +285,23 @@ func generate(opts: Dictionary) -> Dictionary:
 
 # -- Save pipeline ------------------------------------------------------------
 
-## Promote a generation: apply its planned post steps (strip_bg_rect /
-## removeBackground), copy into res://assets/generated/<category>/<name>.<ext>,
-## import, and record attribution in ai_manifest.json + a ledger save event.
-func save_generation(gen_id: String, category: String, asset_name: String) -> Dictionary:
+## Bake a generation's post-processed pixels into the shared pool
+## (res://assets/generated/_pool/<gen_id>.<ext>) and import them. Idempotent: a
+## pooled file is reused as-is (never re-runs the paid removeBackground step).
+## Returns {ok, pool_path, ext, sha, post, rec} or {ok:false, error}.
+func _bake_to_pool(gen_id: String) -> Dictionary:
 	var rec: Dictionary = _index["generations"].get(gen_id, {})
 	if rec.is_empty() or rec.get("file") == null:
 		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
-	if not SAVE_CATEGORIES.has(category):
-		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
-	if not asset_name.is_valid_filename() or asset_name.is_empty():
-		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+
+	var ext := str(rec["file"]).get_extension()
+	var pool_path := "%s/%s.%s" % [POOL_DIR, gen_id, ext]
+	if FileAccess.file_exists(pool_path):
+		# Already baked — trust it; declared post steps stand in for "applied".
+		return {"ok": true, "pool_path": pool_path, "ext": ext,
+			"sha": FileAccess.get_sha256(pool_path), "post": rec.get("post", []), "rec": rec}
 
 	var src_abs := repo_root.path_join(str(rec["file"]))
-	var ext := str(rec["file"]).get_extension()
 	var bytes := FileAccess.get_file_as_bytes(src_abs)
 	if bytes.is_empty():
 		return {"ok": false, "error": "generation file missing: " + str(rec["file"])}
@@ -322,45 +331,165 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 					bytes = Marshalls.base64_to_raw(str(b64))
 					applied.append("removeBackground")
 
-	var dest := "res://assets/generated/%s/%s.%s" % [category, asset_name, ext]
-	if FileAccess.file_exists(dest):
-		return {"ok": false, "error": "asset already exists: " + dest}
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(POOL_DIR))
 	if ext == "png":
 		# Normalize to a genuine PNG (Recraft v4.x / removeBackground may hand
 		# back WebP) so the imported asset is a real .png.
-		var werr := _write_raster_as_png(bytes, ProjectSettings.globalize_path(dest))
+		var werr := _write_raster_as_png(bytes, ProjectSettings.globalize_path(pool_path))
 		if werr != OK:
-			return {"ok": false, "error": "cannot decode/write %s (err %d)" % [dest, werr]}
+			return {"ok": false, "error": "cannot decode/write %s (err %d)" % [pool_path, werr]}
 	else:
-		var fa := FileAccess.open(dest, FileAccess.WRITE)
+		var fa := FileAccess.open(pool_path, FileAccess.WRITE)
 		if fa == null:
-			return {"ok": false, "error": "cannot write %s (err %d)" % [dest, FileAccess.get_open_error()]}
+			return {"ok": false, "error": "cannot write %s (err %d)" % [pool_path, FileAccess.get_open_error()]}
 		fa.store_buffer(bytes)
 		fa.close()
 
 	await _rescan_filesystem()
+	return {"ok": true, "pool_path": pool_path, "ext": ext,
+		"sha": FileAccess.get_sha256(pool_path), "post": applied, "rec": rec}
 
-	var sha := FileAccess.get_sha256(dest)
+
+## Promote a generation into the game as a GenTexture ref: bakes its pixels into
+## the pool, writes res://assets/generated/<category>/<name>.tres pointing at
+## them, and records attribution in ai_manifest.json (keyed by the ref's uid) +
+## a ledger save event. Scenes bind to the .tres; rename/move/swap stay intact.
+func save_generation(gen_id: String, category: String, asset_name: String) -> Dictionary:
+	if not SAVE_CATEGORIES.has(category):
+		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
+	if not asset_name.is_valid_filename() or asset_name.is_empty():
+		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+
+	var dest := "res://assets/generated/%s/%s.tres" % [category, asset_name]
+	if FileAccess.file_exists(dest):
+		return {"ok": false, "error": "asset already exists: " + dest}
+
+	var baked := await _bake_to_pool(gen_id)
+	if not baked.get("ok", false):
+		return baked
+
+	var result := await _write_ref(dest, gen_id, baked)
+	if not result.get("ok", false):
+		return result
+	LedgerT.append(ledger_path, {
+		"type": "save", "gen_id": gen_id, "ts": _now_iso(),
+		"dest": dest, "ref_uid": result["uid"], "pool": baked["pool_path"], "sha256": baked["sha"],
+	})
+	reload_history()
+	return result
+
+
+## Re-point an existing GenTexture ref at a different generation (typically a
+## sibling permutation from the same batch). The .tres keeps its uid, so every
+## consumer follows the swap untouched.
+func swap_permutation(ref_path: String, gen_id: String) -> Dictionary:
+	if not FileAccess.file_exists(ref_path):
+		return {"ok": false, "error": "no ref at " + ref_path}
+	var ref: Variant = ResourceLoader.load(ref_path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if not (ref is GenTextureT):
+		return {"ok": false, "error": "not a GenTexture ref: " + ref_path}
+
+	var baked := await _bake_to_pool(gen_id)
+	if not baked.get("ok", false):
+		return baked
+
+	var result := await _write_ref(ref_path, gen_id, baked)
+	if not result.get("ok", false):
+		return result
+	LedgerT.append(ledger_path, {
+		"type": "swap", "gen_id": gen_id, "ts": _now_iso(),
+		"dest": ref_path, "ref_uid": result["uid"], "pool": baked["pool_path"], "sha256": baked["sha"],
+	})
+	reload_history()
+	return result
+
+
+## Sibling permutations of a generation (same batch, n_index order) — the
+## candidates for swap_permutation. Returns the batch's records (or just the one
+## record for pre-batch ledgers).
+func permutations(gen_id: String) -> Array:
+	var rec: Dictionary = _index["generations"].get(gen_id, {})
+	if rec.is_empty():
+		return []
+	var batch := str(rec.get("batch_id", gen_id))
+	var out: Array = []
+	for gid in _index["order"]:
+		var r: Dictionary = _index["generations"][gid]
+		if str(r.get("batch_id", gid)) == batch:
+			out.append(r)
+	return out
+
+
+## Shared writer for save_generation / swap_permutation: stamps a GenTexture
+## .tres from a baked-pool result, imports it, and upserts the uid-keyed manifest
+## entry. Returns {ok, dest, uid, gen_id, pool, sha256, post}.
+func _write_ref(dest: String, gen_id: String, baked: Dictionary) -> Dictionary:
+	var rec: Dictionary = baked["rec"]
+	var ref := GenTextureT.new()
+	ref.source = _load_texture(str(baked["pool_path"]))
+	if ref.source == null:
+		return {"ok": false, "error": "cannot load baked pixels: " + str(baked["pool_path"])}
+	ref.gen_id = gen_id
+	ref.batch_id = str(rec.get("batch_id", ""))
+	ref.prompt = str(rec.get("prompt", ""))
+	ref.generator = "recraft/" + str(rec.get("model", ""))
+	ref.style_id = str(rec.get("style_id", "")) if rec.get("style_id") != null else ""
+	ref.sha256 = str(baked["sha"])
+	ref.saved_at = _now_iso()
+	ref.post = PackedStringArray(baked["post"])
+
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
+	var serr := ResourceSaver.save(ref, dest)
+	if serr != OK:
+		return {"ok": false, "error": "cannot write ref %s (err %d)" % [dest, serr]}
+	await _rescan_filesystem()
+
+	var uid := _uid_for(dest)
 	var manifest := _load_manifest()
-	manifest["assets"][dest] = {
-		"generator": "recraft/" + str(rec.get("model", "")),
+	# Re-key by uid: drop any stale entry that named this ref by path.
+	manifest["assets"].erase(dest)
+	manifest["assets"][uid] = {
+		"ref_path": dest,
+		"pool": baked["pool_path"],
+		"generator": ref.generator,
 		"style_id": rec.get("style_id"),
-		"prompt": rec.get("prompt"),
+		"prompt": ref.prompt,
 		"gen_id": gen_id,
+		"batch_id": ref.batch_id,
 		"generated_at": rec.get("ts"),
-		"saved_at": _now_iso(),
-		"sha256": sha,
-		"post": applied,
+		"saved_at": ref.saved_at,
+		"sha256": ref.sha256,
+		"post": baked["post"],
 		"modified_after_save": false,
 	}
 	_store_manifest(manifest)
+	return {"ok": true, "dest": dest, "uid": uid, "gen_id": gen_id,
+		"pool": baked["pool_path"], "sha256": baked["sha"], "post": baked["post"]}
 
-	LedgerT.append(ledger_path, {
-		"type": "save", "gen_id": gen_id, "ts": _now_iso(), "dest": dest, "sha256": sha,
-	})
-	reload_history()
-	return {"ok": true, "dest": dest, "sha256": sha, "post": applied}
+
+## The uid:// text id Godot assigned a freshly-imported resource (empty if none).
+func _uid_for(res_path: String) -> String:
+	var id := ResourceLoader.get_resource_uid(res_path)
+	return ResourceUID.id_to_text(id) if id != ResourceUID.INVALID_ID else ""
+
+
+## Load a pooled image as a Texture2D. In-editor the import pipeline has run, so
+## ResourceLoader returns the imported texture — ResourceSaver then stores it in
+## the .tres as a uid ext_resource (the stable pool link). Headless (verifier,
+## no import) falls back to building an ImageTexture from raw pixels, which the
+## .tres embeds — fine for tests; real saves run in-editor.
+func _load_texture(path: String) -> Texture2D:
+	if Engine.is_editor_hint():
+		var t: Variant = ResourceLoader.load(path)
+		if t is Texture2D:
+			return t
+	var img := Image.new()
+	if path.get_extension() == "svg":
+		if img.load_svg_from_string(FileAccess.get_file_as_string(path), 1.0) != OK:
+			return null
+	elif img.load(path) != OK:
+		return null
+	return ImageTexture.create_from_image(img)
 
 
 func discard_generation(gen_id: String) -> Dictionary:
@@ -504,35 +633,104 @@ func preview_image(gen_id: String, apply_post := false) -> Image:
 
 # -- Manifest -----------------------------------------------------------------
 
-## Re-hash every promoted asset: flags hand-edits (modified_after_save) and
-## reports files missing a manifest entry. Returns {"issues": [String]}.
+## Audit promoted assets. For each manifest entry, verify the ref file + its
+## baked pool pixels still exist and flag hand-edits (the pool sha drifting
+## without modified_after_save). Reports on-disk files no entry accounts for.
+## Tolerant of legacy path-keyed entries (key IS the file, no ref_path/pool).
+## Returns {"issues": [String]}.
 func check_manifest() -> Dictionary:
 	var manifest := _load_manifest()
 	var issues: Array = []
 	var changed := false
-	for res_path in manifest["assets"]:
-		if not FileAccess.file_exists(res_path):
-			issues.append("missing file for manifest entry: " + str(res_path))
+	var known := {}  # res_path -> true, the files entries account for
+	for key in manifest["assets"]:
+		var entry: Dictionary = manifest["assets"][key]
+		var ref_path := str(entry.get("ref_path", key))   # legacy: key is the file
+		var pool := str(entry.get("pool", ""))             # legacy: no separate pool
+		var hashed := pool if not pool.is_empty() else ref_path
+		known[ref_path] = true
+		if not pool.is_empty():
+			known[pool] = true
+		if not FileAccess.file_exists(ref_path):
+			issues.append("missing ref for manifest entry: " + ref_path)
 			continue
-		var sha := FileAccess.get_sha256(res_path)
-		var entry: Dictionary = manifest["assets"][res_path]
-		if sha != str(entry.get("sha256")) and not bool(entry.get("modified_after_save", false)):
+		if not FileAccess.file_exists(hashed):
+			issues.append("missing baked pixels for ref: " + ref_path + " → " + hashed)
+			continue
+		if FileAccess.get_sha256(hashed) != str(entry.get("sha256")) \
+				and not bool(entry.get("modified_after_save", false)):
 			entry["modified_after_save"] = true
 			changed = true
-			issues.append("hand-edited after save: " + str(res_path))
-	var dir := DirAccess.open("res://assets/generated")
-	if dir != null:
-		for sub in dir.get_directories():
+			issues.append("hand-edited after save: " + hashed)
+	var root := DirAccess.open("res://assets/generated")
+	if root != null:
+		for sub in root.get_directories():
 			var subdir := DirAccess.open("res://assets/generated/" + sub)
 			for f in subdir.get_files():
 				if f.ends_with(".import") or f.ends_with(".uid"):
 					continue
 				var res_path := "res://assets/generated/%s/%s" % [sub, f]
-				if not manifest["assets"].has(res_path):
+				if not known.has(res_path):
 					issues.append("no manifest entry (invariant violation): " + res_path)
 	if changed:
 		_store_manifest(manifest)
 	return {"issues": issues}
+
+
+## Wrap an existing promoted file (legacy direct .svg/.png asset) into a
+## GenTexture ref without re-generating: copies its current pixels into the pool
+## under its recorded gen_id, writes <category>/<name>.tres beside it, and
+## re-keys the manifest by uid. The old file is left in place — flip consumers to
+## the .tres, then delete it. Returns the _write_ref result.
+func migrate_asset(old_path: String, category: String, asset_name: String) -> Dictionary:
+	if not FileAccess.file_exists(old_path):
+		return {"ok": false, "error": "no file at " + old_path}
+	if not SAVE_CATEGORIES.has(category):
+		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
+	if not asset_name.is_valid_filename() or asset_name.is_empty():
+		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+
+	var manifest := _load_manifest()
+	var entry: Dictionary = manifest["assets"].get(old_path, {})
+	var gen_id := str(entry.get("gen_id", ""))
+	var rec: Dictionary = _index["generations"].get(gen_id, {}) if not gen_id.is_empty() else {}
+	var ext := old_path.get_extension()
+
+	# The promoted file is already post-applied — copy its bytes straight into
+	# the pool (named by gen_id, or by asset name for un-attributed legacy files).
+	var pool_id := gen_id if not gen_id.is_empty() else "legacy_" + asset_name
+	var pool_path := "%s/%s.%s" % [POOL_DIR, pool_id, ext]
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(POOL_DIR))
+	if not FileAccess.file_exists(pool_path):
+		var bytes := FileAccess.get_file_as_bytes(old_path)
+		var fa := FileAccess.open(pool_path, FileAccess.WRITE)
+		if fa == null:
+			return {"ok": false, "error": "cannot write pool file " + pool_path}
+		fa.store_buffer(bytes)
+		fa.close()
+		await _rescan_filesystem()
+
+	var dest := "res://assets/generated/%s/%s.tres" % [category, asset_name]
+	var baked := {
+		"ok": true, "pool_path": pool_path, "ext": ext,
+		"sha": FileAccess.get_sha256(pool_path),
+		"post": entry.get("post", rec.get("post", [])),
+		"rec": rec if not rec.is_empty() else {
+			"prompt": entry.get("prompt", ""),
+			"model": str(entry.get("generator", "")).trim_prefix("recraft/"),
+			"style_id": entry.get("style_id"),
+			"batch_id": entry.get("batch_id", ""),
+			"ts": entry.get("generated_at", ""),
+		},
+	}
+	var result := await _write_ref(dest, pool_id, baked)
+	if result.get("ok", false):
+		LedgerT.append(ledger_path, {
+			"type": "migrate", "gen_id": pool_id, "ts": _now_iso(),
+			"from": old_path, "dest": dest, "ref_uid": result["uid"], "sha256": baked["sha"],
+		})
+		reload_history()
+	return result
 
 
 func _load_manifest() -> Dictionary:

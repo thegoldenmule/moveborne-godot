@@ -110,6 +110,16 @@ func _handle(conn: Dictionary) -> void:
 			result = service.discard_generation(str(body.get("id", "")))
 			if not result.get("ok", false):
 				code = 404
+		["POST", "/swap"]:
+			result = await service.swap_permutation(
+				str(body.get("ref", "")), str(body.get("id", "")))
+			if not result.get("ok", false):
+				code = 400
+		["POST", "/migrate"]:
+			result = await service.migrate_asset(
+				str(body.get("from", "")), str(body.get("category", "")), str(body.get("name", "")))
+			if not result.get("ok", false):
+				code = 400
 		["POST", "/style/create"]:
 			result = await service.create_style(
 				str(body.get("style", "vector_illustration")), body.get("refs", []))

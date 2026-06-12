@@ -97,17 +97,52 @@ const TOOLS = [
   {
     name: "artgen_save",
     description:
-      "Promote a generation into the game: applies its post steps (bg strip / removeBackground), " +
-      "copies to res://assets/generated/<category>/<name>.<ext>, imports it, and records AI " +
-      "attribution in ai_manifest.json.",
+      "Promote a generation into the game as a GenTexture ref: applies its post steps (bg strip / " +
+      "removeBackground), bakes the pixels into res://assets/generated/_pool/<gen_id>.<ext>, and " +
+      "writes res://assets/generated/<category>/<name>.tres pointing at them. Scenes bind to the " +
+      ".tres (a drop-in Texture2D) — rename/move it freely and swap permutations via artgen_swap; " +
+      "the uid keeps every reference alive. Attribution is recorded in ai_manifest.json by uid.",
     inputSchema: {
       type: "object",
       properties: {
         id: { type: "string", description: "generation id (g_…)" },
         category: { type: "string", enum: ["icons", "cards", "textures", "misc"] },
-        name: { type: "string", description: "asset filename without extension" },
+        name: { type: "string", description: "ref filename without extension (becomes <name>.tres)" },
       },
       required: ["id", "category", "name"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "artgen_swap",
+    description:
+      "Re-point an existing GenTexture ref (.tres) at a different generation — typically a sibling " +
+      "permutation from the same batch (use artgen_get/artgen_history to find them). The ref keeps " +
+      "its uid, so every consumer follows the swap with no edits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ref: { type: "string", description: "res:// path to the GenTexture .tres" },
+        id: { type: "string", description: "generation id (g_…) to swap in" },
+      },
+      required: ["ref", "id"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "artgen_migrate",
+    description:
+      "Wrap an existing legacy promoted file (a direct .svg/.png under res://assets/generated/) into " +
+      "a GenTexture ref without re-generating: pools its current pixels and writes <category>/<name>" +
+      ".tres. The old file stays put — flip consumers to the .tres, then delete it.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        from: { type: "string", description: "res:// path to the existing promoted file" },
+        category: { type: "string", enum: ["icons", "cards", "textures", "misc"] },
+        name: { type: "string", description: "ref filename without extension (becomes <name>.tres)" },
+      },
+      required: ["from", "category", "name"],
       additionalProperties: false,
     },
   },
@@ -185,6 +220,10 @@ async function callTool(name: string, args: Json): Promise<Json> {
       return bridge("GET", "/get" + query({ id: args.id }));
     case "artgen_save":
       return bridge("POST", "/save", args);
+    case "artgen_swap":
+      return bridge("POST", "/swap", args);
+    case "artgen_migrate":
+      return bridge("POST", "/migrate", args);
     case "artgen_discard":
       return bridge("POST", "/discard", args);
     case "artgen_style_create":
