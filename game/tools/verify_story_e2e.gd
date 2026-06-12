@@ -13,7 +13,14 @@ extends SceneTree
 ## Prereqs: the local validator on :5555 (tools/run_validator.sh or
 ## `cd validator && bun run dev`) and network for the anonymous Snapser
 ## sign-in the map performs (story is online-only by design).
+##
+## DEPLOYED mode — MB_E2E_DEPLOYED=1 godot --headless ... — skips the local
+## validator and plays against the live snapend through the gateway (the
+## match's own _connect_snapser path). Expects the full production loop:
+## stars graded, rewards GRANTED, and the progress blob persisted + read
+## back on the map refresh.
 
+var _deployed := false
 var _ok := true
 var _router: Node
 var _ui: Node
@@ -59,21 +66,26 @@ func _run() -> void:
 		_finish(1)
 		return
 
-	# 0) The local validator must be up — fail fast with a clear message.
-	var probe := HTTPRequest.new()
-	root.add_child(probe)
-	if probe.request("http://localhost:5555/health") != OK:
-		_ok = false
-		print("FAIL: cannot start health probe")
-		_finish(1)
-		return
-	var presp: Array = await probe.request_completed
-	probe.queue_free()
-	if int(presp[1]) != 200:
-		_ok = false
-		print("FAIL: local validator not running on :5555 — start it first (run-validator)")
-		_finish(1)
-		return
+	_deployed = OS.get_environment("MB_E2E_DEPLOYED") == "1"
+	if _deployed:
+		print("  mode: DEPLOYED (live snapend through the gateway)")
+
+	# 0) Local mode needs the local validator up — fail fast with a clear message.
+	if not _deployed:
+		var probe := HTTPRequest.new()
+		root.add_child(probe)
+		if probe.request("http://localhost:5555/health") != OK:
+			_ok = false
+			print("FAIL: cannot start health probe")
+			_finish(1)
+			return
+		var presp: Array = await probe.request_completed
+		probe.queue_free()
+		if int(presp[1]) != 200:
+			_ok = false
+			print("FAIL: local validator not running on :5555 — start it first (run-validator)")
+			_finish(1)
+			return
 
 	# 1) Mount the shell (what ui/boot.gd does) and open the story map.
 	# load() at runtime, NOT preload: a top-level preload compiles before the
@@ -118,13 +130,18 @@ func _run() -> void:
 	_check("match launched as story w1_l1", m._mode == "story" and m._level_id == "w1_l1")
 	_check("goal HUD strip built from the catalog goals", m._goals.size() == 3)
 
-	# 5) Re-register the (still fresh) match against the LOCAL validator — the
-	# deployed one predates the story contract until the BYOSnap redeploys.
-	# Locally the ?token= IS the self-stamped player id (no gateway).
-	m._match.online = false
-	m._start_net("ws://localhost:5555/hermes/ws", "e2e_player", "e2e_player")
-	_check("local validator accepted the fresh story init",
-		await _wait_until(func() -> bool: return m._match.online, 10.0))
+	# 5) Bind the match to a validator. Deployed: the scene's own
+	# _connect_snapser (gateway Hermes) is already in flight — wait for it.
+	# Local: re-register the (still fresh) match against :5555, where the
+	# ?token= IS the self-stamped player id (no gateway).
+	if _deployed:
+		_check("deployed validator accepted the fresh story init",
+			await _wait_until(func() -> bool: return m._match.online, 20.0))
+	else:
+		m._match.online = false
+		m._start_net("ws://localhost:5555/hermes/ws", "e2e_player", "e2e_player")
+		_check("local validator accepted the fresh story init",
+			await _wait_until(func() -> bool: return m._match.online, 10.0))
 
 	# 6) Play validated moves; chase the first points goal (240) but cap the
 	# move budget — the E2E gate is the grading round-trip, not the stars.
@@ -155,10 +172,24 @@ func _run() -> void:
 		_check("stars graded in 0..3", stars >= 0 and stars <= 3)
 		_check("3 goal results returned", (story.get("goals", []) as Array).size() == 3)
 		_check("grade is for this level", str(story.get("level_id", "")) == "w1_l1")
-		# Storage is disabled on the local validator, so the watermark cannot
-		# land -> rewards must be withheld (the anti-refarm rule).
-		_check("rewards withheld without a progress write", (story.get("rewards", {}) as Dictionary).is_empty())
-		print("  graded: stars=%d new_stars=%d next=%s" % [stars, int(story.get("new_stars", -1)), str(story.get("next_level_id", ""))])
+		if _deployed:
+			# Production loop: the progress write lands, so earned stars grant
+			# catalog rewards and the blob round-trips into the refreshed map.
+			if stars >= 1:
+				_check("earned stars granted catalog rewards",
+					not (story.get("rewards", {}) as Dictionary).is_empty())
+				var blob_has_stars := func() -> bool:
+					var levels = (_gs.story_progress as Dictionary).get("levels", {})
+					if not (levels is Dictionary):
+						return false
+					return int(((levels as Dictionary).get("w1_l1", {}) as Dictionary).get("stars", 0)) >= 1
+				_check("progress blob persisted and read back on map refresh",
+					await _wait_until(blob_has_stars, 15.0))
+		else:
+			# Storage is disabled on the local validator, so the watermark cannot
+			# land -> rewards must be withheld (the anti-refarm rule).
+			_check("rewards withheld without a progress write", (story.get("rewards", {}) as Dictionary).is_empty())
+		print("  graded: stars=%d new_stars=%d next=%s rewards=%s" % [stars, int(story.get("new_stars", -1)), str(story.get("next_level_id", "")), str(story.get("rewards", {}))])
 
 	# 8) The result overlay is up (its continue button registers on the map).
 	var has_continue := false

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Moveborne story_progress blob (Storage snap, key story_progress)",
+  "description": "Per-user story progress written s2s by the validator (story/progress.ts). Deliberately permissive on extra fields so a validator upgrade cannot be bricked by the blob-key validator; the structural invariants (star ranges, watermark) are what matter.",
+  "type": "object",
+  "required": ["catalog_version", "levels", "next_level_id"],
+  "properties": {
+    "catalog_version": { "type": "integer", "minimum": 1 },
+    "next_level_id": { "type": "string" },
+    "levels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["stars", "best_score", "rewarded_stars"],
+        "properties": {
+          "stars": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "best_score": { "type": "integer", "minimum": 0 },
+          "rewarded_stars": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "completed_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

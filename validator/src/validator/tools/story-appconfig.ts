@@ -17,8 +17,21 @@ import catalog from "../../../content/story_catalog.json" with { type: "json" };
 const GATEWAY = process.env.SNAPSER_GATEWAY_URL || "https://gateway.snapser.com/c4n1awfs";
 const APP_CONFIG_VERSION = "v1";
 
+/** Key-order-insensitive equality — the gateway echoes config back with
+ *  alphabetized keys, so raw stringify comparison false-negatives. */
+function canonical(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
+  if (v !== null && typeof v === "object") {
+    const entries = Object.entries(v as Record<string, unknown>)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+      .map(([k, val]) => `${JSON.stringify(k)}:${canonical(val)}`);
+    return `{${entries.join(",")}}`;
+  }
+  return JSON.stringify(v);
+}
+
 function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return canonical(a) === canonical(b);
 }
 
 const cmd = process.argv[2] ?? "emit";

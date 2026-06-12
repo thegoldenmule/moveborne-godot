@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Moveborne app-config (Remote Config, version v1)",
+  "description": "Validates the app-config document. The story catalog rides under the story_catalog key; later features add their own top-level keys (keep additionalProperties true).",
+  "type": "object",
+  "required": ["story_catalog"],
+  "properties": {
+    "story_catalog": {
+      "type": "object",
+      "required": ["catalog_version", "worlds"],
+      "properties": {
+        "catalog_version": { "type": "integer", "minimum": 1 },
+        "worlds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "order", "levels"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "name": { "type": "string" },
+              "order": { "type": "integer", "minimum": 0 },
+              "levels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["id", "order", "scenario_id", "name", "goals", "rewards"],
+                  "properties": {
+                    "id": { "type": "string", "minLength": 1 },
+                    "order": { "type": "integer", "minimum": 0 },
+                    "scenario_id": { "type": "integer", "minimum": 0 },
+                    "name": { "type": "string" },
+                    "goals": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "object",
+                        "required": ["type", "threshold", "time_limit_s"],
+                        "properties": {
+                          "type": { "enum": ["points", "max_tile"] },
+                          "threshold": { "type": "integer", "minimum": 1 },
+                          "time_limit_s": { "type": ["integer", "null"], "minimum": 1 }
+                        }
+                      }
+                    },
+                    "rewards": {
+                      "type": "object",
+                      "required": ["complete", "per_star"],
+                      "properties": {
+                        "complete": {
+                          "type": "object",
+                          "additionalProperties": { "type": "integer", "minimum": 0 }
+                        },
+                        "per_star": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": { "type": "integer", "minimum": 0 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
