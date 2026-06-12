@@ -78,10 +78,6 @@ Offline: the Story button gates with a connect-to-play message when unauthentica
 
 Stars display only inside story_map for v1; no Profiles-snap attribute or social surfaces. Star display surface: should earned stars/world progress also surface outside story_map (e.g. a Profiles-snap attribute like total_stars next to display_name/avatar_id/title for social surfaces), or stay private to the progress blob for v1?
 
-Live rollout executed 2026-06-12 with user authorization: byosnap-validator v0.3.0 published + live; storage + remote-config snaps provisioned; blob key story_progress created (json, protected, scope INTERNAL — client writes rejected with 401, replacing the auth-exemption plan); app-config v1 published and canonically verified. Deployed E2E passes the full loop: stars graded, 42 coins granted, w1_l2 unlocked, blob round-trip, daily-board submission read back. Live rollout authorization needed (deploy was auto-denied as a production action): (1) snapctl byosnap publish byosnap-validator v0.3.0; (2) add storage + remote-config snaps to c4n1awfs; (3) snapend update --byosnaps byosnap-validator:v0.3.0; (4) console: publish app-config v1 from `bun run tools/story-appconfig.ts emit`, create Storage blob key story_progress (json), set Auth User Auth Exemptions on storage write routes; (5) `bun run tools/story-appconfig.ts verify` + refresh snapser/snapend-manifest.json + live smoke. Authorize, or do the console halves yourself and ask me to script the rest?
-
-Post-ship cleanup backlog lives on the brief as an answered question + project memory (non-blocking): net-client HTTP helper dedup, shared s2s transport resolution, event-driven result flushing, data-derived init tile cap. Pick up with the next validator/client feature. Post-ship cleanup backlog (deferred from /code-review high; moved off the implementation plan because open steps gate ship) — where does it live?
-
 ## References
 _None._
 

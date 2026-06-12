@@ -8,7 +8,7 @@
 - **Deciders:** Benjamin Jordan
 
 ## Context
-Story mode needed three-goal star grading, rewards, and unlock progression on top of a deterministic engine whose hashed SynchronizedGameState is a byte-for-byte parity domain with the TS dist (golden vectors, deployed validator). The state even carries a dormant `level` field that tempts reuse. Any state-shape or rule change breaks every golden hash and desyncs the deployed validator, so the question was where story rules could live at all.
+Story mode needed three-goal star grading, rewards, and unlock progression on top of a deterministic engine whose hashed SynchronizedGameState is a byte-for-byte parity domain with the TS dist (golden vectors, deployed validator). The state even carries a dormant level field that tempts reuse. Any state-shape or rule change breaks every golden hash and desyncs the deployed validator, so the question was where story rules could live at all.
 
 ## Decision
 All story rules live OUTSIDE game/logic/ and the hashed state. Goals are graded only at CompleteMatch, by the validator, against its own validated final state (score, max tile on the final board) plus server wall-clock elapsed time from StoredMatch.created_at. The dormant SynchronizedGameState.level field stays deliberately unused.

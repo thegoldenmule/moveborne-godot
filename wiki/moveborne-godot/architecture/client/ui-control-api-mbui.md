@@ -45,8 +45,6 @@ Reg.adopt(_story, "story")                         # adopt a .tscn / pre-built n
 
 Known edges. (1) press() does not await router transitions — it emits the control's signal and returns; a launcher's push or the match exit runs async, so use goto()/run() for awaited navigation (run settles after each press, which covers a launcher push). (2) One-frame visibility race: right after a modal opens, actions() may briefly omit its controls until it settles; press()/resolve() are unaffected (they ignore visibility), so sequences are reliable. (3) The driver resolves UiRouter / MbDebug via get_node_or_null("/root/...") (not the global identifier), so the script compiles and its pure surface (catalog/actions/press) runs even outside the full app — e.g. the headless verifier tools/verify_ui_driver.gd.
 
-Story Mode change (2026-06-12): goto(story) no longer launches a match — it opens the Story world map (StoryMapState; screen id story_map) and waits until the map is interactable. MODE_CFG now carries only infinite. Launch a level via press story_map.play (next level) or story_map.level_<id>; the flow story_play_next chains both. state() reports screen story_map and route [shell, story_map] while the map is up, [shell, story_map, match] in a story level. Old automation that did goto(story) then drove MbDebug must use flow story_play_next (or press play) first.
-
 ## Components
 _No components._
 

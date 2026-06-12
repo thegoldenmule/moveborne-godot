@@ -22,7 +22,6 @@ _No design notes._
 - [History Replay Store](architecture:mq1c3370-000z-l7ivsv)
 - [Crypto & Signing](architecture:mq1c351c-0011-gtfyxx)
 - [MCP Debug Interface](architecture:mq1c366g-0013-odkry1)
-- [Story Grading & Progress](architecture:mqbe244j-00h7-q7z2dt)
 
 ## Dependencies
 _No dependencies._
