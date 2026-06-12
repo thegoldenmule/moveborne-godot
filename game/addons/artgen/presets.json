@@ -54,6 +54,26 @@
 				"background_color": { "rgb": [0, 0, 0] }
 			},
 			"post": []
+		},
+		"story-map": {
+			"model": "raster_v41",
+			"style_id": "none",
+			"size": "2:3",
+			"prompt": "Full-screen vertical 2:3 mobile-game level-map background, occult arcade tarot poster composition. One violet accent only (no second hue) as flat wireframe line art on a textured near-black background; hierarchy by value not color, ranging dim deep-violet line-work up to bright violet; heavy screen-print grain and a soft violet bloom on the strokes. Strict bilateral mirror symmetry about a central vertical axis: ornamental motifs radiate inward from the left and right edges and frame the composition like a printed poster border, while a clear empty dark channel runs unbroken from the bottom edge to the top edge straight down the center, reserved for a level path. Do NOT draw any path, trail, road, dots, or nodes in that central channel — leave it open. Theme: {subject}. A single lone skeleton figure as one off-center anchor that breaks the symmetry. No text, no numbers, no UI, no buttons.",
+			"controls": {
+				"background_color": { "rgb": [0, 0, 0] }
+			},
+			"post": []
+		},
+		"story-map-baked": {
+			"model": "raster_v41",
+			"style_id": "none",
+			"size": "2:3",
+			"prompt": "Full-screen vertical 2:3 mobile-game level-select map, occult arcade tarot poster composition. One violet accent only (no second hue) as flat wireframe line art on a textured near-black background; hierarchy by value not color, ranging dim deep-violet line-work up to bright violet; heavy screen-print grain and a soft violet bloom on the strokes. A bright candy-crush style trail winds up the central vertical axis from the bottom edge to the top edge, studded with evenly-spaced round waypoint nodes that are the brightest, highest-contrast elements in the image. Strict bilateral mirror symmetry: ornamental motifs radiate inward from the left and right edges and frame the path while the central spine stays clear and legible. Theme: {subject}. A single lone skeleton figure as one off-center anchor that breaks the symmetry. No text, no numbers, no UI, no buttons.",
+			"controls": {
+				"background_color": { "rgb": [0, 0, 0] }
+			},
+			"post": []
 		}
 	}
 }
