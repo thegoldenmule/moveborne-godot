@@ -1,12 +1,12 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2217,
+    "version": 2309,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "hypercasual-llm/features/index.md": "896f399c3d631accd30b630b8af20115d56b0b43c488cad44315e85023b421e8",
-      "hypercasual-llm/adrs/index.md": "a1dfba097b4a8ac4afa2d6954841b1432bed20464fbc8184dbb208dd0201875b",
-      "hypercasual-llm/architecture/client/index.md": "6cb9aa8d36adf0d29fe5f1286e66cf2b34ff9ce9e58cee0cefc44dc47ddbb910",
-      "hypercasual-llm/architecture/validator/index.md": "766d7bde5f60c07d7cdc33b87bf586c640fdc0e312aeb29efb678b36ccd47f4e",
+      "hypercasual-llm/adrs/index.md": "207720e05716abe1d2f4536fdc9a6ffdfb39f7f67062597532df3e8e095e4a38",
+      "hypercasual-llm/architecture/client/index.md": "4c52dd62f0183921c9e2ae07bf88f3cde5b270f73ac946b551cf1ece3f160917",
+      "hypercasual-llm/architecture/validator/index.md": "54f83561077aaa8221993521199c3ed7577a3e1b1b1997b1cb98b90c5e10c5a4",
       "hypercasual-llm/architecture/server.md": "b47f08254d30da732e5d6a72cd923150ca3710b891d7224eeefce3de273c183e",
       "hypercasual-llm/architecture/client/determinism-primitives.md": "3563ffeeb934060df2546cfbae94e8564008b26455294b1f9f6647b9aa71e01d",
       "hypercasual-llm/architecture/client/rules-engine.md": "49bb2cb52ebc5644fddeaa55a5cbb17233a7f4bbbde66b39c6da09e266f7fccf",
@@ -96,10 +96,15 @@
       "hypercasual-llm/.archived/feature-spec--mq9xkeg0-00a3-jcbof5.md": "e994b98e1b981de0ade8d90741021e069fb46ff06677d6f25e17d5576f5c56d5",
       "hypercasual-llm/architecture/client/game-control-api-mbdebug.md": "21ab412137fc6825d865a0d358f1037a3736c60f8ff49417cf46630a033cadaa",
       "hypercasual-llm/architecture/client/ui-control-api-mbui.md": "536e9c282f9d7534ba3616450e1354792bcc5e8a5379e9ff79b77652e2740b41",
-      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/index.md": "391f21ffd85ded1821e7b018189c1f9b433d3f6c0d7a7a021c35f80455e9db3a",
-      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/implementation-plan-story-mode-worlds-level-maps-star-goals-progression.md": "889630a2ecd2cbd774c068a859b888eb940e079fecc4c331f7916d07979eeae8",
-      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/testing-plan-story-mode-worlds-level-maps-star-goals-progression.md": "9e31931c5cd5634a9b7028a9ac7a13d28e12996afa8c3dc6a8b90ab5e94d87ce",
-      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/spec-story-mode-worlds-level-maps-star-goals-progression.md": "2e06b8f4104ee0ef0b916ecf7c6f23a8e2c824a83589a9b98e23b9d582b82385"
+      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/index.md": "cef89870c5c0fb9ef5886b46ce117499ea27df71eaff3b4a0bbf42e6e9ee949c",
+      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/implementation-plan-story-mode-worlds-level-maps-star-goals-progression.md": "9f52bbdcc79bc6992a6403002bb8c135cb33c4c437afd72c0101278b73a4e715",
+      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/testing-plan-story-mode-worlds-level-maps-star-goals-progression.md": "6feb19d43079ef547431b31eb44d6182d5c9bc0568fd1a5f957945ddb99a68a7",
+      "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/spec-story-mode-worlds-level-maps-star-goals-progression.md": "c1557136c5f7dffefc207327860f1907f0659aed667fd1b904bfcd87a3a33ce0",
+      "hypercasual-llm/adrs/story-grading-is-validator-authoritative-post-match-and-outside-the-hash-domain.md": "63f347410cdf9582ffc3215503da97da5621f4b7d7870008c5ba3627c2b03958",
+      "hypercasual-llm/adrs/one-committed-story-catalog-feeds-validator-grading-remote-config-and-the-baked-client-fallback.md": "8fd9aec61f4dc94316a2321349ec588b7cf1e84f5904a5ba01c8e70d6481adb0",
+      "hypercasual-llm/adrs/per-user-story-progress-in-an-internal-scope-storage-blob-with-cas-guarded-watermarked-writes.md": "3f5f63b977d2201d22ddcd73c5ebcfb0e13f95ce409f3e51682199cd46347cc8",
+      "hypercasual-llm/architecture/client/story-mode-map-catalog-progress.md": "495bc5dbdfcdd78676b777139d9946e6133e4c28d9ca21c5bb0e04eb9d2be7c8",
+      "hypercasual-llm/architecture/validator/story-grading-progress.md": "6d620702d101428d78722581a9baaac67ccdb986b3420f33a198278779530a5d"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -199,7 +204,12 @@
       "feature-brief:mqb9ay72-001m-oot9x5": "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/index.md",
       "implementation-plan:mqb9ay72-001n-kaunk6": "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/implementation-plan-story-mode-worlds-level-maps-star-goals-progression.md",
       "testing-plan:mqb9ay72-001o-gt5qai": "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/testing-plan-story-mode-worlds-level-maps-star-goals-progression.md",
-      "feature-spec:mqb9ay72-001p-5kbt8j": "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/spec-story-mode-worlds-level-maps-star-goals-progression.md"
+      "feature-spec:mqb9ay72-001p-5kbt8j": "hypercasual-llm/features/story-mode-worlds-level-maps-star-goals-progression/spec-story-mode-worlds-level-maps-star-goals-progression.md",
+      "decision-record:mqbe1y36-00gz-nhtbyd": "hypercasual-llm/adrs/story-grading-is-validator-authoritative-post-match-and-outside-the-hash-domain.md",
+      "decision-record:mqbe203p-00h1-5ku4gu": "hypercasual-llm/adrs/one-committed-story-catalog-feeds-validator-grading-remote-config-and-the-baked-client-fallback.md",
+      "decision-record:mqbe21u6-00h3-dwdtpn": "hypercasual-llm/adrs/per-user-story-progress-in-an-internal-scope-storage-blob-with-cas-guarded-watermarked-writes.md",
+      "architecture:mqbe22zl-00h5-wkstky": "hypercasual-llm/architecture/client/story-mode-map-catalog-progress.md",
+      "architecture:mqbe244j-00h7-q7z2dt": "hypercasual-llm/architecture/validator/story-grading-progress.md"
     }
   }
 }

@@ -1,6 +1,6 @@
 # Implementation plan — Story Mode — worlds, level maps, star goals & progression
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] Provision platform prerequisites: add remote-config and storage snaps to snapend c4n1awfs (snapser MCP update_snapend / snapctl) and reflect them in snapser/snapend-manifest.json; smoke GET /v1/remote-config/app-config/{version} and an owner-scoped Storage json-blob through the gateway using the snapser-validator skill. BLOCKED on the open progress-store question (Storage blob vs Quests).
@@ -14,7 +14,6 @@
 - [x] Build the level-result presentation — on pop back to StoryMapState, show a result overlay (stars earned, per-goal pass/fail, rewards granted, next level unlocked) from GameState.last_result, then refresh the map from the re-fetched progress blob; merge returned balances into GameState.currencies as today (main.gd complete-match await path unchanged).
 - [x] Wire test/driver surfaces — add story flows to MbUi.FLOWS in game/game/mcp_ui_api.gd (updated start_story → home.story → story_map → play; new story_play_next) with _expand_flow support; add McpTestSuite suites game/tests/test_story_catalog.gd, test_remote_config_client.gd, test_story_progress_client.gd; add headless game/tools/verify_story_catalog.gd (catalog ↔ MbScenarios cross-check); extend tools/verify_ui_driver.gd for the new screen registrations.
 - [x] Verify and ship — run ALL existing parity verifiers unchanged (engine_swipe, scenarios, combined, validation, …) to prove zero game/logic/ drift; E2E against the local validator (run-validator skill, :5555 Hermes-emulation, validator MCP get_match_state/simulate_action) driving MbUi+MbDebug headlessly; then deploy the validator BYOSnap (build context validator/, external port unchanged), upload the catalog to Remote Config, live-smoke through the gateway; the user verifies the UI visually.
-- [ ] Post-review cleanup (deferred from /code-review high; non-blocking): (a) hoist the duplicated HTTPRequest round-trip helper now copied across remote_config_client.gd / story_progress_client.gd / leaderboards_client.gd / profile_client.gd; (b) extract the duplicated s2s transport resolution shared by snaps/inventory.ts and snaps/storage.ts; (c) route post-match result flushing through an event/autoload instead of StoryMapState's mcp_shell group lookup; (d) consider deriving the init-guard tile cap from data instead of the 64 constant once the scenario table lives server-side.
 
 ## Data models & interfaces
 ```json

@@ -31,3 +31,6 @@ The remaining records cover backend scope, the presentation and rendering approa
   - [Protobuf as the validator wire contract; game state rides as canonical-JSON strings](decision-record:mq9uhegw-004p-9a7guj)
   - [gRPC over Snapser Hermes as the validator transport, replacing HTTP-init + Socket.IO](decision-record:mq9uhhiv-004r-mrr6kt)
   - [Generate SDKs and swagger from the committed protos (godobuf, protobufjs descriptor, code-defined OpenAPI)](decision-record:mq9uhk7h-004t-fnf1k4)
+  - [Story grading is validator-authoritative, post-match, and outside the hash domain](decision-record:mqbe1y36-00gz-nhtbyd)
+  - [One committed story catalog feeds validator grading, Remote Config, and the baked client fallback](decision-record:mqbe203p-00h1-5ku4gu)
+  - [Per-user story progress in an internal-scope Storage blob with cas-guarded, watermarked writes](decision-record:mqbe21u6-00h3-dwdtpn)

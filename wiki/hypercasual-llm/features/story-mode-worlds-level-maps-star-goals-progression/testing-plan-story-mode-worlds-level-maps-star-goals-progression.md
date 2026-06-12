@@ -1,10 +1,9 @@
 # Testing plan — Story Mode — worlds, level maps, star goals & progression
 
-**Status:** draft
+**Status:** ready
 
 ## Planned
-- Offline/degraded path: with Remote Config unreachable, story_map renders from the baked catalog and cached progress without errors; with the validator unreachable, completion shows no stars granted and the map does not advance (no client-side self-grading).
-- Leaderboard regression: a completed story match still submits exactly once to the existing daily/weekly/monthly boards via should_submit (SUBMIT_MODES unchanged), with lb_submitted flag semantics intact.
+_None._
 
 ## Passed
 - test_story_catalog.gd (McpTestSuite): baked catalog parses; every level.scenario_id exists in MbScenarios.SCENARIOS; exactly 3 goals per level with valid type ∈ {points, max_tile}, positive thresholds, time_limit_s null-or-positive; world/level order fields form a strict total order (the unlock chain is unambiguous).
@@ -17,6 +16,8 @@
 - Parity regression gate: all pre-existing headless verifiers (verify_engine_swipe, verify_scenarios, verify_combined, verify_validation, …) PASS byte-identical with zero golden changes — proves Story Mode added no game/logic/ drift.
 - E2E vs local validator (:5555 via run-validator skill): MbUi.run home → press home.story → story_map shows; pressing a locked level is inert; story_map.play launches main.tscn with the catalog's scenario_id (assert via MbDebug.get_state); after scripted MbDebug swipes + exit, GameState.last_result carries stars; validator MCP get_match_state confirms the match graded; map refresh shows stars and the next level unlocked.
 - verify_ui_driver.gd extension (headless): story_map screen and story_map.play/back/level_N controls auto-register via MbUiReg; MbUi.flows() catalog includes the updated start_story and new story_play_next flows and _expand_flow resolves them.
+- Offline/degraded path: with Remote Config unreachable, story_map renders from the baked catalog and cached progress without errors; with the validator unreachable, completion shows no stars granted and the map does not advance (no client-side self-grading).
+- Leaderboard regression: a completed story match still submits exactly once to the existing daily/weekly/monthly boards via should_submit (SUBMIT_MODES unchanged), with lb_submitted flag semantics intact.
 
 ## Failed
 _None._

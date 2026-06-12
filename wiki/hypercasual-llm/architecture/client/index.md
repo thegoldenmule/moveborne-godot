@@ -26,6 +26,7 @@ Packaging the client for distribution (committed export presets plus a tools/bui
 - [Build & Distribution](architecture:mq9llv7f-00a3-c5f96m)
 - [Game Control API (MbDebug)](architecture:mqay9c1u-0013-wu1lcn)
 - [UI Control API (MbUi)](architecture:mqayf7o4-001y-dyr6k0)
+- [Story Mode (map, catalog, progress)](architecture:mqbe22zl-00h5-wkstky)
 
 ## Dependencies
 - **calls** → [Validator](architecture:mq1c2ixi-000h-kd018q) — Online play: validates every move against the Validator over Socket.IO (via net/).
