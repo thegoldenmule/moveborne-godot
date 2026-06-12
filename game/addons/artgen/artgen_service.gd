@@ -241,16 +241,28 @@ func generate(opts: Dictionary) -> Dictionary:
 	var data: Array = resp["data"].get("data", [])
 	for i in data.size():
 		var raw := Marshalls.base64_to_raw(str(data[i].get("b64_json", "")))
-		var ext := "svg" if _looks_like_svg(raw) else "png"
+		var is_svg := _looks_like_svg(raw)
+		var ext := "svg" if is_svg else "png"
 		var gid := _new_gen_id()
 		var slug := _slugify(subject if not subject.is_empty() else preset_name)
 		var rel := "art/generated/%s/%s-%s.%s" % [month, gid, slug, ext]
-		var fa := FileAccess.open(repo_root.path_join(rel), FileAccess.WRITE)
-		if fa == null:
-			generation_failed.emit("cannot write " + rel)
-			return {"ok": false, "error": "cannot write %s (err %d)" % [rel, FileAccess.get_open_error()]}
-		fa.store_buffer(raw)
-		fa.close()
+		var abs_path := repo_root.path_join(rel)
+		if is_svg:
+			var fa := FileAccess.open(abs_path, FileAccess.WRITE)
+			if fa == null:
+				generation_failed.emit("cannot write " + rel)
+				return {"ok": false, "error": "cannot write %s (err %d)" % [rel, FileAccess.get_open_error()]}
+			fa.store_buffer(raw)
+			fa.close()
+		else:
+			# Recraft v4.x raster (recraftv4_1) returns WebP bytes; older models
+			# returned PNG. Normalize every raster payload to a real PNG so the
+			# .png name is honest — otherwise Finder/QuickLook/iOS/Godot trust the
+			# extension, hit the format mismatch, and fail to thumbnail/import.
+			var werr := _write_raster_as_png(raw, abs_path)
+			if werr != OK:
+				generation_failed.emit("cannot decode raster " + rel)
+				return {"ok": false, "error": "cannot decode/write %s (err %d)" % [rel, werr]}
 		var event := base_event.duplicate()
 		event["id"] = gid
 		event["n_index"] = i
@@ -314,11 +326,18 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 	if FileAccess.file_exists(dest):
 		return {"ok": false, "error": "asset already exists: " + dest}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
-	var fa := FileAccess.open(dest, FileAccess.WRITE)
-	if fa == null:
-		return {"ok": false, "error": "cannot write %s (err %d)" % [dest, FileAccess.get_open_error()]}
-	fa.store_buffer(bytes)
-	fa.close()
+	if ext == "png":
+		# Normalize to a genuine PNG (Recraft v4.x / removeBackground may hand
+		# back WebP) so the imported asset is a real .png.
+		var werr := _write_raster_as_png(bytes, ProjectSettings.globalize_path(dest))
+		if werr != OK:
+			return {"ok": false, "error": "cannot decode/write %s (err %d)" % [dest, werr]}
+	else:
+		var fa := FileAccess.open(dest, FileAccess.WRITE)
+		if fa == null:
+			return {"ok": false, "error": "cannot write %s (err %d)" % [dest, FileAccess.get_open_error()]}
+		fa.store_buffer(bytes)
+		fa.close()
 
 	await _rescan_filesystem()
 
@@ -612,6 +631,26 @@ func _month_bucket() -> String:
 static func _looks_like_svg(raw: PackedByteArray) -> bool:
 	var head := raw.slice(0, mini(200, raw.size())).get_string_from_utf8().strip_edges()
 	return head.begins_with("<?xml") or head.begins_with("<svg")
+
+
+# Decode a raster payload (PNG / WebP / JPEG, sniffed by magic bytes) and write
+# it back out as a genuine PNG. Recraft v4.x returns WebP; if the bytes are
+# already PNG this is a lossless re-encode. Returns OK or a decode/write error.
+static func _write_raster_as_png(raw: PackedByteArray, abs_path: String) -> int:
+	var img := Image.new()
+	var err := FAILED
+	if raw.size() >= 4 and raw[0] == 0x89 and raw[1] == 0x50 and raw[2] == 0x4E and raw[3] == 0x47:
+		err = img.load_png_from_buffer(raw)          # \x89PNG
+	elif raw.size() >= 12 and raw[0] == 0x52 and raw[1] == 0x49 and raw[2] == 0x46 and raw[3] == 0x46 \
+			and raw[8] == 0x57 and raw[9] == 0x45 and raw[10] == 0x42 and raw[11] == 0x50:
+		err = img.load_webp_from_buffer(raw)         # RIFF....WEBP
+	elif raw.size() >= 2 and raw[0] == 0xFF and raw[1] == 0xD8:
+		err = img.load_jpg_from_buffer(raw)          # JPEG
+	else:
+		err = img.load_png_from_buffer(raw)          # assume PNG, surface the error if not
+	if err != OK:
+		return err
+	return img.save_png(abs_path)
 
 
 static func _slugify(text: String) -> String:
