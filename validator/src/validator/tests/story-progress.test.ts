@@ -93,6 +93,33 @@ describe("unlock chain", () => {
     expect(computeNextLevel(all)).toBe("");
   });
 
+  test("completing the FINAL level does not announce a phantom unlock", () => {
+    const all: Record<string, { stars: number; best_score: number; rewarded_stars: number }> = {};
+    for (const id of getOrderedLevelIds()) {
+      all[id] = { stars: 1, best_score: 1, rewarded_stars: 1 };
+    }
+    const lastId = getOrderedLevelIds()[44]!;
+    delete all[lastId];
+    const last = getLevel(lastId)!;
+    const applied = applyGrade(
+      { catalog_version: 1, levels: all, next_level_id: lastId },
+      last,
+      { stars: 1, goals: last.goals.map((goal) => ({ goal, met: true, value: 0 })) },
+      500,
+      catalog,
+      NOW,
+    );
+    expect(applied.nextLevelId).toBe("");
+    expect(applied.unlocked).toBe(false); // frontier moved to "", nothing to announce
+  });
+
+  test("committed catalog is byte-identical to the game's baked copy", async () => {
+    const here = import.meta.dir;
+    const canonical = await Bun.file(`${here}/../../../content/story_catalog.json`).text();
+    const baked = await Bun.file(`${here}/../../../../game/story/story_catalog.json`).text();
+    expect(baked).toBe(canonical);
+  });
+
   test("isLevelUnlocked: frontier and everything before it; locked beyond", () => {
     expect(isLevelUnlocked({}, "w1_l1")).toBe(true);
     expect(isLevelUnlocked({}, "w1_l2")).toBe(false);

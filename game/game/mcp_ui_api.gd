@@ -281,9 +281,34 @@ func goto(target: String) -> Dictionary:
 			sh.mcp_select_tab("home")
 			sh.mcp_start_match({"mode": "story"})  # the shell routes story to the map
 			await _settle()
+			# The map fetches catalog/progress detached after the reveal; wait
+			# until it is interactable — play enabled, or the offline gate's
+			# retry showing — so a following press:story_map.play is
+			# deterministic instead of racing the network.
+			var map_ready := func() -> bool:
+				for a in actions():
+					var id := str(a.get("id", ""))
+					if id == "story_map.play" and bool(a.get("enabled", false)):
+						return true
+					if id == "story_map.retry" and bool(a.get("visible", false)):
+						return true
+				return false
+			await _wait_until(map_ready, 10.0)
 		return state()
 
-	# Any other target wants the shell visible — pop the map if it's on top.
+	if t == "match":
+		if not _in_match():
+			return {"ok": false, "reason": "no_mode",
+				"message": "goto('match') needs an active match; start one with goto('story'/'infinite')"}
+		return state()
+
+	# Validate BEFORE any side effect: an unknown target must leave the UI
+	# untouched (popping the map below would tear down its result overlay).
+	if t != "shell" and t != "back" and not TAB_IDS.has(t) and not MODE_CFG.has(t):
+		return {"ok": false, "reason": "unknown_target",
+			"message": "unknown screen '%s'; see screens()" % target}
+
+	# The remaining targets want the shell visible — pop the map if it's on top.
 	if _top_name() == "StoryMapState":
 		_router().pop()
 		await _settle()
@@ -296,20 +321,10 @@ func goto(target: String) -> Dictionary:
 		await _settle()
 		return state()
 
-	if MODE_CFG.has(t):
-		sh.mcp_start_match(MODE_CFG[t].duplicate(true))
-		await _settle()
-		await _wait_until(func(): var d := _dbg(); return _in_match() and d != null and d.is_ready(), 5.0)
-		return state()
-
-	if t == "match":
-		if not _in_match():
-			return {"ok": false, "reason": "no_mode",
-				"message": "goto('match') needs an active match; start one with goto('story'/'infinite')"}
-		return state()
-
-	return {"ok": false, "reason": "unknown_target",
-		"message": "unknown screen '%s'; see screens()" % target}
+	sh.mcp_start_match(MODE_CFG[t].duplicate(true))
+	await _settle()
+	await _wait_until(func(): var d := _dbg(); return _in_match() and d != null and d.is_ready(), 5.0)
+	return state()
 
 ## Press the in-match exit (validator completion + router pop), awaited to the shell.
 func _exit_match() -> void:

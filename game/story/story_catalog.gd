@@ -123,6 +123,42 @@ static func is_level_unlocked(catalog: Dictionary, progress: Dictionary, level_i
 	return false
 
 
+## Human goal text — "500 pts" / "tile 256", with a ⏱ suffix when timed. The
+## ONE formatter for both the in-match HUD strip and the map's result overlay.
+static func goal_text(goal) -> String:
+	if not (goal is Dictionary):
+		return "?"
+	var g: Dictionary = goal
+	var text := ("tile %d" % int(g.get("threshold", 0))) \
+		if str(g.get("type", "")) == "max_tile" else ("%d pts" % int(g.get("threshold", 0)))
+	var tl = g.get("time_limit_s", null)
+	if tl != null:
+		text += " ⏱%ds" % int(tl)
+	return text
+
+
+## Display-side goal check, mirroring the validator grader (story/goals.ts):
+## threshold against score-or-max-tile AND inside the time limit. elapsed_s is
+## the client's local clock — approximate; the validator's wall-clock decides.
+static func goal_met(goal, score: int, max_tile: int, elapsed_s: float) -> bool:
+	if not (goal is Dictionary):
+		return false
+	var g: Dictionary = goal
+	var value := max_tile if str(g.get("type", "")) == "max_tile" else score
+	if value < int(g.get("threshold", 0)):
+		return false
+	var tl = g.get("time_limit_s", null)
+	return tl == null or elapsed_s <= float(tl)
+
+
+## Highest tile value on a board state (display-side mirror of maxTileValue).
+static func max_tile_value(state: Dictionary) -> int:
+	var max_tile := 0
+	for t in (state.get("board", {}) as Dictionary).get("tiles", []):
+		max_tile = maxi(max_tile, int((t as Dictionary).get("value", 0)))
+	return max_tile
+
+
 ## The GameState.next_match config a story level launches with.
 static func match_cfg(level: Dictionary) -> Dictionary:
 	return {

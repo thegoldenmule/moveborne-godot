@@ -19,15 +19,20 @@ const PLAYER = "player-1";
 const USER_HEADERS = { "auth-type": "user", "user-id": PLAYER };
 
 /** In-memory fake of the Storage snap blob API (GET 404-when-missing / PUT). */
-function fakeStorage(blobs: Map<string, unknown>, opts: { failPut?: boolean } = {}) {
+function fakeStorage(
+  blobs: Map<string, unknown>,
+  opts: { failPut?: boolean; failGet?: boolean; puts?: { count: number } } = {},
+) {
   const fetchFn = (async (url: unknown, init?: RequestInit) => {
     const path = String(url);
     const key = path.split("/").pop()!;
     if (!init || init.method === "GET") {
+      if (opts.failGet) return new Response("storage blip", { status: 500 });
       if (!blobs.has(key)) return new Response("not found", { status: 404 });
       return Response.json({ value: blobs.get(key), cas: "1" });
     }
     if (init.method === "PUT") {
+      if (opts.puts) opts.puts.count += 1;
       if (opts.failPut) return new Response("boom", { status: 500 });
       blobs.set(key, (JSON.parse(String(init.body)) as { value: unknown }).value);
       return Response.json({});
@@ -102,6 +107,10 @@ describe("story InitMatch", () => {
       { ...initial, score: 5000 },
       { ...initial, moveIndex: 12 },
       { ...initial, board: { size: 4, tiles: [{ value: 1024, position: { row: 0, col: 0 } }] } },
+      // w1_l1 has a max_tile-64 goal: a board pre-packed with a 64 would
+      // satisfy it at registration, so it must sit BELOW the threshold even
+      // though 64 is a legitimate fixed tile for other scenarios.
+      { ...initial, board: { size: 4, tiles: [{ value: 64, position: { row: 0, col: 0 } }] } },
     ];
     for (const state of attempts) {
       try {
@@ -218,7 +227,61 @@ describe("story CompleteMatch", () => {
     // rewards on a future improving run since the watermark never landed).
     const story = JSON.parse(resp.story_result_json) as StoryResult;
     expect(story.stars).toBe(3);
+    expect(story.new_stars).toBe(0);
     expect(story.rewards).toEqual({});
+  });
+
+  test("transient progress READ failure never wipes the blob or mints", async () => {
+    // A 5xx on the GET must not be treated as "no progress yet" — merging
+    // against an empty default would overwrite the blob (losing all stars)
+    // and reset every rewarded_stars watermark.
+    const blobs = new Map<string, unknown>();
+    const existing: StoryProgress = {
+      catalog_version: 1,
+      levels: { w1_l1: { stars: 3, best_score: 900, rewarded_stars: 3 } },
+      next_level_id: "w1_l2",
+    };
+    blobs.set(STORY_PROGRESS_KEY, existing);
+    const puts = { count: 0 };
+    const granted: Record<string, number> = {};
+    const store = new InMemoryMatchStateStore();
+    const service = new ValidatorService(
+      store,
+      fakeInventory(granted),
+      fakeStorage(blobs, { failGet: true, puts }),
+    );
+    await store.set("c9", storedStoryMatch("c9", "w1_l1", 700, [2, 64]), 3600);
+
+    const resp = await service.completeMatch({ match_id: "c9" }, USER_HEADERS);
+    expect(resp.granted).toBe(false);
+    expect(resp.rewards).toEqual({});
+    expect(granted).toEqual({});
+    expect(puts.count).toBe(0); // no write attempted on a failed read
+    expect(blobs.get(STORY_PROGRESS_KEY)).toEqual(existing); // blob untouched
+    const story = JSON.parse(resp.story_result_json) as StoryResult;
+    expect(story.stars).toBe(3); // grade still reported
+  });
+
+  test("completing a LOCKED level grades but neither grants nor persists", async () => {
+    // The unlock frontier is enforced server-side at completion (init cannot
+    // check it without a storage read) — an out-of-order completion cannot
+    // mint late-game rewards or corrupt the progression chain.
+    const blobs = new Map<string, unknown>();
+    const puts = { count: 0 };
+    const granted: Record<string, number> = {};
+    const store = new InMemoryMatchStateStore();
+    const service = new ValidatorService(store, fakeInventory(granted), fakeStorage(blobs, { puts }));
+    // Fresh account (empty blob): only w1_l1 is unlocked; complete w3_l15.
+    await store.set("c10", storedStoryMatch("c10", "w3_l15", 99999, [2, 4]), 3600);
+
+    const resp = await service.completeMatch({ match_id: "c10" }, USER_HEADERS);
+    expect(resp.rewards).toEqual({});
+    expect(granted).toEqual({});
+    expect(puts.count).toBe(0);
+    const story = JSON.parse(resp.story_result_json) as StoryResult;
+    expect(story.level_id).toBe("w3_l15");
+    expect(story.new_stars).toBe(0);
+    expect(story.unlocked).toBe(false);
   });
 
   test("story without a level grants nothing (catalog replaced the old table)", async () => {

@@ -1,10 +1,11 @@
 extends SceneTree
 
 ## Headless end-to-end check of the deployed AWARD path (real network):
-## anonymous gateway login -> Hermes WSS -> InitMatch -> ValidateAction
-## (one swipe worth >= 10 points so the story reward table yields coins)
-## -> CompleteMatch -> assert granted=true and the response balances match
-## the Inventory wallet read back over REST.
+## anonymous gateway login -> Hermes WSS -> InitMatch (mode=pvp; story grants
+## are catalog/star-driven now and need a provisioned Storage snap) ->
+## ValidateAction -> CompleteMatch -> assert granted=true with the flat pvp
+## souls reward, and the response balances match the Inventory wallet read
+## back over REST.
 ##   godot --headless --path . --script res://tools/test_snapser_grant.gd
 ## Regression test for bug-report:mq9v48kl-006b-xxqhck (currencies not
 ## provisioned in the snapend's Inventory snap; granted lied on failure).
@@ -19,7 +20,7 @@ const SNAPSER_HERMES_WS := "wss://gateway.snapser.com/c4n1awfs/v1/hermes/ws"
 var _auth
 var _client
 var _inventory
-var _coins_before := 0
+var _souls_before := 0
 var _done := false
 
 
@@ -43,7 +44,7 @@ func _start() -> void:
 	if before.is_empty():
 		_fail("wallet read (before) failed")
 		return
-	_coins_before = int(before["coins"])
+	_souls_before = int(before["souls"])
 	print("[gd] wallet before: %s" % str(before))
 
 	var starting := _make_state()
@@ -54,7 +55,7 @@ func _start() -> void:
 	_client.match_completed.connect(_on_completed)
 	_client.validator_error.connect(func(m): _fail("validator_error: " + m))
 	_client.init_and_connect(SNAPSER_HERMES_WS + "?token=" + _auth.session_token,
-		"gd_grant_%d" % (randi() % 1000000), starting, _auth.user_id)
+		"gd_grant_%d" % (randi() % 1000000), starting, _auth.user_id, "pvp")
 
 
 func _on_ready(starting: Dictionary) -> void:
@@ -80,22 +81,22 @@ func _on_completed(resp: Dictionary) -> void:
 	if not bool(resp.get("granted", false)):
 		_fail("granted=false (award did not credit)")
 		return
-	if not rewards.has("coins") or int(str(rewards["coins"])) <= 0:
-		_fail("no coin reward computed (score too low?)")
+	if not rewards.has("souls") or int(str(rewards["souls"])) <= 0:
+		_fail("no souls reward computed (pvp grants 1 per match)")
 		return
-	var expected := _coins_before + int(str(rewards["coins"]))
-	if not balances.has("coins") or int(str(balances["coins"])) != expected:
-		_fail("balances.coins=%s, expected %d" % [str(balances.get("coins")), expected])
+	var expected := _souls_before + int(str(rewards["souls"]))
+	if not balances.has("souls") or int(str(balances["souls"])) != expected:
+		_fail("balances.souls=%s, expected %d" % [str(balances.get("souls")), expected])
 		return
 	var after: Dictionary = await _inventory.fetch_balances(_auth)
 	print("[gd] wallet after: %s" % str(after))
-	if int(after.get("coins", 0)) != expected:
-		_fail("wallet coins=%d, expected %d" % [int(after.get("coins", 0)), expected])
+	if int(after.get("souls", 0)) != expected:
+		_fail("wallet souls=%d, expected %d" % [int(after.get("souls", 0)), expected])
 		return
 	_finish(true)
 
 
-## One swipe left merges the two 64s -> 128 points -> coins floor(128/10) = 12.
+## One swipe left merges the two 64s -> a real validated action before settling.
 func _make_state() -> Dictionary:
 	var tiles := []
 	for r in range(4):

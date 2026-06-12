@@ -14,6 +14,7 @@ const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 const Reg := preload("res://ui/mcp_ui_reg.gd")
+const StoryCat := preload("res://story/story_catalog.gd")
 
 ## Local dev validator (the V-key debug shortcut; tools/run_validator.sh): the
 ## validator's Hermes-emulation WS endpoint — same envelope as the gateway.
@@ -53,6 +54,8 @@ var _mode := "infinite"   # this match's play mode (selects the validator's rewa
 var _level_id := ""       # story catalog level (rides InitMatch; grades server-side)
 var _goals: Array = []    # the level's goals, copied from the catalog for DISPLAY only
 var _story_result: Dictionary = {}  # validator's story grade from the completion ack
+var _match_start_ms := 0  # local clock for the timed-goal HUD display
+var _net_pending := false  # signing in / registering with the validator (story/pvp)
 var _completing := false  # quit pressed; settling rewards with the validator
 var _score_val: Label
 var _moves_val: Label
@@ -111,6 +114,7 @@ func _ready() -> void:
 			_connect_snapser()
 		_:
 			_match.new_game(int(cfg.get("seed", -1)))
+	_match_start_ms = Time.get_ticks_msec()
 	_play_intro()
 
 
@@ -306,9 +310,20 @@ func _active_glitch_config():
 
 
 func _on_swiped(direction: String) -> void:
-	if _target_kind != "":
+	if _target_kind != "" or _block_moves():
 		return
 	_match.swipe(direction)
+
+
+## Online modes must register the FRESH starting state with the validator
+## (its init guard rejects an advanced board), so moves wait out the brief
+## sign-in/registration window. Cleared on ready AND on error, so a failed
+## connection degrades to unrecorded play instead of a locked board.
+func _block_moves() -> bool:
+	if _net_pending:
+		_toast.text = "Connecting to validator…"
+		return true
+	return false
 
 
 ## Floating "+score" on each merged tile (input.ts:789): green normally, yellow on
@@ -462,6 +477,8 @@ func _two_params() -> Dictionary:
 ##   {status:"error", message}      — invalid index or unsupported card
 ## The hand button's pressed signal discards the return; MbDebug consumes it.
 func _select_card(index: int) -> Dictionary:
+	if _block_moves():
+		return {"status": "error", "message": "connecting to validator — try again in a moment"}
 	var cards: Array = _match.state["hand"]["cards"]
 	if index < 0 or index >= cards.size():
 		return {"status": "error", "message": "invalid card index %d" % index}
@@ -694,30 +711,21 @@ func _update_hud() -> void:
 	_apply_hud_glow(_shards_val, 1)
 
 
-## Refresh the story goal strip from the live state: score for points goals,
-## the highest board tile for max_tile goals. Met goals get a ✓; timed goals
-## carry a ⏱ tag (the validator's wall-clock is authoritative — this is a
-## reminder, not a countdown).
+## Refresh the story goal strip from the live state via the shared
+## MbStoryCatalog mirror of the validator grader (score / max tile / local
+## elapsed clock for timed goals — approximate; the validator's wall-clock is
+## authoritative, so a ✓ near a time limit is a claim, not a promise).
 func _update_goals_hud() -> void:
 	if _goals_lbl == null or _goals.is_empty():
 		return
 	var st: Dictionary = _match.state
 	var score := int(st.get("score", 0))
-	var max_tile := 0
-	for t in (st.get("board", {}) as Dictionary).get("tiles", []):
-		max_tile = maxi(max_tile, int((t as Dictionary).get("value", 0)))
+	var max_tile: int = StoryCat.max_tile_value(st)
+	var elapsed_s := (Time.get_ticks_msec() - _match_start_ms) / 1000.0
 	var parts: Array = []
 	for g in _goals:
-		if not (g is Dictionary):
-			continue
-		var goal: Dictionary = g
-		var is_tile := str(goal.get("type", "")) == "max_tile"
-		var threshold := int(goal.get("threshold", 0))
-		var met := (max_tile if is_tile else score) >= threshold
-		var text := ("tile %d" % threshold) if is_tile else ("%d pts" % threshold)
-		if goal.get("time_limit_s", null) != null:
-			text += " ⏱%ds" % int(goal.get("time_limit_s"))
-		parts.append("%s %s" % ["✓" if met else "·", text])
+		var met: bool = StoryCat.goal_met(g, score, max_tile, elapsed_s)
+		parts.append("%s %s" % ["✓" if met else "·", StoryCat.goal_text(g)])
 	_goals_lbl.text = "   ".join(parts)
 
 
@@ -898,6 +906,7 @@ func _connect_validator() -> void:
 ## — that state is what the server replays from. Coroutine; runs detached.
 func _connect_snapser() -> void:
 	_match.online = false
+	_net_pending = true  # hold moves so the registered starting state stays fresh
 	_net_label.visible = true
 	_net_label.text = "validator: signing in…"
 	var ok: bool = await _auth.ensure_session()
@@ -927,6 +936,9 @@ func _start_net(ws_url: String, player_id: String, token: String) -> void:
 
 func _on_net_ready(_current_state: Dictionary) -> void:
 	_match.online = true
+	_net_pending = false
+	if _toast.text == "Connecting to validator…":
+		_toast.text = ""
 	_net_label.text = "validator: on ✓"
 	_net_label.add_theme_color_override("font_color", Color("2e9e5b"))
 	_toast.text = "Connected — every move is now validated by the server"
@@ -946,13 +958,14 @@ func _on_net_validated(index: int, matched: bool, corrected_state) -> void:
 
 func _on_net_error(message: String) -> void:
 	_match.online = false
+	_net_pending = false  # degrade to unrecorded play, never a locked board
 	_net_label.text = "validator: err"
 	_net_label.add_theme_color_override("font_color", Color("c0392b"))
 	_toast.text = "Validator: %s" % message
 
 
 func _key_swipe(direction: String) -> void:
-	if _target_kind == "":
+	if _target_kind == "" and not _block_moves():
 		_match.swipe(direction)
 
 

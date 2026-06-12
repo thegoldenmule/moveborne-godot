@@ -27,7 +27,7 @@ import type { InventoryClient } from "./snaps/inventory";
 import { StorageClient, STORY_PROGRESS_KEY } from "./snaps/storage";
 import { getCatalog, getLevel } from "./story/catalog";
 import { gradeLevel, maxTileValue } from "./story/goals";
-import { applyGrade, emptyProgress } from "./story/progress";
+import { applyGrade, emptyProgress, isLevelUnlocked } from "./story/progress";
 import type { StoryProgress, StoryResult } from "./story/types";
 import type { RpcName } from "./proto";
 
@@ -152,15 +152,23 @@ export class ValidatorService {
     // The starting state is CLIENT-supplied, so a story level must register a
     // fresh one — otherwise a caller inits a pre-scored / pre-merged board and
     // settles instantly for stars. score==0 + moveIndex==0 force points goals
-    // through validated actions; the tile cap (64 — the largest fixed tile any
-    // scenario places, High Stakes) does the same for max_tile goals. Exact
-    // scenario-board reconstruction needs the scenario table server-side
-    // (documented follow-up hardening).
+    // through validated actions; the tile caps do the same for max_tile goals:
+    // 64 is the largest fixed tile any scenario places (High Stakes), and the
+    // starting board must additionally sit strictly BELOW every max_tile goal
+    // threshold of THIS level, so a threshold-64 goal cannot be satisfied at
+    // registration. Exact scenario-board reconstruction needs the scenario
+    // table server-side (documented follow-up hardening).
     if (level_id) {
+      const startMaxTile = maxTileValue(starting_state);
+      const level = getLevel(level_id)!;
+      const belowGoalThresholds = level.goals.every(
+        (g) => g.type !== "max_tile" || startMaxTile < g.threshold,
+      );
       const fresh =
         starting_state.score === 0 &&
         starting_state.moveIndex === 0 &&
-        maxTileValue(starting_state) <= 64;
+        startMaxTile <= 64 &&
+        belowGoalThresholds;
       if (!fresh) {
         throw new ServiceError(
           GrpcStatus.INVALID_ARGUMENT,
@@ -304,9 +312,16 @@ export class ValidatorService {
     // Story: grade the validator's own final state + wall-clock against the
     // catalog goals, then read-merge-write the progress blob BEFORE granting —
     // if the rewarded_stars watermark doesn't land, the grant is withheld
-    // (a replay would otherwise re-mint the same star tiers). A story match
-    // without a level grants nothing (catalog rewards fully replaced the old
-    // score-derived table); other modes keep the flat reward table.
+    // (a replay would otherwise re-mint the same star tiers). The read must
+    // SUCCEED to proceed: a failed read is not "no progress yet" (merging
+    // against an empty default would wipe the blob and reset every
+    // watermark), and the cas token from the read guards the write against a
+    // concurrent completion double-minting the same tiers. The level must
+    // also be unlocked for this player — InitMatch cannot check that without
+    // a storage read, so the frontier is enforced here where the blob is
+    // already in hand. A story match without a level grants nothing (catalog
+    // rewards fully replaced the old score-derived table); other modes keep
+    // the flat reward table.
     let rewards: CurrencyDeltas = {};
     let storyResultJson = "";
     let progressPersisted = true;
@@ -314,31 +329,41 @@ export class ValidatorService {
     if (level) {
       const catalog = getCatalog();
       const grade = gradeLevel(level, match.current_state, Date.now() - match.created_at);
-      const previous =
-        (await this.storage.getJsonBlob<StoryProgress>(match.player_id, STORY_PROGRESS_KEY)) ??
-        emptyProgress(catalog);
-      const applied = applyGrade(
-        previous,
-        level,
-        grade,
-        match.current_state.score ?? 0,
-        catalog,
-        new Date().toISOString(),
-      );
-      progressPersisted =
-        this.storage.enabled &&
-        (await this.storage.putJsonBlob(match.player_id, STORY_PROGRESS_KEY, applied.progress));
-      if (progressPersisted) {
+      let applied: ReturnType<typeof applyGrade> | null = null;
+      progressPersisted = false;
+      const read = await this.storage.readJsonBlob<StoryProgress>(match.player_id, STORY_PROGRESS_KEY);
+      if (read.ok) {
+        const previous = read.value ?? emptyProgress(catalog);
+        if (isLevelUnlocked(previous.levels, level.id)) {
+          applied = applyGrade(
+            previous,
+            level,
+            grade,
+            match.current_state.score ?? 0,
+            catalog,
+            new Date().toISOString(),
+          );
+          progressPersisted = await this.storage.putJsonBlob(
+            match.player_id,
+            STORY_PROGRESS_KEY,
+            applied.progress,
+            read.cas,
+          );
+        } else {
+          console.warn(`Story completion for LOCKED level ${level.id} by ${match.player_id} — graded, not granted`);
+        }
+      }
+      if (progressPersisted && applied) {
         rewards = applied.rewards;
       }
       const storyResult: StoryResult = {
         level_id: level.id,
         stars: grade.stars,
         goals: grade.goals,
-        new_stars: applied.newStars,
-        rewards: progressPersisted ? (applied.rewards as Record<string, string>) : {},
-        next_level_id: applied.nextLevelId,
-        unlocked: applied.unlocked,
+        new_stars: progressPersisted && applied ? applied.newStars : 0,
+        rewards: rewards as Record<string, string>,
+        next_level_id: applied?.nextLevelId ?? "",
+        unlocked: progressPersisted && applied ? applied.unlocked : false,
       };
       storyResultJson = JSON.stringify(storyResult);
     } else if (match.mode !== "story") {
@@ -350,7 +375,10 @@ export class ValidatorService {
     // merely "the awards transport is enabled". A swallowed s2s failure
     // (e.g. a currency missing from the snapend's Inventory config) would
     // otherwise report success while the wallet stays empty. For story, the
-    // progress write is part of the grant.
+    // progress write is part of the grant. (Known, accepted trade-off kept
+    // from the original latch design: the watermark lands before the
+    // Inventory calls, so an Inventory s2s failure costs the player that
+    // tier's currency rather than risking a double-mint on replay.)
     let granted = this.inventory.enabled && (level === undefined || progressPersisted);
     if (this.inventory.enabled) {
       for (const [currency, delta] of Object.entries(rewards)) {

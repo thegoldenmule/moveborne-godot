@@ -113,7 +113,9 @@ export function applyGrade(
     progress: { catalog_version: catalog.catalog_version, levels, next_level_id: nextLevelId },
     newStars,
     rewards,
-    unlocked: nextLevelId !== prevNext,
+    // "" means everything is complete — the frontier moved, but there is no
+    // next level to announce as unlocked.
+    unlocked: nextLevelId !== prevNext && nextLevelId !== "",
     nextLevelId,
   };
 }

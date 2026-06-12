@@ -28,6 +28,7 @@ var _remote_config: Node    # MbRemoteConfigClient
 var _progress_client: Node  # MbStoryProgressClient
 
 var _catalog: Dictionary = {}
+var _baked: Dictionary = {}  # parsed once; the fallback never changes at runtime
 var _world_index := 0
 var _online := false
 var _refreshing := false
@@ -60,7 +61,8 @@ func _ready() -> void:
 	_build_ui()
 	# Render immediately from the baked catalog + cached progress; refresh()
 	# (called by StoryMapState after the reveal) swaps in live data.
-	_catalog = Catalog.load_baked() if GameState.story_catalog.is_empty() else GameState.story_catalog
+	_baked = Catalog.load_baked()
+	_catalog = _baked if GameState.story_catalog.is_empty() else GameState.story_catalog
 	_world_index = _frontier_world_index()
 	_rebuild()
 
@@ -80,12 +82,15 @@ func refresh() -> void:
 		_show_gate(true)
 		return
 	_show_gate(false)
+	# Sequential awaits: storing an un-awaited coroutine call to "parallelize"
+	# the two fetches breaks the resume chain (verified: the coroutine dies
+	# after the first await and the map never re-renders). Two round trips it is.
 	var rc: Dictionary = await _remote_config.fetch_app_config()
+	var pr: Dictionary = await _progress_client.fetch_progress()
 	if bool(rc.get("ok", false)):
 		var remote: Dictionary = RemoteConfigS.extract_catalog(rc.get("config", {}))
-		_catalog = RemoteConfigS.select_catalog(remote, Catalog.load_baked())
+		_catalog = RemoteConfigS.select_catalog(remote, _baked)
 		GameState.set_story_catalog(_catalog)
-	var pr: Dictionary = await _progress_client.fetch_progress()
 	if bool(pr.get("ok", false)):
 		GameState.set_story_progress(pr.get("progress", {}))
 	_status.text = "" if bool(pr.get("ok", false)) else "progress unavailable — %s" % pr.get("error", "")
@@ -295,11 +300,22 @@ func _rebuild() -> void:
 	for c in _level_list.get_children():
 		c.queue_free()
 	var focus_row: Control = null
+	# Unlock state derives from the frontier in catalog order: everything up to
+	# and including the frontier is playable, everything after is locked (O(1)
+	# per row — no per-row catalog walk). Worlds before the current one are
+	# fully unlocked iff the frontier sits in a later world.
+	var frontier_world := str(Catalog.get_level(_catalog, frontier).get("world_id", "")) if frontier != "" else ""
+	var world_ids: Array = worlds.map(func(w): return str(w.get("id", "")))
+	var frontier_world_idx: int = world_ids.find(frontier_world)
+	var passed_frontier := frontier != "" and frontier_world_idx >= 0 and _world_index > frontier_world_idx
 	for l in levels:
-		var row := _make_level_row(l, progress, frontier)
+		var id := str(l.get("id", ""))
+		var unlocked := frontier == "" or not passed_frontier
+		var row := _make_level_row(l, progress, id == frontier, unlocked)
 		_level_list.add_child(row)
-		if str(l.get("id", "")) == frontier:
+		if id == frontier:
 			focus_row = row
+			passed_frontier = true
 	if focus_row != null:
 		_scroll_to.call_deferred(focus_row)
 
@@ -317,11 +333,9 @@ func _scroll_to(row: Control) -> void:
 		_scroll.ensure_control_visible(row)
 
 
-func _make_level_row(level: Dictionary, progress: Dictionary, frontier: String) -> Control:
+func _make_level_row(level: Dictionary, progress: Dictionary, is_next: bool, unlocked: bool) -> Control:
 	var id := str(level.get("id", ""))
 	var stars := Catalog.stars_for(progress, id)
-	var unlocked := Catalog.is_level_unlocked(_catalog, progress, id)
-	var is_next := id == frontier
 
 	var btn := Button.new()
 	btn.focus_mode = Control.FOCUS_NONE
@@ -329,12 +343,9 @@ func _make_level_row(level: Dictionary, progress: Dictionary, frontier: String) 
 	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn.clip_text = true
 	btn.add_theme_font_size_override("font_size", 17)
-	var star_str := ""
-	for i in range(3):
-		star_str += STAR_FULL if i < stars else STAR_EMPTY
 	var num := int(level.get("order", 0)) + 1
 	if unlocked:
-		btn.text = "%d   %s   %s" % [num, star_str, str(level.get("name", id))]
+		btn.text = "%d   %s   %s" % [num, _star_string(stars), str(level.get("name", id))]
 	else:
 		btn.text = "%d   🔒   %s" % [num, str(level.get("name", id))]
 	_style_level_row(btn, unlocked, is_next, stars)
@@ -413,10 +424,7 @@ func _build_result_overlay(result: Dictionary) -> Control:
 	box.add_child(name_lbl)
 
 	var stars_lbl := Label.new()
-	var s := ""
-	for i in range(3):
-		s += STAR_FULL if i < stars else STAR_EMPTY
-	stars_lbl.text = s
+	stars_lbl.text = _star_string(stars)
 	stars_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stars_lbl.add_theme_font_size_override("font_size", 44)
 	stars_lbl.add_theme_color_override("font_color", Color("ffd54a") if stars > 0 else MbStyle.DIM)
@@ -437,7 +445,7 @@ func _build_result_overlay(result: Dictionary) -> Control:
 				continue
 			var goal = (g as Dictionary).get("goal", {})
 			var line := Label.new()
-			line.text = "%s  %s" % ["✓" if bool((g as Dictionary).get("met", false)) else "✗", _goal_text(goal)]
+			line.text = "%s  %s" % ["✓" if bool((g as Dictionary).get("met", false)) else "✗", Catalog.goal_text(goal)]
 			line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			line.add_theme_font_size_override("font_size", 15)
 			line.add_theme_color_override("font_color",
@@ -476,20 +484,8 @@ func _build_result_overlay(result: Dictionary) -> Control:
 	return overlay
 
 
-## Human goal text: "500 pts", "tile 256", with a timer suffix when limited.
-func _goal_text(goal) -> String:
-	if not (goal is Dictionary):
-		return "?"
-	var g: Dictionary = goal
-	var text := ""
-	if str(g.get("type", "")) == "max_tile":
-		text = "tile %d" % int(g.get("threshold", 0))
-	else:
-		text = "%d pts" % int(g.get("threshold", 0))
-	var tl = g.get("time_limit_s", null)
-	if tl != null:
-		text += "  ⏱ %ds" % int(tl)
-	return text
+func _star_string(stars: int) -> String:
+	return STAR_FULL.repeat(clampi(stars, 0, 3)) + STAR_EMPTY.repeat(3 - clampi(stars, 0, 3))
 
 
 # ── styling ───────────────────────────────────────────────────────────────────
