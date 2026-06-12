@@ -23,8 +23,8 @@ Quality="*res://scenes/quality.gd"
 MbDebug="*res://game/mcp_game_api.gd"
 GameState="*res://ui/game_state.gd"
 UiRouter="*res://ui/router/app_router.gd"
-MbUi="*res://game/mcp_ui_api.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+MbUi="*res://game/mcp_ui_api.gd"
 
 [display]
 

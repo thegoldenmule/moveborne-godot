@@ -8,18 +8,11 @@ function stateWithScore(score: number): SynchronizedGameState {
 }
 
 describe("computeMatchRewards", () => {
-  test("story: coins derived from validated score (floor(score/10))", () => {
-    expect(computeMatchRewards("story", stateWithScore(1530))).toEqual({ coins: "153" });
-    expect(computeMatchRewards("story", stateWithScore(19))).toEqual({ coins: "1" });
-  });
-
-  test("story: zero-delta coins are omitted entirely", () => {
+  test("story: nothing from the flat table — catalog star rewards own story", () => {
+    // Decision 2026-06-12: catalog per-star rewards fully replaced the old
+    // floor(score/10) placeholder; story grants flow through story/progress.ts.
+    expect(computeMatchRewards("story", stateWithScore(1530))).toEqual({});
     expect(computeMatchRewards("story", stateWithScore(0))).toEqual({});
-    expect(computeMatchRewards("story", stateWithScore(9))).toEqual({});
-  });
-
-  test("story: negative score never produces a negative grant", () => {
-    expect(computeMatchRewards("story", stateWithScore(-50))).toEqual({});
   });
 
   test("pvp: flat souls per completed match", () => {

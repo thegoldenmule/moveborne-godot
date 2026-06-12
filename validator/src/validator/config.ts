@@ -30,6 +30,7 @@ export function loadConfig(): ValidatorConfig {
     snapserApiKey: process.env.SNAPSER_API_KEY || undefined,
     // Platform-injected inside the snapend; absent in local dev.
     inventoryInternalUrl: process.env.SNAPEND_INVENTORY_HTTP_URL || undefined,
+    storageInternalUrl: process.env.SNAPEND_STORAGE_HTTP_URL || undefined,
     internalHeader: process.env.SNAPEND_INTERNAL_HEADER || undefined,
   };
 }

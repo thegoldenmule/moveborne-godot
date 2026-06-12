@@ -19,6 +19,9 @@ message InitMatchRequest {
   // "story" | "pvp" | "infinite" — selects the reward TABLE only; amounts
   // always derive from the validator-validated state.
   string mode = 4;
+  // Story-mode catalog level id (e.g. "w1_l3"); empty for other modes.
+  // Bound at registration so grading cannot be re-aimed after the fact.
+  string level_id = 5;
 }
 
 message InitMatchResponse {
@@ -65,8 +68,13 @@ message CompleteMatchResponse {
   // True only when every reward in `rewards` was actually credited to the
   // Inventory wallet (each appears in `balances`). False when already
   // settled, awards disabled in this environment, or any Inventory s2s
-  // credit failed.
+  // credit failed. For story matches the progress-blob write is part of
+  // the grant.
   bool granted = 4;
+  // Story grading result as canonical JSON (the JSON-in-proto convention):
+  // {level_id, stars, goals, new_stars, rewards, next_level_id, unlocked}.
+  // Empty for non-story matches and already-settled completions.
+  string story_result_json = 5;
 }
 
 // Failures use standard gRPC status codes (also carried in the Hermes

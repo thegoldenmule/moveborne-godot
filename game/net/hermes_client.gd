@@ -34,7 +34,7 @@ const CASE_API_RESPONSE := 50
 
 signal ready_received(current_state: Dictionary)
 signal action_validated(index: int, matched: bool, corrected_state)   # matched=true => keep optimistic; else corrected_state is the authoritative state
-signal match_completed(response: Dictionary)   # CompleteMatch: {match_id, rewards, balances, granted}
+signal match_completed(response: Dictionary)   # CompleteMatch: {match_id, rewards, balances, granted, story}
 signal validator_error(message: String)
 signal connected()
 
@@ -45,6 +45,7 @@ var _ready_ok := false
 var _match_id := ""
 var _player_id := ""
 var _mode := "story"
+var _level_id := ""
 var _starting_state: Dictionary = {}
 var _mid := 0
 var _pending: Dictionary = {}   # mid -> {kind: String, index: int}
@@ -53,10 +54,11 @@ var _pending: Dictionary = {}   # mid -> {kind: String, index: int}
 ## Connect to a Hermes(-compatible) WSS endpoint and register the match: on the
 ## socket opening, InitMatch is sent; its response fires connected() +
 ## ready_received(state). `ws_url` must already carry the ?token= query param.
-func init_and_connect(ws_url: String, match_id: String, starting_state: Dictionary, player_id: String, mode: String = "story") -> void:
+func init_and_connect(ws_url: String, match_id: String, starting_state: Dictionary, player_id: String, mode: String = "story", level_id: String = "") -> void:
 	_match_id = match_id
 	_player_id = player_id
 	_mode = mode
+	_level_id = level_id
 	_starting_state = starting_state
 	_opened = false
 	_ready_ok = false
@@ -128,6 +130,7 @@ func _send_init() -> void:
 	req.set_starting_state_json(JSON.stringify(_starting_state))
 	req.set_player_id(_player_id)
 	req.set_mode(_mode)
+	req.set_level_id(_level_id)
 	_call(SERVICE + "/InitMatch", req.to_bytes(), {"kind": "init"})
 
 
@@ -206,9 +209,14 @@ func _handle_api_response(sm) -> void:
 			if done.from_bytes(payload) != ValidatorPb.PB_ERR.NO_ERRORS:
 				validator_error.emit("bad CompleteMatchResponse")
 				return
+			# story_result_json rides the JSON-in-proto convention; {} for
+			# non-story matches and already-settled completions.
+			var story = JSON.parse_string(done.get_story_result_json()) \
+				if done.get_story_result_json() != "" else null
 			match_completed.emit({
 				"match_id": done.get_match_id(),
 				"rewards": done.get_rewards(),
 				"balances": done.get_balances(),
 				"granted": done.get_granted(),
+				"story": story if story is Dictionary else {},
 			})

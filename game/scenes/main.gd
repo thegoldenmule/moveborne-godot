@@ -50,6 +50,9 @@ var _board
 var _net
 var _auth   # MbSnapserAuth — anonymous Snapser session for the deployed validator
 var _mode := "infinite"   # this match's play mode (selects the validator's reward table)
+var _level_id := ""       # story catalog level (rides InitMatch; grades server-side)
+var _goals: Array = []    # the level's goals, copied from the catalog for DISPLAY only
+var _story_result: Dictionary = {}  # validator's story grade from the completion ack
 var _completing := false  # quit pressed; settling rewards with the validator
 var _score_val: Label
 var _moves_val: Label
@@ -61,6 +64,7 @@ var _score_tw: Tween
 var _shown_shards := 0            # displayed shards; filled as doobers land
 var _doobers_pending := 0        # in-flight shard doobers
 var _hud_glow: ShaderMaterial    # shared white glow for HUD value labels
+var _goals_lbl: Label            # story goal strip (built only when goals exist)
 var _net_label: Label
 var _toast: Label
 var _hand_box: Control           # plain container; cards are fanned by hand
@@ -88,6 +92,9 @@ func _ready() -> void:
 	# this scene is launched standalone). Plain Dictionary, mirrors how state is passed.
 	var cfg: Dictionary = GameState.next_match if not GameState.next_match.is_empty() else {"mode": "infinite"}
 	_mode = str(cfg.get("mode", "infinite"))
+	_level_id = str(cfg.get("level_id", ""))
+	var cfg_goals = cfg.get("goals", [])
+	_goals = cfg_goals if cfg_goals is Array else []
 	_match = MbMatchS.new()
 	_build_ui()
 	_match.changed.connect(_on_changed)
@@ -230,6 +237,20 @@ func _build_ui() -> void:
 	_toast.text = ""
 	add_child(_toast)
 
+	# Story goal strip — display-only (the validator grades authoritatively at
+	# completion; this just keeps the targets in sight). Quiet bottom band.
+	if not _goals.is_empty():
+		_goals_lbl = Label.new()
+		_goals_lbl.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		_goals_lbl.offset_left = margin
+		_goals_lbl.offset_right = -margin
+		_goals_lbl.offset_top = -32.0
+		_goals_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_goals_lbl.add_theme_font_size_override("font_size", 14)
+		_goals_lbl.add_theme_color_override("font_color", Style.DIM)
+		_goals_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_goals_lbl)
+
 	_hand_box = Control.new()
 	_hand_box.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	_hand_box.offset_left = 16
@@ -343,6 +364,11 @@ func _on_home_pressed() -> void:
 			var balances = resp.get("balances", {})
 			if balances is Dictionary and not balances.is_empty():
 				GameState.merge_currencies(balances)
+			# The validator's story grade (stars/goals/rewards/unlock) rides the
+			# completion ack; banked into the exit result for the map overlay.
+			var story = resp.get("story", {})
+			if story is Dictionary:
+				_story_result = story
 		_net.match_completed.connect(on_completed, CONNECT_ONE_SHOT)
 		# Wait for the ack, but never trap the player on a dead socket.
 		var waited := 0.0
@@ -356,6 +382,8 @@ func _on_home_pressed() -> void:
 		"score": int(_match.state.get("score", 0)),
 		"move_index": int(_match.state.get("moveIndex", 0)),
 		"reason": "quit",
+		"level_id": _level_id,
+		"story": _story_result,  # {} when offline / settlement timed out
 	})
 	# Standalone (no listener) the emit is a no-op — re-arm the button.
 	_completing = false
@@ -660,9 +688,37 @@ func _update_hud() -> void:
 	_set_shards(int(st["shards"]))
 	_set_score(int(st["score"]))
 	_set_combo(int(st["comboMultiplier"]))
+	_update_goals_hud()
 	_apply_hud_glow(_moves_val, 1)
 	_apply_hud_glow(_score_val, 1)
 	_apply_hud_glow(_shards_val, 1)
+
+
+## Refresh the story goal strip from the live state: score for points goals,
+## the highest board tile for max_tile goals. Met goals get a ✓; timed goals
+## carry a ⏱ tag (the validator's wall-clock is authoritative — this is a
+## reminder, not a countdown).
+func _update_goals_hud() -> void:
+	if _goals_lbl == null or _goals.is_empty():
+		return
+	var st: Dictionary = _match.state
+	var score := int(st.get("score", 0))
+	var max_tile := 0
+	for t in (st.get("board", {}) as Dictionary).get("tiles", []):
+		max_tile = maxi(max_tile, int((t as Dictionary).get("value", 0)))
+	var parts: Array = []
+	for g in _goals:
+		if not (g is Dictionary):
+			continue
+		var goal: Dictionary = g
+		var is_tile := str(goal.get("type", "")) == "max_tile"
+		var threshold := int(goal.get("threshold", 0))
+		var met := (max_tile if is_tile else score) >= threshold
+		var text := ("tile %d" % threshold) if is_tile else ("%d pts" % threshold)
+		if goal.get("time_limit_s", null) != null:
+			text += " ⏱%ds" % int(goal.get("time_limit_s"))
+		parts.append("%s %s" % ["✓" if met else "·", text])
+	_goals_lbl.text = "   ".join(parts)
 
 
 func _hud_glow_material() -> ShaderMaterial:
@@ -863,7 +919,7 @@ func _start_net(ws_url: String, player_id: String, token: String) -> void:
 	var match_id := "gd_%d" % (randi() % 1000000)
 	# uri_encode the token: a Snapser session token can carry URL-reserved chars
 	# (+ / =), which would otherwise corrupt the ?token= value at the gateway.
-	_net.init_and_connect(ws_url + "?token=" + token.uri_encode(), match_id, _match.state, player_id, _mode)
+	_net.init_and_connect(ws_url + "?token=" + token.uri_encode(), match_id, _match.state, player_id, _mode, _level_id)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % ws_url

@@ -45,7 +45,9 @@ func _ready() -> void:
 	_pvp.disabled = true
 	_pvp.modulate = Color(1.0, 1.0, 1.0, 0.5)
 
-	_story.pressed.connect(_launch.bind({"mode": "story", "scenario_id": 0}))
+	# Story opens the world map (the shell routes mode=story to StoryMapState);
+	# the level config is chosen there, not here.
+	_story.pressed.connect(_launch.bind({"mode": "story"}))
 	_infinite.pressed.connect(_launch.bind({"mode": "infinite"}))
 
 	# MbUi: the .tscn-built launchers register as home.story / home.infinite / home.pvp.

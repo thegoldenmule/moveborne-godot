@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Theme" path="res://ui/theme/moveborne_ui.tres" id="1_theme"]
+[ext_resource type="Script" path="res://ui/screens/story_map.gd" id="2_script"]
+
+[node name="StoryMap" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")

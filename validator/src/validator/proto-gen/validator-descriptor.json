@@ -203,6 +203,10 @@
                     "mode": {
                       "type": "string",
                       "id": 4
+                    },
+                    "level_id": {
+                      "type": "string",
+                      "id": 5
                     }
                   }
                 },
@@ -289,6 +293,10 @@
                     "granted": {
                       "type": "bool",
                       "id": 4
+                    },
+                    "story_result_json": {
+                      "type": "string",
+                      "id": 5
                     }
                   }
                 }

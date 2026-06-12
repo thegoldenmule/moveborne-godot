@@ -24,6 +24,11 @@ import { signValidatorResponse } from "./utils/crypto";
 import { verifySnapserCaller } from "./utils/snapser-auth";
 import { computeMatchRewards } from "./rewards";
 import type { InventoryClient } from "./snaps/inventory";
+import { StorageClient, STORY_PROGRESS_KEY } from "./snaps/storage";
+import { getCatalog, getLevel } from "./story/catalog";
+import { gradeLevel, maxTileValue } from "./story/goals";
+import { applyGrade, emptyProgress } from "./story/progress";
+import type { StoryProgress, StoryResult } from "./story/types";
 import type { RpcName } from "./proto";
 
 /** Gateway-stamped caller headers (lowercased keys), regardless of transport:
@@ -54,6 +59,8 @@ export interface InitMatchRequest {
   starting_state_json: string;
   player_id: string;
   mode: string;
+  /** Story-mode catalog level id (e.g. "w1_l3"); empty for other modes. */
+  level_id?: string;
 }
 export interface InitMatchResponse {
   match_id: string;
@@ -80,12 +87,16 @@ export interface CompleteMatchResponse {
   rewards: Record<string, string>;
   balances: Record<string, string>;
   granted: boolean;
+  /** Story grading result (canonical JSON, see story/types.ts StoryResult);
+   *  empty for non-story matches and for already-settled completions. */
+  story_result_json: string;
 }
 
 export class ValidatorService {
   constructor(
     private readonly store: MatchStateStore,
     private readonly inventory: InventoryClient,
+    private readonly storage: StorageClient = new StorageClient({ kind: "disabled" }),
   ) {}
 
   async initMatch(req: InitMatchRequest, caller: CallerHeaders): Promise<InitMatchResponse> {
@@ -131,11 +142,39 @@ export class ValidatorService {
     const state_history = new Map<number, SynchronizedGameState>();
     state_history.set(starting_state.moveIndex, starting_state);
 
+    // Bind the story level at registration so grading cannot be re-aimed at a
+    // different level after the fact. Unknown ids are rejected up front — the
+    // alternative (silently grading nothing) reads as a lost reward later.
+    const level_id = mode === "story" && req.level_id ? req.level_id : undefined;
+    if (level_id && !getLevel(level_id)) {
+      throw new ServiceError(GrpcStatus.INVALID_ARGUMENT, `unknown story level_id '${level_id}'`);
+    }
+    // The starting state is CLIENT-supplied, so a story level must register a
+    // fresh one — otherwise a caller inits a pre-scored / pre-merged board and
+    // settles instantly for stars. score==0 + moveIndex==0 force points goals
+    // through validated actions; the tile cap (64 — the largest fixed tile any
+    // scenario places, High Stakes) does the same for max_tile goals. Exact
+    // scenario-board reconstruction needs the scenario table server-side
+    // (documented follow-up hardening).
+    if (level_id) {
+      const fresh =
+        starting_state.score === 0 &&
+        starting_state.moveIndex === 0 &&
+        maxTileValue(starting_state) <= 64;
+      if (!fresh) {
+        throw new ServiceError(
+          GrpcStatus.INVALID_ARGUMENT,
+          "story matches must register a fresh scenario starting state",
+        );
+      }
+    }
+
     const storedMatch: StoredMatch = {
       match_id,
       current_state: starting_state,
       player_id,
       mode,
+      level_id,
       created_at: now,
       last_action_at: now,
       action_count: 0,
@@ -144,7 +183,9 @@ export class ValidatorService {
     };
     await this.store.set(match_id, storedMatch, config.matchSessionTTL);
 
-    console.log(`Match initialized: ${match_id} for player ${player_id} (mode=${mode})`);
+    console.log(
+      `Match initialized: ${match_id} for player ${player_id} (mode=${mode}${level_id ? `, level=${level_id}` : ""})`,
+    );
 
     return {
       match_id,
@@ -251,7 +292,7 @@ export class ValidatorService {
     }
 
     if (match.rewards_granted) {
-      return { match_id, rewards: {}, balances: {}, granted: false };
+      return { match_id, rewards: {}, balances: {}, granted: false, story_result_json: "" };
     }
 
     // Latch BEFORE the s2s calls so a racing duplicate completion can't
@@ -260,13 +301,57 @@ export class ValidatorService {
     match.rewards_granted = true;
     await this.store.set(match_id, match, config.matchSessionTTL);
 
-    const rewards = computeMatchRewards(match.mode, match.current_state);
+    // Story: grade the validator's own final state + wall-clock against the
+    // catalog goals, then read-merge-write the progress blob BEFORE granting —
+    // if the rewarded_stars watermark doesn't land, the grant is withheld
+    // (a replay would otherwise re-mint the same star tiers). A story match
+    // without a level grants nothing (catalog rewards fully replaced the old
+    // score-derived table); other modes keep the flat reward table.
+    let rewards: CurrencyDeltas = {};
+    let storyResultJson = "";
+    let progressPersisted = true;
+    const level = match.mode === "story" && match.level_id ? getLevel(match.level_id) : undefined;
+    if (level) {
+      const catalog = getCatalog();
+      const grade = gradeLevel(level, match.current_state, Date.now() - match.created_at);
+      const previous =
+        (await this.storage.getJsonBlob<StoryProgress>(match.player_id, STORY_PROGRESS_KEY)) ??
+        emptyProgress(catalog);
+      const applied = applyGrade(
+        previous,
+        level,
+        grade,
+        match.current_state.score ?? 0,
+        catalog,
+        new Date().toISOString(),
+      );
+      progressPersisted =
+        this.storage.enabled &&
+        (await this.storage.putJsonBlob(match.player_id, STORY_PROGRESS_KEY, applied.progress));
+      if (progressPersisted) {
+        rewards = applied.rewards;
+      }
+      const storyResult: StoryResult = {
+        level_id: level.id,
+        stars: grade.stars,
+        goals: grade.goals,
+        new_stars: applied.newStars,
+        rewards: progressPersisted ? (applied.rewards as Record<string, string>) : {},
+        next_level_id: applied.nextLevelId,
+        unlocked: applied.unlocked,
+      };
+      storyResultJson = JSON.stringify(storyResult);
+    } else if (match.mode !== "story") {
+      rewards = computeMatchRewards(match.mode, match.current_state);
+    }
+
     const balances: CurrencyDeltas = {};
     // granted must mean "every computed reward was actually credited" — not
     // merely "the awards transport is enabled". A swallowed s2s failure
     // (e.g. a currency missing from the snapend's Inventory config) would
-    // otherwise report success while the wallet stays empty.
-    let granted = this.inventory.enabled;
+    // otherwise report success while the wallet stays empty. For story, the
+    // progress write is part of the grant.
+    let granted = this.inventory.enabled && (level === undefined || progressPersisted);
     if (this.inventory.enabled) {
       for (const [currency, delta] of Object.entries(rewards)) {
         const result = await this.inventory.incrementUserCurrency(
@@ -283,7 +368,7 @@ export class ValidatorService {
     }
 
     console.log(
-      `Match completed: ${match_id} (mode=${match.mode}, score=${match.current_state.score})`,
+      `Match completed: ${match_id} (mode=${match.mode}${level ? `, level=${level.id}` : ""}, score=${match.current_state.score})`,
       { rewards, balances, granted },
     );
 
@@ -292,6 +377,7 @@ export class ValidatorService {
       rewards: rewards as Record<string, string>,
       balances: balances as Record<string, string>,
       granted,
+      story_result_json: storyResultJson,
     };
   }
 }

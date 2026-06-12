@@ -11,6 +11,9 @@ export interface StoredMatch {
   current_state: SynchronizedGameState;
   player_id: string;
   mode: MatchMode;
+  /** Story-mode catalog level this match plays (InitMatchRequest.level_id);
+   *  absent for infinite/pvp and for story launches without a level. */
+  level_id?: string;
   created_at: number;
   last_action_at: number;
   action_count: number;
@@ -36,6 +39,9 @@ export interface ValidatorConfig {
   /** Platform-injected internal HTTP URL of the Inventory snap
    *  (SNAPEND_INVENTORY_HTTP_URL, e.g. http://service-inventory:8090/). */
   inventoryInternalUrl?: string;
+  /** Platform-injected internal HTTP URL of the Storage snap
+   *  (SNAPEND_STORAGE_HTTP_URL) — the story_progress blob's s2s write path. */
+  storageInternalUrl?: string;
   /** Platform-injected internal-auth value (SNAPEND_INTERNAL_HEADER), sent as
    *  the `Gateway` header on internal snap-to-snap calls. */
   internalHeader?: string;

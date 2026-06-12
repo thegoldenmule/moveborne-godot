@@ -1,0 +1,1781 @@
+{
+  "catalog_version": 1,
+  "worlds": [
+    {
+      "id": "w1",
+      "name": "The Frozen Veil",
+      "order": 0,
+      "levels": [
+        {
+          "id": "w1_l1",
+          "order": 0,
+          "scenario_id": 0,
+          "name": "Freeze Focus",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 240,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 480,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 64,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 30
+            },
+            "per_star": [
+              {
+                "coins": 12
+              },
+              {
+                "coins": 24
+              },
+              {
+                "coins": 36
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l2",
+          "order": 1,
+          "scenario_id": 0,
+          "name": "Freeze Focus II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 280,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 560,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 64,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 35
+            },
+            "per_star": [
+              {
+                "coins": 14
+              },
+              {
+                "coins": 28
+              },
+              {
+                "coins": 42
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l3",
+          "order": 2,
+          "scenario_id": 13,
+          "name": "Four Corners",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 320,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 640,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 320,
+              "time_limit_s": 180
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 40
+            },
+            "per_star": [
+              {
+                "coins": 16
+              },
+              {
+                "coins": 32
+              },
+              {
+                "coins": 48
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l4",
+          "order": 3,
+          "scenario_id": 7,
+          "name": "Combo Punisher",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 360,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 720,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 64,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 45
+            },
+            "per_star": [
+              {
+                "coins": 18
+              },
+              {
+                "coins": 36
+              },
+              {
+                "coins": 54
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l5",
+          "order": 4,
+          "scenario_id": 0,
+          "name": "Freeze Focus III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 400,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 800,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 64,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 50
+            },
+            "per_star": [
+              {
+                "coins": 20
+              },
+              {
+                "coins": 40
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l6",
+          "order": 5,
+          "scenario_id": 13,
+          "name": "Four Corners II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 440,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 880,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 440,
+              "time_limit_s": 180
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 55
+            },
+            "per_star": [
+              {
+                "coins": 22
+              },
+              {
+                "coins": 44
+              },
+              {
+                "coins": 66
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l7",
+          "order": 6,
+          "scenario_id": 7,
+          "name": "Combo Punisher II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 480,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 960,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 60
+            },
+            "per_star": [
+              {
+                "coins": 24
+              },
+              {
+                "coins": 48
+              },
+              {
+                "coins": 72
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l8",
+          "order": 7,
+          "scenario_id": 17,
+          "name": "Fracture",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 520,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1040,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 65
+            },
+            "per_star": [
+              {
+                "coins": 26
+              },
+              {
+                "coins": 52
+              },
+              {
+                "coins": 78
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l9",
+          "order": 8,
+          "scenario_id": 13,
+          "name": "Four Corners III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 560,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1120,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 560,
+              "time_limit_s": 180
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 70
+            },
+            "per_star": [
+              {
+                "coins": 28
+              },
+              {
+                "coins": 56
+              },
+              {
+                "coins": 84
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l10",
+          "order": 9,
+          "scenario_id": 7,
+          "name": "Combo Punisher III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 600,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1200,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 75
+            },
+            "per_star": [
+              {
+                "coins": 30
+              },
+              {
+                "coins": 60
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l11",
+          "order": 10,
+          "scenario_id": 17,
+          "name": "Fracture II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 640,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1280,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 80
+            },
+            "per_star": [
+              {
+                "coins": 32
+              },
+              {
+                "coins": 64
+              },
+              {
+                "coins": 96
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l12",
+          "order": 11,
+          "scenario_id": 0,
+          "name": "Freeze Focus IV",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 680,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1360,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 680,
+              "time_limit_s": 180
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 85
+            },
+            "per_star": [
+              {
+                "coins": 34
+              },
+              {
+                "coins": 68
+              },
+              {
+                "coins": 102
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l13",
+          "order": 12,
+          "scenario_id": 7,
+          "name": "Combo Punisher IV",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 720,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1440,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 90
+            },
+            "per_star": [
+              {
+                "coins": 36
+              },
+              {
+                "coins": 72
+              },
+              {
+                "coins": 108
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l14",
+          "order": 13,
+          "scenario_id": 13,
+          "name": "Four Corners IV",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 760,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1520,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 95
+            },
+            "per_star": [
+              {
+                "coins": 38
+              },
+              {
+                "coins": 76
+              },
+              {
+                "coins": 114
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l15",
+          "order": 14,
+          "scenario_id": 17,
+          "name": "Fracture III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 800,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1600,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 800,
+              "time_limit_s": 180
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 100
+            },
+            "per_star": [
+              {
+                "coins": 40
+              },
+              {
+                "coins": 80
+              },
+              {
+                "gems": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "name": "The Amplified Court",
+      "order": 1,
+      "levels": [
+        {
+          "id": "w2_l1",
+          "order": 0,
+          "scenario_id": 1,
+          "name": "Amplify Challenge",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 840,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1680,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 105
+            },
+            "per_star": [
+              {
+                "coins": 42
+              },
+              {
+                "coins": 84
+              },
+              {
+                "coins": 126
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l2",
+          "order": 1,
+          "scenario_id": 9,
+          "name": "Merge Mania",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 880,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1760,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 110
+            },
+            "per_star": [
+              {
+                "coins": 44
+              },
+              {
+                "coins": 88
+              },
+              {
+                "coins": 132
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l3",
+          "order": 2,
+          "scenario_id": 1,
+          "name": "Amplify Challenge II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 920,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1840,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 920,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 115
+            },
+            "per_star": [
+              {
+                "coins": 46
+              },
+              {
+                "coins": 92
+              },
+              {
+                "coins": 138
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l4",
+          "order": 3,
+          "scenario_id": 11,
+          "name": "Score Hunter",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 960,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1920,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 120
+            },
+            "per_star": [
+              {
+                "coins": 48
+              },
+              {
+                "coins": 96
+              },
+              {
+                "coins": 144
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l5",
+          "order": 4,
+          "scenario_id": 9,
+          "name": "Merge Mania II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1000,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2000,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 128,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 125
+            },
+            "per_star": [
+              {
+                "coins": 50
+              },
+              {
+                "coins": 100
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l6",
+          "order": 5,
+          "scenario_id": 12,
+          "name": "Frozen Wasteland",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1040,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2080,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1040,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 130
+            },
+            "per_star": [
+              {
+                "coins": 52
+              },
+              {
+                "coins": 104
+              },
+              {
+                "coins": 156
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l7",
+          "order": 6,
+          "scenario_id": 11,
+          "name": "Score Hunter II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1080,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2160,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 135
+            },
+            "per_star": [
+              {
+                "coins": 54
+              },
+              {
+                "coins": 108
+              },
+              {
+                "coins": 162
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l8",
+          "order": 7,
+          "scenario_id": 16,
+          "name": "Amplified Corners",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1120,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2240,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 140
+            },
+            "per_star": [
+              {
+                "coins": 56
+              },
+              {
+                "coins": 112
+              },
+              {
+                "coins": 168
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l9",
+          "order": 8,
+          "scenario_id": 12,
+          "name": "Frozen Wasteland II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1160,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2320,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1160,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 145
+            },
+            "per_star": [
+              {
+                "coins": 58
+              },
+              {
+                "coins": 116
+              },
+              {
+                "coins": 174
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l10",
+          "order": 9,
+          "scenario_id": 1,
+          "name": "Amplify Challenge III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1200,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2400,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 150
+            },
+            "per_star": [
+              {
+                "coins": 60
+              },
+              {
+                "coins": 120
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l11",
+          "order": 10,
+          "scenario_id": 9,
+          "name": "Merge Mania III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1240,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2480,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 155
+            },
+            "per_star": [
+              {
+                "coins": 62
+              },
+              {
+                "coins": 124
+              },
+              {
+                "coins": 186
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l12",
+          "order": 11,
+          "scenario_id": 16,
+          "name": "Amplified Corners II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1280,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2560,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1280,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 160
+            },
+            "per_star": [
+              {
+                "coins": 64
+              },
+              {
+                "coins": 128
+              },
+              {
+                "coins": 192
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l13",
+          "order": 12,
+          "scenario_id": 11,
+          "name": "Score Hunter III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1320,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2640,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 165
+            },
+            "per_star": [
+              {
+                "coins": 66
+              },
+              {
+                "coins": 132
+              },
+              {
+                "coins": 198
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l14",
+          "order": 13,
+          "scenario_id": 12,
+          "name": "Frozen Wasteland III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1360,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2720,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 170
+            },
+            "per_star": [
+              {
+                "coins": 68
+              },
+              {
+                "coins": 136
+              },
+              {
+                "coins": 204
+              }
+            ]
+          }
+        },
+        {
+          "id": "w2_l15",
+          "order": 14,
+          "scenario_id": 16,
+          "name": "Amplified Corners III",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1400,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2800,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1400,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 175
+            },
+            "per_star": [
+              {
+                "coins": 70
+              },
+              {
+                "coins": 140
+              },
+              {
+                "gems": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "name": "The Shattered Sanctum",
+      "order": 2,
+      "levels": [
+        {
+          "id": "w3_l1",
+          "order": 0,
+          "scenario_id": 2,
+          "name": "Lock Mayhem",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1440,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2880,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 180
+            },
+            "per_star": [
+              {
+                "coins": 72
+              },
+              {
+                "coins": 144
+              },
+              {
+                "coins": 216
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l2",
+          "order": 1,
+          "scenario_id": 2,
+          "name": "Lock Mayhem II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1480,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2960,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 185
+            },
+            "per_star": [
+              {
+                "coins": 74
+              },
+              {
+                "coins": 148
+              },
+              {
+                "coins": 222
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l3",
+          "order": 2,
+          "scenario_id": 8,
+          "name": "Rising Tide",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1520,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3040,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1520,
+              "time_limit_s": 120
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 190
+            },
+            "per_star": [
+              {
+                "coins": 76
+              },
+              {
+                "coins": 152
+              },
+              {
+                "coins": 228
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l4",
+          "order": 3,
+          "scenario_id": 15,
+          "name": "High Stakes",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1560,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3120,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 195
+            },
+            "per_star": [
+              {
+                "coins": 78
+              },
+              {
+                "coins": 156
+              },
+              {
+                "coins": 234
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l5",
+          "order": 4,
+          "scenario_id": 3,
+          "name": "Stone Garden",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1600,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3200,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 200
+            },
+            "per_star": [
+              {
+                "coins": 80
+              },
+              {
+                "coins": 160
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l6",
+          "order": 5,
+          "scenario_id": 14,
+          "name": "The Wall",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1640,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3280,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1640,
+              "time_limit_s": 120
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 205
+            },
+            "per_star": [
+              {
+                "coins": 82
+              },
+              {
+                "coins": 164
+              },
+              {
+                "coins": 246
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l7",
+          "order": 6,
+          "scenario_id": 3,
+          "name": "Stone Garden II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1680,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3360,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 210
+            },
+            "per_star": [
+              {
+                "coins": 84
+              },
+              {
+                "coins": 168
+              },
+              {
+                "coins": 252
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l8",
+          "order": 7,
+          "scenario_id": 5,
+          "name": "Decay Rush",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1720,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3440,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 215
+            },
+            "per_star": [
+              {
+                "coins": 86
+              },
+              {
+                "coins": 172
+              },
+              {
+                "coins": 258
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l9",
+          "order": 8,
+          "scenario_id": 5,
+          "name": "Decay Rush II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1760,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3520,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1760,
+              "time_limit_s": 120
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 220
+            },
+            "per_star": [
+              {
+                "coins": 88
+              },
+              {
+                "coins": 176
+              },
+              {
+                "coins": 264
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l10",
+          "order": 9,
+          "scenario_id": 4,
+          "name": "Black Hole Gauntlet",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1800,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3600,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 512,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 225
+            },
+            "per_star": [
+              {
+                "coins": 90
+              },
+              {
+                "coins": 180
+              },
+              {
+                "gems": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l11",
+          "order": 10,
+          "scenario_id": 4,
+          "name": "Black Hole Gauntlet II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1840,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3680,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 1024,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 230
+            },
+            "per_star": [
+              {
+                "coins": 92
+              },
+              {
+                "coins": 184
+              },
+              {
+                "coins": 276
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l12",
+          "order": 11,
+          "scenario_id": 6,
+          "name": "Effect Chaos",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1880,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3760,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1880,
+              "time_limit_s": 120
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 235
+            },
+            "per_star": [
+              {
+                "coins": 94
+              },
+              {
+                "coins": 188
+              },
+              {
+                "coins": 282
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l13",
+          "order": 12,
+          "scenario_id": 10,
+          "name": "The Gauntlet",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1920,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3840,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 1024,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 240
+            },
+            "per_star": [
+              {
+                "coins": 96
+              },
+              {
+                "coins": 192
+              },
+              {
+                "coins": 288
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l14",
+          "order": 13,
+          "scenario_id": 6,
+          "name": "Effect Chaos II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 1960,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 3920,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 1024,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 245
+            },
+            "per_star": [
+              {
+                "coins": 98
+              },
+              {
+                "coins": 196
+              },
+              {
+                "coins": 294
+              }
+            ]
+          }
+        },
+        {
+          "id": "w3_l15",
+          "order": 14,
+          "scenario_id": 10,
+          "name": "The Gauntlet II",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 2000,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 4000,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 2000,
+              "time_limit_s": 120
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 250
+            },
+            "per_star": [
+              {
+                "coins": 100
+              },
+              {
+                "coins": 200
+              },
+              {
+                "gems": 2
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

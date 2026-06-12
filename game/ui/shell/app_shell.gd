@@ -5,6 +5,7 @@ extends Control
 ## covers it.
 
 const MatchStateS := preload("res://ui/router/match_state.gd")
+const StoryMapStateS := preload("res://ui/router/story_map_state.gd")
 const HomeScene := preload("res://ui/screens/home.tscn")
 const PlaceholderScene := preload("res://ui/screens/placeholder_tab.tscn")
 const LeaderboardScene := preload("res://ui/screens/leaderboard_tab.tscn")
@@ -389,6 +390,11 @@ func _make_tab_label(btn: Button, text: String) -> Label:
 func _on_play_mode_selected(cfg: Dictionary) -> void:
 	if UiRouter.is_busy():
 		return
+	# Story goes through the world map (which picks the level and pushes the
+	# match itself); other modes launch a match directly.
+	if str(cfg.get("mode", "")) == "story" and not cfg.has("level_id"):
+		UiRouter.push(StoryMapStateS.new(UiRouter.content_root), cfg)
+		return
 	UiRouter.push(MatchStateS.new(UiRouter.content_root), cfg)
 
 
@@ -407,6 +413,16 @@ func set_active(v: bool) -> void:
 			# match_rewards ack already merged the granted deltas optimistically).
 			_currency_bar.refresh()
 	if v and _leaderboards != null:
+		_leaderboards.submit_pending(GameState.last_result)
+
+
+## Submit the banked result to the leaderboards now. Called by StoryMapState on
+## resume — while the player chains story levels the shell stays suspended, and
+## a second launch would overwrite GameState.last_result before the shell's own
+## set_active(true) flush ever ran. submit_pending's lb_submitted flag keeps
+## this exactly-once with the shell-resume path.
+func flush_pending_result() -> void:
+	if _leaderboards != null:
 		_leaderboards.submit_pending(GameState.last_result)
 
 

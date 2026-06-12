@@ -66,3 +66,24 @@ func merge_profile(partial: Dictionary) -> void:
 ## The canonical handle, or "" when no profile is loaded.
 func profile_handle() -> String:
 	return str(profile.get("display_name", ""))
+
+
+## Parsed story catalog: Remote Config app-config when reachable, else the
+## baked res://story/story_catalog.json fallback. Account/meta data — like
+## currencies/profile, NOT part of SynchronizedGameState, never hashed.
+var story_catalog: Dictionary = {}
+
+## Mirror of the Storage-snap story_progress json-blob. Client READ-ONLY —
+## the validator is the sole writer (stars/unlocks are server-authoritative).
+var story_progress: Dictionary = {}
+
+signal story_progress_changed(progress: Dictionary)
+
+
+func set_story_catalog(catalog: Dictionary) -> void:
+	story_catalog = catalog
+
+
+func set_story_progress(progress: Dictionary) -> void:
+	story_progress = progress
+	story_progress_changed.emit(story_progress)

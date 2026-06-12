@@ -36,8 +36,9 @@ const NOT_READY := {"ok": false, "reason": "not_ready",
 ## Tab screen ids (selectable inside the shell — NOT router pushes).
 const TAB_IDS := ["collection", "leaderboard", "home", "guilds", "settings"]
 ## Play modes (router pushes) and the match config each launches with.
+## Story is NOT here: goto("story") opens the world map (StoryMapState) — the
+## level is chosen on the map (press story_map.play / story_map.level_<id>).
 const MODE_CFG := {
-	"story": {"mode": "story", "scenario_id": 0},
 	"infinite": {"mode": "infinite"},
 }
 
@@ -47,7 +48,8 @@ const MODE_CFG := {
 ## lockstep with _expand_flow's match — verify_ui_driver asserts every entry here
 ## expands to non-null steps.
 const FLOWS := [
-	{"name": "start_story", "params": [], "summary": "Launch a Story match."},
+	{"name": "start_story", "params": [], "summary": "Open the Story world map."},
+	{"name": "story_play_next", "params": [], "summary": "Open the Story map and play the next unlocked level."},
 	{"name": "start_infinite", "params": [], "summary": "Launch an Infinite match."},
 	{"name": "open_settings", "params": [], "summary": "Switch to the Settings tab."},
 	{"name": "open_leaderboard", "params": [], "summary": "Switch to the Leaderboard tab."},
@@ -113,9 +115,16 @@ func state() -> Dictionary:
 	var route: Array = []
 	if router != null:
 		for r in router.route_names():
-			route.append("match" if r == "MatchState" else "shell")
+			match r:
+				"MatchState":
+					route.append("match")
+				"StoryMapState":
+					route.append("story_map")
+				_:
+					route.append("shell")
 	var active := _active_screen_ids()
 	var in_match := _in_match()
+	var on_map := _top_name() == "StoryMapState"
 	var modal := "avatar" if active.has("avatar") else ""
 	return {
 		"ok": true,
@@ -123,7 +132,7 @@ func state() -> Dictionary:
 		"route": route,
 		"route_depth": router.stack_depth() if router != null else 0,
 		"tab": sh.mcp_current_tab_id(),
-		"screen": "match" if in_match else sh.mcp_current_tab_id(),
+		"screen": "match" if in_match else ("story_map" if on_map else sh.mcp_current_tab_id()),
 		"modal": modal,
 		"match_ready": dbg != null and dbg.is_ready(),
 	}
@@ -133,8 +142,8 @@ func screens() -> Dictionary:
 	return {
 		"tabs": TAB_IDS,
 		"modes": MODE_CFG.keys(),
-		"surfaces": ["shell", "back", "match", "avatar"],
-		"note": "goto(tab) selects a tab; goto(mode) starts a match; goto('shell'/'back') exits a match.",
+		"surfaces": ["shell", "back", "match", "avatar", "story", "story_map"],
+		"note": "goto(tab) selects a tab; goto(mode) starts a match; goto('story') opens the world map (play via story_map.play); goto('shell'/'back') exits a match/map.",
 	}
 
 
@@ -265,6 +274,19 @@ func goto(target: String) -> Dictionary:
 	# Leaving a match first if the target isn't the match itself.
 	if _in_match() and t != "match":
 		await _exit_match()
+
+	# Story world map: a router surface between the shell and a match.
+	if t == "story" or t == "story_map":
+		if _top_name() != "StoryMapState":
+			sh.mcp_select_tab("home")
+			sh.mcp_start_match({"mode": "story"})  # the shell routes story to the map
+			await _settle()
+		return state()
+
+	# Any other target wants the shell visible — pop the map if it's on top.
+	if _top_name() == "StoryMapState":
+		_router().pop()
+		await _settle()
 
 	if t == "shell" or t == "back":
 		return state()
@@ -475,6 +497,8 @@ func _expand_flow(name: String, params: Dictionary):
 	match name:
 		"start_story":
 			return ["goto:story"]
+		"story_play_next":
+			return ["goto:story", "press:story_map.play"]
 		"start_infinite":
 			return ["goto:infinite"]
 		"open_settings":

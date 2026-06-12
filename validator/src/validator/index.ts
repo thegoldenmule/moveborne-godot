@@ -6,6 +6,8 @@ import { createMatchRoutes } from "./routes/match";
 import { createValidatorMCP } from "./mcp";
 import { getConfig } from "./config";
 import { InventoryClient, resolveInventoryTransport } from "./snaps/inventory";
+import { StorageClient, resolveStorageTransport } from "./snaps/storage";
+import { validateCatalog } from "./story/catalog";
 import { ValidatorService } from "./service";
 import { startGrpcServer } from "./grpc";
 import { HermesDispatcher, upgradeCallerHeaders } from "./hermes-ws";
@@ -18,7 +20,11 @@ const config = getConfig();
 const inventory = new InventoryClient(resolveInventoryTransport(config));
 console.log(`💰 Currency awards: ${inventory.enabled ? `enabled (${inventory.transportKind})` : "disabled (no s2s credentials)"}`);
 
-const service = new ValidatorService(store, inventory);
+const storage = new StorageClient(resolveStorageTransport(config));
+console.log(`⭐ Story progress: ${storage.enabled ? `enabled (${storage.transportKind})` : "disabled (no s2s credentials)"}`);
+validateCatalog(); // a malformed catalog edit fails at boot, not as NaN grades
+
+const service = new ValidatorService(store, inventory, storage);
 const dispatcher = new HermesDispatcher(service);
 
 // gRPC is the production transport: Snapser Hermes proxies snap-api requests

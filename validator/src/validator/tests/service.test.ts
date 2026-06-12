@@ -95,7 +95,7 @@ describe("ValidatorService", () => {
     ).toBe(true);
   });
 
-  test("completeMatch settles once: story rewards from validated state, then latches", async () => {
+  test("completeMatch settles once and latches (story sans level grants nothing)", async () => {
     const { initial, steps } = await golden();
     const service = makeService();
     await service.initMatch(
@@ -109,8 +109,11 @@ describe("ValidatorService", () => {
     );
 
     const first = await service.completeMatch({ match_id: "m3" }, USER_HEADERS);
-    // Reward table: story coins = floor(score / 10), from the VALIDATOR's state.
-    expect(first.rewards.coins).toBe(String(Math.floor(step.state.score / 10)));
+    // Catalog star rewards replaced the flat story table (decision 2026-06-12);
+    // a story match without a level_id grants nothing. Story-with-level paths
+    // are covered in service-story.test.ts.
+    expect(first.rewards).toEqual({});
+    expect(first.story_result_json).toBe("");
     // No s2s credentials in tests -> grant is a logged no-op.
     expect(first.granted).toBe(false);
 
@@ -134,8 +137,10 @@ describe("ValidatorService", () => {
     };
 
     const play = async (service: ValidatorService, matchId: string) => {
+      // pvp grants flat souls through the reward table (story rewards are
+      // catalog-driven and covered in service-story.test.ts).
       await service.initMatch(
-        { match_id: matchId, starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "story" },
+        { match_id: matchId, starting_state_json: JSON.stringify(initial), player_id: PLAYER, mode: "pvp" },
         USER_HEADERS,
       );
       await service.validateAction(
@@ -148,7 +153,7 @@ describe("ValidatorService", () => {
     // Upstream failure (e.g. currency not provisioned in the snapend's
     // Inventory config) -> rewards reported but granted=false, no balances.
     const failed = await play(serviceWithInventory(404, { message: "currency not found" }), "m5");
-    expect(failed.rewards.coins).toBe(String(Math.floor(step.state.score / 10)));
+    expect(failed.rewards.souls).toBe("1");
     expect(failed.balances).toEqual({});
     expect(failed.granted).toBe(false);
 
@@ -157,7 +162,7 @@ describe("ValidatorService", () => {
       serviceWithInventory(200, { previous_balance_64: "0", current_balance_64: "8" }),
       "m6",
     );
-    expect(ok.balances.coins).toBe("8");
+    expect(ok.balances.souls).toBe("8");
     expect(ok.granted).toBe(true);
   });
 

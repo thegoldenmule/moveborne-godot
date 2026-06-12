@@ -708,6 +708,11 @@ class InitMatchRequest:
 		service.field = __mode
 		data[__mode.tag] = service
 		
+		__level_id = PBField.new("level_id", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		service = PBServiceField.new()
+		service.field = __level_id
+		data[__level_id.tag] = service
+		
 	var data = {}
 	
 	var __match_id: PBField
@@ -761,6 +766,19 @@ class InitMatchRequest:
 		__mode.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
 	func set_mode(value : String) -> void:
 		__mode.value = value
+	
+	var __level_id: PBField
+	func has_level_id() -> bool:
+		if __level_id.value != null:
+			return true
+		return false
+	func get_level_id() -> String:
+		return __level_id.value
+	func clear_level_id() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__level_id.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
+	func set_level_id(value : String) -> void:
+		__level_id.value = value
 	
 	func _to_string() -> String:
 		return PBPacker.message_to_string(data)
@@ -1140,6 +1158,11 @@ class CompleteMatchResponse:
 		service.field = __granted
 		data[__granted.tag] = service
 		
+		__story_result_json = PBField.new("story_result_json", PB_DATA_TYPE.STRING, PB_RULE.OPTIONAL, 5, true, DEFAULT_VALUES_3[PB_DATA_TYPE.STRING])
+		service = PBServiceField.new()
+		service.field = __story_result_json
+		data[__story_result_json.tag] = service
+		
 	var data = {}
 	
 	var __match_id: PBField
@@ -1219,6 +1242,19 @@ class CompleteMatchResponse:
 		__granted.value = DEFAULT_VALUES_3[PB_DATA_TYPE.BOOL]
 	func set_granted(value : bool) -> void:
 		__granted.value = value
+	
+	var __story_result_json: PBField
+	func has_story_result_json() -> bool:
+		if __story_result_json.value != null:
+			return true
+		return false
+	func get_story_result_json() -> String:
+		return __story_result_json.value
+	func clear_story_result_json() -> void:
+		data[5].state = PB_SERVICE_STATE.UNFILLED
+		__story_result_json.value = DEFAULT_VALUES_3[PB_DATA_TYPE.STRING]
+	func set_story_result_json(value : String) -> void:
+		__story_result_json.value = value
 	
 	class map_type_rewards:
 		extends RefCounted
