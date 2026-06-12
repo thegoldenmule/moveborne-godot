@@ -1,6 +1,6 @@
 # Spec — Player Profile &amp; Settings Screen
 
-**Status:** drafting
+**Status:** sealed
 
 ## Overview
 Design for surfacing and editing the player profile inside a real Settings screen. The Settings tab (app_shell index 4) stops being a `placeholder_tab` stub and becomes `settings_tab`, hosting two zones: a **Profile** zone backed by the Snapser Profiles snap (editable display name = canonical handle, preset avatar pick, identity readout) and a **Client settings** zone (audio/SFX, haptics, account/sign-out) persisted locally. Networking reuses the existing transient-HTTPRequest + gateway-auth-header pattern; no game/logic/ changes, so determinism parity is untouched.

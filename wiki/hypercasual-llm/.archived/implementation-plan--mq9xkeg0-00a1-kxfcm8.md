@@ -1,6 +1,6 @@
 # Implementation plan — Player Profile &amp; Settings Screen
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] Confirm Profiles snap is provisioned on snapend c4n1awfs (snapser MCP list_snaps / console). If absent, add it and update the snapend. BLOCKER for all following steps.
@@ -16,7 +16,7 @@
 - [x] Wire display_name as canonical handle: leaderboard score submission reads cached profile display_name, falling back to username() when no profile/session. Broadcast a profile-changed signal so dependent surfaces refresh.
 - [x] Implement offline/no-session degradation: profile + avatar sections read-only/hidden without a valid Snapser session; guard all awaits; client settings remain functional.
 - [x] Style pass to MbStyle + moveborne_ui.tres / art STYLE_GUIDE; screenshot via godot-ai editor_screenshot for review.
-- [ ] Verify no game/logic/ files changed (determinism parity untouched); run the existing parity verifiers as a sanity check; manual end-to-end: edit name + avatar, confirm persistence across relaunch and that the leaderboard shows the new name.
+- [x] Verify no game/logic/ files changed (determinism parity untouched); run the existing parity verifiers as a sanity check; manual end-to-end: edit name + avatar, confirm persistence across relaunch and that the leaderboard shows the new name.
 
 ## Data models & interfaces
 ```gdscript

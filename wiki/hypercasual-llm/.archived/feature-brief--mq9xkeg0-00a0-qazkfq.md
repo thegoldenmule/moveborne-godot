@@ -1,6 +1,6 @@
 # Feature: Player Profile &amp; Settings Screen
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 Turn the Settings tab — today an empty `placeholder_tab` stub at index 4 of the app shell — into a real screen whose centerpiece is the **player profile**, backed by the Snapser **Profiles snap**.
@@ -58,3 +58,4 @@ _None._
 ## Commits
 - `4f30c74fb04495829fb17d175d4374c9a0628563` feat(ui): Player Profile in a real Settings screen (Profiles snap)
 - `ca726839140f63606668622c51dfe39f4ba9e759` polish(ui): shared MbScreenScaffold for consistent tab-screen padding
+- `4c582b22b6645fd19c82849d14f5e31a86a5b0a3` polish(ui): avatar picker as a modal overlay, not an inline grid

@@ -1,11 +1,11 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2017,
+    "version": 2061,
     "files": {
       "hypercasual-llm/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "hypercasual-llm/features/index.md": "5e6ae6ace88f1b513c63e289425579c3117ad0dcacc820863136c77b5aec3b7a",
+      "hypercasual-llm/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
       "hypercasual-llm/adrs/index.md": "a1dfba097b4a8ac4afa2d6954841b1432bed20464fbc8184dbb208dd0201875b",
-      "hypercasual-llm/architecture/client/index.md": "1aeeb9b8b09c16f16118e841defd41f3d0401760ab58fad4e388bd5473c29af4",
+      "hypercasual-llm/architecture/client/index.md": "4d20d08cfb4add147d85dd62c8599e397cf8a5d2a8dece51cad85151610b80d5",
       "hypercasual-llm/architecture/validator/index.md": "55eb6354876aec3aff751a6918f605e6a58a5a10d4ced8ac2c4aea30e184d50a",
       "hypercasual-llm/architecture/server.md": "b47f08254d30da732e5d6a72cd923150ca3710b891d7224eeefce3de273c183e",
       "hypercasual-llm/architecture/client/determinism-primitives.md": "3563ffeeb934060df2546cfbae94e8564008b26455294b1f9f6647b9aa71e01d",
@@ -90,10 +90,12 @@
       "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "2e7e98cdacda2cbb9e1cb8d321fa2da68b380bddb07cb832cb94794c6f8ec8c8",
       "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "88eb9c1eab13c8ae3f36e87bbdae0cea57f56375a10cd9056ac2968c0879360b",
       "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/spec-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "d11557982c510e28f19fcc8892fddd751c01f81f659055fd0191c976f47f0e3a",
-      "hypercasual-llm/features/player-profile-amp-settings-screen/index.md": "6d81e17e5c85ef10a919b44e0b28d00f810233bdc801091ff260df1f376f576c",
-      "hypercasual-llm/features/player-profile-amp-settings-screen/implementation-plan-player-profile-amp-settings-screen.md": "27854f5a0a323400c56f26f09c10512fb511d3e494582851d76234c096857702",
-      "hypercasual-llm/features/player-profile-amp-settings-screen/testing-plan-player-profile-amp-settings-screen.md": "c6f834febd09b79f46ee37949a7f92412c972ea1acae8d566158ff1e6f9c2955",
-      "hypercasual-llm/features/player-profile-amp-settings-screen/spec-player-profile-amp-settings-screen.md": "490753bab59276cc1158adc7a826fb14767241b868ece9c37c094080207a493c"
+      "hypercasual-llm/.archived/feature-brief--mq9xkeg0-00a0-qazkfq.md": "8132e200dc013c1fdecc06376b40d6aa42d5f123cce5d9d48b891dedd9b86d9d",
+      "hypercasual-llm/.archived/implementation-plan--mq9xkeg0-00a1-kxfcm8.md": "1d421a3299e1f14ddaee5bd8834344c77d9931d33bcd3b7cbc902be69141bef7",
+      "hypercasual-llm/.archived/testing-plan--mq9xkeg0-00a2-hpm89g.md": "1f5478c00b53b4b6419299858e09a4b29dc1e6273f6242f47db3c22f4bc8afe9",
+      "hypercasual-llm/.archived/feature-spec--mq9xkeg0-00a3-jcbof5.md": "07598f7227ce87f14ffd8dab87ef8da417984d0fd93eecfa63c867ae47b08273",
+      "hypercasual-llm/architecture/client/game-control-api-mbdebug.md": "21ab412137fc6825d865a0d358f1037a3736c60f8ff49417cf46630a033cadaa",
+      "hypercasual-llm/architecture/client/ui-control-api-mbui.md": "2f98ea177ef61d2c094ea778ee79a1dfe1334cb96144e38f38125f571f2170ba"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "hypercasual-llm/architecture/index.md",
@@ -184,10 +186,12 @@
       "implementation-plan:mq9xfhki-008k-36hi2b": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
       "testing-plan:mq9xfhki-008l-6m9iq5": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
       "feature-spec:mq9xfhki-008m-11y4hq": "hypercasual-llm/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/spec-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md",
-      "feature-brief:mq9xkeg0-00a0-qazkfq": "hypercasual-llm/features/player-profile-amp-settings-screen/index.md",
-      "implementation-plan:mq9xkeg0-00a1-kxfcm8": "hypercasual-llm/features/player-profile-amp-settings-screen/implementation-plan-player-profile-amp-settings-screen.md",
-      "testing-plan:mq9xkeg0-00a2-hpm89g": "hypercasual-llm/features/player-profile-amp-settings-screen/testing-plan-player-profile-amp-settings-screen.md",
-      "feature-spec:mq9xkeg0-00a3-jcbof5": "hypercasual-llm/features/player-profile-amp-settings-screen/spec-player-profile-amp-settings-screen.md"
+      "feature-brief:mq9xkeg0-00a0-qazkfq": "hypercasual-llm/.archived/feature-brief--mq9xkeg0-00a0-qazkfq.md",
+      "implementation-plan:mq9xkeg0-00a1-kxfcm8": "hypercasual-llm/.archived/implementation-plan--mq9xkeg0-00a1-kxfcm8.md",
+      "testing-plan:mq9xkeg0-00a2-hpm89g": "hypercasual-llm/.archived/testing-plan--mq9xkeg0-00a2-hpm89g.md",
+      "feature-spec:mq9xkeg0-00a3-jcbof5": "hypercasual-llm/.archived/feature-spec--mq9xkeg0-00a3-jcbof5.md",
+      "architecture:mqay9c1u-0013-wu1lcn": "hypercasual-llm/architecture/client/game-control-api-mbdebug.md",
+      "architecture:mqayf7o4-001y-dyr6k0": "hypercasual-llm/architecture/client/ui-control-api-mbui.md"
     }
   }
 }
