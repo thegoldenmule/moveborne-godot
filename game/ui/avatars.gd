@@ -30,7 +30,8 @@ static func resolve_id(avatar_id: String) -> String:
 ## Texture for an avatar_id, or null if it can't be loaded (caller draws a
 ## fallback). Resolves unknown/empty ids to the default first.
 static func texture(avatar_id: String) -> Texture2D:
-	var path := DIR + resolve_id(avatar_id) + ".svg"
+	# A GenTexture ref (.tres) — a drop-in Texture2D over the pooled, scalable SVG.
+	var path := DIR + resolve_id(avatar_id) + ".tres"
 	if ResourceLoader.exists(path):
 		return load(path)
 	return null

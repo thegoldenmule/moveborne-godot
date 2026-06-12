@@ -463,10 +463,14 @@ func _write_ref(dest: String, gen_id: String, baked: Dictionary) -> Dictionary:
 	await _rescan_filesystem()
 
 	var uid := _uid_for(dest)
+	# Key by uid; fall back to the ref path when the uid isn't resolvable yet
+	# (e.g. headless, pre-scan) so concurrent saves can't collide on "".
+	var key := uid if not uid.is_empty() else dest
 	var manifest := _load_manifest()
-	# Re-key by uid: drop any stale entry that named this ref by path.
+	# Re-key: drop any stale entry that named this ref by path or empty uid.
 	manifest["assets"].erase(dest)
-	manifest["assets"][uid] = {
+	manifest["assets"].erase("")
+	manifest["assets"][key] = {
 		"ref_path": dest,
 		"pool": baked["pool_path"],
 		"generator": ref.generator,
@@ -491,16 +495,16 @@ func _uid_for(res_path: String) -> String:
 	return ResourceUID.id_to_text(id) if id != ResourceUID.INVALID_ID else ""
 
 
-## Load a pooled image as a Texture2D. In-editor the import pipeline has run, so
-## ResourceLoader returns the imported texture — ResourceSaver then stores it in
-## the .tres as a uid ext_resource (the stable pool link). Headless (verifier,
-## no import) falls back to building an ImageTexture from raw pixels, which the
-## .tres embeds — fine for tests; real saves run in-editor.
+## Load a pooled image as a Texture2D. Whenever the pool file has been imported
+## (in-editor, or any run after a project scan), ResourceLoader returns the
+## imported texture — ResourceSaver then stores it in the .tres as a uid
+## ext_resource (the stable pool link), and an imported SVG stays scalable. Only
+## when the file isn't imported yet (e.g. freshly written, pre-scan) do we fall
+## back to embedding raw pixels.
 func _load_texture(path: String) -> Texture2D:
-	if Engine.is_editor_hint():
-		var t: Variant = ResourceLoader.load(path)
-		if t is Texture2D:
-			return t
+	var t: Variant = ResourceLoader.load(path)
+	if t is Texture2D:
+		return t
 	var img := Image.new()
 	if path.get_extension() == "svg":
 		if img.load_svg_from_string(FileAccess.get_file_as_string(path), 1.0) != OK:
@@ -743,12 +747,25 @@ func migrate_asset(old_path: String, category: String, asset_name: String) -> Di
 	}
 	var result := await _write_ref(dest, pool_id, baked)
 	if result.get("ok", false):
+		# NB: the stale path-keyed legacy entry is left in place so a re-run can
+		# still resolve gen_id from it (uid-linking needs the pool imported first,
+		# which can take a second pass). drop_manifest_entry() clears it once done.
 		LedgerT.append(ledger_path, {
 			"type": "migrate", "gen_id": pool_id, "ts": _now_iso(),
 			"from": old_path, "dest": dest, "ref_uid": result["uid"], "sha256": baked["sha"],
 		})
 		reload_history()
 	return result
+
+
+## Remove a manifest entry by key (e.g. a legacy path-keyed entry after its file
+## has been migrated to a ref and deleted). Returns true if one was removed.
+func drop_manifest_entry(key: String) -> bool:
+	var manifest := _load_manifest()
+	if manifest["assets"].erase(key):
+		_store_manifest(manifest)
+		return true
+	return false
 
 
 func _load_manifest() -> Dictionary:

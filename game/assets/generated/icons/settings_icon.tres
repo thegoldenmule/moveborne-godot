@@ -1,0 +1,17 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_huv3x"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/g_1781118088_7251.svg" id="2_6rbno"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_huv3x")
+source = ExtResource("2_6rbno")
+gen_id = "g_1781118088_7251"
+batch_id = "b_1781118088_f0e2"
+prompt = "settings gear glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text"
+generator = "recraft/recraftv4_1_vector"
+sha256 = "72b1a99878906aa217ed1f17cdcd4799171542a9f94d28af5a4a650d0cfb7844"
+saved_at = "2026-06-12T20:53:28Z"
+post = PackedStringArray("strip_bg_rect")

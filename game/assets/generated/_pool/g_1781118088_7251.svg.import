@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clci3eopyeq37"
-path="res://.godot/imported/guilds_icon.svg-e2d69c6e6146e98d746c42889e43ac31.ctex"
+uid="uid://cc0ueeh5fjvht"
+path="res://.godot/imported/g_1781118088_7251.svg-3d9507f1077d235371bbe0872179509b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/icons/guilds_icon.svg"
-dest_files=["res://.godot/imported/guilds_icon.svg-e2d69c6e6146e98d746c42889e43ac31.ctex"]
+source_file="res://assets/generated/_pool/g_1781118088_7251.svg"
+dest_files=["res://.godot/imported/g_1781118088_7251.svg-3d9507f1077d235371bbe0872179509b.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nsc4qfve6x3x"
-path="res://.godot/imported/leaderboard_ticon.svg-93d1a3cd8633a47e211277f2b5127278.ctex"
+uid="uid://dmaij2sdyutwn"
+path="res://.godot/imported/g_1781209209_7469.svg-a1027c50b43c7dc96a7bbe1aa85793fe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/icons/leaderboard_ticon.svg"
-dest_files=["res://.godot/imported/leaderboard_ticon.svg-93d1a3cd8633a47e211277f2b5127278.ctex"]
+source_file="res://assets/generated/_pool/g_1781209209_7469.svg"
+dest_files=["res://.godot/imported/g_1781209209_7469.svg-a1027c50b43c7dc96a7bbe1aa85793fe.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

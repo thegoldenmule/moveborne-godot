@@ -1,0 +1,14 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_83j1v"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/legacy_leaderboard_ticon.svg" id="2_43e8u"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_83j1v")
+source = ExtResource("2_43e8u")
+gen_id = "legacy_leaderboard_ticon"
+generator = "recraft/"
+sha256 = "c462537faca8c877b57cd20acf369f8ab35cd2d142a63b9c0bf21a6c8ddbe8ef"
+saved_at = "2026-06-12T20:53:28Z"

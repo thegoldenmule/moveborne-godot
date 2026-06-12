@@ -1,0 +1,16 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_61xqv"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/g_1781295015_1c04.png" id="2_nmorq"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_61xqv")
+source = ExtResource("2_nmorq")
+gen_id = "g_1781295015_1c04"
+batch_id = "b_1781295014_5a9f"
+prompt = "Full-screen vertical 2:3 mobile-game level-select map, occult arcade tarot poster composition. One violet accent only (no second hue) as flat wireframe line art on a textured near-black background; hierarchy by value not color, ranging dim deep-violet line-work up to bright violet; heavy screen-print grain and a soft violet bloom on the strokes. A bright candy-crush style trail winds up the central vertical axis from the bottom edge to the top edge, weaving from right to left, studded with evenly-spaced round waypoint nodes that are the brightest, highest-contrast elements in the image. Strict bilateral mirror symmetry: ornamental motifs radiate inward from the left and right edges and frame the path while the central spine stays clear and legible. Theme: ice planet. No text, no numbers, no UI, no buttons."
+generator = "recraft/recraftv4_1"
+sha256 = "6b7264096d6295a8956497ad9ef2150a40880bb7a048ca21a3f4c035df5eccf4"
+saved_at = "2026-06-12T20:53:28Z"

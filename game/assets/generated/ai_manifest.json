@@ -1,247 +1,286 @@
 {
 	"assets": {
-		"res://assets/generated/icons/collections_icon.svg": {
+		"res://assets/generated/icons/collections_icon.tres": {
+			"batch_id": "b_1781118667_3135",
 			"gen_id": "g_1781118667_d2a4",
-			"generated_at": "2026-06-10T19:11:07Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
-			"modified_after_save": true,
+			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781118667_d2a4.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "spellbook, flat violet line art icon centered on solid black background, symbol on cover with book outline, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T19:11:19Z",
-			"sha256": "6ddf82934aa4bc6fc5bd9b3811518a643c7d2f08ce5907943ce7af605c357370",
+			"ref_path": "res://assets/generated/icons/collections_icon.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
+			"sha256": "8ca543c1cdc37011fa984bec1df20807090fb426d71406b288134044dcb26e00",
 			"style_id": null
 		},
-		"res://assets/generated/icons/guilds_icon.svg": {
+		"res://assets/generated/icons/guilds_icon.tres": {
+			"batch_id": "b_1781118566_7f59",
 			"gen_id": "g_1781118566_5016",
-			"generated_at": "2026-06-10T19:09:26Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
-			"modified_after_save": true,
+			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781118566_5016.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "three skeleton heads in a group glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T19:09:51Z",
-			"sha256": "cd5f6f70978cc75169a7a49bba783c68b620aec4a80eb7fc046464eab2b87516",
+			"ref_path": "res://assets/generated/icons/guilds_icon.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
+			"sha256": "f268d2a1ca6cdf0378083408f77ad53f884d40c28243ffc2fb3d1f2832ecf132",
 			"style_id": null
 		},
-		"res://assets/generated/icons/home_icon.svg": {
+		"res://assets/generated/icons/home_icon.tres": {
+			"batch_id": "b_1781117955_74eb",
 			"gen_id": "g_1781117955_9b03",
-			"generated_at": "2026-06-10T18:59:15Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
-			"modified_after_save": true,
+			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781117955_9b03.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "spellbook glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T19:19:05Z",
-			"sha256": "c0ec91ed2006f8d2bc94375de455b9eb16b6b2d8de316ce4079354b4bc287d6d",
+			"ref_path": "res://assets/generated/icons/home_icon.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
+			"sha256": "0963291818dfbee43d0d1718ff621462f5f52a51a90023807f59fa695541a1ec",
 			"style_id": null
 		},
-		"res://assets/generated/icons/ice_planet.png": {
+		"res://assets/generated/icons/ice_planet.tres": {
+			"batch_id": "b_1781295014_5a9f",
 			"gen_id": "g_1781295015_1c04",
-			"generated_at": "2026-06-12T20:10:14Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781295015_1c04.png",
 			"post": [],
 			"prompt": "Full-screen vertical 2:3 mobile-game level-select map, occult arcade tarot poster composition. One violet accent only (no second hue) as flat wireframe line art on a textured near-black background; hierarchy by value not color, ranging dim deep-violet line-work up to bright violet; heavy screen-print grain and a soft violet bloom on the strokes. A bright candy-crush style trail winds up the central vertical axis from the bottom edge to the top edge, weaving from right to left, studded with evenly-spaced round waypoint nodes that are the brightest, highest-contrast elements in the image. Strict bilateral mirror symmetry: ornamental motifs radiate inward from the left and right edges and frame the path while the central spine stays clear and legible. Theme: ice planet. No text, no numbers, no UI, no buttons.",
-			"saved_at": "2026-06-12T20:11:08Z",
+			"ref_path": "res://assets/generated/icons/ice_planet.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "6b7264096d6295a8956497ad9ef2150a40880bb7a048ca21a3f4c035df5eccf4",
 			"style_id": null
 		},
-		"res://assets/generated/icons/icon_home_rune.svg": {
-			"gen_id": "g_1781102332_0845",
-			"generated_at": "2026-06-10T14:38:52Z",
-			"generator": "recraft/recraftv3_vector",
+		"res://assets/generated/icons/leaderboard_ticon.tres": {
+			"batch_id": "",
+			"gen_id": "legacy_leaderboard_ticon",
+			"generated_at": "",
+			"generator": "recraft/",
 			"modified_after_save": false,
-			"post": [
-				"strip_bg_rect"
-			],
-			"prompt": "home rune glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T14:38:52Z",
-			"sha256": "3cf06ec2a65ad804b0b658f06090859a3f5cbabf7bb9b738012a8c2f4e5f39a5",
-			"style_id": "19f7542f-0727-4f6f-9d07-728c439fc583"
-		},
-		"res://assets/generated/icons/leaderboard_trophy.svg": {
-			"gen_id": "g_1781115447_aea4",
-			"generated_at": "2026-06-10T18:17:27Z",
-			"generator": "recraft/recraftv4_1_vector",
-			"modified_after_save": false,
-			"post": [
-				"strip_bg_rect"
-			],
-			"prompt": "leaderboard trophy glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T18:32:43Z",
-			"sha256": "e42ff8e8d19db109a0e4ce8d970e13b113a3456b3364eb575039b464f557bf57",
+			"pool": "res://assets/generated/_pool/legacy_leaderboard_ticon.svg",
+			"post": [],
+			"prompt": "",
+			"ref_path": "res://assets/generated/icons/leaderboard_ticon.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
+			"sha256": "c462537faca8c877b57cd20acf369f8ab35cd2d142a63b9c0bf21a6c8ddbe8ef",
 			"style_id": null
 		},
-		"res://assets/generated/icons/settings_icon.svg": {
+		"res://assets/generated/icons/settings_icon.tres": {
+			"batch_id": "b_1781118088_f0e2",
 			"gen_id": "g_1781118088_7251",
-			"generated_at": "2026-06-10T19:01:28Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
-			"modified_after_save": true,
+			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781118088_7251.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "settings gear glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-10T19:02:31Z",
-			"sha256": "95f07a12110d0a4f4f4a74c70ef27941ff4681c2702cf9f54aee6f2a7cc63699",
+			"ref_path": "res://assets/generated/icons/settings_icon.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
+			"sha256": "72b1a99878906aa217ed1f17cdcd4799171542a9f94d28af5a4a650d0cfb7844",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_01.svg": {
+		"res://assets/generated/icons/skull_avatar_01.tres": {
+			"batch_id": "b_1781209008_eee7",
 			"gen_id": "g_1781209009_5ed8",
-			"generated_at": "2026-06-11T20:16:48Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209009_5ed8.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:39Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_01.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "f3083da4ea7940ca40dc119a4f7a56d5d91373715c2be2673391c784cd0fa605",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_02.svg": {
+		"res://assets/generated/icons/skull_avatar_02.tres": {
+			"batch_id": "b_1781209008_eee7",
 			"gen_id": "g_1781209009_041e",
-			"generated_at": "2026-06-11T20:16:48Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209009_041e.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:42Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_02.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "39e938277813f0998e2f058e1c3c9c8a89d388e5c8c3d48a983a4eb4450b7154",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_03.svg": {
+		"res://assets/generated/icons/skull_avatar_03.tres": {
+			"batch_id": "b_1781209037_6175",
 			"gen_id": "g_1781209037_64bd",
-			"generated_at": "2026-06-11T20:17:17Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209037_64bd.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:44Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_03.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "769e5d5626a34e1d72f3bc78a974bc9e3b00a1f6c2aa0c3da1393a79328ae2df",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_04.svg": {
+		"res://assets/generated/icons/skull_avatar_04.tres": {
+			"batch_id": "b_1781209037_6175",
 			"gen_id": "g_1781209037_c6c1",
-			"generated_at": "2026-06-11T20:17:17Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209037_c6c1.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:46Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_04.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "0a7815d900119c6c4bfdf791268d5399485a853bb904d64597ed24024d147f94",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_05.svg": {
+		"res://assets/generated/icons/skull_avatar_05.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_35ed",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_35ed.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:48Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_05.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "c86da418e75feb0c586dd9189af8222dfe3b1ffc1304c3a9c62e2a96e5a63876",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_06.svg": {
+		"res://assets/generated/icons/skull_avatar_06.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_f266",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_f266.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:50Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_06.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "9859d2780e7c8aae00abf482d1f579039b16cd769bfb2b3c1e1ee67d3f680c44",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_07.svg": {
+		"res://assets/generated/icons/skull_avatar_07.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_f2e3",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_f2e3.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:55Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_07.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "46e565a5dfce2f9aa3958a28aee97e391271850941b77c4687c08e6a9019dcf9",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_08.svg": {
+		"res://assets/generated/icons/skull_avatar_08.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_199e",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_199e.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:57Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_08.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "4946df6420b22ef17206cddebd3d4570fdfa675ca5206ab671d0147b67956bcc",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_09.svg": {
+		"res://assets/generated/icons/skull_avatar_09.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_08dd",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_08dd.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:20:58Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_09.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "3ed2f9759686bd8f93ab657efbd354d7b7944590c55d8934325d89f3011c2db1",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_10.svg": {
+		"res://assets/generated/icons/skull_avatar_10.tres": {
+			"batch_id": "b_1781209193_be48",
 			"gen_id": "g_1781209193_a625",
-			"generated_at": "2026-06-11T20:19:53Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209193_a625.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:21:00Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_10.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "90455a40bc64d5a2d23a2cc160897707ec2c135433f5b0052e174a854fe8aa18",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_11.svg": {
+		"res://assets/generated/icons/skull_avatar_11.tres": {
+			"batch_id": "b_1781209208_ffa0",
 			"gen_id": "g_1781209209_7469",
-			"generated_at": "2026-06-11T20:20:08Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209209_7469.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:21:03Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_11.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "fb35cd343aea02e43baa735bf3ebdc069c3a0f884ef5dbe31baea284f4e3a7cd",
 			"style_id": null
 		},
-		"res://assets/generated/icons/skull_avatar_12.svg": {
+		"res://assets/generated/icons/skull_avatar_12.tres": {
+			"batch_id": "b_1781209208_ffa0",
 			"gen_id": "g_1781209209_42f2",
-			"generated_at": "2026-06-11T20:20:08Z",
+			"generated_at": "",
 			"generator": "recraft/recraftv4_1_vector",
 			"modified_after_save": false,
+			"pool": "res://assets/generated/_pool/g_1781209209_42f2.svg",
 			"post": [
 				"strip_bg_rect"
 			],
 			"prompt": "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text",
-			"saved_at": "2026-06-11T20:21:04Z",
+			"ref_path": "res://assets/generated/icons/skull_avatar_12.tres",
+			"saved_at": "2026-06-12T20:53:28Z",
 			"sha256": "4f6c3839ab9104c1778644236bc71357da4f35bbc3ac08a790c420bae27107dc",
 			"style_id": null
 		},
@@ -259,5 +298,5 @@
 			"style_id": null
 		}
 	},
-	"version": 1.0
+	"version": 1
 }

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://plnfufyhv32"
-path="res://.godot/imported/skull_avatar_05.svg-ef36d99203f8c146a9cf80646fb48f0c.ctex"
+uid="uid://dfo667vsvgv4v"
+path="res://.godot/imported/g_1781295015_1c04.png-96d528cca2a32be098eb10ab85edc05d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/icons/skull_avatar_05.svg"
-dest_files=["res://.godot/imported/skull_avatar_05.svg-ef36d99203f8c146a9cf80646fb48f0c.ctex"]
+source_file="res://assets/generated/_pool/g_1781295015_1c04.png"
+dest_files=["res://.godot/imported/g_1781295015_1c04.png-96d528cca2a32be098eb10ab85edc05d.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

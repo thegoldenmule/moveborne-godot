@@ -25,12 +25,14 @@ const SETTINGS_INDEX := 4
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
 ## Stable screen ids (MbUi), aligned by index with TAB_LABELS / _tabs.
 const SCREEN_IDS := ["collection", "leaderboard", "home", "guilds", "settings"]
+# GenTexture refs (art/gen_texture.gd): drop-in Texture2D wrappers carrying
+# provenance, swappable in the ArtGen dock without touching this binding.
 const TAB_ICONS: Array[Texture2D] = [
-	preload("res://assets/generated/icons/collections_icon.svg"),
-	preload("res://assets/generated/icons/leaderboard_ticon.svg"),
-	preload("res://assets/generated/icons/home_icon.svg"),
-	preload("res://assets/generated/icons/guilds_icon.svg"),
-	preload("res://assets/generated/icons/settings_icon.svg"),
+	preload("res://assets/generated/icons/collections_icon.tres"),
+	preload("res://assets/generated/icons/leaderboard_ticon.tres"),
+	preload("res://assets/generated/icons/home_icon.tres"),
+	preload("res://assets/generated/icons/guilds_icon.tres"),
+	preload("res://assets/generated/icons/settings_icon.tres"),
 ]
 # Layout/look knobs are @export so they can be tuned in the Inspector at edit time
 # and live in the Remote scene tree while the game runs. Each setter re-applies its

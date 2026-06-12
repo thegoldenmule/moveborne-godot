@@ -1,0 +1,17 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_klrqs"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/g_1781118667_d2a4.svg" id="2_nsker"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_klrqs")
+source = ExtResource("2_nsker")
+gen_id = "g_1781118667_d2a4"
+batch_id = "b_1781118667_3135"
+prompt = "spellbook, flat violet line art icon centered on solid black background, symbol on cover with book outline, occult arcade wireframe style, no gradients, no glow, no shading, no text"
+generator = "recraft/recraftv4_1_vector"
+sha256 = "8ca543c1cdc37011fa984bec1df20807090fb426d71406b288134044dcb26e00"
+saved_at = "2026-06-12T20:53:28Z"
+post = PackedStringArray("strip_bg_rect")

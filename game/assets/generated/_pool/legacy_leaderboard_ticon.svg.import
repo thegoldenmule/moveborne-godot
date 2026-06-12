@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqmlw6vg2buci"
-path="res://.godot/imported/ice_planet.png-5d3fc2132608d68cfc7902a8ee3a7ce5.ctex"
+uid="uid://dhy6yddkrj7of"
+path="res://.godot/imported/legacy_leaderboard_ticon.svg-3e65999e9df13327d9dca0c5802e4821.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/icons/ice_planet.png"
-dest_files=["res://.godot/imported/ice_planet.png-5d3fc2132608d68cfc7902a8ee3a7ce5.ctex"]
+source_file="res://assets/generated/_pool/legacy_leaderboard_ticon.svg"
+dest_files=["res://.godot/imported/legacy_leaderboard_ticon.svg-3e65999e9df13327d9dca0c5802e4821.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

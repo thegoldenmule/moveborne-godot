@@ -74,8 +74,9 @@ func _run() -> void:
 	var entry := _entry_for(manifest, DEST)
 	ok = _check(ok, not entry.is_empty(), "manifest has an entry resolving to the ref")
 	ok = _check(ok, str(entry.get("gen_id", "")) == "g_v1", "manifest entry carries gen_id")
-	ok = _check(ok, not str(saved.get("dest", "")) in manifest.get("assets", {}),
-		"manifest is NOT keyed by path (keyed by uid)")
+	# Keyed by the ref's uid in-editor; headless (no scan → no uid) falls back to
+	# the ref path. Either way there must be no collided empty-string key.
+	ok = _check(ok, not manifest.get("assets", {}).has(""), "no empty-uid collision key")
 
 	# -- siblings enumerate for swap -------------------------------------------
 	var sibs: Array = service.permutations("g_v1")

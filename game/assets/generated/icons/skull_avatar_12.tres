@@ -1,0 +1,17 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_jhjt1"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/g_1781209209_42f2.svg" id="2_pgn0c"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_jhjt1")
+source = ExtResource("2_pgn0c")
+gen_id = "g_1781209209_42f2"
+batch_id = "b_1781209208_ffa0"
+prompt = "skull avatar glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text"
+generator = "recraft/recraftv4_1_vector"
+sha256 = "4f6c3839ab9104c1778644236bc71357da4f35bbc3ac08a790c420bae27107dc"
+saved_at = "2026-06-12T20:53:28Z"
+post = PackedStringArray("strip_bg_rect")

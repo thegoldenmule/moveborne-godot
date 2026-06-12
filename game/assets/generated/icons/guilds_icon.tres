@@ -1,0 +1,17 @@
+[gd_resource type="Texture2D" script_class="GenTexture" format=3]
+
+[ext_resource type="Script" path="res://assets/gen_texture.gd" id="1_l2ha1"]
+[ext_resource type="Texture2D" path="res://assets/generated/_pool/g_1781118566_5016.svg" id="2_511ay"]
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_l2ha1")
+source = ExtResource("2_511ay")
+gen_id = "g_1781118566_5016"
+batch_id = "b_1781118566_7f59"
+prompt = "three skeleton heads in a group glyph, flat violet line art icon centered on solid black background, single bare symbol, no frame, no border, occult arcade wireframe style, no gradients, no glow, no shading, no text"
+generator = "recraft/recraftv4_1_vector"
+sha256 = "f268d2a1ca6cdf0378083408f77ad53f884d40c28243ffc2fb3d1f2832ecf132"
+saved_at = "2026-06-12T20:53:28Z"
+post = PackedStringArray("strip_bg_rect")
