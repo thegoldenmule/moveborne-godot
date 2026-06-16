@@ -461,11 +461,33 @@ func _on_save() -> void:
 	if f == null:
 		_status.text = "Could not open %s for writing." % Layout.BAKED_PATH
 		return
-	f.store_string(JSON.stringify(_layout, "  ") + "\n")
+	# sort_keys=false (3rd arg) keeps our stable order — the default TRUE would
+	# alphabetize (maps before version, dots before texture) and churn the file.
+	f.store_string(JSON.stringify(_normalized_layout(), "  ", false) + "\n")
 	f.close()
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
 	_status.text = "Saved %s ✓" % Layout.BAKED_PATH
+
+
+## A stable, normalized copy of the layout for serialization: integer `version`
+## (JSON round-tripping otherwise promotes it to 1.0), and a fixed key order
+## (version, maps; per world texture, dots; per dot level_id, x, y) with dot
+## coordinates snapped to 0.001 — so saves produce clean, churn-free diffs.
+func _normalized_layout() -> Dictionary:
+	var maps_in: Dictionary = _layout.get("maps", {})
+	var maps_out := {}
+	for wid in maps_in:
+		var m: Dictionary = maps_in[wid]
+		var dots_out: Array = []
+		for d in m.get("dots", []):
+			dots_out.append({
+				"level_id": str(d.get("level_id", "")),
+				"x": snappedf(float(d.get("x", 0.0)), 0.001),
+				"y": snappedf(float(d.get("y", 0.0)), 0.001),
+			})
+		maps_out[wid] = {"texture": str(m.get("texture", "")), "dots": dots_out}
+	return {"version": int(_layout.get("version", 1)), "maps": maps_out}
 
 
 # ── Catalog ⇄ Remote Config ──────────────────────────────────────────────────
