@@ -614,8 +614,13 @@ func _show_level_detail(level: Dictionary) -> void:
 func _on_detail_play() -> void:
 	var level := _detail_level
 	_hide_level_detail()
-	if not level.is_empty():
-		_launch_level(level)
+	# Re-validate against current state — the modal's disabled flag is computed at
+	# open time and could be stale if progress/connectivity changed since.
+	if level.is_empty():
+		return
+	if not _online or not Catalog.is_level_unlocked(_catalog, GameState.story_progress, str(level.get("id", ""))):
+		return
+	_launch_level(level)
 
 
 func _hide_level_detail() -> void:
