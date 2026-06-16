@@ -1,6 +1,6 @@
 # Implementation plan — Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] Validator config: add remote-config transport inputs. In types.ts add `remoteConfigInternalUrl?: string` (and reuse internalHeader/snapserApiKey/snapserGatewayUrl). In config.ts read `SNAPEND_REMOTE_CONFIG_HTTP_URL` (confirm the exact platform-injected name against the deployed snapend) into remoteConfigInternalUrl. Add APP_CONFIG_VERSION + CATALOG_KEY constants (mirror remote_config_client.gd / story-appconfig.ts).

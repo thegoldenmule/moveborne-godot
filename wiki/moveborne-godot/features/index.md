@@ -11,3 +11,4 @@ All feature specs and feature pages belong under here.
 - [Server-authoritative hardening — lock mint APIs + validator-submitted scores](feature-brief:mq9xfhki-008j-79ql1c)
 - [Story Map — progressive level dots on a textured path](feature-brief:mqgpny4v-0019-ckm79v)
 - [Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper](feature-brief:mqgs9hqv-00i9-xoib53)
+- [Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)](feature-brief:mqh3549u-0010-q64913)

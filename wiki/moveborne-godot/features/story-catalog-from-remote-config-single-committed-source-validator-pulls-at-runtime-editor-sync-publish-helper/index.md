@@ -1,6 +1,6 @@
 # Feature: Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 Make the **story catalog a single committed source** that flows to all surfaces without hand-maintained copies, and change the **validator to PULL the catalog from Remote Config at runtime** instead of bundling it in its Docker image.

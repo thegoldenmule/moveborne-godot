@@ -1,6 +1,6 @@
 # Spec — Story Map — progressive level dots on a textured path
 
-**Status:** drafting
+**Status:** sealed
 
 ## Overview
 _No overview yet._

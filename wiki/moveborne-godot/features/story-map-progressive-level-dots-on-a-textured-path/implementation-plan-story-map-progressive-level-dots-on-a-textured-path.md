@@ -1,6 +1,6 @@
 # Implementation plan — Story Map — progressive level dots on a textured path
 
-**Status:** draft
+**Status:** ready
 
 ## Steps
 - [x] Data layer: add res://story/story_maps.json ({ version, maps: { <world_id>: { texture, dots:[{level_id,x,y}] } } }) and game/story/story_map_layout.gd (class_name MbStoryMapLayout, RefCounted, static-only): load_baked(), map_for_world(layout, world_id), texture_for_world(layout, world_id), dots_for_world(layout, world_id), validate(layout, catalog) -> [] when valid. Mirror MbStoryCatalog (BAKED_PATH const, JSON.parse_string, {} fallback). Commit the .gd.uid.

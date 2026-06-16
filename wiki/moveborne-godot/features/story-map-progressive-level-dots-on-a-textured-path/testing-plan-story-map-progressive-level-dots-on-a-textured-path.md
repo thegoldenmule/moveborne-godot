@@ -1,10 +1,9 @@
 # Testing plan — Story Map — progressive level dots on a textured path
 
-**Status:** draft
+**Status:** ready
 
 ## Planned
-- Round trip: launch the frontier level from a dot, return from the match; the show_result overlay appears, refresh() runs, and the next dot advances to the new frontier on re-render.
-- Editor authoring tool: placing a dot writes a normalized {level_id,x,y}; Save produces JSON that re-loads and passes validate(); dragging an existing dot updates only its x/y (clamped to 0..1).
+_None._
 
 ## Passed
 - MbStoryMapLayout.validate(load_baked(), MbStoryCatalog.load_baked()) returns [] for the committed story_maps.json (every dot binds to a real catalog level, all positions in 0..1, no duplicate dots).
@@ -15,6 +14,8 @@
 - Locked dot: opening its modal shows a locked status and a disabled Play; no play_level is emitted.
 - MbUi catalog includes the 'story_map' screen with level_<id> dot controls and, while open, the 'story_level_detail' modal screen; the existing start_story / story_play_next flows still resolve.
 - Fallback: with story_maps.json missing/empty (no texture) for the current world, the screen renders the existing flat list and remains playable — no crash, gate/online behavior preserved.
+- Round trip: launch the frontier level from a dot, return from the match; the show_result overlay appears, refresh() runs, and the next dot advances to the new frontier on re-render.
+- Editor authoring tool: placing a dot writes a normalized {level_id,x,y}; Save produces JSON that re-loads and passes validate(); dragging an existing dot updates only its x/y (clamped to 0..1).
 - Project sanity: the game opens and the existing headless verifiers/test suites still pass (no regression to game/logic/, net/, or the validator); story_map_editor plugin loads in-editor without errors.
 
 ## Failed

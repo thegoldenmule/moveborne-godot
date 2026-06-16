@@ -1,6 +1,6 @@
 # Feature: Story Map — progressive level dots on a textured path
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 Replace Story Mode's flat vertical level list with an interactive **map**: a per-world background texture overlaid with absolutely-positioned **dot buttons**, one per catalog level, instantiated from a NEW committed client-only data file `res://story/story_maps.json` (texture path + normalized 0..1 dot positions bound to catalog `level_id`s). Dots render lock/star state from the same `MbStoryCatalog` frontier math over the (server-authoritative, read-only) `GameState.story_progress`; clicking a dot opens a small **level-detail modal** (CanvasLayer, mirroring the settings_tab avatar-picker pattern) showing the level name, lock status, stars out of 3, and a **Play** button that calls the existing `_launch_level -> Catalog.match_cfg -> StoryMapState/MatchState` path unchanged. A NEW `@tool` EditorPlugin (`game/addons/story_map_editor/`, mirroring `addons/artgen/`) lets a designer pick a world + texture and click-place / drag dots, validating against the catalog and saving `story_maps.json`. The change is pure presentation + navigation: no impact on `game/logic/`, `net/`, the validator, or determinism parity. The existing flat list is kept ONLY as a graceful fallback when a world has no map data. Reference art with the desired path-with-dots look: `art/generated/2026-06/g_1781295015_4cfa-ice-planet.png`.

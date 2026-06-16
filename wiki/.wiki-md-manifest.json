@@ -1,11 +1,11 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2483,
+    "version": 2594,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "moveborne-godot/features/index.md": "234aca86d793c97817f9d5af7fa2ba3550d1ab03d909fcd9c7f9bbc2bfa8c1b2",
+      "moveborne-godot/features/index.md": "161126f7965d03f2af3729fdcf7c59d5f0036f89baed66bc76039cd598d44a52",
       "moveborne-godot/adrs/index.md": "13081a00859203a8d073c0bcc1eb30ef5bd0ce4ea4ae4b77fe4a55e5a550fd25",
-      "moveborne-godot/architecture/client/index.md": "6cb9aa8d36adf0d29fe5f1286e66cf2b34ff9ce9e58cee0cefc44dc47ddbb910",
+      "moveborne-godot/architecture/client/index.md": "c6836e27a79c73f8fcdab1b69be7bdce83620b1c944e899f6bd9c9c78cdb44ba",
       "moveborne-godot/architecture/validator/index.md": "766d7bde5f60c07d7cdc33b87bf586c640fdc0e312aeb29efb678b36ccd47f4e",
       "moveborne-godot/architecture/server.md": "b47f08254d30da732e5d6a72cd923150ca3710b891d7224eeefce3de273c183e",
       "moveborne-godot/architecture/client/determinism-primitives.md": "3563ffeeb934060df2546cfbae94e8564008b26455294b1f9f6647b9aa71e01d",
@@ -103,16 +103,21 @@
       "moveborne-godot/adrs/story-grading-is-validator-authoritative-post-match-and-outside-the-hash-domain.md": "c7b6b4a85d4bd24fe517a3672e8d84b9cf5f4eaf1ff9f001ce0278359f9efd48",
       "moveborne-godot/adrs/one-committed-story-catalog-feeds-validator-grading-remote-config-and-the-baked-client-fallback.md": "29ecca51f1075cdeda9580452d783cabd60b92a783f400658cd1ad41d988d15b",
       "moveborne-godot/adrs/per-user-story-progress-in-an-internal-scope-storage-blob-with-cas-guarded-watermarked-writes.md": "3f5f63b977d2201d22ddcd73c5ebcfb0e13f95ce409f3e51682199cd46347cc8",
-      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/index.md": "41647ee93631ec416d4476f4c833adf797ebf118a1cabe2d9ccf030371f47105",
-      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/implementation-plan-story-map-progressive-level-dots-on-a-textured-path.md": "25281d0fe133037a9e1e2d0c9c257554cb3c10e21cd4b8ba7eff227213a47492",
-      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/testing-plan-story-map-progressive-level-dots-on-a-textured-path.md": "5aeb44bf0b596508ca5bb72dfbc6e00a0548dd79b30d71609589d1c1ff1d2f2c",
-      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/spec-story-map-progressive-level-dots-on-a-textured-path.md": "9f289a7b5b4126c265febb19579f707920e1cefa527688a57c7f2e0afb1651b7",
-      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/index.md": "69e2d443be0c41fa0037cf9c5f0b6f1fa5759cbb4c1284a32962d6bc19a9320c",
-      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/implementation-plan-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "a9006cbb12f4e0784b4a9f4da640a79e377da6bce96fd555081df3278c167659",
-      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/testing-plan-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "488217503a32760a60ee0055c26980ebfbf159a810eec7d8ba8ec336a324da4a",
-      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/spec-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "5c0ceb7f9a350e0dab44b0b72b4aa46fb84b56e1e261650e5c059b999158549c",
+      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/index.md": "8e05896611f12e6e86ab0e7e2a3373884540af67a042a23453d64bf65732bdfc",
+      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/implementation-plan-story-map-progressive-level-dots-on-a-textured-path.md": "9161c550e7318358d7bb3f2a96709aacb1a15f7785036f4baaaa0f4d1896c349",
+      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/testing-plan-story-map-progressive-level-dots-on-a-textured-path.md": "b03a7ac3cd5fd4abe4880b2c12974bf7dc646416f8fd7a8688f3fc7fcd729213",
+      "moveborne-godot/features/story-map-progressive-level-dots-on-a-textured-path/spec-story-map-progressive-level-dots-on-a-textured-path.md": "699dff2ba0d1bdd0f76b9b251833cefa8a02d6edbb15bd8446f90a83fe2e3a69",
+      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/index.md": "59fc95c12b6935416cceda8c4c05f6cd9dc8d5d8c00829943a95d15fd8e45dd7",
+      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/implementation-plan-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "9f9e3702970fd5e88387080abfa99bfbabd8e738651a7f894ba4f41832de152b",
+      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/testing-plan-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "4c0f6345d61bb019786848c8530c3021624de1ad531f788c6e03a2c93a4ef35e",
+      "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/spec-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md": "776b638b2a4734e0504b65a739468b652291cf9f3ce35c91d7c87647d5e81bb0",
       "moveborne-godot/adrs/validator-pulls-the-story-catalog-from-remote-config-at-runtime-per-match-version-pinning-init-handshake-supersedes-adr-23.md": "fb9d0ab3bebb77552a825176856799cf0158550f06106351fb643df1f7442685",
-      "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md": "7029f4289e792c1d21c5e24cbf92655de850ff001e1689f7399f045a8ac412fd"
+      "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md": "7029f4289e792c1d21c5e24cbf92655de850ff001e1689f7399f045a8ac412fd",
+      "moveborne-godot/architecture/client/editor-tool-framework.md": "cce9db0011d8768921d56d127d95b4493da1a12f74ebb4f5fabf35b153eef7ce",
+      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/index.md": "92344813b80c6ebea462ea5c2dfdaa2fa5f3f3eb3d0cdeb908b85373a69da6e7",
+      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/implementation-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "495f2bb6cb9f145736bb25616cf954c72bef1f7bfb4f68f83ad3baf0ee45056e",
+      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/testing-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "8a095bd6330f79e9747201a0285727847f54c3465cb552f43ec8cdf27155fbb6",
+      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/spec-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "83fed18aabb2e80f0e56cedfaf31d7b5f27f7042bc778033215d058f3d36d651"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
@@ -225,7 +230,12 @@
       "testing-plan:mqgs9hqv-00ib-x0md17": "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/testing-plan-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md",
       "feature-spec:mqgs9hqv-00ic-b5v9we": "moveborne-godot/features/story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper/spec-story-catalog-from-remote-config-single-committed-source-validator-pulls-at-runtime-editor-sync-publish-helper.md",
       "decision-record:mqgt1goe-00mt-1b16ck": "moveborne-godot/adrs/validator-pulls-the-story-catalog-from-remote-config-at-runtime-per-match-version-pinning-init-handshake-supersedes-adr-23.md",
-      "decision-record:mqgt8d42-00nq-wcx3vt": "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md"
+      "decision-record:mqgt8d42-00nq-wcx3vt": "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md",
+      "architecture:mqh31a29-0001-sy7uqn": "moveborne-godot/architecture/client/editor-tool-framework.md",
+      "feature-brief:mqh3549u-0010-q64913": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/index.md",
+      "implementation-plan:mqh3549u-0011-1wzyuz": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/implementation-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md",
+      "testing-plan:mqh3549v-0012-buxzhf": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/testing-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md",
+      "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/spec-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md"
     }
   }
 }
