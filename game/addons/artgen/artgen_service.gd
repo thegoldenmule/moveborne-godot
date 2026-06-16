@@ -319,9 +319,11 @@ func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 						bytes = str(stripped["text"]).to_utf8_buffer()
 						applied.append("strip_bg_rect")
 					elif stripped["status"] == SvgT.STATUS_FILL_MISMATCH:
-						return {"ok": false, "error":
-							"background fill doesn't match the requested background — " +
-							"this composition uses it as ink; save raw or regenerate"}
+						# The "background" is used as ink (e.g. a story-map backdrop is
+						# the art), so stripping it would damage the image. Keep the
+						# full composition rather than aborting — strip_bg_rect is a
+						# no-op here, not a failure.
+						push_warning("[artgen] %s: background is part of the art — keeping it (strip_bg_rect skipped)" % gen_id)
 			"removeBackground":
 				if ext == "png":
 					var rb: Dictionary = await client.remove_background(bytes)
