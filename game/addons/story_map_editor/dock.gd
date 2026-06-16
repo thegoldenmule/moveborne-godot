@@ -29,6 +29,7 @@ var _selected_info: Label
 var _unplaced: Label
 var _status: Label
 var _file_dialog: FileDialog
+var _rc_status: Label   # Catalog ⇄ Remote Config sync panel
 
 
 func _ready() -> void:
@@ -148,6 +149,27 @@ func _build_ui() -> void:
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	help.custom_minimum_size = Vector2(300, 0)
 	right.add_child(help)
+
+	# ── Catalog ⇄ Remote Config (the story catalog, distinct from dot layout) ──
+	right.add_child(HSeparator.new())
+	var rc_title := Label.new()
+	rc_title.text = "STORY CATALOG ⇄ REMOTE CONFIG"
+	right.add_child(rc_title)
+	var rc_row := HBoxContainer.new()
+	right.add_child(rc_row)
+	var rc_check := Button.new()
+	rc_check.text = "Check sync"
+	rc_check.pressed.connect(_check_catalog_sync)
+	rc_row.add_child(rc_check)
+	var rc_copy := Button.new()
+	rc_copy.text = "Copy publish payload"
+	rc_copy.pressed.connect(_copy_publish_payload)
+	rc_row.add_child(rc_copy)
+	_rc_status = Label.new()
+	_rc_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_rc_status.custom_minimum_size = Vector2(300, 0)
+	_rc_status.text = "The catalog has no publish API — 'Copy publish payload' then paste into the Snapser console."
+	right.add_child(_rc_status)
 
 
 # ── data ────────────────────────────────────────────────────────────────────
@@ -444,3 +466,39 @@ func _on_save() -> void:
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
 	_status.text = "Saved %s ✓" % Layout.BAKED_PATH
+
+
+# ── Catalog ⇄ Remote Config ──────────────────────────────────────────────────
+
+
+## Reuse the canonical TS comparator (key-order-insensitive) instead of
+## reimplementing it: shell out to `bun tools/story-appconfig.ts verify`, which
+## anon-logs in, GETs the live app-config, and deep-compares it to the committed
+## catalog. Blocking (a manual button); falls back to a terminal hint if bun
+## isn't on PATH.
+func _check_catalog_sync() -> void:
+	var committed := int(Catalog.load_baked().get("catalog_version", 0))
+	_rc_status.text = "Checking live Remote Config (committed v%d)…" % committed
+	var script := ProjectSettings.globalize_path("res://").path_join(
+		"../validator/src/validator/tools/story-appconfig.ts")
+	var out: Array = []
+	var code := OS.execute("bun", [script, "verify"], out, true)
+	var text := "\n".join(out).strip_edges() if out.size() > 0 else ""
+	if code == 0:
+		_rc_status.text = "In sync ✓ (committed v%d)\n%s" % [committed, text]
+	elif code == -1:
+		_rc_status.text = "Could not run bun. In a terminal: `cd validator && bun run tools/story-appconfig.ts verify`"
+	else:
+		_rc_status.text = "DRIFT or error (exit %d):\n%s" % [code, text]
+
+
+## Put the exact {"story_catalog": <committed>} JSON on the clipboard for a manual
+## paste into the Snapser console App Config tool (Remote Config has no write API).
+func _copy_publish_payload() -> void:
+	var catalog := Catalog.load_baked()
+	if catalog.is_empty():
+		_rc_status.text = "No committed catalog found."
+		return
+	var payload := JSON.stringify({"story_catalog": catalog}, "  ")
+	DisplayServer.clipboard_set(payload)
+	_rc_status.text = "Copied {story_catalog:…} (v%d) to clipboard — paste into the Snapser console App Config (version v1)." % int(catalog.get("catalog_version", 0))
