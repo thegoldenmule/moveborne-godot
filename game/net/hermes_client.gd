@@ -68,10 +68,12 @@ func init_and_connect(ws_url: String, match_id: String, starting_state: Dictiona
 	_opened = false
 	_ready_ok = false
 	_pending.clear()
-	# Fresh peer every connect: WebSocketPeer.connect_to_url returns
-	# ERR_ALREADY_IN_USE unless the peer is CLOSED, so reusing one breaks
-	# re-connects (R-key re-register, or V after a Snapser session). A new peer
-	# also drops any stale buffered frames bound to the previous ?token= identity.
+	# Close any prior connection before reconnecting (R-key re-register, V after a
+	# Snapser session, or the catalog-mismatch retry) so we don't orphan an open
+	# socket + its server-side match. A fresh peer then avoids ERR_ALREADY_IN_USE
+	# and drops stale frames bound to the previous ?token= identity.
+	if _ws != null:
+		_ws.close()
 	_ws = WebSocketPeer.new()
 	var err := _ws.connect_to_url(ws_url)
 	if err != OK:

@@ -159,6 +159,10 @@ export async function refreshCatalog(): Promise<{ version: number; source: strin
     adopt(catalog);
     return { version: catalog.catalog_version, source, ok: true };
   } catch (e) {
+    // Reset the TTL clock even on failure so a sustained Remote Config outage
+    // doesn't re-fire a background refresh on every access (one per TTL, not a
+    // storm); last-known-good keeps serving meanwhile.
+    loadedAt = Date.now();
     console.warn(`story catalog refresh kept last-known-good (version ${current}): ${e}`);
     return { version: current, source: "last-known-good", ok: false };
   }

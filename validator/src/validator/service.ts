@@ -213,10 +213,13 @@ export class ValidatorService {
       rewards_granted: false,
     };
     // Pin the catalog version for this match's lifetime. A same-owner re-init
-    // overwrites the entry without an evict callback firing, so drop the old
-    // ref first to avoid leaking a retained version.
-    if (existing?.catalog_version !== undefined) release(existing.catalog_version);
-    if (catalog_version !== undefined) retain(catalog_version);
+    // overwrites the entry without an evict callback firing; when the version
+    // changes, retain the new one BEFORE releasing the old (so a shared version
+    // can't be transiently evicted). Same version → keep the existing ref.
+    if (catalog_version !== existing?.catalog_version) {
+      if (catalog_version !== undefined) retain(catalog_version);
+      if (existing?.catalog_version !== undefined) release(existing.catalog_version);
+    }
     await this.store.set(match_id, storedMatch, config.matchSessionTTL);
 
     console.log(

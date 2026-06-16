@@ -61,7 +61,9 @@ export function isLevelUnlocked(
   const ordered = orderedIds;
   const index = ordered.indexOf(levelId);
   if (index < 0) return false;
-  const frontier = computeNextLevel(levels);
+  // Frontier MUST use the same (pinned) ordering as the index check — defaulting
+  // to the global current catalog would defeat per-match version pinning.
+  const frontier = computeNextLevel(levels, orderedIds);
   if (frontier === "") return true; // everything completed
   return index <= ordered.indexOf(frontier);
 }

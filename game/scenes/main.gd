@@ -971,6 +971,7 @@ func _on_catalog_mismatch() -> void:
 func _on_net_ready(_current_state: Dictionary) -> void:
 	_match.online = true
 	_net_pending = false
+	_catalog_retry_done = false  # a future mismatch (e.g. R-key re-register) gets a fresh refresh
 	if _toast.text == "Connecting to validator…":
 		_toast.text = ""
 	_net_label.text = "validator: on ✓"
