@@ -1,0 +1,59 @@
+# Feature: Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper
+
+**Status:** building
+
+## Summary
+Make the **story catalog a single committed source** that flows to all surfaces without hand-maintained copies, and change the **validator to PULL the catalog from Remote Config at runtime** instead of bundling it in its Docker image.
+
+Today (ADR-23) `validator/content/story_catalog.json` is canonical, is **`import`ed at compile time** into the validator (so it ships inside the image), is byte-copied to `game/story/story_catalog.json` (client baked fallback), and is published to the Snapser Remote Config app-config (`v1`, key `story_catalog`) by a manual console paste. Drift is only caught after the fact by `verify_story_catalog.gd` (baked⇄committed) and `tools/story-appconfig.ts verify` (committed⇄live).
+
+This feature changes that to: **(1)** one edited file (`validator/content/story_catalog.json`); the client baked copy becomes a **generated, byte-verified artifact** (`tools/sync-catalog.ts`), not a hand-copy. **(2)** The validator no longer bundles the catalog — it **fetches app-config `v1` from the Remote Config snap over the existing s2s transport** (internal `SNAPEND_*_HTTP_URL` + `Gateway` header; api-key gateway fallback; committed-file fallback only for local dev), validates it, and caches it; `getCatalog()/getLevel()` become cache reads. **(3)** The editor gains a **Catalog ⇄ Remote Config sync panel**: it shows whether the committed catalog matches the live app-config (and the live `catalog_version`) and provides a **Copy-publish-payload** button — Snapser has **no app-config write API** (confirmed with their team), so publishing stays a manual console paste; the tool can emit + verify but never push.
+
+Scope: validator catalog loader + s2s client, Dockerfile/.dockerignore, sync/status scripts, editor sync panel, and a superseding ADR. Pure content-pipeline + presentation; determinism parity untouched. This is the catalog (level definitions) — distinct from `story_maps.json` (dot positions), which stays client-only.
+
+## Components affected
+- Validator catalog loader (validator/src/validator/story/catalog.ts) — refactor from a compile-time `import ... story_catalog.json` module const to a RUNTIME loader: async loadCatalog() fetches+validates+caches at boot; getCatalog/getLevel/getOrderedLevelIds become cache reads (throw if not loaded). validateCatalog still gates adoption.
+- Remote Config s2s client (validator/src/validator/snaps/remote-config.ts, NEW) — mirrors snaps/storage.ts: transport = internal (SNAPEND_REMOTE_CONFIG_HTTP_URL + Gateway header) | api-key (gateway + Api-Key) | disabled; GET /v1/remote-config/app-config/v1, extract config.story_catalog. Config additions in config.ts + types.ts (remoteConfigInternalUrl).
+- Dockerfile + .dockerignore — stop bundling the catalog in the image: remove the build-time dependency on content/story_catalog.json (no static import) and .dockerignore it so production has no embedded copy and MUST pull from Remote Config.
+- Single committed source + generated baked copy — validator/content/story_catalog.json is the ONE edited file; tools/sync-catalog.ts (bun) regenerates game/story/story_catalog.json from it; verify_story_catalog.gd byte-compare stays as the drift guard so the generated copy can never diverge.
+- Editor Catalog ⇄ Remote Config sync panel — in the story editor (a panel/tab in addons/story_map_editor or a sibling dock): shows committed-vs-live sync status + live catalog_version, a Refresh check, and a 'Copy publish payload' button (the {story_catalog: ...} JSON to clipboard) with a reminder to paste it in the Snapser console. No push (no write API).
+- Status/verify tooling (validator/src/validator/tools/story-appconfig.ts) — keep emit + verify; add a combined report of the catalog_version across the three surfaces: committed file, deployed-validator (loaded), and live Remote Config — so drift is visible from one command.
+- Superseding ADR — a new decision-record amending ADR-23 (mqbfd5mc): Remote Config is the validator's RUNTIME source of truth; the committed file is the publish seed + dev/test fallback and is NOT bundled in the image.
+
+## Design constraints
+1. Snapser Remote Config has NO app-config write API (confirmed with the Snapser team). Publishing stays a manual console paste; the editor tool may emit the payload and verify the live config, but can never push. Any 'publish' affordance is copy-to-clipboard + console instructions only.
+2. The catalog MUST NOT be bundled in the validator Docker image. Remove the compile-time JSON import and .dockerignore content/story_catalog.json; the production validator MUST obtain the catalog by pulling app-config v1 from the Remote Config snap at runtime.
+3. Validator s2s to Remote Config follows the EXISTING transport selection (see snaps/storage.ts / snaps/inventory.ts): internal SNAPEND_REMOTE_CONFIG_HTTP_URL + SNAPEND_INTERNAL_HEADER (as the `Gateway` header) inside the snapend; api-key gateway fallback; disabled locally. Confirm the exact platform-injected env var name for the remote-config snap against the deployed snapend.
+4. The catalog must be loaded AND validateCatalog-passed before any story grading. getCatalog()/getLevel() change from a synchronous module const to cache reads populated by an awaited boot load; grading runs post-boot so the cache is ready. A malformed/empty remote payload must be rejected (never silently degrade grading).
+5. Keep catalog_version as the cross-surface drift detector. The validator logs the loaded version + its source (remote vs fallback). The client keeps its select_catalog rule (adopt remote only if valid AND version >= baked), so a stale remote can't downgrade a shipped client.
+6. Single committed source: validator/content/story_catalog.json is the only hand-edited catalog file. game/story/story_catalog.json becomes a GENERATED artifact (committed because Godot needs it in res://) kept identical by tools/sync-catalog.ts and enforced by the existing byte-compare verifier.
+7. Determinism parity untouched: catalog + grading live outside the hash domain (hard-wall ADR). No change to game/logic/ or the validator's state hashing; no parity goldens are affected.
+8. This supersedes ADR-23's clause that the catalog 'ships inside the validator image'. The rest of ADR-23 (one source; catalog_version drift detection; levels reference existing scenario ids) still holds. Record the change as a new ADR rather than editing the accepted one.
+9. Confirmed infra (via snapctl, snapend c4n1awfs LIVE): the `remote-config` snap (v1.4.0) is provisioned in the snapend, so the validator's s2s read is real. The internal URL is read from `SNAPEND_REMOTE_CONFIG_HTTP_URL` (the proven SNAPEND_<SNAP>_HTTP_URL convention used by storage/inventory/profiles/auth); confirm the literal against the container env at deploy, with the disabled-transport committed-file fallback covering dev.
+10. Decided refresh + failure policy: boot-load + short TTL re-fetch + an on-demand refresh endpoint. Serve LAST-KNOWN-GOOD — a TTL refresh that fails (or returns invalid) keeps the in-memory cached catalog, never downgrading to empty. Cold boot has no cache yet, so retry with backoff until the first successful load; non-story matches stay available meanwhile.
+11. Per-match catalog pinning (no wipe): a story match is graded against the catalog_version it was initialized with for its ENTIRE lifetime. A TTL/on-demand refresh (or a new publish) must never change an in-flight match's grading basis. The validator therefore keeps a REGISTRY of catalog versions and retains an old version as long as any active match references it (ref-counted retain/release); a version is evicted only when unreferenced AND not the current version. Replaces the single mutable cache.
+12. Initial-handshake version agreement: story-match init carries the client's catalog_version, and client + validator must agree on ONE version before play. Equal → pin it. Client AHEAD of the validator → the validator force-refreshes from the same Remote Config source and re-checks (they converge). Client BEHIND (or still mismatched) → reject the init with the validator's current version so the client re-fetches Remote Config and retries. Grading uses the agreed, pinned version. Applies to STORY matches only (Infinite/PvP carry no catalog).
+
+## Open questions
+_None._
+
+## Resolved questions
+1. **Validator catalog refresh cadence: (a) boot-load only — restart to pick up a new catalog (simplest, fewest moving parts); (b) boot-load + short TTL/periodic refetch; (c) on-demand refresh endpoint. RECOMMEND (a) boot-load only for v1 (a redeploy/restart already accompanies threshold changes per ADR-23), revisiting TTL later. Which do you want?** — _Boot-load + short TTL refresh + an on-demand refresh endpoint (all three). The catalog is loaded at boot, re-fetched when the TTL expires, and can be force-refreshed via an endpoint._
+2. **Production startup when Remote Config is unreachable (no committed copy in the image): (a) fail-fast — refuse to grade STORY matches (return an error), non-story matches unaffected, with retry/backoff; (b) serve a last-known cached catalog. RECOMMEND (a) fail-fast with retries — grading on missing/guessed data is worse than a clear error. Acceptable?** — _Serve last-known-good. On a refresh failure, keep serving the in-memory cached catalog (never downgrade to empty). Cold boot has no last-known-good yet, so retry with backoff until the first successful fetch; non-story matches stay available meanwhile._
+3. **Where the sync/publish UI lives: (a) a 'Catalog ⇄ Remote Config' panel/tab inside the existing addons/story_map_editor dock; (b) a separate dedicated dock. RECOMMEND (a) — it's the existing story-authoring surface and already loads the catalog. Preference?** — _In the existing story_map_editor tool (a panel/tab), since it is checking a specific Remote Config._
+4. **How the editor computes sync status: (a) reuse the canonical TS comparator by shelling out to `bun tools/story-appconfig.ts verify` (one source of truth for the key-order-insensitive compare) via OS.execute/a bridge; (b) reimplement anon-login + GET + canonical compare natively in GDScript. RECOMMEND (a) to avoid duplicating the comparator. Okay?** — _Reuse the canonical TS comparator (invoke tools/story-appconfig.ts verify); do not reimplement the compare in GDScript._
+5. **Single-file mechanics for the client baked copy: (a) generate game/story/story_catalog.json via tools/sync-catalog.ts + byte-verify (recommended); (b) symlink it to the canonical file (fragile across Godot import/git/Windows); (c) have Godot fetch at editor time. RECOMMEND (a). Agree?** — _Generate + byte-verify (tools/sync-catalog.ts writes game/story/story_catalog.json; verify_story_catalog.gd guards parity)._
+
+## References
+_None._
+
+## Child pages
+- [Implementation plan — Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper](implementation-plan:mqgs9hqv-00ia-dsvhil)
+- [Testing plan — Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper](testing-plan:mqgs9hqv-00ib-x0md17)
+- [Spec — Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper](feature-spec:mqgs9hqv-00ic-b5v9we)
+
+## Commits
+- `f2daeb0` feat(validator): pull story catalog from Remote Config at runtime + per-match version pinning
+- `b7ef5b1` feat(story-handshake): catalog_version on InitMatch; client sends + reconciles
+- `902b42a` feat(story-map-editor): Catalog ⇄ Remote Config sync panel + content-pipeline docs
+- `1edcea8` fix(story-catalog): honor pinned ordering in isLevelUnlocked + review hardenings

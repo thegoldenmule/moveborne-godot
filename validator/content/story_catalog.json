@@ -1,5 +1,5 @@
 {
-  "catalog_version": 3,
+  "catalog_version": 4,
   "worlds": [
     {
       "id": "w1",
@@ -1218,45 +1218,6 @@
               },
               {
                 "coins": 204
-              }
-            ]
-          }
-        },
-        {
-          "id": "w2_l15",
-          "order": 14,
-          "scenario_id": 16,
-          "name": "Amplified Corners III",
-          "goals": [
-            {
-              "type": "points",
-              "threshold": 1400,
-              "time_limit_s": null
-            },
-            {
-              "type": "points",
-              "threshold": 2800,
-              "time_limit_s": null
-            },
-            {
-              "type": "points",
-              "threshold": 1400,
-              "time_limit_s": 150
-            }
-          ],
-          "rewards": {
-            "complete": {
-              "coins": 175
-            },
-            "per_star": [
-              {
-                "coins": 70
-              },
-              {
-                "coins": 140
-              },
-              {
-                "gems": 2
               }
             ]
           }

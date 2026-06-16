@@ -145,7 +145,7 @@ func _build_dots_tab(tabs: TabContainer) -> void:
 	var tex_row := HBoxContainer.new()
 	tab.add_child(tex_row)
 	_tex_field = LineEdit.new()
-	_tex_field.placeholder_text = "res://assets/generated/maps/…png"
+	_tex_field.placeholder_text = "res://assets/generated/maps/….tres"
 	_tex_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tex_field.text_submitted.connect(func(t): _set_texture(t))
 	tex_row.add_child(_tex_field)
@@ -356,11 +356,18 @@ func _open_texture_dialog() -> void:
 		_file_dialog = FileDialog.new()
 		_file_dialog.access = FileDialog.ACCESS_RESOURCES
 		_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
-		_file_dialog.filters = PackedStringArray(["*.png ; PNG", "*.webp ; WebP", "*.jpg ; JPG"])
+		# Point at the artgen GenTexture slot (.tres), not a raw image — so the
+		# map follows artgen permutation swaps (uid-stable) instead of pinning to
+		# one generated png. Resources, not source images.
+		_file_dialog.filters = PackedStringArray(["*.tres ; Texture resource"])
 		_file_dialog.file_selected.connect(func(p):
 			_tex_field.text = p
 			_set_texture(p))
 		add_child(_file_dialog)
+	# Open to the generated maps dir (where the .tres slots live) when it exists.
+	const MAPS_DIR := "res://assets/generated/maps"
+	if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(MAPS_DIR)):
+		_file_dialog.current_dir = MAPS_DIR
 	_file_dialog.popup_centered_ratio(0.6)
 
 

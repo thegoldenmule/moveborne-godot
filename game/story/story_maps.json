@@ -2,7 +2,7 @@
   "version": 1,
   "maps": {
     "w1": {
-      "texture": "res://assets/generated/maps/story_map_w1.png",
+      "texture": "res://assets/generated/maps/story_map_w1.tres",
       "dots": [
         {
           "level_id": "w1_l1",
@@ -92,8 +92,79 @@
       ]
     },
     "w2": {
-      "texture": "",
-      "dots": []
+      "texture": "res://assets/generated/maps/w2.tres",
+      "dots": [
+        {
+          "level_id": "w2_l1",
+          "x": 0.501,
+          "y": 0.898
+        },
+        {
+          "level_id": "w2_l2",
+          "x": 0.675,
+          "y": 0.841
+        },
+        {
+          "level_id": "w2_l3",
+          "x": 0.503,
+          "y": 0.785
+        },
+        {
+          "level_id": "w2_l4",
+          "x": 0.325,
+          "y": 0.729
+        },
+        {
+          "level_id": "w2_l5",
+          "x": 0.499,
+          "y": 0.674
+        },
+        {
+          "level_id": "w2_l6",
+          "x": 0.679,
+          "y": 0.614
+        },
+        {
+          "level_id": "w2_l7",
+          "x": 0.503,
+          "y": 0.554
+        },
+        {
+          "level_id": "w2_l8",
+          "x": 0.504,
+          "y": 0.451
+        },
+        {
+          "level_id": "w2_l9",
+          "x": 0.328,
+          "y": 0.388
+        },
+        {
+          "level_id": "w2_l10",
+          "x": 0.493,
+          "y": 0.335
+        },
+        {
+          "level_id": "w2_l11",
+          "x": 0.669,
+          "y": 0.273
+        },
+        {
+          "level_id": "w2_l12",
+          "x": 0.499,
+          "y": 0.211
+        },
+        {
+          "level_id": "w2_l13",
+          "x": 0.325,
+          "y": 0.157
+        },
+        {
+          "level_id": "w2_l14",
+          "x": 0.5,
+          "y": 0.096
+        }
+      ]
     },
     "w3": {
       "texture": "",

@@ -34,3 +34,5 @@ The remaining records cover backend scope, the presentation and rendering approa
   - [Story grading is validator-authoritative, post-match, and outside the hash domain](decision-record:mqbfcr95-0001-xxv607)
   - [One committed story catalog feeds validator grading, Remote Config, and the baked client fallback](decision-record:mqbfd5mc-000n-mlxtdq)
   - [Per-user story progress in an internal-scope Storage blob with cas-guarded, watermarked writes](decision-record:mqbfdjx4-0017-w20t5r)
+  - [Validator pulls the story catalog from Remote Config at runtime; per-match version pinning + init handshake (supersedes ADR-23)](decision-record:mqgt1goe-00mt-1b16ck)
+  - [Enduring story-catalog invariants: one canonical source, catalog_version drift detection, scenario-bound levels, client adopts-if-newer](decision-record:mqgt8d42-00nq-wcx3vt)

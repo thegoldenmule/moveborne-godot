@@ -1,6 +1,6 @@
 # ADR-23: One committed story catalog feeds validator grading, Remote Config, and the baked client fallback
 
-**Status:** accepted
+**Status:** superseded
 
 ## Metadata
 - **Date:** 2026-06-12
@@ -25,4 +25,4 @@ Remote Config has no write API, so publishing is a console step wrapped by the e
 Levels may only reference existing MbScenarios ids (0-17); genuinely new mechanics are TS-first scenario work with regenerated golden vectors.
 
 ## Relations
-_None._
+- **Superseded by** → [Validator pulls the story catalog from Remote Config at runtime; per-match version pinning + init handshake (supersedes ADR-23)](decision-record:mqgt1goe-00mt-1b16ck)
