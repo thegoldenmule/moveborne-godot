@@ -15,6 +15,7 @@ const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
 const Reg := preload("res://ui/mcp_ui_reg.gd")
 const StoryCat := preload("res://story/story_catalog.gd")
+const RemoteConfigS := preload("res://net/remote_config_client.gd")
 
 ## Local dev validator (the V-key debug shortcut; tools/run_validator.sh): the
 ## validator's Hermes-emulation WS endpoint — same envelope as the gateway.
@@ -194,6 +195,7 @@ func _build_ui() -> void:
 	_net.ready_received.connect(_on_net_ready)
 	_net.action_validated.connect(_on_net_validated)
 	_net.validator_error.connect(_on_net_error)
+	_net.catalog_version_mismatch.connect(_on_catalog_mismatch)
 
 	_auth = MbSnapserAuthS.new()
 	add_child(_auth)
@@ -919,6 +921,7 @@ func _connect_snapser() -> void:
 var _net_ws_url := ""            # last validator target, so R can re-register
 var _net_player_id := ""
 var _net_token := ""
+var _catalog_retry_done := false # one-shot story catalog_version reconcile guard
 
 
 func _start_net(ws_url: String, player_id: String, token: String) -> void:
@@ -926,12 +929,43 @@ func _start_net(ws_url: String, player_id: String, token: String) -> void:
 	_net_player_id = player_id
 	_net_token = token
 	var match_id := "gd_%d" % (randi() % 1000000)
+	# The story handshake carries the catalog version the client is displaying so
+	# the validator can pin an agreed version (0 for non-story modes).
+	var catalog_version := int(GameState.story_catalog.get("catalog_version", 0)) if _mode == "story" else 0
 	# uri_encode the token: a Snapser session token can carry URL-reserved chars
 	# (+ / =), which would otherwise corrupt the ?token= value at the gateway.
-	_net.init_and_connect(ws_url + "?token=" + token.uri_encode(), match_id, _match.state, player_id, _mode, _level_id)
+	_net.init_and_connect(ws_url + "?token=" + token.uri_encode(), match_id, _match.state, player_id, _mode, _level_id, catalog_version)
 	_net_label.visible = true
 	_net_label.text = "validator: …"
 	_toast.text = "Connecting to validator at %s …" % ws_url
+
+
+## Story init was rejected because our catalog_version disagrees with the
+## validator's. Refresh the catalog from Remote Config (the shared source of
+## truth) and retry the registration ONCE; a second mismatch is surfaced as an
+## error (reopen the level from the map, which refreshes again).
+func _on_catalog_mismatch() -> void:
+	if _catalog_retry_done:
+		_on_net_error("Story content changed — reopen the level")
+		return
+	_catalog_retry_done = true
+	_net_label.visible = true
+	_net_label.text = "validator: updating levels…"
+	var rc = RemoteConfigS.new(_auth)
+	add_child(rc)
+	var r: Dictionary = await rc.fetch_app_config()
+	rc.queue_free()
+	if bool(r.get("ok", false)):
+		var remote: Dictionary = RemoteConfigS.extract_catalog(r.get("config", {}))
+		var chosen: Dictionary = RemoteConfigS.select_catalog(remote, StoryCat.load_baked())
+		GameState.set_story_catalog(chosen)
+		# Refresh the display goals for this level from the updated catalog
+		# (validator grades authoritatively against the agreed version).
+		var lvl: Dictionary = StoryCat.get_level(chosen, _level_id)
+		if not lvl.is_empty():
+			var g = lvl.get("goals", [])
+			_goals = g if g is Array else _goals
+	_start_net(_net_ws_url, _net_player_id, _net_token)
 
 
 func _on_net_ready(_current_state: Dictionary) -> void:

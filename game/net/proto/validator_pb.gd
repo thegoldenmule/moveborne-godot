@@ -713,6 +713,11 @@ class InitMatchRequest:
 		service.field = __level_id
 		data[__level_id.tag] = service
 		
+		__catalog_version = PBField.new("catalog_version", PB_DATA_TYPE.UINT32, PB_RULE.OPTIONAL, 6, true, DEFAULT_VALUES_3[PB_DATA_TYPE.UINT32])
+		service = PBServiceField.new()
+		service.field = __catalog_version
+		data[__catalog_version.tag] = service
+		
 	var data = {}
 	
 	var __match_id: PBField
@@ -780,6 +785,19 @@ class InitMatchRequest:
 	func set_level_id(value : String) -> void:
 		__level_id.value = value
 	
+	var __catalog_version: PBField
+	func has_catalog_version() -> bool:
+		if __catalog_version.value != null:
+			return true
+		return false
+	func get_catalog_version() -> int:
+		return __catalog_version.value
+	func clear_catalog_version() -> void:
+		data[6].state = PB_SERVICE_STATE.UNFILLED
+		__catalog_version.value = DEFAULT_VALUES_3[PB_DATA_TYPE.UINT32]
+	func set_catalog_version(value : int) -> void:
+		__catalog_version.value = value
+	
 	func _to_string() -> String:
 		return PBPacker.message_to_string(data)
 		
@@ -821,6 +839,11 @@ class InitMatchResponse:
 		service.field = __expires_at
 		data[__expires_at.tag] = service
 		
+		__catalog_version = PBField.new("catalog_version", PB_DATA_TYPE.UINT32, PB_RULE.OPTIONAL, 4, true, DEFAULT_VALUES_3[PB_DATA_TYPE.UINT32])
+		service = PBServiceField.new()
+		service.field = __catalog_version
+		data[__catalog_version.tag] = service
+		
 	var data = {}
 	
 	var __match_id: PBField
@@ -861,6 +884,19 @@ class InitMatchResponse:
 		__expires_at.value = DEFAULT_VALUES_3[PB_DATA_TYPE.INT64]
 	func set_expires_at(value : int) -> void:
 		__expires_at.value = value
+	
+	var __catalog_version: PBField
+	func has_catalog_version() -> bool:
+		if __catalog_version.value != null:
+			return true
+		return false
+	func get_catalog_version() -> int:
+		return __catalog_version.value
+	func clear_catalog_version() -> void:
+		data[4].state = PB_SERVICE_STATE.UNFILLED
+		__catalog_version.value = DEFAULT_VALUES_3[PB_DATA_TYPE.UINT32]
+	func set_catalog_version(value : int) -> void:
+		__catalog_version.value = value
 	
 	func _to_string() -> String:
 		return PBPacker.message_to_string(data)

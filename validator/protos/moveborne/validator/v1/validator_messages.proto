@@ -22,6 +22,11 @@ message InitMatchRequest {
   // Story-mode catalog level id (e.g. "w1_l3"); empty for other modes.
   // Bound at registration so grading cannot be re-aimed after the fact.
   string level_id = 5;
+  // Catalog version the CLIENT is displaying (story init handshake). 0/absent
+  // when the client sends none (older client / non-story). The validator pins
+  // the match to an AGREED version; a mismatch is rejected (FAILED_PRECONDITION
+  // "catalog_version_mismatch") so the client re-fetches Remote Config + retries.
+  uint32 catalog_version = 6;
 }
 
 message InitMatchResponse {
@@ -30,6 +35,9 @@ message InitMatchResponse {
   string current_state_json = 2;
   // Match session expiry, ms since epoch.
   int64 expires_at = 3;
+  // The catalog version this match was PINNED to (the agreed one); 0 for
+  // non-story matches. Grading uses this version for the match's whole life.
+  uint32 catalog_version = 4;
 }
 
 message ValidateActionRequest {

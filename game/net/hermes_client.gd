@@ -37,6 +37,9 @@ signal action_validated(index: int, matched: bool, corrected_state)   # matched=
 signal match_completed(response: Dictionary)   # CompleteMatch: {match_id, rewards, balances, granted, story}
 signal validator_error(message: String)
 signal connected()
+## InitMatch rejected because the client's story catalog_version disagrees with
+## the validator's. The client should refresh Remote Config and retry once.
+signal catalog_version_mismatch()
 
 var _ws: WebSocketPeer = null
 var _polling := false
@@ -46,6 +49,7 @@ var _match_id := ""
 var _player_id := ""
 var _mode := "story"
 var _level_id := ""
+var _catalog_version := 0   # story handshake: the catalog version the client is displaying
 var _starting_state: Dictionary = {}
 var _mid := 0
 var _pending: Dictionary = {}   # mid -> {kind: String, index: int}
@@ -54,11 +58,12 @@ var _pending: Dictionary = {}   # mid -> {kind: String, index: int}
 ## Connect to a Hermes(-compatible) WSS endpoint and register the match: on the
 ## socket opening, InitMatch is sent; its response fires connected() +
 ## ready_received(state). `ws_url` must already carry the ?token= query param.
-func init_and_connect(ws_url: String, match_id: String, starting_state: Dictionary, player_id: String, mode: String = "story", level_id: String = "") -> void:
+func init_and_connect(ws_url: String, match_id: String, starting_state: Dictionary, player_id: String, mode: String = "story", level_id: String = "", catalog_version: int = 0) -> void:
 	_match_id = match_id
 	_player_id = player_id
 	_mode = mode
 	_level_id = level_id
+	_catalog_version = catalog_version
 	_starting_state = starting_state
 	_opened = false
 	_ready_ok = false
@@ -131,6 +136,7 @@ func _send_init() -> void:
 	req.set_player_id(_player_id)
 	req.set_mode(_mode)
 	req.set_level_id(_level_id)
+	req.set_catalog_version(_catalog_version)
 	_call(SERVICE + "/InitMatch", req.to_bytes(), {"kind": "init"})
 
 
@@ -177,9 +183,17 @@ func _handle_api_response(sm) -> void:
 	var resp = sm.get_api_response()
 	if resp.get_is_error():
 		var detail := "api error"
+		var msg := ""
 		if resp.has_error():
 			var e = resp.get_error()
-			detail = "%s (code %d)" % [e.get_error_message(), e.get_code()]
+			msg = e.get_error_message()
+			detail = "%s (code %d)" % [msg, e.get_code()]
+		# A story init rejected for a catalog version disagreement is recoverable:
+		# signal the owner to refresh Remote Config + retry rather than surfacing a
+		# generic error. (FAILED_PRECONDITION carrying "catalog_version_mismatch".)
+		if str(pending.get("kind", "")) == "init" and msg.contains("catalog_version_mismatch"):
+			catalog_version_mismatch.emit()
+			return
 		validator_error.emit("%s: %s" % [str(pending.get("kind", "?")), detail])
 		return
 	var payload: PackedByteArray = resp.get_payload()

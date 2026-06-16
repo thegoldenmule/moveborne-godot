@@ -207,6 +207,10 @@
                     "level_id": {
                       "type": "string",
                       "id": 5
+                    },
+                    "catalog_version": {
+                      "type": "uint32",
+                      "id": 6
                     }
                   }
                 },
@@ -223,6 +227,10 @@
                     "expires_at": {
                       "type": "int64",
                       "id": 3
+                    },
+                    "catalog_version": {
+                      "type": "uint32",
+                      "id": 4
                     }
                   }
                 },
