@@ -57,6 +57,9 @@ Don't restate the architecture here — read the canonical pages:
     --script res://tools/verify_engine_swipe.gd        # prints VERIFY ...: PASS/FAIL
 # Verifiers: engine_swipe, playcard, powercards, validation, tile_effects, totems,
 # events, scenarios, combined, and the validator client.
+# Story content: story_catalog, story_map, catalog_edit (the in-editor catalog/dot
+# authoring — addons/story_map_editor edits validator/content/story_catalog.json,
+# writes the byte-identical baked game/story copy, and re-saves story_maps.json).
 ```
 
 Editor test suites (`McpTestSuite`) run via the `godot-ai` MCP `test_run`, not the CLI. After editing
