@@ -91,6 +91,13 @@ func _run() -> void:
 	var tree_root = dock._cat_tree.get_root() if dock._cat_tree != null else null
 	_check("dock builds + catalog tree populated",
 		tree_root != null and tree_root.get_child_count() == Catalog.ordered_worlds(catalog).size())
+
+	# Adding a level auto-places a dot in that world (no manual click needed).
+	dock._cat_sel = {"kind": "world", "world_id": "w1"}
+	var dots_before: int = dock._dots_for_world("w1").size()
+	dock._on_add_level()
+	_check("add level auto-places a dot", dock._dots_for_world("w1").size() == dots_before + 1)
+
 	dock.queue_free()
 
 	print("VERIFY catalog_edit: %s" % ["PASS" if _ok else "FAIL"])

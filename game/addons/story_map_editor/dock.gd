@@ -692,9 +692,50 @@ func _on_add_level() -> void:
 	if l.is_empty():
 		_status.text = "Could not add a level — unknown world %s." % wid
 		return
+	var lid := str(l.get("id", ""))
+	_add_dot_near_last(wid, lid)   # show it on the map immediately, near the last dot
 	_mark_dirty()
 	_refresh_cat_tree()
-	_status.text = "Added level %s to %s — select it, then click the map to place its dot." % [str(l.get("id", "")), wid]
+	# Switch the map to this world so the new dot is visible, then select it.
+	if wid != _world_id:
+		_world_id = wid
+		_sync_world_opt()
+		_load_world()
+	else:
+		_refresh()
+	if not _dot_by_id(lid).is_empty():
+		_select(lid)
+	_arm_lid = ""
+	_status.text = "Added level %s with a dot near the last — drag it to position." % lid
+
+
+## Drop a dot for `lid` in world `wid`, offset from the last existing dot (or a
+## sensible default for the first one), so a newly added level appears on the map
+## without a manual click. No-op if it somehow already has a dot.
+func _add_dot_near_last(wid: String, lid: String) -> void:
+	var dots: Array = _world_map_for(wid)["dots"]
+	for d in dots:
+		if str(d.get("level_id", "")) == lid:
+			return
+	var pos := Vector2(0.5, 0.12)
+	if not dots.is_empty():
+		var last: Dictionary = dots[dots.size() - 1]
+		pos = Vector2(
+			clampf(float(last.get("x", 0.5)) + 0.05, 0.0, 1.0),
+			clampf(float(last.get("y", 0.12)) + 0.05, 0.0, 1.0))
+	dots.append({"level_id": lid, "x": snappedf(pos.x, 0.001), "y": snappedf(pos.y, 0.001)})
+
+
+## The map entry for an ARBITRARY world, creating it if absent (cf. _world_map(),
+## which is scoped to the active world).
+func _world_map_for(wid: String) -> Dictionary:
+	var maps: Dictionary = _layout["maps"]
+	if not (maps.get(wid) is Dictionary):
+		maps[wid] = {"texture": "", "dots": []}
+	var m: Dictionary = maps[wid]
+	if not (m.get("dots") is Array):
+		m["dots"] = []
+	return m
 
 
 func _on_remove_cat() -> void:
