@@ -1,6 +1,6 @@
 # Feature: Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 Extract the common skeleton that ArtGen and Story Map both reinvent into a small, editor-only shared framework — `game/addons/editor_tool_kit/` — then migrate both tools onto it with **zero behavior change**. The framework is five primitives drawn from what ArtGen already proves in production: **`EditorToolPlugin`** (collapses the ~25–37 line `plugin.gd` bootstrap + bottom-panel mount/teardown), **`ToolService`** (a `Node` base owning state + signals, every method returning `{ok, error}`, with no `Control`/`EditorInterface` deps so it runs headless), **`ContentStore`** (load → validate → atomic N-target write → `fs.scan()`, with dirty tracking, version-bump rollback, and canonical serialization — generalizing Story Map's hand-written baked+canonical+layout save), **`EditorToolUi`** (the `HSplitContainer`-with-floors layout, `label_wrap`/row builders, selection restyle, and one-line status `Label` both docks rebuild), and an optional **`BridgeServer`** (`TCPServer` poll loop + `Content-Length` framing + async route table + headless-skip, generalized from ArtGen's `:4848` bridge). **ArtGen** migrates by re-basing its plugin/service/bridge on the new bases and deleting the per-tool copies (it already conforms to ~80%). **Story Map** is the bigger lift and the real prize: its monolithic 1,000-line dock splits into a headless-testable `StoryMapService(ToolService)` + a thin view, with `catalog_edit.gd`'s serialize + 3-file atomic save moving behind `ContentStore`. Net result: persistence, layout, status, and optional MCP/CLI access are inherited, every tool's logic becomes headless-verifiable, and the next authoring tool is a service + a view. See the *Editor Tool Framework* architecture node for the target structure. Output files, ArtGen's bridge port + MCP surface, and Story Map's validator-content sync all stay byte-identical.
@@ -42,4 +42,4 @@ _None._
 - [Spec — Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)](feature-spec:mqh3549v-0013-jighcj)
 
 ## Commits
-_None._
+- `ab96f10b5f8bd5838e2a54367e4329790effd525` refactor(editor): shared editor_tool_kit framework; migrate ArtGen + Story Map

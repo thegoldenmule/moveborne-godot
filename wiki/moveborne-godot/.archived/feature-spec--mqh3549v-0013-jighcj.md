@@ -1,6 +1,6 @@
 # Spec — Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)
 
-**Status:** drafting
+**Status:** sealed
 
 ## Overview
 Define a small **editor-only** framework that captures the skeleton ArtGen and Story Map both reinvent, then migrate both tools onto it with **zero behavior change**. The spec covers the five primitives (`EditorToolPlugin`, `ToolService`, `ContentStore`, `EditorToolUi`, optional `BridgeServer`), the editor/headless seam that makes tool logic verifiable, and the two-stage migration (ArtGen re-bases; Story Map's monolith splits into service + view). The target structure is documented in the *Editor Tool Framework* architecture node; this spec fixes the contracts and the migration boundaries. Out of scope: the SVG Trim helper, any new authoring tool, and giving Story Map a bridge.

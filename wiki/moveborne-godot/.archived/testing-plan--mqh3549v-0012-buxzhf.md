@@ -1,8 +1,11 @@
 # Testing plan — Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)
 
-**Status:** draft
+**Status:** ready
 
 ## Planned
+_None._
+
+## Passed
 - Framework primitives (verify_editor_tool_kit.gd, headless): ToolService.ok()/err() return the documented {ok,error?,code?} shapes and is_dirty() tracks mark/clear; ContentStore.load_json returns {} for a missing path and parses a written temp file; assert these pass under godot --headless.
 - ContentStore atomicity + rollback (headless): save_all writes N temp targets when validate returns []; when validate returns problems, NO target file is created/modified; a simulated open-failure on the 2nd of 3 targets leaves the version-bump reverted (in-memory catalog_version unchanged) and returns ok=false.
 - EditorToolUi builders (headless): split_root returns an HSplitContainer with both min-size floors set; label_wrap/form_row return the expected VBox/HBox node shapes; restyle_selected swaps the StyleBoxFlat border color on the selected/unselected states.
@@ -13,9 +16,6 @@
 - Story Map save parity: a save through StoryMapService + ContentStore.save_all writes res://story/story_catalog.json, validator/content/story_catalog.json, and res://story/story_maps.json that are byte-identical to a pre-migration save of the same edits (baked == canonical bytes; catalog_version bumps once and only when dirty).
 - Story Map Remote Config + dock parity (editor open): the Remote Config 'verify' action still shells out to bun story-appconfig.ts and reports in-sync/drift; clipboard export still copies {story_catalog:...}; the interactive map canvas places/drags dots and the catalog tree edit forms produce the same status-label messages as before.
 - Isolation guarantee: grep confirms editor_tool_kit/ is referenced only by the two addons (not by game/scenes, game/ui, game/net, or game/logic/); the full determinism parity verifier suite (engine_swipe, playcard, ... combined) is untouched and still PASSes; no validator change is required.
-
-## Passed
-_None._
 
 ## Failed
 _None._

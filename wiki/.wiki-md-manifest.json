@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2598,
+    "version": 2635,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "moveborne-godot/features/index.md": "05d8ebbdf0da77ebe54f52e91e2825cd441b88dc230dcaff30206c7f437478ef",
+      "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
       "moveborne-godot/adrs/index.md": "13081a00859203a8d073c0bcc1eb30ef5bd0ce4ea4ae4b77fe4a55e5a550fd25",
       "moveborne-godot/architecture/client/index.md": "c6836e27a79c73f8fcdab1b69be7bdce83620b1c944e899f6bd9c9c78cdb44ba",
       "moveborne-godot/architecture/validator/index.md": "766d7bde5f60c07d7cdc33b87bf586c640fdc0e312aeb29efb678b36ccd47f4e",
@@ -113,11 +113,11 @@
       "moveborne-godot/.archived/feature-spec--mqgs9hqv-00ic-b5v9we.md": "776b638b2a4734e0504b65a739468b652291cf9f3ce35c91d7c87647d5e81bb0",
       "moveborne-godot/adrs/validator-pulls-the-story-catalog-from-remote-config-at-runtime-per-match-version-pinning-init-handshake-supersedes-adr-23.md": "fb9d0ab3bebb77552a825176856799cf0158550f06106351fb643df1f7442685",
       "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md": "7029f4289e792c1d21c5e24cbf92655de850ff001e1689f7399f045a8ac412fd",
-      "moveborne-godot/architecture/client/editor-tool-framework.md": "cce9db0011d8768921d56d127d95b4493da1a12f74ebb4f5fabf35b153eef7ce",
-      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/index.md": "7f078a111666fa7f8275e174ebd525c89e8c7b0d2214b01c3d30bd3b4a602a3e",
-      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/implementation-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "495f2bb6cb9f145736bb25616cf954c72bef1f7bfb4f68f83ad3baf0ee45056e",
-      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/testing-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "8a095bd6330f79e9747201a0285727847f54c3465cb552f43ec8cdf27155fbb6",
-      "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/spec-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md": "83fed18aabb2e80f0e56cedfaf31d7b5f27f7042bc778033215d058f3d36d651"
+      "moveborne-godot/architecture/client/editor-tool-framework.md": "6c247b076b603c93912fa5200d4f7120909d3fce75b3a441f3e6f35721dd240a",
+      "moveborne-godot/.archived/feature-brief--mqh3549u-0010-q64913.md": "56d0151a48310f3ef2d48dd260dec236d829be7f160b8c0b45356e632db86210",
+      "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md": "97a883a020475625f3a263e88f4b8c9a611c346df7c3d1290efaac879b61a560",
+      "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md": "16c5c4c9bcfc3a1fd6f829996ae791a5103f5d9ef9546e8010e67eae6fdd6988",
+      "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md": "3aa0ebe5afa74c8c6f348233b8ee7a1383433a96a281b894de5f43b265779b7d"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
@@ -232,10 +232,10 @@
       "decision-record:mqgt1goe-00mt-1b16ck": "moveborne-godot/adrs/validator-pulls-the-story-catalog-from-remote-config-at-runtime-per-match-version-pinning-init-handshake-supersedes-adr-23.md",
       "decision-record:mqgt8d42-00nq-wcx3vt": "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md",
       "architecture:mqh31a29-0001-sy7uqn": "moveborne-godot/architecture/client/editor-tool-framework.md",
-      "feature-brief:mqh3549u-0010-q64913": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/index.md",
-      "implementation-plan:mqh3549u-0011-1wzyuz": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/implementation-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md",
-      "testing-plan:mqh3549v-0012-buxzhf": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/testing-plan-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md",
-      "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/features/editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map/spec-editor-tool-framework-shared-base-for-in-editor-authoring-tools-migrate-artgen-story-map.md"
+      "feature-brief:mqh3549u-0010-q64913": "moveborne-godot/.archived/feature-brief--mqh3549u-0010-q64913.md",
+      "implementation-plan:mqh3549u-0011-1wzyuz": "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md",
+      "testing-plan:mqh3549v-0012-buxzhf": "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md",
+      "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md"
     }
   }
 }

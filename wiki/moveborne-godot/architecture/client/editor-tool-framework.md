@@ -6,7 +6,7 @@
 layer
 
 ## Summary
-The **aspirational** common structure for Moveborne's in-editor authoring tools — the `@tool` addons that run inside the Godot editor (not the game) to produce committed content. Today two tools embody the pattern at opposite ends of a maturity curve: **ArtGen** (`addons/artgen/`) is a clean three-layer split — a stateful `Service` node, an HTTP `Bridge`, and a thin view `Dock` — while **Story Map** (`addons/story_map_editor/`) is a ~1,000-line monolithic dock that fuses UI, in-memory state, file I/O, and serialization into one `Control`. Both reinvent the same skeleton: an `@tool EditorPlugin` that mounts a pure-code dock into the bottom panel, JSON load/edit/validate/atomic-write against committed files, an `EditorInterface` filesystem rescan, and a single status `Label`. This node documents the **target**: a small shared framework — `EditorToolPlugin` + `ToolService` + `ContentStore` + a UI kit + an optional `BridgeServer` — that every editor tool builds on, so a new tool is a domain service plus a view and never the boilerplate again. ArtGen is what the framework should make every tool look like; Story Map is the boilerplate and file-sync logic the framework should absorb. The framework itself is not yet built — see the *Editor Tool Framework* feature.
+The common structure for Moveborne's in-editor authoring tools — the `@tool` addons that run inside the Godot editor (not the game) to produce committed content. **Built and live** as `game/addons/editor_tool_kit/` (commit ab96f10): five shared primitives — **`EditorToolPlugin`** (plugin bootstrap + bottom-panel mount/teardown), **`ToolService`** (a `Node` state base with `ok()`/`err()` + dirty tracking and no `Control`/`EditorInterface` deps, so it runs headless), **`ContentStore`** (load → validate → atomic N-target write → rescan, with version-bump rollback), **`EditorToolUi`** (the shared `HSplitContainer`/`label_wrap`/`form_row`/`status_label`/selection-restyle builders), and an optional **`BridgeServer`** (localhost HTTP base for an MCP/CLI shim). Both editor tools now build on it: **ArtGen** (`addons/artgen/`) re-bases its plugin + `ArtgenService(ToolService)` + `ArtgenBridge(BridgeServer)` (`:4848`, all routes preserved); **Story Map** (`addons/story_map_editor/`) split its ~1,000-line monolithic dock into a headless-testable `StoryMapService(ToolService)` + a thin view, with the baked+canonical+layout save moving behind `ContentStore`. The migration was byte-identical (same output files, same bridge port/MCP surface) and editor-only (never imported by `game/logic`/scenes/ui/net — zero parity tests touched). A new authoring tool is now a service + a view. Headless coverage: `tools/verify_editor_tool_kit.gd` (the bases) and `tools/verify_story_map_service.gd` (the migrated Story Map logic). See `game/addons/editor_tool_kit/README.md` for the recipe.
 
 ## Purpose
 Two real costs motivate the framework. **Duplication:** each tool hand-rolls the same plugin bootstrap, bottom-panel mount/teardown, pure-code `HSplitContainer` layout with min-size floors, JSON read / `JSON.stringify` write, post-write `EditorInterface.get_resource_filesystem().scan()`, and `{ok, error}` status plumbing. **Untestability:** because Story Map fuses its logic into a `Control` that only exists inside a running editor, none of its mutation / serialize / atomic-write logic can run under the headless verifier loop the rest of the project leans on (`godot --headless --script res://tools/verify_*.gd`). ArtGen avoided this by putting all state and logic in a `Service` *node* the dock merely observes — which is exactly why a framework should make the service layer mandatory and the editor-only view optional. The payoff is leverage: the next authoring tool (a totem editor, a scenario tuner, a level balancer) should be ~a service + a view, inheriting persistence, layout, status feedback, and optional MCP/CLI access for free.
@@ -67,6 +67,12 @@ _No dependencies._
 - file `Signal-bound view dock (EditorToolUi exemplar)` in `game/addons/artgen/dock.gd`
 - file `Monolithic dock to split into service + view` in `game/addons/story_map_editor/dock.gd`
 - file `Canonical serialize + mutations (ContentStore reference)` in `game/addons/story_map_editor/catalog_edit.gd`
+- class `EditorToolPlugin (plugin bootstrap base)` in `game/addons/editor_tool_kit/editor_tool_plugin.gd`
+- class `ToolService (headless-safe state base)` in `game/addons/editor_tool_kit/tool_service.gd`
+- class `ContentStore (load/validate/atomic-write/rollback)` in `game/addons/editor_tool_kit/content_store.gd`
+- class `EditorToolUi (shared layout builders)` in `game/addons/editor_tool_kit/editor_tool_ui.gd`
+- class `BridgeServer (optional localhost HTTP base)` in `game/addons/editor_tool_kit/bridge_server.gd`
+- class `StoryMapService (Story Map logic, extracted onto ToolService)` in `game/addons/story_map_editor/story_map_service.gd`
 
 ## Data model
 The framework is five primitives, each a thin extraction of what ArtGen already proves in production:
@@ -94,4 +100,4 @@ The existing **SVG Trim** tool (see the sibling *Editor Tools* node) is the triv
 - Dock-to-service signal bindings use method callables (not lambdas), so a plugin hot-reload cannot fire a late signal into a freed Control.
 
 ## Synced commit
-_None._
+ab96f10b5f8bd5838e2a54367e4329790effd525
