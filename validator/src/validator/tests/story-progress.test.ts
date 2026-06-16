@@ -22,13 +22,15 @@ function stars(n: number): StoryGradeResult {
 const NOW = "2026-06-12T00:00:00Z";
 
 describe("committed catalog", () => {
-  test("validates, with 45 levels in 3 worlds and w1_l1 first", () => {
+  test("validates, with >= 45 levels in 3 worlds and w1_l1 first", () => {
     expect(() => validateCatalog()).not.toThrow();
     expect(catalog.worlds.length).toBe(3);
     const ids = getOrderedLevelIds();
-    expect(ids.length).toBe(45);
+    // The catalog is editable now — assert the baseline + structure, not a fixed count.
+    expect(ids.length).toBeGreaterThanOrEqual(45);
     expect(ids[0]).toBe("w1_l1");
-    expect(ids[15]).toBe("w2_l1");
+    expect(ids).toContain("w2_l1");
+    expect(ids).toContain("w3_l1");
   });
 });
 
@@ -98,7 +100,8 @@ describe("unlock chain", () => {
     for (const id of getOrderedLevelIds()) {
       all[id] = { stars: 1, best_score: 1, rewarded_stars: 1 };
     }
-    const lastId = getOrderedLevelIds()[44]!;
+    const orderedIds = getOrderedLevelIds();
+    const lastId = orderedIds[orderedIds.length - 1]!;
     delete all[lastId];
     const last = getLevel(lastId)!;
     const applied = applyGrade(

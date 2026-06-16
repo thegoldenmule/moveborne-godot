@@ -31,7 +31,9 @@ func _initialize() -> void:
 	_check("baked catalog structurally valid", problems.is_empty())
 
 	var levels := Catalog.ordered_levels(catalog)
-	_check("45 levels in 3 worlds", levels.size() == 45 and Catalog.ordered_worlds(catalog).size() == 3)
+	# 3 worlds, and at least the original 45 levels — additions are fine (the
+	# catalog is editable now), but a drop below the baseline is suspicious.
+	_check("3 worlds, >= 45 levels", Catalog.ordered_worlds(catalog).size() == 3 and levels.size() >= 45)
 	for level in levels:
 		var sid := int(level.get("scenario_id", -1))
 		_check("level %s -> scenario %d exists" % [level.get("id"), sid],

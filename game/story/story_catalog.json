@@ -1,5 +1,5 @@
 {
-  "catalog_version": 1,
+  "catalog_version": 3,
   "worlds": [
     {
       "id": "w1",
@@ -587,6 +587,84 @@
               },
               {
                 "gems": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l16",
+          "order": 15,
+          "scenario_id": 7,
+          "name": "Glacial Gauntlet",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 840,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1680,
+              "time_limit_s": null
+            },
+            {
+              "type": "max_tile",
+              "threshold": 256,
+              "time_limit_s": null
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 105
+            },
+            "per_star": [
+              {
+                "coins": 42
+              },
+              {
+                "coins": 84
+              },
+              {
+                "gems": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "w1_l17",
+          "order": 16,
+          "scenario_id": 0,
+          "name": "The Frozen Veil",
+          "goals": [
+            {
+              "type": "points",
+              "threshold": 900,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 1800,
+              "time_limit_s": null
+            },
+            {
+              "type": "points",
+              "threshold": 900,
+              "time_limit_s": 150
+            }
+          ],
+          "rewards": {
+            "complete": {
+              "coins": 130
+            },
+            "per_star": [
+              {
+                "coins": 52
+              },
+              {
+                "coins": 104
+              },
+              {
+                "gems": 3
               }
             ]
           }

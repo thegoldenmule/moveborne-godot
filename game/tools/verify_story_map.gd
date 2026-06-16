@@ -39,7 +39,10 @@ func _run() -> void:
 	_check("committed layout validates clean", Layout.validate(layout, catalog) == [])
 	_check("w1 has a map", Layout.has_map(layout, "w1"))
 	_check("w2 has no map (fallback)", not Layout.has_map(layout, "w2"))
-	_check("w1 dots == 15", Layout.dots_for_world(layout, "w1").size() == 15)
+	var w1_levels := Catalog.ordered_levels(catalog).filter(
+		func(l): return str(l.get("world_id", "")) == "w1").size()
+	var w1_dots := Layout.dots_for_world(layout, "w1").size()
+	_check("every w1 level has a dot", w1_dots == w1_levels)
 
 	var unknown := {"version": 1, "maps": {"w1": {"dots": [{"level_id": "nope", "x": 0.5, "y": 0.5}]}}}
 	_check("validate flags unknown level_id",
@@ -61,7 +64,7 @@ func _run() -> void:
 	await process_frame
 
 	_check("map shown, flat list hidden", screen._dot_layer.visible and not screen._scroll.visible)
-	_check("renders 15 dots", screen._dot_layer.get_child_count() == 15)
+	_check("renders one dot per w1 dot", screen._dot_layer.get_child_count() == w1_dots)
 
 	var dots := _dots_by_id(screen)
 	_check("frontier dot is next + unlocked + 0 stars",
