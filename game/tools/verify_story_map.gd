@@ -38,7 +38,14 @@ func _run() -> void:
 	# ── pure helper: validate + lookups ──────────────────────────────────────
 	_check("committed layout validates clean", Layout.validate(layout, catalog) == [])
 	_check("w1 has a map", Layout.has_map(layout, "w1"))
-	_check("w2 has no map (fallback)", not Layout.has_map(layout, "w2"))
+	# A world without a map exercises the flat-list fallback (which worlds are
+	# mapped is editable content now, so find one dynamically).
+	var unmapped := ""
+	for w in Catalog.ordered_worlds(catalog):
+		if not Layout.has_map(layout, str(w.get("id", ""))):
+			unmapped = str(w.get("id", ""))
+			break
+	_check("an unmapped world exists for the fallback test", unmapped != "")
 	var w1_levels := Catalog.ordered_levels(catalog).filter(
 		func(l): return str(l.get("world_id", "")) == "w1").size()
 	var w1_dots := Layout.dots_for_world(layout, "w1").size()
@@ -122,12 +129,20 @@ func _run() -> void:
 		dots2.has("w1_l3") and dots2["w1_l3"].get_meta("is_next"))
 
 	# ── fallback: a world without a map renders the flat list ────────────────
-	screen._world_index = 1   # w2 — no texture in story_maps.json
+	var all_worlds := Catalog.ordered_worlds(catalog)
+	var unmapped_idx := 0
+	var unmapped_levels := 0
+	for i in range(all_worlds.size()):
+		if str(all_worlds[i].get("id", "")) == unmapped:
+			unmapped_idx = i
+			unmapped_levels = Catalog.ordered_levels(catalog).filter(
+				func(l): return str(l.get("world_id", "")) == unmapped).size()
+	screen._world_index = unmapped_idx
 	screen._rebuild()
 	await process_frame
 	_check("fallback shows flat list, hides map",
 		screen._scroll.visible and not screen._dot_layer.visible
-		and screen._level_list.get_child_count() == 15)
+		and screen._level_list.get_child_count() == unmapped_levels)
 
 	screen.queue_free()
 	print("VERIFY story_map: %s" % ["PASS" if _ok else "FAIL"])
