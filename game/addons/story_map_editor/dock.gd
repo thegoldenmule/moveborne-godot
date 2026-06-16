@@ -2,34 +2,37 @@
 extends Control
 
 ## Bottom-panel dock for authoring story-map dot layouts. Pick a world + its
-## background texture, then click the canvas to drop the next unplaced level's
-## dot and drag an existing dot to move it. Positions are normalized 0..1 against
-## the canvas rect — the SAME basis the runtime map (story_map.gd) renders from,
-## which fills the body rect with STRETCH_SCALE. Save writes story_maps.json and
-## rescans the filesystem.
+## background texture; each level shows as a numbered dot you can CLICK to select
+## (the panel shows which level it is) and DRAG to move. Click empty canvas to
+## drop the next unplaced level's dot. Positions are normalized 0..1 against the
+## canvas rect — the SAME basis the runtime map (story_map.gd) renders from with
+## STRETCH_SCALE. Save writes story_maps.json and rescans the filesystem.
 
 const Catalog := preload("res://story/story_catalog.gd")
 const Layout := preload("res://story/story_map_layout.gd")
 
-const CANVAS_SIZE := Vector2(360, 540)  # 2:3, matching the artgen story-map presets
-const HIT_RADIUS := 16.0
+const CANVAS_SIZE := Vector2(720, 1080)  # 2:3, matching the artgen story-map presets (2× the old size)
+const DOT := Vector2(32, 32)
 
 var _catalog: Dictionary = {}
 var _layout: Dictionary = {}
 var _world_id := ""
-var _dragging := -1  # index into the current world's dots while dragging, else -1
+var _selected_lid := ""   # the dot the user has selected (shows its level info)
+var _drag_lid := ""       # the dot currently being dragged, "" when idle
+var _markers: Dictionary = {}  # level_id -> the dot Control on the overlay
 
 var _world_opt: OptionButton
 var _tex_field: LineEdit
 var _canvas: TextureRect
 var _overlay: Control
+var _selected_info: Label
 var _unplaced: Label
 var _status: Label
 var _file_dialog: FileDialog
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(0, 600)
+	custom_minimum_size = Vector2(0, 560)
 	_build_ui()
 	_reload()
 
@@ -40,28 +43,35 @@ func _build_ui() -> void:
 	root.add_theme_constant_override("separation", 16)
 	add_child(root)
 
-	# Left: the canvas (texture + dot overlay).
-	var left := VBoxContainer.new()
-	root.add_child(left)
+	# Left: the canvas in a scroll view (the 2× texture is taller than the panel).
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(scroll)
+
+	# A fixed-size texture (never stretched by the container) with the dot overlay
+	# pinned to it via anchors, so canvas pixels and dot pixels always agree.
 	_canvas = TextureRect.new()
 	_canvas.custom_minimum_size = CANVAS_SIZE
 	_canvas.size = CANVAS_SIZE
+	_canvas.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_canvas.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_canvas.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_canvas.stretch_mode = TextureRect.STRETCH_SCALE
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left.add_child(_canvas)
+	scroll.add_child(_canvas)
+
 	_overlay = Control.new()
-	_overlay.custom_minimum_size = CANVAS_SIZE
-	_overlay.size = CANVAS_SIZE
-	_overlay.position = Vector2.ZERO
-	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	_overlay.gui_input.connect(_on_canvas_input)
+	_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)  # tracks the canvas rect exactly
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP        # empty clicks place dots
+	_overlay.gui_input.connect(_on_overlay_input)
 	_canvas.add_child(_overlay)
 
 	# Right: controls.
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 10)
 	right.custom_minimum_size = Vector2(320, 0)
+	right.size_flags_vertical = Control.SIZE_FILL
 	root.add_child(right)
 
 	var title := Label.new()
@@ -89,6 +99,18 @@ func _build_ui() -> void:
 	pick.pressed.connect(_open_texture_dialog)
 	tex_row.add_child(pick)
 
+	_selected_info = Label.new()
+	_selected_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_selected_info.custom_minimum_size = Vector2(300, 56)
+	right.add_child(_selected_info)
+
+	var sel_row := HBoxContainer.new()
+	right.add_child(sel_row)
+	var remove_sel := Button.new()
+	remove_sel.text = "Remove selected"
+	remove_sel.pressed.connect(_remove_selected)
+	sel_row.add_child(remove_sel)
+
 	_unplaced = Label.new()
 	_unplaced.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_unplaced.custom_minimum_size = Vector2(300, 0)
@@ -96,10 +118,6 @@ func _build_ui() -> void:
 
 	var btn_row := HBoxContainer.new()
 	right.add_child(btn_row)
-	var undo := Button.new()
-	undo.text = "Remove last dot"
-	undo.pressed.connect(_remove_last)
-	btn_row.add_child(undo)
 	var clear := Button.new()
 	clear.text = "Clear world"
 	clear.pressed.connect(_clear_world)
@@ -126,7 +144,7 @@ func _build_ui() -> void:
 	right.add_child(_status)
 
 	var help := Label.new()
-	help.text = "Click empty canvas: drop the next unplaced level's dot. Drag a dot: move it. Positions are normalized 0..1."
+	help.text = "Click a dot to select it (its level shows above). Drag a dot to move it. Click empty canvas to drop the next unplaced level's dot."
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	help.custom_minimum_size = Vector2(300, 0)
 	right.add_child(help)
@@ -163,7 +181,7 @@ func _on_world_selected(idx: int) -> void:
 	_load_world()
 
 
-## The dots array for the current world, creating the map entry if absent.
+## The map entry for the current world, creating it if absent.
 func _world_map() -> Dictionary:
 	var maps: Dictionary = _layout["maps"]
 	if not (maps.get(_world_id) is Dictionary):
@@ -178,7 +196,16 @@ func _dots() -> Array:
 	return _world_map()["dots"]
 
 
+func _dot_by_id(lid: String) -> Dictionary:
+	for d in _dots():
+		if str(d.get("level_id", "")) == lid:
+			return d
+	return {}
+
+
 func _load_world() -> void:
+	_drag_lid = ""
+	_selected_lid = ""
 	var m := _world_map()
 	_tex_field.text = str(m.get("texture", ""))
 	_set_texture(_tex_field.text)
@@ -207,52 +234,58 @@ func _open_texture_dialog() -> void:
 	_file_dialog.popup_centered_ratio(0.6)
 
 
-# ── placement ─────────────────────────────────────────────────────────────────
+# ── placement + selection + drag ──────────────────────────────────────────────
 
 
-func _on_canvas_input(e: InputEvent) -> void:
+## Empty-canvas click: drop the next unplaced level's dot there. Clicks on a dot
+## are consumed by that dot (see _on_dot_input), so they never reach here.
+func _on_overlay_input(e: InputEvent) -> void:
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and e.pressed:
+		_place_next(_norm(e.position))
+
+
+## Per-dot input: press selects + starts a drag, motion (button held) moves it.
+func _on_dot_input(e: InputEvent, lid: String) -> void:
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
 		if e.pressed:
-			var hit := _dot_at(e.position)
-			if hit >= 0:
-				_dragging = hit
-			else:
-				_place_next(_norm(e.position))
+			_select(lid)
+			_drag_lid = lid
 		else:
-			_dragging = -1
-	elif e is InputEventMouseMotion and _dragging >= 0:
-		var d: Dictionary = _dots()[_dragging]
-		var n := _norm(e.position)
-		d["x"] = n.x
-		d["y"] = n.y
-		_refresh()
+			_drag_lid = ""
+	elif e is InputEventMouseMotion and _drag_lid == lid:
+		if (e.button_mask & MOUSE_BUTTON_MASK_LEFT) == 0:
+			_drag_lid = ""
+			return
+		var d := _dot_by_id(lid)
+		if d.is_empty():
+			_drag_lid = ""
+			return
+		var n := _norm(_overlay.get_local_mouse_position())
+		d["x"] = snappedf(n.x, 0.001)
+		d["y"] = snappedf(n.y, 0.001)
+		_place_marker(lid)       # move the existing node — do NOT rebuild mid-drag
+		_refresh_info()
 
 
 ## Normalized 0..1 position against the canvas rect.
 func _norm(p: Vector2) -> Vector2:
-	return Vector2(
-		clampf(p.x / CANVAS_SIZE.x, 0.0, 1.0),
-		clampf(p.y / CANVAS_SIZE.y, 0.0, 1.0))
+	return Vector2(clampf(p.x / CANVAS_SIZE.x, 0.0, 1.0), clampf(p.y / CANVAS_SIZE.y, 0.0, 1.0))
 
 
-## Index of the dot under a pixel position, or -1.
-func _dot_at(p: Vector2) -> int:
-	var dots := _dots()
-	for i in range(dots.size()):
-		var d: Dictionary = dots[i]
-		var px := Vector2(float(d.get("x", 0.0)), float(d.get("y", 0.0))) * CANVAS_SIZE
-		if px.distance_to(p) <= HIT_RADIUS:
-			return i
-	return -1
+func _select(lid: String) -> void:
+	_selected_lid = lid
+	_restyle_markers()
+	_refresh_info()
 
 
 ## Place a dot for the first catalog level in this world that has no dot yet.
 func _place_next(n: Vector2) -> void:
 	var lid := _next_unplaced()
 	if lid == "":
-		_status.text = "All levels in this world already have a dot."
+		_status.text = "All levels in this world already have a dot. Drag the dots to position them."
 		return
 	_dots().append({"level_id": lid, "x": snappedf(n.x, 0.001), "y": snappedf(n.y, 0.001)})
+	_selected_lid = lid
 	_refresh()
 
 
@@ -279,41 +312,114 @@ func _next_unplaced() -> String:
 	return ""
 
 
-func _remove_last() -> void:
+func _remove_selected() -> void:
+	if _selected_lid == "":
+		_status.text = "No dot selected."
+		return
 	var dots := _dots()
-	if not dots.is_empty():
-		dots.remove_at(dots.size() - 1)
-		_refresh()
+	for i in range(dots.size()):
+		if str(dots[i].get("level_id", "")) == _selected_lid:
+			dots.remove_at(i)
+			break
+	_selected_lid = ""
+	_refresh()
 
 
 func _clear_world() -> void:
 	_world_map()["dots"] = []
+	_selected_lid = ""
 	_refresh()
 
 
 # ── render ──────────────────────────────────────────────────────────────────
 
 
+## Rebuild every dot marker from the data (structural changes only — never call
+## this mid-drag; _place_marker moves an existing marker in place).
 func _refresh() -> void:
 	for c in _overlay.get_children():
 		c.queue_free()
-	var names := {}
-	for l in Catalog.ordered_levels(_catalog):
-		names[str(l.get("id", ""))] = int(l.get("order", 0)) + 1
+	_markers.clear()
+	var names := _level_numbers()
 	for d in _dots():
 		var lid := str(d.get("level_id", ""))
-		var px := Vector2(float(d.get("x", 0.0)), float(d.get("y", 0.0))) * CANVAS_SIZE
-		var marker := Label.new()
-		marker.text = str(names.get(lid, "?"))
-		marker.add_theme_color_override("font_color", Color.WHITE)
-		marker.add_theme_color_override("font_outline_color", Color(0.5, 0.0, 0.7))
-		marker.add_theme_constant_override("outline_size", 6)
-		marker.position = px - Vector2(8, 10)
-		marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_overlay.add_child(marker)
+		var m := _make_marker(lid, int(names.get(lid, 0)))
+		_overlay.add_child(m)
+		_markers[lid] = m
+		_place_marker(lid)
+	_restyle_markers()
+	_refresh_info()
 	var unplaced := _world_level_ids().filter(func(id): return not _placed_ids().has(id))
 	_unplaced.text = "Unplaced (%d): %s" % [unplaced.size(), ", ".join(unplaced)] if not unplaced.is_empty() \
 		else "All %d levels placed." % _world_level_ids().size()
+
+
+func _level_numbers() -> Dictionary:
+	var names := {}
+	for l in Catalog.ordered_levels(_catalog):
+		names[str(l.get("id", ""))] = int(l.get("order", 0)) + 1
+	return names
+
+
+func _make_marker(lid: String, num: int) -> Control:
+	var m := Control.new()
+	m.custom_minimum_size = DOT
+	m.size = DOT
+	m.pivot_offset = DOT * 0.5  # scale the selection pop from the dot's center
+	m.mouse_filter = Control.MOUSE_FILTER_STOP
+	m.tooltip_text = "%s — %s" % [lid, str(Catalog.get_level(_catalog, lid).get("name", ""))]
+	var panel := Panel.new()
+	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", _dot_style(false))
+	m.add_child(panel)
+	var lbl := Label.new()
+	lbl.text = str(num)
+	lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.add_theme_color_override("font_color", Color.WHITE)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	m.add_child(lbl)
+	m.gui_input.connect(_on_dot_input.bind(lid))
+	return m
+
+
+func _dot_style(selected: bool) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.07, 0.07, 0.1, 0.92)
+	sb.set_corner_radius_all(int(DOT.x / 2.0))
+	sb.set_border_width_all(3 if selected else 2)
+	sb.border_color = Color("44ff88") if selected else Color("b400ff")
+	return sb
+
+
+func _place_marker(lid: String) -> void:
+	if not _markers.has(lid):
+		return
+	var d := _dot_by_id(lid)
+	var px := Vector2(float(d.get("x", 0.0)), float(d.get("y", 0.0))) * CANVAS_SIZE
+	(_markers[lid] as Control).position = px - DOT * 0.5
+
+
+func _restyle_markers() -> void:
+	for lid in _markers:
+		var m: Control = _markers[lid]
+		var panel := m.get_child(0) as Panel
+		if panel != null:
+			panel.add_theme_stylebox_override("panel", _dot_style(lid == _selected_lid))
+		m.scale = Vector2(1.25, 1.25) if lid == _selected_lid else Vector2.ONE
+
+
+func _refresh_info() -> void:
+	if _selected_lid == "" or _dot_by_id(_selected_lid).is_empty():
+		_selected_info.text = "No dot selected.\nClick a dot to select it; drag to move."
+		return
+	var d := _dot_by_id(_selected_lid)
+	var lvl := Catalog.get_level(_catalog, _selected_lid)
+	var num := int(lvl.get("order", 0)) + 1
+	_selected_info.text = "Selected  #%d  %s\n%s\n(x %.3f, y %.3f)" % [
+		num, _selected_lid, str(lvl.get("name", "?")), float(d.get("x", 0.0)), float(d.get("y", 0.0))]
 
 
 func _on_validate() -> void:
