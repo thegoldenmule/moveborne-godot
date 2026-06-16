@@ -575,26 +575,30 @@ func _on_save() -> void:
 		return
 
 	var bumped := _catalog_dirty
+	var old_v := int(_catalog.get("catalog_version", 1))
 	if bumped:
-		_catalog["catalog_version"] = int(_catalog.get("catalog_version", 1)) + 1
+		_catalog["catalog_version"] = old_v + 1
 	var catalog_text := CatalogEdit.serialize(_catalog)
 	var canonical := ProjectSettings.globalize_path("res://").path_join("..").simplify_path() \
 		.path_join("validator/content/story_catalog.json")
-	if not _write_file(Catalog.BAKED_PATH, catalog_text):
-		return
-	if not _write_file(canonical, catalog_text):
-		return
-	# sort_keys=false keeps our stable order; see _normalized_layout.
-	if not _write_file(Layout.BAKED_PATH, JSON.stringify(_normalized_layout(), "  ", false) + "\n"):
+	var layout_text := JSON.stringify(_normalized_layout(), "  ", false) + "\n"
+	# Write all three (and short-circuit on the first failure). On ANY failure,
+	# roll back the in-memory version bump so a retry recomputes the SAME version
+	# (no double-bump) and keep dirty; a partial on-disk write self-heals on the
+	# next successful save (baked + canonical get the same bytes again).
+	if not (_write_file(Catalog.BAKED_PATH, catalog_text) \
+			and _write_file(canonical, catalog_text) \
+			and _write_file(Layout.BAKED_PATH, layout_text)):
+		_catalog["catalog_version"] = old_v
 		return
 
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
-	var v := int(_catalog.get("catalog_version", 1))
 	_catalog_dirty = false
 	_refresh_cat_tree()
 	_status.text = "Saved catalog v%d + map ✓ (baked + canonical)%s" % [
-		v, ("  — version bumped; publish via the Remote Config tab to reach the deployed validator" if bumped else "")]
+		int(_catalog.get("catalog_version", 1)),
+		("  — version bumped; publish via the Remote Config tab to reach the deployed validator" if bumped else "")]
 
 
 func _write_file(path: String, text: String) -> bool:
@@ -704,7 +708,23 @@ func _on_remove_cat() -> void:
 	_clear_form()
 	_refresh_world_opt()
 	_refresh_cat_tree()
-	_refresh()
+	# The active world may have just been removed — re-point it at a surviving
+	# world (or none) so _refresh()/_world_map() can't resurrect an orphan entry.
+	var worlds := Catalog.ordered_worlds(_catalog)
+	var valid := false
+	for w in worlds:
+		if str(w.get("id", "")) == _world_id:
+			valid = true
+	if not valid:
+		_world_id = str(worlds[0].get("id", "")) if not worlds.is_empty() else ""
+		_sync_world_opt()
+	if _world_id != "":
+		_load_world()
+	else:
+		_canvas.texture = null
+		for c in _overlay.get_children():
+			c.queue_free()
+		_markers.clear()
 
 
 # ── catalog tab: the selected world/level edit form ───────────────────────────
