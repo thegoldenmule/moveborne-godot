@@ -83,22 +83,28 @@ func _run() -> void:
 			all_resolve = false
 	_check("all level scenario_ids resolve", all_resolve)
 
-	# 5. dock instantiation smoke — _ready → _build_ui (tabs/tree/form) → _reload
-	#    run without runtime errors and the catalog tree populates.
+	# 5. dock + service smoke — the dock is now a view over StoryMapService (the
+	#    EditorToolPlugin injects the service). Inject it here, then _ready →
+	#    _build_ui (tabs/tree/form) → _reload run without errors and the tree fills.
+	var svc = preload("res://addons/story_map_editor/story_map_service.gd").new()
 	var dock = preload("res://addons/story_map_editor/dock.gd").new()
+	dock.service = svc
+	root.add_child(svc)
 	root.add_child(dock)
 	await process_frame  # let _ready → _build_ui → _reload run
 	var tree_root = dock._cat_tree.get_root() if dock._cat_tree != null else null
 	_check("dock builds + catalog tree populated",
 		tree_root != null and tree_root.get_child_count() == Catalog.ordered_worlds(catalog).size())
 
-	# Adding a level auto-places a dot in that world (no manual click needed).
+	# Adding a level via the dock auto-places a dot in that world (the dock calls
+	# the service, which mutates + emits `changed`).
 	dock._cat_sel = {"kind": "world", "world_id": "w1"}
-	var dots_before: int = dock._dots_for_world("w1").size()
+	var dots_before: int = svc.dots_for_world("w1").size()
 	dock._on_add_level()
-	_check("add level auto-places a dot", dock._dots_for_world("w1").size() == dots_before + 1)
+	_check("add level auto-places a dot", svc.dots_for_world("w1").size() == dots_before + 1)
 
 	dock.queue_free()
+	svc.queue_free()
 
 	print("VERIFY catalog_edit: %s" % ["PASS" if _ok else "FAIL"])
 	quit(0 if _ok else 1)

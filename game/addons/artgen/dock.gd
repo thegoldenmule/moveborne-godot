@@ -5,6 +5,8 @@ extends Control
 ## Pure-code UI (no .tscn) — everything binds to the UI-free service, and the
 ## service's signals keep the gallery live when the MCP bridge drives work.
 
+const Ui := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
+
 var service: Node
 
 var _preset_option: OptionButton
@@ -95,8 +97,7 @@ func _on_generation_failed(error: String) -> void:
 # -- UI construction ----------------------------------------------------------
 
 func _build_ui() -> void:
-	var split := HSplitContainer.new()
-	split.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var split := Ui.split_root()  # full-rect HSplitContainer (shared builder)
 	add_child(split)
 
 	split.add_child(_build_compose())

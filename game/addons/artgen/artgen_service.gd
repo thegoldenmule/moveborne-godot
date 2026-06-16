@@ -1,8 +1,8 @@
 @tool
 class_name ArtgenService
-extends Node
+extends "res://addons/editor_tool_kit/tool_service.gd"
 
-## UI-free ArtGen core: presets/config, request building, decode + immediate
+## UI-free ArtGen core (a ToolService: ok()/err() return contract, headless-safe): presets/config, request building, decode + immediate
 ## write, post-processing, the save pipeline (res://assets/generated/ +
 ## ai_manifest.json), ledger journaling, and thumbnails. The dock and the MCP
 ## bridge are both thin callers; signals keep the dock fresh when the bridge
@@ -128,8 +128,8 @@ func set_api_key(key: String) -> void:
 func build_payload(opts: Dictionary) -> Dictionary:
 	var preset_name := str(opts.get("preset", ""))
 	if not presets.has(preset_name):
-		return {"ok": false, "error": "unknown preset '%s' (have: %s)" % [
-			preset_name, ", ".join(presets.keys())]}
+		return err("unknown preset '%s' (have: %s)" % [
+			preset_name, ", ".join(presets.keys())])
 	var preset: Dictionary = presets[preset_name]
 
 	var subject := str(opts.get("subject", ""))
@@ -162,8 +162,8 @@ func build_payload(opts: Dictionary) -> Dictionary:
 		if caps.get("supports_styles", true):
 			payload["style_id"] = str(style_id)
 		elif opts.get("style_id") != null:
-			return {"ok": false, "error": ("custom styles are v2/v3-only; %s rejects " +
-				"style_id (use a v3 model kind, or style_id 'none')") % model}
+			return err(("custom styles are v2/v3-only; %s rejects " +
+				"style_id (use a v3 model kind, or style_id 'none')") % model)
 		# else: preset/config-inherited style — silently omitted for v4.x
 	var controls: Variant = opts.get("controls", preset.get("controls"))
 	if controls != null:
@@ -235,7 +235,7 @@ func generate(opts: Dictionary) -> Dictionary:
 		LedgerT.append(ledger_path, failed)
 		reload_history()
 		generation_failed.emit(msg)
-		return {"ok": false, "error": msg, "code": resp.get("code", 0)}
+		return err(msg, resp.get("code", 0))
 
 	var old_balance := balance
 	await _refresh_balance()
@@ -257,7 +257,7 @@ func generate(opts: Dictionary) -> Dictionary:
 			var fa := FileAccess.open(abs_path, FileAccess.WRITE)
 			if fa == null:
 				generation_failed.emit("cannot write " + rel)
-				return {"ok": false, "error": "cannot write %s (err %d)" % [rel, FileAccess.get_open_error()]}
+				return err("cannot write %s (err %d)" % [rel, FileAccess.get_open_error()])
 			fa.store_buffer(raw)
 			fa.close()
 		else:
@@ -268,7 +268,7 @@ func generate(opts: Dictionary) -> Dictionary:
 			var werr := _write_raster_as_png(raw, abs_path)
 			if werr != OK:
 				generation_failed.emit("cannot decode raster " + rel)
-				return {"ok": false, "error": "cannot decode/write %s (err %d)" % [rel, werr]}
+				return err("cannot decode/write %s (err %d)" % [rel, werr])
 		var event := base_event.duplicate()
 		event["id"] = gid
 		event["n_index"] = i
@@ -280,7 +280,7 @@ func generate(opts: Dictionary) -> Dictionary:
 
 	reload_history()
 	generation_completed.emit(records)
-	return {"ok": true, "generations": records}
+	return ok({"generations": records})
 
 
 # -- Save pipeline ------------------------------------------------------------
@@ -292,7 +292,7 @@ func generate(opts: Dictionary) -> Dictionary:
 func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 	var rec: Dictionary = _index["generations"].get(gen_id, {})
 	if rec.is_empty() or rec.get("file") == null:
-		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
+		return err("unknown generation '%s'" % gen_id)
 
 	var ext := str(rec["file"]).get_extension()
 	# Raw bakes (post steps skipped) live in a separate pool file so they never
@@ -300,13 +300,13 @@ func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 	var pool_path := "%s/%s%s.%s" % [POOL_DIR, gen_id, (".raw" if raw else ""), ext]
 	if FileAccess.file_exists(pool_path):
 		# Already baked — trust it; declared post steps stand in for "applied".
-		return {"ok": true, "pool_path": pool_path, "ext": ext,
-			"sha": FileAccess.get_sha256(pool_path), "post": ([] if raw else rec.get("post", [])), "rec": rec}
+		return ok({"pool_path": pool_path, "ext": ext,
+			"sha": FileAccess.get_sha256(pool_path), "post": ([] if raw else rec.get("post", [])), "rec": rec})
 
 	var src_abs := repo_root.path_join(str(rec["file"]))
 	var bytes := FileAccess.get_file_as_bytes(src_abs)
 	if bytes.is_empty():
-		return {"ok": false, "error": "generation file missing: " + str(rec["file"])}
+		return err("generation file missing: " + str(rec["file"]))
 
 	var applied: Array = []
 	for step in (([] if raw else rec.get("post", [])) as Array):
@@ -328,10 +328,10 @@ func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 				if ext == "png":
 					var rb: Dictionary = await client.remove_background(bytes)
 					if not rb.get("ok", false):
-						return {"ok": false, "error": "removeBackground failed: " + str(rb.get("error"))}
+						return err("removeBackground failed: " + str(rb.get("error")))
 					var b64: Variant = rb.get("data", {}).get("image", {}).get("b64_json")
 					if b64 == null:
-						return {"ok": false, "error": "removeBackground returned an unexpected shape"}
+						return err("removeBackground returned an unexpected shape")
 					bytes = Marshalls.base64_to_raw(str(b64))
 					applied.append("removeBackground")
 
@@ -341,17 +341,17 @@ func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 		# back WebP) so the imported asset is a real .png.
 		var werr := _write_raster_as_png(bytes, ProjectSettings.globalize_path(pool_path))
 		if werr != OK:
-			return {"ok": false, "error": "cannot decode/write %s (err %d)" % [pool_path, werr]}
+			return err("cannot decode/write %s (err %d)" % [pool_path, werr])
 	else:
 		var fa := FileAccess.open(pool_path, FileAccess.WRITE)
 		if fa == null:
-			return {"ok": false, "error": "cannot write %s (err %d)" % [pool_path, FileAccess.get_open_error()]}
+			return err("cannot write %s (err %d)" % [pool_path, FileAccess.get_open_error()])
 		fa.store_buffer(bytes)
 		fa.close()
 
 	await _rescan_filesystem()
-	return {"ok": true, "pool_path": pool_path, "ext": ext,
-		"sha": FileAccess.get_sha256(pool_path), "post": applied, "rec": rec}
+	return ok({"pool_path": pool_path, "ext": ext,
+		"sha": FileAccess.get_sha256(pool_path), "post": applied, "rec": rec})
 
 
 ## Promote a generation into the game as a GenTexture ref: bakes its pixels into
@@ -360,13 +360,13 @@ func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 ## a ledger save event. Scenes bind to the .tres; rename/move/swap stay intact.
 func save_generation(gen_id: String, category: String, asset_name: String, raw: bool = false) -> Dictionary:
 	if not SAVE_CATEGORIES.has(category):
-		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
+		return err("category must be one of %s" % str(SAVE_CATEGORIES))
 	if not asset_name.is_valid_filename() or asset_name.is_empty():
-		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+		return err("invalid asset name '%s'" % asset_name)
 
 	var dest := "res://assets/generated/%s/%s.tres" % [category, asset_name]
 	if FileAccess.file_exists(dest):
-		return {"ok": false, "error": "asset already exists: " + dest}
+		return err("asset already exists: " + dest)
 
 	var baked := await _bake_to_pool(gen_id, raw)
 	if not baked.get("ok", false):
@@ -390,11 +390,11 @@ func swap_permutation(ref_path: String, gen_id: String, raw: bool = false) -> Di
 	print("[artgen] swap_permutation: bake %s%s, write into %s" % [gen_id, (" (raw)" if raw else ""), ref_path])
 	if not FileAccess.file_exists(ref_path):
 		push_warning("[artgen] swap: no ref at %s" % ref_path)
-		return {"ok": false, "error": "no ref at " + ref_path}
+		return err("no ref at " + ref_path)
 	var ref: Variant = ResourceLoader.load(ref_path, "", ResourceLoader.CACHE_MODE_IGNORE)
 	if not (ref is GenTextureT):
 		push_warning("[artgen] swap: %s is not a GenTexture ref" % ref_path)
-		return {"ok": false, "error": "not a GenTexture ref: " + ref_path}
+		return err("not a GenTexture ref: " + ref_path)
 
 	var baked := await _bake_to_pool(gen_id, raw)
 	if not baked.get("ok", false):
@@ -455,7 +455,7 @@ func _write_ref(dest: String, gen_id: String, baked: Dictionary) -> Dictionary:
 	var ref := GenTextureT.new()
 	ref.source = _load_texture(str(baked["pool_path"]))
 	if ref.source == null:
-		return {"ok": false, "error": "cannot load baked pixels: " + str(baked["pool_path"])}
+		return err("cannot load baked pixels: " + str(baked["pool_path"]))
 	ref.gen_id = gen_id
 	ref.batch_id = str(rec.get("batch_id", ""))
 	ref.prompt = str(rec.get("prompt", ""))
@@ -468,7 +468,7 @@ func _write_ref(dest: String, gen_id: String, baked: Dictionary) -> Dictionary:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dest.get_base_dir()))
 	var serr := ResourceSaver.save(ref, dest)
 	if serr != OK:
-		return {"ok": false, "error": "cannot write ref %s (err %d)" % [dest, serr]}
+		return err("cannot write ref %s (err %d)" % [dest, serr])
 	await _rescan_filesystem()
 
 	var uid := _uid_for(dest)
@@ -494,8 +494,8 @@ func _write_ref(dest: String, gen_id: String, baked: Dictionary) -> Dictionary:
 		"modified_after_save": false,
 	}
 	_store_manifest(manifest)
-	return {"ok": true, "dest": dest, "uid": uid, "gen_id": gen_id,
-		"pool": baked["pool_path"], "sha256": baked["sha"], "post": baked["post"]}
+	return ok({"dest": dest, "uid": uid, "gen_id": gen_id,
+		"pool": baked["pool_path"], "sha256": baked["sha"], "post": baked["post"]})
 
 
 ## The uid:// text id Godot assigned a freshly-imported resource (empty if none).
@@ -525,16 +525,16 @@ func _load_texture(path: String) -> Texture2D:
 
 func discard_generation(gen_id: String) -> Dictionary:
 	if not _index["generations"].has(gen_id):
-		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
+		return err("unknown generation '%s'" % gen_id)
 	LedgerT.append(ledger_path, {"type": "discard", "gen_id": gen_id, "ts": _now_iso()})
 	reload_history()
-	return {"ok": true}
+	return ok()
 
 
 func create_style(base_style: String, ref_paths: Array) -> Dictionary:
 	var resp: Dictionary = await client.create_style(base_style, ref_paths)
 	if not resp.get("ok", false):
-		return {"ok": false, "error": str(resp.get("error"))}
+		return err(str(resp.get("error")))
 	var style_id := str(resp["data"]["id"])
 	LedgerT.append(ledger_path, {
 		"type": "style_created", "ts": _now_iso(), "style_id": style_id,
@@ -544,7 +544,7 @@ func create_style(base_style: String, ref_paths: Array) -> Dictionary:
 	})
 	reload_history()
 	await _refresh_balance()
-	return {"ok": true, "style_id": style_id}
+	return ok({"style_id": style_id})
 
 
 # -- History / index ----------------------------------------------------------
@@ -715,11 +715,11 @@ func check_manifest() -> Dictionary:
 ## the .tres, then delete it. Returns the _write_ref result.
 func migrate_asset(old_path: String, category: String, asset_name: String) -> Dictionary:
 	if not FileAccess.file_exists(old_path):
-		return {"ok": false, "error": "no file at " + old_path}
+		return err("no file at " + old_path)
 	if not SAVE_CATEGORIES.has(category):
-		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
+		return err("category must be one of %s" % str(SAVE_CATEGORIES))
 	if not asset_name.is_valid_filename() or asset_name.is_empty():
-		return {"ok": false, "error": "invalid asset name '%s'" % asset_name}
+		return err("invalid asset name '%s'" % asset_name)
 
 	var manifest := _load_manifest()
 	var entry: Dictionary = manifest["assets"].get(old_path, {})
@@ -736,7 +736,7 @@ func migrate_asset(old_path: String, category: String, asset_name: String) -> Di
 		var bytes := FileAccess.get_file_as_bytes(old_path)
 		var fa := FileAccess.open(pool_path, FileAccess.WRITE)
 		if fa == null:
-			return {"ok": false, "error": "cannot write pool file " + pool_path}
+			return err("cannot write pool file " + pool_path)
 		fa.store_buffer(bytes)
 		fa.close()
 		await _rescan_filesystem()

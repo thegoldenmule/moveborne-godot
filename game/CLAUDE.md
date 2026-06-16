@@ -92,11 +92,24 @@ verifier/suite — never hand-write expected values.
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
   dist), or `cd ../validator && bun run dev`. Endpoints + the MCP debug tools are in
   `../validator/README.md` and `../validator/src/validator/CLAUDE.md`.
-- **ArtGen (AI asset generation):** `addons/artgen/` — bottom-panel dock + Recraft
-  client + localhost bridge (`:4848`) behind the `artgen` MCP (`../tools/artgen_mcp.ts`).
-  History journals to `../art/generated/ledger.jsonl`; saves land in
-  `res://assets/generated/` with attribution in `ai_manifest.json`. Headless check:
+- **Editor tool framework:** `addons/editor_tool_kit/` — shared bases for
+  in-editor authoring tools (`EditorToolPlugin` + `ToolService` + a dock, with an
+  optional `BridgeServer` + the `ContentStore` / `EditorToolUi` helpers). A new
+  tool is a service + a view; the service is headless-testable (no `Control` /
+  `EditorInterface` deps). Recipe + verifying: `addons/editor_tool_kit/README.md`.
+  Headless check: `--script res://tools/verify_editor_tool_kit.gd`.
+- **ArtGen (AI asset generation):** `addons/artgen/` — an `editor_tool_kit` tool
+  (plugin + `ArtgenService(ToolService)` + `ArtgenBridge(BridgeServer)` + dock).
+  Bottom-panel dock + Recraft client + localhost bridge (`:4848`) behind the
+  `artgen` MCP (`../tools/artgen_mcp.ts`). History journals to
+  `../art/generated/ledger.jsonl`; saves land in `res://assets/generated/` with
+  attribution in `ai_manifest.json`. Headless check:
   `--script res://tools/verify_artgen_svg.gd`.
+- **Story Map (level-dot authoring):** `addons/story_map_editor/` — an
+  `editor_tool_kit` tool (plugin + `StoryMapService(ToolService)` + dock, no
+  bridge). The service owns the catalog + layout, mutations, validation, the
+  3-file byte-identical save, and the Remote Config helpers; the dock is the view.
+  Headless check: `--script res://tools/verify_story_map_service.gd`.
 
 ## GDScript gotchas (learned the hard way)
 

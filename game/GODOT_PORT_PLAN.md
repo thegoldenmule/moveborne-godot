@@ -63,6 +63,7 @@
 ### Tooling
 - Author scenes/scripts via the **`godot-ai` MCP** (`node_create`, `scene_manage`, `script_create/patch`, `autoload_manage`, `animation_manage`, `particle_manage`, `material_manage`, `signal_manage`, `input_map_manage`, `project_run`, `test_run`, `editor_screenshot`).
 - Tests = `res://tests/test_*.gd` subclasses of `McpTestSuite` (built-in runner, **not** GUT). Every test must make ≥1 assertion or it auto-fails; name throwaway nodes `_McpTest*`.
+- **In-editor authoring tools** build on `addons/editor_tool_kit/` — shared bases (`EditorToolPlugin` + `ToolService` + dock, optional `BridgeServer`, plus the `ContentStore` / `EditorToolUi` helpers). A tool is a *service + a view*: the service owns state/mutations/save and stays headless-testable (no `Control`/`EditorInterface` deps), the dock renders. Consumers: `addons/artgen/` (with a `:4848` MCP bridge) and `addons/story_map_editor/` (dock-only). Recipe: `addons/editor_tool_kit/README.md`.
 
 ---
 

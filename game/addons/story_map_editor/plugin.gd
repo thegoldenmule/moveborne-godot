@@ -1,24 +1,22 @@
 @tool
-extends EditorPlugin
+extends "res://addons/editor_tool_kit/editor_tool_plugin.gd"
 
 ## Story Map editor plugin: a bottom-panel dock for placing the per-level dots
 ## that the Story Mode map renders. Pure editor-side authoring — it reads the
-## committed story_catalog.json + story_maps.json and writes story_maps.json.
-## No runtime/game dependency and no bridge (placement needs no cloud service).
+## committed story_catalog.json + story_maps.json and writes the catalog
+## (baked + canonical) + story_maps.json. No runtime/game dependency and no
+## bridge (placement needs no cloud service). The shared EditorToolPlugin base
+## constructs the StoryMapService + dock and mounts/tears them down.
 
+const ServiceT := preload("res://addons/story_map_editor/story_map_service.gd")
 const DockT := preload("res://addons/story_map_editor/dock.gd")
 
-var _dock: Control
 
-
-func _enter_tree() -> void:
-	_dock = DockT.new()
-	_dock.name = "StoryMap"
-	add_control_to_bottom_panel(_dock, "Story Map")
-
-
-func _exit_tree() -> void:
-	if _dock != null:
-		remove_control_from_bottom_panel(_dock)
-		_dock.free()
-		_dock = null
+func _config() -> Dictionary:
+	return {
+		"panel": "Story Map",
+		"service": ServiceT,
+		"dock": DockT,
+		"service_name": "StoryMapService",
+		"dock_name": "StoryMap",
+	}
