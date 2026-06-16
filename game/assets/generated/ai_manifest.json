@@ -284,6 +284,20 @@
 			"sha256": "4f6c3839ab9104c1778644236bc71357da4f35bbc3ac08a790c420bae27107dc",
 			"style_id": null
 		},
+		"res://assets/generated/maps/story_map_w1.png": {
+			"batch_id": "b_1781295014_5a9f",
+			"gen_id": "g_1781295015_4cfa",
+			"generated_at": "",
+			"generator": "recraft/recraftv4_1",
+			"modified_after_save": false,
+			"pool": "art/generated/2026-06/g_1781295015_4cfa-ice-planet.png",
+			"post": [],
+			"prompt": "Full-screen vertical 2:3 mobile-game level-select map, occult arcade tarot poster composition ... candy-crush style trail winds up the central vertical axis studded with evenly-spaced round waypoint nodes. Theme: ice planet. (story-map-baked preset)",
+			"ref_path": "res://assets/generated/maps/story_map_w1.png",
+			"saved_at": "2026-06-16T00:00:00Z",
+			"sha256": "c57c4c013602500af375abba80ba96033f4b627ac07604057023fa29f7eb6735",
+			"style_id": null
+		},
 		"res://assets/generated/misc/v41_smoke_sigil.svg": {
 			"gen_id": "g_1781107690_325c",
 			"generated_at": "2026-06-10T16:08:10Z",

@@ -17,11 +17,13 @@ const AuthS := preload("res://net/snapser_auth.gd")
 const RemoteConfigS := preload("res://net/remote_config_client.gd")
 const ProgressClientS := preload("res://net/story_progress_client.gd")
 const Catalog := preload("res://story/story_catalog.gd")
+const Layout := preload("res://story/story_map_layout.gd")
 const Reg := preload("res://ui/mcp_ui_reg.gd")
 
 const SCREEN_MARGIN := 24.0
 const STAR_FULL := "★"
 const STAR_EMPTY := "☆"
+const DOT_SIZE := Vector2(46, 46)
 
 var _auth: MbSnapserAuth
 var _remote_config: Node    # MbRemoteConfigClient
@@ -29,6 +31,7 @@ var _progress_client: Node  # MbStoryProgressClient
 
 var _catalog: Dictionary = {}
 var _baked: Dictionary = {}  # parsed once; the fallback never changes at runtime
+var _layout: Dictionary = {} # story_maps.json (texture + dot positions per world)
 var _world_index := 0
 var _online := false
 var _refreshing := false
@@ -39,10 +42,21 @@ var _world_prev: Button
 var _world_next: Button
 var _scroll: ScrollContainer
 var _level_list: VBoxContainer
+var _map_tex: TextureRect    # world background; visible when the world has a map
+var _dot_layer: Control      # absolutely-positioned level dots over _map_tex
+var _dots: Array = []        # [{btn, x, y}] for resolution-independent repositioning
 var _play_btn: Button
 var _status: Label
 var _gate: Control          # connect-to-play panel (offline)
 var _overlay: Control       # level-result overlay
+
+# Level-detail modal (CanvasLayer; its own MbUi screen "story_level_detail").
+var _detail_modal: CanvasLayer
+var _detail_name: Label
+var _detail_status: Label
+var _detail_stars: Label
+var _detail_play: Button
+var _detail_level: Dictionary = {}
 
 
 func _ready() -> void:
@@ -62,6 +76,7 @@ func _ready() -> void:
 	# Render immediately from the baked catalog + cached progress; refresh()
 	# (called by StoryMapState after the reveal) swaps in live data.
 	_baked = Catalog.load_baked()
+	_layout = Layout.load_baked()
 	_catalog = _baked if GameState.story_catalog.is_empty() else GameState.story_catalog
 	_world_index = _frontier_world_index()
 	_rebuild()
@@ -177,11 +192,39 @@ func _build_ui() -> void:
 	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_status)
 
-	# The level path: a scrollable vertical list, level 1 at the top.
+	# The body rect shared by both renderings (map and flat-list fallback).
+	var body_pos := Vector2(SCREEN_MARGIN, 122.0)
+	var body_size := Vector2(vp.x - 2.0 * SCREEN_MARGIN, vp.y - 122.0 - 96.0)
+
+	# Interactive map: a background texture with absolutely-positioned dots. Shown
+	# when the current world has a map in story_maps.json; otherwise hidden and the
+	# flat list below takes over (graceful fallback).
+	_map_tex = TextureRect.new()
+	_map_tex.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_map_tex.position = body_pos
+	_map_tex.size = body_size
+	_map_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	# Fill the body rect so normalized dot coords map linearly to it (the editor
+	# authors against the same full-rect basis).
+	_map_tex.stretch_mode = TextureRect.STRETCH_SCALE
+	_map_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_map_tex.visible = false
+	add_child(_map_tex)
+
+	_dot_layer = Control.new()
+	_dot_layer.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_dot_layer.position = body_pos
+	_dot_layer.size = body_size
+	_dot_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE  # dots themselves catch input
+	_dot_layer.visible = false
+	_dot_layer.resized.connect(_reposition_dots)
+	add_child(_dot_layer)
+
+	# The level path: a scrollable vertical list, level 1 at the top (fallback).
 	_scroll = ScrollContainer.new()
 	_scroll.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_scroll.position = Vector2(SCREEN_MARGIN, 122.0)
-	_scroll.size = Vector2(vp.x - 2.0 * SCREEN_MARGIN, vp.y - 122.0 - 96.0)
+	_scroll.position = body_pos
+	_scroll.size = body_size
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(_scroll)
 
@@ -205,6 +248,7 @@ func _build_ui() -> void:
 	add_child(_play_btn)
 
 	_build_gate()
+	_build_level_detail_modal()
 
 
 ## Connect-to-play gate (story is online-only). Covers the map until a session
@@ -297,6 +341,56 @@ func _rebuild() -> void:
 	_world_prev.disabled = _world_index == 0
 	_world_next.disabled = _world_index >= worlds.size() - 1
 
+	# Interactive map when this world has one; otherwise the flat-list fallback.
+	if Layout.has_map(_layout, str(world.get("id", ""))):
+		_render_dots(str(world.get("id", "")), progress, frontier)
+	else:
+		_render_flat_list(levels, worlds, progress, frontier)
+
+	var next_level := Catalog.get_level(_catalog, frontier)
+	if frontier == "":
+		_play_btn.text = "All levels complete"
+		_play_btn.disabled = true
+	else:
+		_play_btn.text = "Play  ·  %s" % str(next_level.get("name", frontier))
+		_play_btn.disabled = not _online
+
+
+## Map rendering: the world texture plus one dot button per level, placed from the
+## normalized story_maps.json positions. Lock/star state is the SAME frontier math
+## the flat list uses (is_level_unlocked); dots only display it.
+func _render_dots(world_id: String, progress: Dictionary, frontier: String) -> void:
+	_scroll.visible = false
+	_map_tex.visible = true
+	_dot_layer.visible = true
+	var tex_path := Layout.texture_for_world(_layout, world_id)
+	_map_tex.texture = load(tex_path) if ResourceLoader.exists(tex_path) else null
+
+	for c in _dot_layer.get_children():
+		c.queue_free()
+	_dots.clear()
+	for dot in Layout.dots_for_world(_layout, world_id):
+		var id := str(dot.get("level_id", ""))
+		var level := Catalog.get_level(_catalog, id)
+		if level.is_empty():
+			continue
+		var unlocked := Catalog.is_level_unlocked(_catalog, progress, id)
+		var btn := _make_level_dot(level, progress, id == frontier, unlocked)
+		_dot_layer.add_child(btn)
+		_dots.append({"btn": btn, "x": float(dot.get("x", 0.5)), "y": float(dot.get("y", 0.5))})
+	_reposition_dots()
+
+
+## Flat vertical list (the original rendering), kept as the fallback for worlds
+## without map data.
+func _render_flat_list(levels: Array, worlds: Array, progress: Dictionary, frontier: String) -> void:
+	_map_tex.visible = false
+	_dot_layer.visible = false
+	_scroll.visible = true
+	for c in _dot_layer.get_children():
+		c.queue_free()
+	_dots.clear()
+
 	for c in _level_list.get_children():
 		c.queue_free()
 	var focus_row: Control = null
@@ -319,13 +413,18 @@ func _rebuild() -> void:
 	if focus_row != null:
 		_scroll_to.call_deferred(focus_row)
 
-	var next_level := Catalog.get_level(_catalog, frontier)
-	if frontier == "":
-		_play_btn.text = "All levels complete"
-		_play_btn.disabled = true
-	else:
-		_play_btn.text = "Play  ·  %s" % str(next_level.get("name", frontier))
-		_play_btn.disabled = not _online
+
+## Re-place every dot from its normalized (x, y) against the current dot-layer
+## rect, so the map stays correct across viewport resizes.
+func _reposition_dots() -> void:
+	if _dot_layer == null:
+		return
+	var rect := _dot_layer.size
+	for d in _dots:
+		var btn: Control = d.get("btn")
+		if not is_instance_valid(btn):
+			continue
+		btn.position = Vector2(float(d.get("x", 0.5)), float(d.get("y", 0.5))) * rect - DOT_SIZE * 0.5
 
 
 func _scroll_to(row: Control) -> void:
@@ -354,6 +453,174 @@ func _make_level_row(level: Dictionary, progress: Dictionary, is_next: bool, unl
 		btn.pressed.connect(_launch_level.bind(level))
 	Reg.adopt(btn, "level_%s" % id)
 	return btn
+
+
+## A single map dot: a round button showing the level number (or a lock), with a
+## compact star count beneath when unlocked. Clicking it opens the detail modal.
+## Mirrors _make_level_row's next/completed/locked styling. Records its render
+## state as meta for headless verification.
+func _make_level_dot(level: Dictionary, progress: Dictionary, is_next: bool, unlocked: bool) -> Control:
+	var id := str(level.get("id", ""))
+	var stars := Catalog.stars_for(progress, id)
+
+	var btn := Button.new()
+	btn.focus_mode = Control.FOCUS_NONE
+	btn.custom_minimum_size = DOT_SIZE
+	btn.size = DOT_SIZE
+	btn.clip_text = true
+	btn.add_theme_font_size_override("font_size", 18)
+	var num := int(level.get("order", 0)) + 1
+	btn.text = str(num) if unlocked else "🔒"
+	btn.tooltip_text = str(level.get("name", id))
+	_style_level_dot(btn, unlocked, is_next, stars)
+	btn.pressed.connect(_show_level_detail.bind(level))
+	btn.set_meta("stars", stars)
+	btn.set_meta("unlocked", unlocked)
+	btn.set_meta("is_next", is_next)
+	Reg.adopt(btn, "level_%s" % id)
+
+	# Compact star count under the dot (★ count, not full ★/☆) — keeps the dot
+	# readable while still surfacing earned stars on the map.
+	var pip := Label.new()
+	pip.text = ("%d %s" % [stars, STAR_FULL]) if unlocked else ""
+	pip.add_theme_font_size_override("font_size", 12)
+	pip.add_theme_color_override("font_color", Color("ffd54a") if stars > 0 else MbStyle.DIM)
+	pip.position = Vector2(-DOT_SIZE.x * 0.5, DOT_SIZE.y - 2.0)
+	pip.size = Vector2(DOT_SIZE.x * 2.0, 16)
+	pip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(pip)
+	return btn
+
+
+## Round dot styling: next glows (primary border + halo, white text), completed
+## dots get a calm primary border, plain unlocked dots a faint light border, and
+## locked dots a dim border + dim glyph.
+func _style_level_dot(b: Button, unlocked: bool, is_next: bool, stars: int) -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = MbStyle.BOARD
+	sb.set_corner_radius_all(int(DOT_SIZE.x / 2.0))
+	sb.set_border_width_all(2)
+	if is_next:
+		sb.border_color = MbStyle.PRIMARY
+		sb.shadow_color = Color(MbStyle.PRIMARY, 0.55)
+		sb.shadow_size = 8
+	elif unlocked and stars > 0:
+		sb.border_color = Color(MbStyle.PRIMARY, 0.6)
+	elif unlocked:
+		sb.border_color = Color(MbStyle.TEXT, 0.4)
+	else:
+		sb.border_color = Color(MbStyle.DIM, 0.35)
+	var hover := sb.duplicate()
+	hover.bg_color = Color(MbStyle.PRIMARY, 0.22)
+	for st in ["normal", "focus", "disabled"]:
+		b.add_theme_stylebox_override(st, sb)
+	for st in ["hover", "pressed", "hover_pressed"]:
+		b.add_theme_stylebox_override(st, hover)
+	var fg := Color.WHITE if is_next else (MbStyle.TEXT if unlocked else Color(MbStyle.DIM, 0.8))
+	b.add_theme_color_override("font_color", fg)
+	b.add_theme_color_override("font_hover_color", Color.WHITE)
+
+
+# ── level-detail modal ─────────────────────────────────────────────────────────
+
+
+## A small centered modal (its own CanvasLayer + MbUi screen) showing the tapped
+## level's name, lock status, stars, and a Play button. Built once, hidden until a
+## dot is pressed; mirrors the settings_tab avatar-picker pattern.
+func _build_level_detail_modal() -> void:
+	_detail_modal = CanvasLayer.new()
+	_detail_modal.layer = 20
+	_detail_modal.visible = false
+	Reg.screen(_detail_modal, "story_level_detail")
+	add_child(_detail_modal)
+	visibility_changed.connect(func() -> void:
+		if not visible:
+			_hide_level_detail())
+
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_detail_modal.add_child(root)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.66)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dim.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			_hide_level_detail())
+	root.add_child(dim)
+
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(center)
+
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = MbStyle.BOARD
+	sb.border_color = MbStyle.PRIMARY
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(10)
+	sb.set_content_margin_all(22)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	box.custom_minimum_size = Vector2(300, 0)
+	panel.add_child(box)
+
+	_detail_name = Label.new()
+	_detail_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_detail_name.add_theme_font_size_override("font_size", 22)
+	_detail_name.add_theme_color_override("font_color", MbStyle.PRIMARY)
+	box.add_child(_detail_name)
+
+	_detail_stars = Label.new()
+	_detail_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_detail_stars.add_theme_font_size_override("font_size", 30)
+	_detail_stars.add_theme_color_override("font_color", Color("ffd54a"))
+	box.add_child(_detail_stars)
+
+	_detail_status = Label.new()
+	_detail_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_detail_status.add_theme_font_size_override("font_size", 15)
+	_detail_status.add_theme_color_override("font_color", MbStyle.DIM)
+	box.add_child(_detail_status)
+
+	_detail_play = Reg.button("play", box, "Play")  # MbUi: story_level_detail.play
+	_detail_play.focus_mode = Control.FOCUS_NONE
+	_detail_play.custom_minimum_size = Vector2(0, 46)
+	_detail_play.add_theme_font_size_override("font_size", 20)
+	_style_chrome_button(_detail_play)
+	_detail_play.pressed.connect(_on_detail_play)
+
+
+func _show_level_detail(level: Dictionary) -> void:
+	_detail_level = level
+	var id := str(level.get("id", ""))
+	var progress: Dictionary = GameState.story_progress
+	var stars := Catalog.stars_for(progress, id)
+	var unlocked := Catalog.is_level_unlocked(_catalog, progress, id)
+	_detail_name.text = str(level.get("name", id))
+	_detail_stars.text = _star_string(stars)
+	_detail_status.text = "Unlocked" if unlocked else "🔒 Locked"
+	_detail_play.disabled = not unlocked or not _online
+	_detail_play.modulate = Color(1, 1, 1, 0.5) if _detail_play.disabled else Color.WHITE
+	_detail_modal.visible = true
+
+
+func _on_detail_play() -> void:
+	var level := _detail_level
+	_hide_level_detail()
+	if not level.is_empty():
+		_launch_level(level)
+
+
+func _hide_level_detail() -> void:
+	if _detail_modal != null:
+		_detail_modal.visible = false
 
 
 func _launch_level(level: Dictionary) -> void:
