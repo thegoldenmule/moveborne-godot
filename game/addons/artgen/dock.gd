@@ -659,12 +659,29 @@ func _select(gen_id: String) -> void:
 	_refresh_detail()
 
 
+## "Ice Planet!" → "ice_planet": lower-case, runs of non-alphanumerics collapse
+## to a single underscore, trimmed — a valid, readable default asset filename.
+func _default_save_name(rec: Dictionary) -> String:
+	var s := str(rec.get("subject", "")).to_lower()
+	var out := ""
+	for ch in s:
+		if (ch >= "a" and ch <= "z") or (ch >= "0" and ch <= "9"):
+			out += ch
+		elif out.length() > 0 and not out.ends_with("_"):
+			out += "_"
+	return out.trim_suffix("_")
+
+
 func _refresh_detail() -> void:
 	var rec: Dictionary = service.get_generation(_selected_id)
 	if rec.is_empty():
 		_set_detail_enabled(false)
 		return
 	_set_detail_enabled(true)
+
+	# Default the save name to a snake_case of the subject ("Ice Planet" →
+	# "ice_planet"), refreshed on every image click so it tracks the selection.
+	_name_edit.text = _default_save_name(rec)
 
 	var style_box := StyleBoxFlat.new()
 	style_box.bg_color = Color.BLACK
