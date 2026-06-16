@@ -419,9 +419,19 @@ func _on_save() -> void:
 
 
 func _on_swap(ref_path: String, gen_id: String) -> void:
+	print("[artgen] swap requested: %s → %s" % [gen_id, ref_path])
+	_status_label.text = "swapping %s → %s…" % [gen_id, ref_path.get_file()]
+	if service == null:
+		push_warning("[artgen] swap: service is null")
+		_status_label.text = "swap failed: service not ready"
+		return
 	var result: Dictionary = await service.swap_permutation(ref_path, gen_id)
-	_status_label.text = ("swapped → " + str(result.get("dest"))) if result.get("ok", false) \
-			else "swap failed: " + str(result.get("error"))
+	if result.get("ok", false):
+		print("[artgen] swap ok → %s" % str(result.get("dest")))
+		_status_label.text = "swapped → " + str(result.get("dest"))
+	else:
+		push_warning("[artgen] swap failed: %s" % str(result.get("error")))
+		_status_label.text = "swap failed: " + str(result.get("error"))
 	_refresh_detail()
 
 

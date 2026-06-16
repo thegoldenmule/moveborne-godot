@@ -23,7 +23,7 @@ const MANIFEST_PATH := "res://assets/generated/ai_manifest.json"
 # GenTexture .tres by uid — opaque, deduped, GC-able. The human-named .tres refs
 # are what scenes bind to. See assets/gen_texture.gd.
 const POOL_DIR := "res://assets/generated/_pool"
-const SAVE_CATEGORIES := ["icons", "cards", "textures", "misc"]
+const SAVE_CATEGORIES := ["icons", "cards", "textures", "maps", "misc"]
 const THUMB_SIZE := 256
 
 # Model-family capabilities, keyed by model-id prefix. Per the Recraft docs
@@ -383,18 +383,23 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 ## sibling permutation from the same batch). The .tres keeps its uid, so every
 ## consumer follows the swap untouched.
 func swap_permutation(ref_path: String, gen_id: String) -> Dictionary:
+	print("[artgen] swap_permutation: bake %s, write into %s" % [gen_id, ref_path])
 	if not FileAccess.file_exists(ref_path):
+		push_warning("[artgen] swap: no ref at %s" % ref_path)
 		return {"ok": false, "error": "no ref at " + ref_path}
 	var ref: Variant = ResourceLoader.load(ref_path, "", ResourceLoader.CACHE_MODE_IGNORE)
 	if not (ref is GenTextureT):
+		push_warning("[artgen] swap: %s is not a GenTexture ref" % ref_path)
 		return {"ok": false, "error": "not a GenTexture ref: " + ref_path}
 
 	var baked := await _bake_to_pool(gen_id)
 	if not baked.get("ok", false):
+		push_warning("[artgen] swap: bake failed: %s" % str(baked.get("error")))
 		return baked
 
 	var result := await _write_ref(ref_path, gen_id, baked)
 	if not result.get("ok", false):
+		push_warning("[artgen] swap: write failed: %s" % str(result.get("error")))
 		return result
 	LedgerT.append(ledger_path, {
 		"type": "swap", "gen_id": gen_id, "ts": _now_iso(),
