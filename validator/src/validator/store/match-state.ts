@@ -15,8 +15,13 @@ interface CacheEntry {
 export class InMemoryMatchStateStore implements MatchStateStore {
   private matchCache: Map<string, CacheEntry> = new Map();
   private cleanupInterval: Timer | null = null;
+  /** Fired exactly once when a match leaves the store (expiry or delete). Used
+   *  to release the match's pinned catalog version ref. NOT fired on set()
+   *  (which only updates an existing entry in place). */
+  private onEvict?: (match: StoredMatch) => void;
 
-  constructor() {
+  constructor(onEvict?: (match: StoredMatch) => void) {
+    this.onEvict = onEvict;
     this.startCleanup();
   }
 
@@ -24,6 +29,14 @@ export class InMemoryMatchStateStore implements MatchStateStore {
     this.cleanupInterval = setInterval(() => {
       this.cleanup();
     }, 60000);
+  }
+
+  /** Remove a key and notify onEvict once (idempotent — no-op if absent). */
+  private evict(key: string): void {
+    const entry = this.matchCache.get(key);
+    if (!entry) return;
+    this.matchCache.delete(key);
+    this.onEvict?.(entry.match);
   }
 
   private cleanup(): void {
@@ -37,7 +50,7 @@ export class InMemoryMatchStateStore implements MatchStateStore {
     }
 
     for (const key of expiredKeys) {
-      this.matchCache.delete(key);
+      this.evict(key);
     }
   }
 
@@ -48,7 +61,7 @@ export class InMemoryMatchStateStore implements MatchStateStore {
     }
 
     if (entry.expiresAt < Date.now()) {
-      this.matchCache.delete(matchId);
+      this.evict(matchId);
       return null;
     }
 
@@ -65,7 +78,7 @@ export class InMemoryMatchStateStore implements MatchStateStore {
   }
 
   async delete(matchId: string): Promise<void> {
-    this.matchCache.delete(matchId);
+    this.evict(matchId);
   }
 
   async getAll(): Promise<StoredMatch[]> {

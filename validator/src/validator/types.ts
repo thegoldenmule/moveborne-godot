@@ -14,6 +14,10 @@ export interface StoredMatch {
   /** Story-mode catalog level this match plays (InitMatchRequest.level_id);
    *  absent for infinite/pvp and for story launches without a level. */
   level_id?: string;
+  /** Catalog version this story match is PINNED to at init; grading reads this
+   *  version for the match's whole life so a mid-match refresh can't change the
+   *  grading basis. Absent for non-story matches. */
+  catalog_version?: number;
   created_at: number;
   last_action_at: number;
   action_count: number;
@@ -42,6 +46,9 @@ export interface ValidatorConfig {
   /** Platform-injected internal HTTP URL of the Storage snap
    *  (SNAPEND_STORAGE_HTTP_URL) — the story_progress blob's s2s write path. */
   storageInternalUrl?: string;
+  /** Platform-injected internal HTTP URL of the Remote Config snap
+   *  (SNAPEND_REMOTE_CONFIG_HTTP_URL) — the runtime source of the story catalog. */
+  remoteConfigInternalUrl?: string;
   /** Platform-injected internal-auth value (SNAPEND_INTERNAL_HEADER), sent as
    *  the `Gateway` header on internal snap-to-snap calls. */
   internalHeader?: string;

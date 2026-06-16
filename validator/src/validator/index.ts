@@ -7,22 +7,40 @@ import { createValidatorMCP } from "./mcp";
 import { getConfig } from "./config";
 import { InventoryClient, resolveInventoryTransport } from "./snaps/inventory";
 import { StorageClient, resolveStorageTransport } from "./snaps/storage";
-import { validateCatalog } from "./story/catalog";
+import { RemoteConfigClient, resolveRemoteConfigTransport } from "./snaps/remote-config";
+import { loadCatalog, refreshCatalog, loadedInfo, release } from "./story/catalog";
 import { ValidatorService } from "./service";
 import { startGrpcServer } from "./grpc";
 import { HermesDispatcher, upgradeCallerHeaders } from "./hermes-ws";
 import type { CallerHeaders } from "./service";
 import pkg from "./package.json" with { type: "json" };
 
-const store = new InMemoryMatchStateStore();
-const historyStore = new FileSystemHistoryStore();
 const config = getConfig();
+// Release a match's pinned catalog version when it leaves the store (expiry or
+// delete), so old versions drain from the registry once no match needs them.
+const store = new InMemoryMatchStateStore((m) => {
+  if (m.catalog_version !== undefined) release(m.catalog_version);
+});
+const historyStore = new FileSystemHistoryStore();
 const inventory = new InventoryClient(resolveInventoryTransport(config));
 console.log(`💰 Currency awards: ${inventory.enabled ? `enabled (${inventory.transportKind})` : "disabled (no s2s credentials)"}`);
 
 const storage = new StorageClient(resolveStorageTransport(config));
 console.log(`⭐ Story progress: ${storage.enabled ? `enabled (${storage.transportKind})` : "disabled (no s2s credentials)"}`);
-validateCatalog(); // a malformed catalog edit fails at boot, not as NaN grades
+
+// The story catalog is the validator's RUNTIME source: pulled from Remote Config
+// (s2s), with the committed file as the dev/test fallback. In production we do
+// NOT block boot — non-story matches serve while the catalog loads in the
+// background (story init/grade return UNAVAILABLE until it lands). In dev (no
+// remote-config s2s) we load the committed file now so a malformed edit fails
+// fast at boot, not as NaN grades.
+const remoteConfig = new RemoteConfigClient(resolveRemoteConfigTransport(config));
+console.log(`📖 Story catalog: ${remoteConfig.enabled ? `Remote Config (${remoteConfig.transportKind})` : "committed fallback (no remote-config s2s)"}`);
+if (remoteConfig.enabled) {
+  loadCatalog(remoteConfig).catch((e) => console.error("story catalog initial load failed:", e));
+} else {
+  await loadCatalog(remoteConfig, 1);
+}
 
 const service = new ValidatorService(store, inventory, storage);
 const dispatcher = new HermesDispatcher(service);
@@ -56,6 +74,7 @@ app.get("/health", (c) => {
 });
 
 app.get("/api/status", (c) => {
+  const cat = loadedInfo();
   return c.json({
     server: "validator",
     version: pkg.version,
@@ -63,7 +82,22 @@ app.get("/api/status", (c) => {
     transport: "grpc+hermes",
     // Which s2s transport the currency-award path resolved to (no secrets).
     awards: inventory.enabled ? inventory.transportKind : "disabled",
+    // The catalog version this validator is currently serving (0 until loaded);
+    // the status tool compares it across surfaces. No secrets.
+    story_catalog_version: cat.version,
+    story_catalog_source: remoteConfig.enabled ? remoteConfig.transportKind : "committed-fallback",
+    story_catalog_loaded_at: cat.loadedAt,
   });
+});
+
+// Force a catalog re-fetch from Remote Config (ops + the editor status panel).
+// Internal-guarded when an internal header is configured; open in local dev.
+app.post("/api/story/catalog/refresh", async (c) => {
+  if (config.internalHeader && c.req.header("Gateway") !== config.internalHeader) {
+    return c.json({ error: "forbidden" }, 403);
+  }
+  const result = await refreshCatalog();
+  return c.json(result);
 });
 
 app.get("/", (c) => {

@@ -16,3 +16,11 @@ data/
 # but harmless to include; keep the image lean by excluding docs.
 README.md
 **/README.md
+
+# The story catalog is the validator's RUNTIME source: pulled from Remote Config
+# (s2s) at boot, NOT bundled in the image (supersedes the bundled-image clause of
+# ADR-23). The committed file stays in the repo as the publish seed + dev/test
+# fallback; keeping it out of the production image ensures the validator cannot
+# silently grade against stale embedded content. (Reference schemas are dev-only.)
+content/story_catalog.json
+content/*.schema.json

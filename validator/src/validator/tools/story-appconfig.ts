@@ -71,7 +71,55 @@ if (cmd === "emit") {
     process.exit(1);
   }
   console.log(`✓ live app-config/${APP_CONFIG_VERSION} story_catalog matches the committed catalog (version ${(catalog as { catalog_version: number }).catalog_version})`);
+} else if (cmd === "status") {
+  // Report catalog_version across all three surfaces so drift is visible at a
+  // glance: the committed file, the live Remote Config app-config, and the
+  // deployed validator's loaded catalog (GET /api/status). Read-only; no secrets.
+  const committedVersion = (catalog as { catalog_version: number }).catalog_version;
+  console.log(`committed (validator/content/story_catalog.json): v${committedVersion}`);
+
+  // Live Remote Config (anon session, like verify).
+  let liveVersion: number | string = "unavailable";
+  let liveMatches: boolean | string = "?";
+  try {
+    const login = await fetch(`${GATEWAY}/v1/auth/login/anon`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "story-catalog-status", create_user: true }),
+    });
+    if (login.ok) {
+      const { user } = (await login.json()) as { user: { id: string; session_token: string } };
+      const res = await fetch(`${GATEWAY}/v1/remote-config/app-config/${APP_CONFIG_VERSION}`, {
+        headers: { Token: user.session_token, "User-Id": user.id },
+      });
+      if (res.ok) {
+        const body = (await res.json()) as { config?: { story_catalog?: { catalog_version?: number } } };
+        const live = body.config?.story_catalog;
+        liveVersion = live?.catalog_version ?? "absent";
+        liveMatches = live ? deepEqual(live, catalog) : "absent";
+      }
+    }
+  } catch (e) {
+    liveVersion = `error: ${e}`;
+  }
+  console.log(`live Remote Config app-config/${APP_CONFIG_VERSION}: v${liveVersion} (matches committed: ${liveMatches})`);
+
+  // Deployed validator's loaded catalog (no auth on /api/status).
+  const base = process.env.VALIDATOR_STATUS_URL || `${GATEWAY}/v1/byosnap-validator`;
+  let deployedVersion: number | string = "unavailable";
+  try {
+    const res = await fetch(`${base}/api/status`);
+    if (res.ok) {
+      const body = (await res.json()) as { story_catalog_version?: number; story_catalog_source?: string };
+      deployedVersion = body.story_catalog_version ?? "unknown";
+      console.log(`deployed validator (${base}/api/status): v${deployedVersion} (source ${body.story_catalog_source ?? "?"})`);
+    } else {
+      console.log(`deployed validator (${base}/api/status): HTTP ${res.status}`);
+    }
+  } catch (e) {
+    console.log(`deployed validator (${base}/api/status): error: ${e}`);
+  }
 } else {
-  console.error(`unknown command '${cmd}' — use emit | verify`);
+  console.error(`unknown command '${cmd}' — use emit | verify | status`);
   process.exit(1);
 }

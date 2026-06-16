@@ -25,7 +25,15 @@ import { verifySnapserCaller } from "./utils/snapser-auth";
 import { computeMatchRewards } from "./rewards";
 import type { InventoryClient } from "./snaps/inventory";
 import { StorageClient, STORY_PROGRESS_KEY } from "./snaps/storage";
-import { getCatalog, getLevel } from "./story/catalog";
+import {
+  currentVersion,
+  getCatalogAt,
+  getLevelAt,
+  getOrderedLevelIdsAt,
+  refreshCatalog,
+  retain,
+  release,
+} from "./story/catalog";
 import { gradeLevel, maxTileValue } from "./story/goals";
 import { applyGrade, emptyProgress, isLevelUnlocked } from "./story/progress";
 import type { StoryProgress, StoryResult } from "./story/types";
@@ -40,7 +48,9 @@ export const GrpcStatus = {
   INVALID_ARGUMENT: 3,
   NOT_FOUND: 5,
   PERMISSION_DENIED: 7,
+  FAILED_PRECONDITION: 9,
   INTERNAL: 13,
+  UNAVAILABLE: 14,
 } as const;
 
 export class ServiceError extends Error {
@@ -61,11 +71,17 @@ export interface InitMatchRequest {
   mode: string;
   /** Story-mode catalog level id (e.g. "w1_l3"); empty for other modes. */
   level_id?: string;
+  /** The catalog_version the CLIENT is displaying (story init handshake); 0 /
+   *  absent when the client sends none (older clients, non-story modes). */
+  catalog_version?: number;
 }
 export interface InitMatchResponse {
   match_id: string;
   current_state_json: string;
   expires_at: number;
+  /** The catalog_version the match was PINNED to (the agreed one). 0 for
+   *  non-story matches. */
+  catalog_version?: number;
 }
 export interface ValidateActionRequest {
   match_id: string;
@@ -145,9 +161,15 @@ export class ValidatorService {
     // Bind the story level at registration so grading cannot be re-aimed at a
     // different level after the fact. Unknown ids are rejected up front — the
     // alternative (silently grading nothing) reads as a lost reward later.
+    // The match also PINS a catalog_version here (agreed with the client via the
+    // handshake) and is graded against that version for its whole life.
     const level_id = mode === "story" && req.level_id ? req.level_id : undefined;
-    if (level_id && !getLevel(level_id)) {
-      throw new ServiceError(GrpcStatus.INVALID_ARGUMENT, `unknown story level_id '${level_id}'`);
+    let catalog_version: number | undefined;
+    if (level_id) {
+      catalog_version = await this.pinVersion(req.catalog_version ?? 0);
+      if (!getLevelAt(catalog_version, level_id)) {
+        throw new ServiceError(GrpcStatus.INVALID_ARGUMENT, `unknown story level_id '${level_id}'`);
+      }
     }
     // The starting state is CLIENT-supplied, so a story level must register a
     // fresh one — otherwise a caller inits a pre-scored / pre-merged board and
@@ -160,7 +182,7 @@ export class ValidatorService {
     // table server-side (documented follow-up hardening).
     if (level_id) {
       const startMaxTile = maxTileValue(starting_state);
-      const level = getLevel(level_id)!;
+      const level = getLevelAt(catalog_version!, level_id)!;
       const belowGoalThresholds = level.goals.every(
         (g) => g.type !== "max_tile" || startMaxTile < g.threshold,
       );
@@ -183,23 +205,59 @@ export class ValidatorService {
       player_id,
       mode,
       level_id,
+      catalog_version,
       created_at: now,
       last_action_at: now,
       action_count: 0,
       state_history,
       rewards_granted: false,
     };
+    // Pin the catalog version for this match's lifetime. A same-owner re-init
+    // overwrites the entry without an evict callback firing, so drop the old
+    // ref first to avoid leaking a retained version.
+    if (existing?.catalog_version !== undefined) release(existing.catalog_version);
+    if (catalog_version !== undefined) retain(catalog_version);
     await this.store.set(match_id, storedMatch, config.matchSessionTTL);
 
     console.log(
-      `Match initialized: ${match_id} for player ${player_id} (mode=${mode}${level_id ? `, level=${level_id}` : ""})`,
+      `Match initialized: ${match_id} for player ${player_id} (mode=${mode}${level_id ? `, level=${level_id}, catalog_v=${catalog_version}` : ""})`,
     );
 
     return {
       match_id,
       current_state_json: JSON.stringify(starting_state),
       expires_at,
+      catalog_version: catalog_version ?? 0,
     };
+  }
+
+  /** Story init handshake: converge on ONE catalog version with the client.
+   *  Equal → pin current. Client AHEAD → force a refresh from the same Remote
+   *  Config source and re-check. Client BEHIND / still mismatched → reject so
+   *  the client re-fetches and retries. clientVersion 0 = client sent none
+   *  (older client / no handshake) → pin current. Throws UNAVAILABLE if no
+   *  catalog is loaded yet (production cold start). */
+  private async pinVersion(clientVersion: number): Promise<number> {
+    let v: number;
+    try {
+      v = currentVersion();
+    } catch {
+      throw new ServiceError(GrpcStatus.UNAVAILABLE, "story catalog not loaded yet — retry shortly");
+    }
+    if (clientVersion === 0 || clientVersion === v) return v;
+    if (clientVersion > v) {
+      await refreshCatalog();
+      try {
+        v = currentVersion();
+      } catch {
+        throw new ServiceError(GrpcStatus.UNAVAILABLE, "story catalog not loaded yet — retry shortly");
+      }
+      if (clientVersion === v) return v;
+    }
+    throw new ServiceError(
+      GrpcStatus.FAILED_PRECONDITION,
+      `catalog_version_mismatch (client ${clientVersion}, validator ${v})`,
+    );
   }
 
   async validateAction(req: ValidateActionRequest, caller: CallerHeaders): Promise<ValidateActionResponse> {
@@ -325,16 +383,21 @@ export class ValidatorService {
     let rewards: CurrencyDeltas = {};
     let storyResultJson = "";
     let progressPersisted = true;
-    const level = match.mode === "story" && match.level_id ? getLevel(match.level_id) : undefined;
+    // Grade against the version this match was PINNED to at init — never the
+    // global current — so a mid-match TTL refresh / publish can't change the
+    // basis. The version is retained for the match's life, so it is present here.
+    const pinned = match.catalog_version ?? (match.level_id ? currentVersion() : 0);
+    const level = match.mode === "story" && match.level_id ? getLevelAt(pinned, match.level_id) : undefined;
     if (level) {
-      const catalog = getCatalog();
+      const catalog = getCatalogAt(pinned)!;
+      const orderedIds = getOrderedLevelIdsAt(pinned);
       const grade = gradeLevel(level, match.current_state, Date.now() - match.created_at);
       let applied: ReturnType<typeof applyGrade> | null = null;
       progressPersisted = false;
       const read = await this.storage.readJsonBlob<StoryProgress>(match.player_id, STORY_PROGRESS_KEY);
       if (read.ok) {
         const previous = read.value ?? emptyProgress(catalog);
-        if (isLevelUnlocked(previous.levels, level.id)) {
+        if (isLevelUnlocked(previous.levels, level.id, orderedIds)) {
           applied = applyGrade(
             previous,
             level,
@@ -342,6 +405,7 @@ export class ValidatorService {
             match.current_state.score ?? 0,
             catalog,
             new Date().toISOString(),
+            orderedIds,
           );
           progressPersisted = await this.storage.putJsonBlob(
             match.player_id,

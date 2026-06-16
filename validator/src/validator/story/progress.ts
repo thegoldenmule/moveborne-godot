@@ -23,25 +23,42 @@ import type {
   StoryRewardAmounts,
 } from "./types";
 
+/** Canonical level order for a specific catalog (the PINNED one at grade time),
+ *  independent of whichever version is globally current. */
+function orderedIdsOf(catalog: StoryCatalog): string[] {
+  return [...catalog.worlds]
+    .sort((a, b) => a.order - b.order)
+    .flatMap((w) => [...w.levels].sort((a, b) => a.order - b.order))
+    .map((l) => l.id);
+}
+
 export function emptyProgress(catalog: StoryCatalog): StoryProgress {
   return {
     catalog_version: catalog.catalog_version,
     levels: {},
-    next_level_id: getOrderedLevelIds()[0] ?? "",
+    next_level_id: orderedIdsOf(catalog)[0] ?? "",
   };
 }
 
-/** First level (catalog order) not yet completed with >=1 star; "" when done. */
-export function computeNextLevel(levels: Record<string, LevelProgress>): string {
-  for (const id of getOrderedLevelIds()) {
+/** First level (catalog order) not yet completed with >=1 star; "" when done.
+ *  `orderedIds` defaults to the current catalog; grading passes the pinned one. */
+export function computeNextLevel(
+  levels: Record<string, LevelProgress>,
+  orderedIds: string[] = getOrderedLevelIds(),
+): string {
+  for (const id of orderedIds) {
     if ((levels[id]?.stars ?? 0) < 1) return id;
   }
   return "";
 }
 
 /** A level is playable when it sits at or before the unlock frontier. */
-export function isLevelUnlocked(levels: Record<string, LevelProgress>, levelId: string): boolean {
-  const ordered = getOrderedLevelIds();
+export function isLevelUnlocked(
+  levels: Record<string, LevelProgress>,
+  levelId: string,
+  orderedIds: string[] = getOrderedLevelIds(),
+): boolean {
+  const ordered = orderedIds;
   const index = ordered.indexOf(levelId);
   if (index < 0) return false;
   const frontier = computeNextLevel(levels);
@@ -75,6 +92,7 @@ export function applyGrade(
   finalScore: number,
   catalog: StoryCatalog,
   nowIso: string,
+  orderedIds: string[] = orderedIdsOf(catalog),
 ): AppliedGrade {
   const prev: LevelProgress = previous.levels[level.id] ?? {
     stars: 0,
@@ -101,8 +119,8 @@ export function applyGrade(
   }
 
   const levels = { ...previous.levels, [level.id]: merged };
-  const prevNext = computeNextLevel(previous.levels);
-  const nextLevelId = computeNextLevel(levels);
+  const prevNext = computeNextLevel(previous.levels, orderedIds);
+  const nextLevelId = computeNextLevel(levels, orderedIds);
 
   const rewards: CurrencyDeltas = {};
   for (const [currency, total] of Object.entries(totals)) {
