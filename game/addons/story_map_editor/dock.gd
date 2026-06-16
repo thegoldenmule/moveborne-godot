@@ -49,13 +49,17 @@ func _ready() -> void:
 
 
 func _build_ui() -> void:
-	var root := HBoxContainer.new()
+	# A draggable split: the canvas on the left, the tabbed controls on the right.
+	# A split keeps the divider where the user puts it, so the right-panel width
+	# stays CONSTANT across tab switches (a plain TabContainer otherwise resizes to
+	# each tab's content). The right pane has a wide floor so no tab pushes it.
+	var root := HSplitContainer.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_theme_constant_override("separation", 16)
 	add_child(root)
 
 	# Left: the canvas in a scroll view (the 2× texture is taller than the panel).
 	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(220, 0)  # the left pane can't be dragged away entirely
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(scroll)
@@ -82,7 +86,9 @@ func _build_ui() -> void:
 	# action footer. One "Save all" persists the catalog AND the dot layout.
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 8)
-	right.custom_minimum_size = Vector2(380, 0)
+	# Floor wider than any tab's content min, so switching tabs never re-clamps the
+	# divider (constant width). Drag the divider left to widen further.
+	right.custom_minimum_size = Vector2(400, 0)
 	right.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(right)
 
@@ -113,6 +119,10 @@ func _build_ui() -> void:
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.custom_minimum_size = Vector2(360, 0)
 	right.add_child(_status)
+
+	# Push the divider fully right so the right pane starts at its floor (400);
+	# the user can drag it left to widen. Clamped to the children's min sizes.
+	root.split_offset = 4096
 
 
 ## Map-dots tab: world picker, texture, dot select/remove, help. (Placement +
