@@ -289,17 +289,19 @@ func generate(opts: Dictionary) -> Dictionary:
 ## (res://assets/generated/_pool/<gen_id>.<ext>) and import them. Idempotent: a
 ## pooled file is reused as-is (never re-runs the paid removeBackground step).
 ## Returns {ok, pool_path, ext, sha, post, rec} or {ok:false, error}.
-func _bake_to_pool(gen_id: String) -> Dictionary:
+func _bake_to_pool(gen_id: String, raw: bool = false) -> Dictionary:
 	var rec: Dictionary = _index["generations"].get(gen_id, {})
 	if rec.is_empty() or rec.get("file") == null:
 		return {"ok": false, "error": "unknown generation '%s'" % gen_id}
 
 	var ext := str(rec["file"]).get_extension()
-	var pool_path := "%s/%s.%s" % [POOL_DIR, gen_id, ext]
+	# Raw bakes (post steps skipped) live in a separate pool file so they never
+	# collide with a processed bake of the same generation.
+	var pool_path := "%s/%s%s.%s" % [POOL_DIR, gen_id, (".raw" if raw else ""), ext]
 	if FileAccess.file_exists(pool_path):
 		# Already baked — trust it; declared post steps stand in for "applied".
 		return {"ok": true, "pool_path": pool_path, "ext": ext,
-			"sha": FileAccess.get_sha256(pool_path), "post": rec.get("post", []), "rec": rec}
+			"sha": FileAccess.get_sha256(pool_path), "post": ([] if raw else rec.get("post", [])), "rec": rec}
 
 	var src_abs := repo_root.path_join(str(rec["file"]))
 	var bytes := FileAccess.get_file_as_bytes(src_abs)
@@ -307,7 +309,7 @@ func _bake_to_pool(gen_id: String) -> Dictionary:
 		return {"ok": false, "error": "generation file missing: " + str(rec["file"])}
 
 	var applied: Array = []
-	for step in rec.get("post", []):
+	for step in (([] if raw else rec.get("post", [])) as Array):
 		match str(step):
 			"strip_bg_rect":
 				if ext == "svg":
@@ -354,7 +356,7 @@ func _bake_to_pool(gen_id: String) -> Dictionary:
 ## the pool, writes res://assets/generated/<category>/<name>.tres pointing at
 ## them, and records attribution in ai_manifest.json (keyed by the ref's uid) +
 ## a ledger save event. Scenes bind to the .tres; rename/move/swap stay intact.
-func save_generation(gen_id: String, category: String, asset_name: String) -> Dictionary:
+func save_generation(gen_id: String, category: String, asset_name: String, raw: bool = false) -> Dictionary:
 	if not SAVE_CATEGORIES.has(category):
 		return {"ok": false, "error": "category must be one of %s" % str(SAVE_CATEGORIES)}
 	if not asset_name.is_valid_filename() or asset_name.is_empty():
@@ -364,7 +366,7 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 	if FileAccess.file_exists(dest):
 		return {"ok": false, "error": "asset already exists: " + dest}
 
-	var baked := await _bake_to_pool(gen_id)
+	var baked := await _bake_to_pool(gen_id, raw)
 	if not baked.get("ok", false):
 		return baked
 
@@ -382,8 +384,8 @@ func save_generation(gen_id: String, category: String, asset_name: String) -> Di
 ## Re-point an existing GenTexture ref at a different generation (typically a
 ## sibling permutation from the same batch). The .tres keeps its uid, so every
 ## consumer follows the swap untouched.
-func swap_permutation(ref_path: String, gen_id: String) -> Dictionary:
-	print("[artgen] swap_permutation: bake %s, write into %s" % [gen_id, ref_path])
+func swap_permutation(ref_path: String, gen_id: String, raw: bool = false) -> Dictionary:
+	print("[artgen] swap_permutation: bake %s%s, write into %s" % [gen_id, (" (raw)" if raw else ""), ref_path])
 	if not FileAccess.file_exists(ref_path):
 		push_warning("[artgen] swap: no ref at %s" % ref_path)
 		return {"ok": false, "error": "no ref at " + ref_path}
@@ -392,7 +394,7 @@ func swap_permutation(ref_path: String, gen_id: String) -> Dictionary:
 		push_warning("[artgen] swap: %s is not a GenTexture ref" % ref_path)
 		return {"ok": false, "error": "not a GenTexture ref: " + ref_path}
 
-	var baked := await _bake_to_pool(gen_id)
+	var baked := await _bake_to_pool(gen_id, raw)
 	if not baked.get("ok", false):
 		push_warning("[artgen] swap: bake failed: %s" % str(baked.get("error")))
 		return baked

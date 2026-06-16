@@ -118,7 +118,7 @@ func _handle(conn: Dictionary) -> void:
 				code = 404
 		["POST", "/swap"]:
 			result = await service.swap_permutation(
-				str(body.get("ref", "")), str(body.get("id", "")))
+				str(body.get("ref", "")), str(body.get("id", "")), bool(body.get("raw", false)))
 			if not result.get("ok", false):
 				code = 400
 		["POST", "/migrate"]:

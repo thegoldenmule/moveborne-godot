@@ -106,7 +106,7 @@ const TOOLS = [
       type: "object",
       properties: {
         id: { type: "string", description: "generation id (g_…)" },
-        category: { type: "string", enum: ["icons", "cards", "textures", "misc"] },
+        category: { type: "string", enum: ["icons", "cards", "textures", "maps", "misc"] },
         name: { type: "string", description: "ref filename without extension (becomes <name>.tres)" },
       },
       required: ["id", "category", "name"],
@@ -124,6 +124,12 @@ const TOOLS = [
       properties: {
         ref: { type: "string", description: "res:// path to the GenTexture .tres" },
         id: { type: "string", description: "generation id (g_…) to swap in" },
+        raw: {
+          type: "boolean",
+          description:
+            "skip post-processing (e.g. the SVG background strip) — use when the " +
+            "composition's background is part of the art (e.g. story maps)",
+        },
       },
       required: ["ref", "id"],
       additionalProperties: false,
@@ -139,7 +145,7 @@ const TOOLS = [
       type: "object",
       properties: {
         from: { type: "string", description: "res:// path to the existing promoted file" },
-        category: { type: "string", enum: ["icons", "cards", "textures", "misc"] },
+        category: { type: "string", enum: ["icons", "cards", "textures", "maps", "misc"] },
         name: { type: "string", description: "ref filename without extension (becomes <name>.tres)" },
       },
       required: ["from", "category", "name"],

@@ -39,6 +39,7 @@ var _swap_row: HFlowContainer
 var _category_option: OptionButton
 var _name_edit: LineEdit
 var _save_btn: Button
+var _raw_toggle: CheckButton  # save/swap WITHOUT post-processing (e.g. bg strip)
 var _iterate_btn: Button
 var _more_btn: Button
 var _reveal_btn: Button
@@ -285,6 +286,14 @@ func _build_detail() -> Control:
 	_save_row.add_child(_save_btn)
 	_detail_box.add_child(_save_row)
 
+	# Skip post-processing (e.g. the SVG background strip) for Save AND Swap — use
+	# for compositions whose "background" is part of the art (story maps), where
+	# the strip step would otherwise abort with a fill-mismatch.
+	_raw_toggle = CheckButton.new()
+	_raw_toggle.text = "raw (skip bg strip)"
+	_raw_toggle.tooltip_text = "Save/swap the generation as-is, without its post steps."
+	_detail_box.add_child(_raw_toggle)
+
 	# Swap-into buttons, one per already-promoted ref in this generation's batch
 	# (populated in _refresh_detail). Re-points that ref at the selected variant.
 	_swap_row = HFlowContainer.new()
@@ -411,7 +420,7 @@ func _on_save() -> void:
 	_save_btn.disabled = true
 	var result: Dictionary = await service.save_generation(
 		_selected_id, _category_option.get_item_text(_category_option.selected),
-		_name_edit.text.strip_edges())
+		_name_edit.text.strip_edges(), _raw_toggle.button_pressed)
 	_save_btn.disabled = false
 	_status_label.text = ("saved → " + str(result.get("dest"))) if result.get("ok", false) \
 			else "save failed: " + str(result.get("error"))
@@ -425,7 +434,7 @@ func _on_swap(ref_path: String, gen_id: String) -> void:
 		push_warning("[artgen] swap: service is null")
 		_status_label.text = "swap failed: service not ready"
 		return
-	var result: Dictionary = await service.swap_permutation(ref_path, gen_id)
+	var result: Dictionary = await service.swap_permutation(ref_path, gen_id, _raw_toggle.button_pressed)
 	if result.get("ok", false):
 		print("[artgen] swap ok → %s" % str(result.get("dest")))
 		_status_label.text = "swapped → " + str(result.get("dest"))
