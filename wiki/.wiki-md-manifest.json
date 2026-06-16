@@ -1,12 +1,12 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2635,
+    "version": 2660,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
       "moveborne-godot/adrs/index.md": "13081a00859203a8d073c0bcc1eb30ef5bd0ce4ea4ae4b77fe4a55e5a550fd25",
       "moveborne-godot/architecture/client/index.md": "c6836e27a79c73f8fcdab1b69be7bdce83620b1c944e899f6bd9c9c78cdb44ba",
-      "moveborne-godot/architecture/validator/index.md": "766d7bde5f60c07d7cdc33b87bf586c640fdc0e312aeb29efb678b36ccd47f4e",
+      "moveborne-godot/architecture/validator/index.md": "0fde48ba310db111dac4e4a75649ffe062ffd429773f0e97960f5fb9f41b420f",
       "moveborne-godot/architecture/server.md": "b47f08254d30da732e5d6a72cd923150ca3710b891d7224eeefce3de273c183e",
       "moveborne-godot/architecture/client/determinism-primitives.md": "3563ffeeb934060df2546cfbae94e8564008b26455294b1f9f6647b9aa71e01d",
       "moveborne-godot/architecture/client/rules-engine.md": "49bb2cb52ebc5644fddeaa55a5cbb17233a7f4bbbde66b39c6da09e266f7fccf",
@@ -117,7 +117,8 @@
       "moveborne-godot/.archived/feature-brief--mqh3549u-0010-q64913.md": "56d0151a48310f3ef2d48dd260dec236d829be7f160b8c0b45356e632db86210",
       "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md": "97a883a020475625f3a263e88f4b8c9a611c346df7c3d1290efaac879b61a560",
       "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md": "16c5c4c9bcfc3a1fd6f829996ae791a5103f5d9ef9546e8010e67eae6fdd6988",
-      "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md": "3aa0ebe5afa74c8c6f348233b8ee7a1383433a96a281b894de5f43b265779b7d"
+      "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md": "3aa0ebe5afa74c8c6f348233b8ee7a1383433a96a281b894de5f43b265779b7d",
+      "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md": "a7d62ef212ddf25a6378196893f4240705060f12480fc1385ca28d865f549d2b"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
@@ -235,7 +236,8 @@
       "feature-brief:mqh3549u-0010-q64913": "moveborne-godot/.archived/feature-brief--mqh3549u-0010-q64913.md",
       "implementation-plan:mqh3549u-0011-1wzyuz": "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md",
       "testing-plan:mqh3549v-0012-buxzhf": "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md",
-      "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md"
+      "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md",
+      "architecture:mqh6jhyd-0095-4qhwpw": "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md"
     }
   }
 }

@@ -36,6 +36,7 @@ Don't restate the architecture here — read the canonical pages:
 | Native VFX mapping | `game/VFX_MAPPING.md` |
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
+| Deploying the validator BYOSnap (publish → sync → manifest, gotchas, Remote Config prerequisite) | `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md` |
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
 | Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
 
@@ -84,6 +85,9 @@ bun run type-check     # tsc --noEmit on the validator
 `bun run dev` process — `--watch` reloads on change.
 
 ### Snapser BYOSnap deploy (the validator, containerized)
+
+**Full runbook (publish → sync → manifest refresh, plus the gotchas and the Remote Config
+prerequisite):** `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md`.
 
 `validator/Dockerfile` → Snapser `byosnap-validator` (profile: `validator/snapser-byosnap-profile.json`,
 app `c4n1awfs`). Notes: **build context MUST be `validator/`** (so the `workspace:*` link resolves);

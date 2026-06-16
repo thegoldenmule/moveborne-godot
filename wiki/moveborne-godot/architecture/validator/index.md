@@ -22,6 +22,7 @@ _No design notes._
 - [History Replay Store](architecture:mq1c3370-000z-l7ivsv)
 - [Crypto & Signing](architecture:mq1c351c-0011-gtfyxx)
 - [MCP Debug Interface](architecture:mq1c366g-0013-odkry1)
+- [Deploying the Validator (BYOSnap)](architecture:mqh6jhyd-0095-4qhwpw)
 
 ## Dependencies
 _No dependencies._
