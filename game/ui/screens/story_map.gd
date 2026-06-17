@@ -358,12 +358,13 @@ func _rebuild() -> void:
 	else:
 		_render_flat_list(levels, worlds, progress, frontier)
 
-	var next_level := Catalog.get_level(_catalog, frontier)
 	if frontier == "":
 		_play_btn.text = "All levels complete"
 		_play_btn.disabled = true
 	else:
-		_play_btn.text = "Play  ·  %s" % str(next_level.get("name", frontier))
+		# Just "Play" — the next level is already the glowing dot on the map, so the
+		# button stays a clean CTA instead of trying to cram a level name onto 312px.
+		_play_btn.text = "Play"
 		_play_btn.disabled = not _online
 
 
