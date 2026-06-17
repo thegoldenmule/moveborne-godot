@@ -13,6 +13,8 @@ extends CanvasLayer
 
 const MbSnapserAuthS := preload("res://net/snapser_auth.gd")
 const MbInventoryS := preload("res://net/inventory_client.gd")
+## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
+const SafeArea := preload("res://ui/safe_area.gd")
 
 const BAR_HEIGHT := 44.0
 ## glyph + accent color per currency, in display order.
@@ -131,12 +133,4 @@ func _apply_layout() -> void:
 
 
 func _top_safe_inset() -> float:
-	var win := DisplayServer.window_get_size()
-	if win.y <= 0:
-		return 0.0
-	var safe := DisplayServer.get_display_safe_area()
-	var phys_top := float(safe.position.y - DisplayServer.window_get_position().y)
-	if phys_top <= 0.0:
-		return 0.0
-	var vp_y: float = _bar.get_viewport().get_visible_rect().size.y
-	return minf(phys_top * vp_y / float(win.y), vp_y * 0.15)
+	return SafeArea.top_inset(_bar.get_viewport().get_visible_rect().size.y)

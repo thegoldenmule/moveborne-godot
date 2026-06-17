@@ -19,8 +19,17 @@ const ProgressClientS := preload("res://net/story_progress_client.gd")
 const Catalog := preload("res://story/story_catalog.gd")
 const Layout := preload("res://story/story_map_layout.gd")
 const Reg := preload("res://ui/mcp_ui_reg.gd")
+## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
+const SafeArea := preload("res://ui/safe_area.gd")
 
 const SCREEN_MARGIN := 24.0
+## Header region: the back button, title, world selector, and status sit in the top
+## HEADER_H px (below the device safe inset). FOOTER_H is the bottom band reserved for
+## the Play button (above the safe inset). The body (map / level list) fills between.
+## As a router takeover this screen owns the raw viewport — the shell's nav + currency
+## bands (and their safe-area handling) are hidden — so it applies both insets itself.
+const HEADER_H := 122.0
+const FOOTER_H := 96.0
 const STAR_FULL := "★"
 const STAR_EMPTY := "☆"
 const DOT_SIZE := Vector2(46, 46)
@@ -119,6 +128,8 @@ func refresh() -> void:
 
 func _build_ui() -> void:
 	var vp := size
+	var safe_top := SafeArea.top_inset(vp.y)        # notch / status bar (0 on desktop)
+	var safe_bottom := SafeArea.bottom_inset(vp.y)  # home indicator / gesture bar (0 on desktop)
 	var bg := ColorRect.new()
 	bg.color = MbStyle.BG
 	bg.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -129,7 +140,7 @@ func _build_ui() -> void:
 	var back := Button.new()
 	back.text = "‹ Home"
 	back.focus_mode = Control.FOCUS_NONE
-	back.position = Vector2(SCREEN_MARGIN, 14.0)
+	back.position = Vector2(SCREEN_MARGIN, 14.0 + safe_top)
 	back.custom_minimum_size = Vector2(0, 34)
 	back.add_theme_font_size_override("font_size", 15)
 	_style_chrome_button(back)
@@ -140,7 +151,7 @@ func _build_ui() -> void:
 	_title = Label.new()
 	_title.text = "STORY"
 	_title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_title.offset_top = 16.0
+	_title.offset_top = 16.0 + safe_top
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.add_theme_font_size_override("font_size", 26)
 	_title.add_theme_color_override("font_color", MbStyle.PRIMARY)
@@ -152,7 +163,7 @@ func _build_ui() -> void:
 	world_row.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	world_row.offset_left = SCREEN_MARGIN
 	world_row.offset_right = -SCREEN_MARGIN
-	world_row.offset_top = 58.0
+	world_row.offset_top = 58.0 + safe_top
 	world_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	world_row.add_theme_constant_override("separation", 14)
 	add_child(world_row)
@@ -185,16 +196,18 @@ func _build_ui() -> void:
 
 	_status = Label.new()
 	_status.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_status.offset_top = 96.0
+	_status.offset_top = 96.0 + safe_top
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.add_theme_font_size_override("font_size", 13)
 	_status.add_theme_color_override("font_color", MbStyle.DIM)
 	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_status)
 
-	# The body rect shared by both renderings (map and flat-list fallback).
-	var body_pos := Vector2(SCREEN_MARGIN, 122.0)
-	var body_size := Vector2(vp.x - 2.0 * SCREEN_MARGIN, vp.y - 122.0 - 96.0)
+	# The body rect shared by both renderings (map and flat-list fallback): between the
+	# header (below the top safe inset) and the footer (above the bottom safe inset).
+	var body_top := HEADER_H + safe_top
+	var body_pos := Vector2(SCREEN_MARGIN, body_top)
+	var body_size := Vector2(vp.x - 2.0 * SCREEN_MARGIN, vp.y - body_top - FOOTER_H - safe_bottom)
 
 	# Interactive map: a background texture with absolutely-positioned dots. Shown
 	# when the current world has a map in story_maps.json; otherwise hidden and the
@@ -239,8 +252,8 @@ func _build_ui() -> void:
 	_play_btn.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_play_btn.offset_left = SCREEN_MARGIN
 	_play_btn.offset_right = -SCREEN_MARGIN
-	_play_btn.offset_top = -76.0
-	_play_btn.offset_bottom = -20.0
+	_play_btn.offset_top = -76.0 - safe_bottom
+	_play_btn.offset_bottom = -20.0 - safe_bottom
 	_play_btn.add_theme_font_size_override("font_size", 24)
 	_style_chrome_button(_play_btn)
 	_play_btn.pressed.connect(_play_next)

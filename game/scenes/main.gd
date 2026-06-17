@@ -16,6 +16,8 @@ const GlowShader := preload("res://scenes/glow_text.gdshader")
 const Reg := preload("res://ui/mcp_ui_reg.gd")
 const StoryCat := preload("res://story/story_catalog.gd")
 const RemoteConfigS := preload("res://net/remote_config_client.gd")
+## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
+const SafeArea := preload("res://ui/safe_area.gd")
 
 ## Local dev validator (the V-key debug shortcut; tools/run_validator.sh): the
 ## validator's Hermes-emulation WS endpoint — same envelope as the gateway.
@@ -123,13 +125,23 @@ func _build_ui() -> void:
 	var vp := get_viewport_rect().size
 	var margin := SCREEN_MARGIN
 	var safe_top := _top_safe_inset()        # device notch / status bar inset (0 on desktop)
-	var board_px: float = clampf(minf(vp.x * 0.92, vp.y * 0.62), 300.0, 720.0)
+	var safe_bottom := _bottom_safe_inset()  # home indicator / gesture bar inset (0 on desktop)
 	# Top HUD band (below the notch): a Home row, the stat row, the combo banner, then
-	# totems. The board + hand block is vertically centered in the leftover space below.
-	var top_bar := safe_top + 154.0
+	# totems. Below it sit the board, the hand, and a footer band (goals strip / toast).
+	var hud_h := 154.0
 	var hand_h := 150.0
 	var gap := 24.0
-	var board_y := top_bar + maxf(20.0, (vp.y - top_bar - (board_px + gap + hand_h) - 40.0) / 2.0)
+	var footer_h := 80.0  # bottom band for the story-goal strip + toast prompts
+	# Board fits the width, its own 0.62 height cap, AND the vertical space left after the
+	# HUD / hand / footer and BOTH safe insets — so a notched device shrinks the board
+	# toward its 300px floor instead of shoving the hand + footer under the home indicator.
+	# At insets=0 this term is non-binding, so desktop/editor layout is unchanged.
+	var avail_v := vp.y - safe_top - safe_bottom - hud_h - gap - hand_h - footer_h
+	var board_px: float = clampf(minf(minf(vp.x * 0.92, vp.y * 0.62), avail_v), 300.0, 720.0)
+	# The board + hand block is vertically centered in the leftover space below the HUD,
+	# with the bottom safe inset reserved so the footer clears the home indicator.
+	var top_bar := safe_top + hud_h
+	var board_y := top_bar + maxf(20.0, (vp.y - top_bar - (board_px + gap + hand_h) - 40.0 - safe_bottom) / 2.0)
 	var hand_top := board_y + board_px + gap
 
 	var th := Theme.new()
@@ -234,8 +246,10 @@ func _build_ui() -> void:
 	_toast.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	_toast.offset_left = margin
 	_toast.offset_right = -margin
-	_toast.offset_top = hand_top + hand_h + 12.0
-	_toast.offset_bottom = hand_top + hand_h + 40.0
+	# Lifted by the bottom safe inset (like the goals strip) so a prompt never renders
+	# under the home indicator on a notched device.
+	_toast.offset_top = hand_top + hand_h + 12.0 - safe_bottom
+	_toast.offset_bottom = hand_top + hand_h + 40.0 - safe_bottom
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_font_size_override("font_size", 18)
 	_toast.add_theme_color_override("font_color", Style.DIM)
@@ -250,7 +264,8 @@ func _build_ui() -> void:
 		_goals_lbl.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 		_goals_lbl.offset_left = margin
 		_goals_lbl.offset_right = -margin
-		_goals_lbl.offset_top = -32.0
+		_goals_lbl.offset_top = -32.0 - safe_bottom
+		_goals_lbl.offset_bottom = -safe_bottom
 		_goals_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_goals_lbl.add_theme_font_size_override("font_size", 14)
 		_goals_lbl.add_theme_color_override("font_color", Style.DIM)
@@ -430,21 +445,16 @@ func _style_home_button(b: Button) -> void:
 
 
 ## Top device-safe inset (notch / status bar) in logical px, so the Home row and HUD
-## clear it; resolves to 0 on desktop/editor. get_display_safe_area() is reported in
-## GLOBAL screen coordinates, so we make it window-relative by subtracting the window
-## position — otherwise a multi-monitor desktop yields a huge bogus inset. Clamped to a
-## sane fraction of the viewport so a surprising reading can never wreck the layout.
+## clear it; resolves to 0 on desktop/editor. See safe_area.gd for the math.
 func _top_safe_inset() -> float:
-	var win := DisplayServer.window_get_size()
-	if win.y <= 0:
-		return 0.0
-	var safe := DisplayServer.get_display_safe_area()
-	var phys_top := float(safe.position.y - DisplayServer.window_get_position().y)
-	if phys_top <= 0.0:
-		return 0.0
-	# Physical px -> logical (canvas) px via the viewport/window height ratio.
-	var vp_y := get_viewport_rect().size.y
-	return minf(phys_top * vp_y / float(win.y), vp_y * 0.15)
+	return SafeArea.top_inset(get_viewport_rect().size.y)
+
+
+## Bottom device-safe inset (home indicator / gesture bar) in logical px, so the
+## footer (story-goal strip / toast) clears it; 0 on desktop/editor. As a router
+## takeover the match scene hides the shell's nav band and so owns this itself.
+func _bottom_safe_inset() -> float:
+	return SafeArea.bottom_inset(get_viewport_rect().size.y)
 
 
 ## Tap handler / MCP target supplier. Returns a status Dictionary (the board's

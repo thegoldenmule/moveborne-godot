@@ -18,6 +18,8 @@ const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 ## MbUi control registry (preloaded, not the class_name global, so the headless
 ## verifier that instances the shell doesn't depend on a full editor scan).
 const Reg := preload("res://ui/mcp_ui_reg.gd")
+## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
+const SafeArea := preload("res://ui/safe_area.gd")
 
 const HOME_INDEX := 2
 const LEADERBOARD_INDEX := 1
@@ -531,15 +533,7 @@ func _apply_safe_area() -> void:
 
 
 func _bottom_safe_inset() -> float:
-	var win := DisplayServer.window_get_size()
-	if win.y <= 0:
-		return 0.0
-	var safe := DisplayServer.get_display_safe_area()
-	var phys_bottom := float(win.y) - float(safe.position.y + safe.size.y)
-	if phys_bottom <= 0.0:
-		return 0.0
-	# Physical px -> logical (canvas) px via the viewport/window height ratio.
-	return phys_bottom * get_viewport_rect().size.y / float(win.y)
+	return SafeArea.bottom_inset(get_viewport_rect().size.y)
 
 
 ## Position the content host in the gap between the top currency band and the
