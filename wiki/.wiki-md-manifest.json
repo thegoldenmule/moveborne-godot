@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2751,
+    "version": 2780,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -50,7 +50,7 @@
       "moveborne-godot/.archived/implementation-plan--mq88pnku-000x-77nvic.md": "0fcca547d7916327a7bcfa50c953b2496e3317478f0d16db91c074d17804eadc",
       "moveborne-godot/.archived/testing-plan--mq88pnku-000y-7jmitx.md": "c2928dcaa9eff08a633932be6d2037244d35bf77d590f080067f641f73736291",
       "moveborne-godot/.archived/feature-spec--mq88pnkv-000z-ix8ln1.md": "0fb4aac0e3da8cb67337ef7e6722932a35b67c16358ed272a8b8f7c357db0190",
-      "moveborne-godot/design/index.md": "e427b671fedf18e71450dacdeac64b665ea7b4103429ecd5990b9b04285a8fba",
+      "moveborne-godot/design/index.md": "83f5b2ba4ba698532bb9eae6b1d8767bcf255aa7e6de39a3bd002abd038848ac",
       "moveborne-godot/design/general.md": "38bd8b5d15875e4c4ab6055f9c492d72f535f2bfeed6ac5837115ceb8b0ba36f",
       "moveborne-godot/.archived/feature-brief--mq8ejxt1-005v-k2eu9f.md": "346bfe4d7385267ae15ef89e50b3bc46960683b9126fcad042a9300368059cbf",
       "moveborne-godot/.archived/implementation-plan--mq8ejxt1-005w-iw8mhf.md": "4029f79d3b300ad8ae7adde99d766bf8cf76e4e26274e37169a66b19fb2e3e48",
@@ -122,7 +122,8 @@
       "moveborne-godot/.archived/feature-brief--mqi73zju-00ao-tkrlam.md": "5fb31451a5b8845e448d98bfb8edff58f27fddd83b2917bc93a9e0a1012f8888",
       "moveborne-godot/.archived/implementation-plan--mqi73zju-00ap-2e62fy.md": "823a7eff88c3bde5b960d57e6e574cf156c3334f65050c156229d221abdd4078",
       "moveborne-godot/.archived/testing-plan--mqi73zju-00aq-8qfv96.md": "5a554cef3072642f2436e1e76208e1f66fa3a4e3e75e7c70a589199d6b71abb9",
-      "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md": "28e3b72e510fbaeaaf021e59eef5a21d08aca97374740d5f2329a1b9ee281d3d"
+      "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md": "28e3b72e510fbaeaaf021e59eef5a21d08aca97374740d5f2329a1b9ee281d3d",
+      "moveborne-godot/design/mobile-first-ui-layout-best-practices.md": "b5c88a40ba202679a7e0f3f0cef121d1e93d015d47a090f4a66980c73a6fac62"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
@@ -245,7 +246,8 @@
       "feature-brief:mqi73zju-00ao-tkrlam": "moveborne-godot/.archived/feature-brief--mqi73zju-00ao-tkrlam.md",
       "implementation-plan:mqi73zju-00ap-2e62fy": "moveborne-godot/.archived/implementation-plan--mqi73zju-00ap-2e62fy.md",
       "testing-plan:mqi73zju-00aq-8qfv96": "moveborne-godot/.archived/testing-plan--mqi73zju-00aq-8qfv96.md",
-      "feature-spec:mqi73zju-00ar-mxvp8q": "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md"
+      "feature-spec:mqi73zju-00ar-mxvp8q": "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md",
+      "document:mqigdxu0-015a-at30p1": "moveborne-godot/design/mobile-first-ui-layout-best-practices.md"
     }
   }
 }
