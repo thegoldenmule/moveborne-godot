@@ -31,14 +31,18 @@ static func split_root(min_left: float = 0.0, min_right: float = 0.0) -> HSplitC
 	return root
 
 
-## A VBox of a caption label above an expanding control.
-static func label_wrap(text: String, control: Control) -> VBoxContainer:
+## A VBox of a caption label above a control. The control always fills
+## horizontally; pass fill_v := true to also let it expand vertically (a
+## TextEdit/canvas that should consume the leftover height) — leave it false for
+## the common single-line labeled field, so a column of them doesn't stretch.
+static func label_wrap(text: String, control: Control, fill_v := false) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	var lbl := Label.new()
 	lbl.text = text
 	box.add_child(lbl)
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	control.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	if fill_v:
+		control.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(control)
 	return box
 
@@ -54,6 +58,44 @@ static func form_row(label_text: String, control: Control, label_w: float = 78.0
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(control)
 	return row
+
+
+## A Button with text, an optional pressed handler, and an optional tooltip — the
+## make → set text → connect idiom both docks repeat. Pass an invalid Callable
+## (the default) to skip wiring a handler.
+static func button(text: String, on_press := Callable(), tooltip := "") -> Button:
+	var b := Button.new()
+	b.text = text
+	if tooltip != "":
+		b.tooltip_text = tooltip
+	if on_press.is_valid():
+		b.pressed.connect(on_press)
+	return b
+
+
+## An HBox packing the given controls (typically a row of buttons) left-to-right.
+## Non-Control entries are skipped.
+static func button_bar(items: Array) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	for item in items:
+		if item is Control:
+			row.add_child(item)
+	return row
+
+
+## A step-1 (by default) SpinBox preset with its range and value — the spin
+## factory both the catalog form and the goal/reward grids repeat. `fill` makes
+## it expand to fill its row (the grids); leave it false for a fixed-width spin
+## beside a form_row label.
+static func spin(minv: float, maxv: float, value: float, step := 1.0, fill := false) -> SpinBox:
+	var s := SpinBox.new()
+	s.min_value = minv
+	s.max_value = maxv
+	s.step = step
+	s.value = value
+	if fill:
+		s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return s
 
 
 ## A word-wrapping status Label with a minimum width (so long messages wrap

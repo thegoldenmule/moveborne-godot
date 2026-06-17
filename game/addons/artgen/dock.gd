@@ -124,10 +124,7 @@ func _build_compose() -> Control:
 	title.text = "Compose"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title)
-	var gear := Button.new()
-	gear.text = "Settings"
-	gear.pressed.connect(_open_settings)
-	title_row.add_child(gear)
+	title_row.add_child(Ui.button("Settings", _open_settings))
 	box.add_child(title_row)
 
 	var preset_row := HBoxContainer.new()
@@ -135,65 +132,57 @@ func _build_compose() -> Control:
 	_preset_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_preset_option.item_selected.connect(func(_i: int) -> void: _update_prompt_preview())
 	preset_row.add_child(_preset_option)
-	var load_btn := Button.new()
-	load_btn.text = "Load"
-	load_btn.tooltip_text = "fill every field below from the preset; edit anything before generating"
-	load_btn.pressed.connect(_on_load_preset)
-	preset_row.add_child(load_btn)
-	box.add_child(_label_wrap("Preset", preset_row))
+	preset_row.add_child(Ui.button("Load", _on_load_preset,
+		"fill every field below from the preset; edit anything before generating"))
+	box.add_child(Ui.label_wrap("Preset", preset_row))
 
 	_subject_edit = LineEdit.new()
 	_subject_edit.placeholder_text = "e.g. leaderboard trophy"
 	_subject_edit.text_changed.connect(func(_t: String) -> void: _update_prompt_preview())
-	box.add_child(_label_wrap("Subject", _subject_edit))
+	box.add_child(Ui.label_wrap("Subject", _subject_edit))
 
 	_prompt_override = TextEdit.new()
 	_prompt_override.custom_minimum_size.y = 60
 	_prompt_override.text_changed.connect(_update_prompt_preview)
-	box.add_child(_label_wrap("Prompt", _prompt_override))
+	box.add_child(Ui.label_wrap("Prompt", _prompt_override))
 
 	_prompt_preview = Label.new()
 	_prompt_preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_prompt_preview.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
-	box.add_child(_label_wrap("Full prompt", _prompt_preview))
+	box.add_child(Ui.label_wrap("Full prompt", _prompt_preview))
 
 	_model_option = OptionButton.new()
 	_model_option.add_item("preset")  # real kinds come from config via _populate_models
 	_model_option.item_selected.connect(func(_i: int) -> void: _update_model_note())
-	box.add_child(_label_wrap("Model", _model_option))
+	box.add_child(Ui.label_wrap("Model", _model_option))
 	_model_note = Label.new()
 	_model_note.visible = false
 	box.add_child(_model_note)
 
 	_style_id_edit = LineEdit.new()
 	_style_id_edit.placeholder_text = "style_id override / 'none'"
-	box.add_child(_label_wrap("Style id", _style_id_edit))
+	box.add_child(Ui.label_wrap("Style id", _style_id_edit))
 
 	_size_edit = LineEdit.new()
 	_size_edit.placeholder_text = "WxH, blank = preset"
-	box.add_child(_label_wrap("Size", _size_edit))
+	box.add_child(Ui.label_wrap("Size", _size_edit))
 
 	_controls_edit = LineEdit.new()
 	_controls_edit.placeholder_text = "controls JSON, blank = preset"
-	box.add_child(_label_wrap("Controls", _controls_edit))
+	box.add_child(Ui.label_wrap("Controls", _controls_edit))
 
 	_post_edit = LineEdit.new()
 	_post_edit.placeholder_text = "post steps, comma-separated, blank = preset"
-	box.add_child(_label_wrap("Post", _post_edit))
+	box.add_child(Ui.label_wrap("Post", _post_edit))
 
-	_n_spin = SpinBox.new()
-	_n_spin.min_value = 1
-	_n_spin.max_value = 6
-	_n_spin.value = 2
-	box.add_child(_label_wrap("Variations", _n_spin))
+	_n_spin = Ui.spin(1, 6, 2)
+	box.add_child(Ui.label_wrap("Variations", _n_spin))
 
 	_parent_label = Label.new()
 	_parent_label.text = ""
 	box.add_child(_parent_label)
 
-	_generate_btn = Button.new()
-	_generate_btn.text = "Generate"
-	_generate_btn.pressed.connect(_on_generate)
+	_generate_btn = Ui.button("Generate", _on_generate)
 	box.add_child(_generate_btn)
 
 	_status_label = Label.new()
@@ -281,9 +270,7 @@ func _build_detail() -> Control:
 	_name_edit.placeholder_text = "asset name"
 	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_save_row.add_child(_name_edit)
-	_save_btn = Button.new()
-	_save_btn.text = "Save"
-	_save_btn.pressed.connect(_on_save)
+	_save_btn = Ui.button("Save", _on_save)
 	_save_row.add_child(_save_btn)
 	_detail_box.add_child(_save_row)
 
@@ -300,25 +287,11 @@ func _build_detail() -> Control:
 	_swap_row = HFlowContainer.new()
 	_detail_box.add_child(_swap_row)
 
-	var action_row := HBoxContainer.new()
-	_iterate_btn = Button.new()
-	_iterate_btn.text = "Iterate"
-	_iterate_btn.pressed.connect(_on_iterate)
-	action_row.add_child(_iterate_btn)
-	_more_btn = Button.new()
-	_more_btn.text = "More variations"
-	_more_btn.pressed.connect(_on_more_variations)
-	action_row.add_child(_more_btn)
-	_reveal_btn = Button.new()
-	_reveal_btn.text = "Reveal"
-	_reveal_btn.tooltip_text = "show the generated file in Finder"
-	_reveal_btn.pressed.connect(_on_reveal)
-	action_row.add_child(_reveal_btn)
-	_discard_btn = Button.new()
-	_discard_btn.text = "Discard"
-	_discard_btn.pressed.connect(_on_discard)
-	action_row.add_child(_discard_btn)
-	_detail_box.add_child(action_row)
+	_iterate_btn = Ui.button("Iterate", _on_iterate)
+	_more_btn = Ui.button("More variations", _on_more_variations)
+	_reveal_btn = Ui.button("Reveal", _on_reveal, "show the generated file in Finder")
+	_discard_btn = Ui.button("Discard", _on_discard)
+	_detail_box.add_child(Ui.button_bar([_iterate_btn, _more_btn, _reveal_btn, _discard_btn]))
 
 	_set_detail_enabled(false)
 	return _detail_box
@@ -333,12 +306,9 @@ func _build_settings() -> void:
 	_key_edit = LineEdit.new()
 	_key_edit.secret = true
 	_key_edit.placeholder_text = "Recraft API key (stored in gitignored editor metadata)"
-	box.add_child(_label_wrap("API key", _key_edit))
+	box.add_child(Ui.label_wrap("API key", _key_edit))
 	var key_row := HBoxContainer.new()
-	var validate := Button.new()
-	validate.text = "Save && validate"
-	validate.pressed.connect(_on_validate_key)
-	key_row.add_child(validate)
+	key_row.add_child(Ui.button("Save && validate", _on_validate_key))
 	_key_status = Label.new()
 	key_row.add_child(_key_status)
 	box.add_child(key_row)
@@ -349,15 +319,9 @@ func _build_settings() -> void:
 	_styles_list = ItemList.new()
 	_styles_list.custom_minimum_size.y = 120
 	box.add_child(_styles_list)
-	var refresh_styles := Button.new()
-	refresh_styles.text = "Refresh styles"
-	refresh_styles.pressed.connect(_on_refresh_styles)
-	box.add_child(refresh_styles)
+	box.add_child(Ui.button("Refresh styles", _on_refresh_styles))
 
-	var manifest_btn := Button.new()
-	manifest_btn.text = "Check ai_manifest invariant"
-	manifest_btn.pressed.connect(_on_check_manifest)
-	box.add_child(manifest_btn)
+	box.add_child(Ui.button("Check ai_manifest invariant", _on_check_manifest))
 	_manifest_label = Label.new()
 	_manifest_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_manifest_label)
@@ -725,11 +689,9 @@ func _refresh_detail() -> void:
 		child.queue_free()
 	for r in swap_targets:
 		var ref_path := str(r["ref_path"])
-		var btn := Button.new()
-		btn.text = "⇄ swap into " + ref_path.get_file()
-		btn.tooltip_text = "Re-point %s at %s (every consumer follows)" % [ref_path, _selected_id]
-		btn.pressed.connect(_on_swap.bind(ref_path, _selected_id))
-		_swap_row.add_child(btn)
+		_swap_row.add_child(Ui.button("⇄ swap into " + ref_path.get_file(),
+			_on_swap.bind(ref_path, _selected_id),
+			"Re-point %s at %s (every consumer follows)" % [ref_path, _selected_id]))
 
 	var lineage_text := ""
 	for parent in rec.get("lineage", []):
@@ -757,16 +719,6 @@ func _set_detail_enabled(enabled: bool) -> void:
 
 
 # -- Helpers ------------------------------------------------------------------
-
-func _label_wrap(text: String, control: Control) -> Control:
-	var box := VBoxContainer.new()
-	var label := Label.new()
-	label.text = text
-	box.add_child(label)
-	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_child(control)
-	return box
-
 
 func _make_checkerboard() -> Texture2D:
 	var img := Image.create(64, 64, false, Image.FORMAT_RGB8)

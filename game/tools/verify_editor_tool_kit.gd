@@ -109,10 +109,33 @@ func _run() -> void:
 	bare.free()
 	var lw: VBoxContainer = EditorToolUiT.label_wrap("Caption", LineEdit.new())
 	ok = _check(ok, lw is VBoxContainer and lw.get_child_count() == 2, "label_wrap is a VBox(label, control)")
+	ok = _check(ok, (lw.get_child(1) as Control).size_flags_vertical != Control.SIZE_EXPAND_FILL,
+		"label_wrap leaves the control non-expanding vertically by default")
 	lw.free()
+	var lwv: VBoxContainer = EditorToolUiT.label_wrap("Caption", TextEdit.new(), true)
+	ok = _check(ok, (lwv.get_child(1) as Control).size_flags_vertical == Control.SIZE_EXPAND_FILL,
+		"label_wrap(fill_v) expands the control vertically")
+	lwv.free()
 	var fr: HBoxContainer = EditorToolUiT.form_row("Name", LineEdit.new())
 	ok = _check(ok, fr is HBoxContainer and fr.get_child_count() == 2, "form_row is an HBox(label, control)")
 	fr.free()
+	var called := [0]
+	var btn: Button = EditorToolUiT.button("Go", func() -> void: called[0] += 1, "tip")
+	ok = _check(ok, btn is Button and btn.text == "Go" and btn.tooltip_text == "tip"
+		and btn.pressed.get_connections().size() == 1, "button sets text/tooltip and connects the handler")
+	var plain: Button = EditorToolUiT.button("Plain")
+	ok = _check(ok, plain.pressed.get_connections().is_empty(), "button with no handler leaves pressed unconnected")
+	plain.free()
+	var bar: HBoxContainer = EditorToolUiT.button_bar([btn, Label.new(), "skip", Button.new()])
+	ok = _check(ok, bar is HBoxContainer and bar.get_child_count() == 3, "button_bar packs only the Control items")
+	bar.free()
+	var sp: SpinBox = EditorToolUiT.spin(1, 6, 2)
+	ok = _check(ok, sp is SpinBox and sp.min_value == 1 and sp.max_value == 6 and sp.value == 2
+		and sp.step == 1 and sp.size_flags_horizontal != Control.SIZE_EXPAND_FILL, "spin presets range/value, no fill by default")
+	sp.free()
+	var spf: SpinBox = EditorToolUiT.spin(0, 9, 0, 1.0, true)
+	ok = _check(ok, spf.size_flags_horizontal == Control.SIZE_EXPAND_FILL, "spin(fill) expands horizontally")
+	spf.free()
 	var sl: Label = EditorToolUiT.status_label()
 	ok = _check(ok, sl is Label and sl.autowrap_mode == TextServer.AUTOWRAP_WORD_SMART,
 		"status_label is a wrapping Label")

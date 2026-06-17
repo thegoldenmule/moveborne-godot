@@ -69,8 +69,8 @@ addons/<tool>/
   rolls back if the save fails). The canonical serializer stays per-tool (field
   order is domain-specific; see `story_map_editor/catalog_edit.gd`).
 - **`EditorToolUi`** (static) — `split_root`, `label_wrap`, `form_row`,
-  `status_label`, `restyle_selected`. Pure construction, no state; adopt
-  incrementally with no visual change.
+  `button`, `button_bar`, `spin`, `status_label`, `restyle_selected`. Pure
+  construction, no state; adopt incrementally with no visual change.
 - **`BridgeServer`** — optional localhost HTTP base (TCPServer poll loop +
   Content-Length framing + async dispatch + headless skip). A subclass overrides
   `_resolve_port()` and `_route(method, path, query, body) -> {code, payload}`.

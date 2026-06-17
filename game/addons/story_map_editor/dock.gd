@@ -109,20 +109,11 @@ func _build_ui() -> void:
 	_build_rc_tab(tabs)
 
 	right.add_child(HSeparator.new())
-	var act := HBoxContainer.new()
-	right.add_child(act)
-	var reload := Button.new()
-	reload.text = "Reload"
-	reload.pressed.connect(_reload)
-	act.add_child(reload)
-	var validate := Button.new()
-	validate.text = "Validate"
-	validate.pressed.connect(_on_validate)
-	act.add_child(validate)
-	var save := Button.new()
-	save.text = "Save all"
-	save.pressed.connect(_on_save)
-	act.add_child(save)
+	right.add_child(Ui.button_bar([
+		Ui.button("Reload", _reload),
+		Ui.button("Validate", _on_validate),
+		Ui.button("Save all", _on_save),
+	]))
 
 	_status = Ui.status_label()
 	right.add_child(_status)
@@ -156,26 +147,17 @@ func _build_dots_tab(tabs: TabContainer) -> void:
 	_tex_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tex_field.text_submitted.connect(func(t): _set_texture(t))
 	tex_row.add_child(_tex_field)
-	var pick := Button.new()
-	pick.text = "Pick…"
-	pick.pressed.connect(_open_texture_dialog)
-	tex_row.add_child(pick)
+	tex_row.add_child(Ui.button("Pick…", _open_texture_dialog))
 
 	_selected_info = Label.new()
 	_selected_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_selected_info.custom_minimum_size = Vector2(360, 56)
 	tab.add_child(_selected_info)
 
-	var sel_row := HBoxContainer.new()
-	tab.add_child(sel_row)
-	var remove_sel := Button.new()
-	remove_sel.text = "Remove selected dot"
-	remove_sel.pressed.connect(_remove_selected)
-	sel_row.add_child(remove_sel)
-	var clear := Button.new()
-	clear.text = "Clear world dots"
-	clear.pressed.connect(_clear_world)
-	sel_row.add_child(clear)
+	tab.add_child(Ui.button_bar([
+		Ui.button("Remove selected dot", _remove_selected),
+		Ui.button("Clear world dots", _clear_world),
+	]))
 
 	_unplaced = Ui.status_label()
 	tab.add_child(_unplaced)
@@ -191,16 +173,10 @@ func _build_rc_tab(tabs: TabContainer) -> void:
 	tab.name = "Remote Config"
 	tab.add_theme_constant_override("separation", 8)
 	tabs.add_child(tab)
-	var rc_row := HBoxContainer.new()
-	tab.add_child(rc_row)
-	var rc_check := Button.new()
-	rc_check.text = "Check sync"
-	rc_check.pressed.connect(_check_catalog_sync)
-	rc_row.add_child(rc_check)
-	var rc_copy := Button.new()
-	rc_copy.text = "Copy publish payload"
-	rc_copy.pressed.connect(_copy_publish_payload)
-	rc_row.add_child(rc_copy)
+	tab.add_child(Ui.button_bar([
+		Ui.button("Check sync", _check_catalog_sync),
+		Ui.button("Copy publish payload", _copy_publish_payload),
+	]))
 	_rc_status = Ui.status_label()
 	_rc_status.text = "Remote Config has no publish API — 'Copy publish payload' then paste into the Snapser console (app-config v1)."
 	tab.add_child(_rc_status)
@@ -214,20 +190,11 @@ func _build_catalog_tab(tabs: TabContainer) -> void:
 	tab.add_theme_constant_override("separation", 8)
 	tabs.add_child(tab)
 
-	var btns := HBoxContainer.new()
-	tab.add_child(btns)
-	var add_w := Button.new()
-	add_w.text = "Add world"
-	add_w.pressed.connect(_on_add_world)
-	btns.add_child(add_w)
-	var add_l := Button.new()
-	add_l.text = "Add level"
-	add_l.pressed.connect(_on_add_level)
-	btns.add_child(add_l)
-	var rem := Button.new()
-	rem.text = "Remove"
-	rem.pressed.connect(_on_remove_cat)
-	btns.add_child(rem)
+	tab.add_child(Ui.button_bar([
+		Ui.button("Add world", _on_add_world),
+		Ui.button("Add level", _on_add_level),
+		Ui.button("Remove", _on_remove_cat),
+	]))
 
 	_cat_tree = Tree.new()
 	_cat_tree.hide_root = true
@@ -642,15 +609,6 @@ func _clear_form() -> void:
 		c.queue_free()
 
 
-func _spin(minv: float, maxv: float, value: float) -> SpinBox:
-	var s := SpinBox.new()
-	s.min_value = minv
-	s.max_value = maxv
-	s.step = 1
-	s.value = value
-	return s
-
-
 func _show_world_form(wid: String) -> void:
 	_clear_form()
 	var w: Dictionary = service.get_world(wid)
@@ -663,7 +621,7 @@ func _show_world_form(wid: String) -> void:
 	name_e.text = str(w.get("name", ""))
 	name_e.text_changed.connect(func(t): service.set_world_field(wid, "name", t))
 	_cat_form.add_child(Ui.form_row("Name", name_e))
-	var order_s := _spin(0, 999, int(w.get("order", 0)))
+	var order_s := Ui.spin(0, 999, int(w.get("order", 0)))
 	order_s.value_changed.connect(func(v): service.set_world_field(wid, "order", int(v)))
 	_cat_form.add_child(Ui.form_row("Order", order_s))
 
@@ -687,7 +645,7 @@ func _show_level_form(wid: String, lid: String) -> void:
 	name_e.text_changed.connect(func(t): service.set_level_field(wid, lid, "name", t))
 	_cat_form.add_child(Ui.form_row("Name", name_e))
 
-	var order_s := _spin(0, 999, int(l.get("order", 0)))
+	var order_s := Ui.spin(0, 999, int(l.get("order", 0)))
 	order_s.value_changed.connect(func(v): service.set_level_field(wid, lid, "order", int(v)))
 	_cat_form.add_child(Ui.form_row("Order", order_s))
 
@@ -727,22 +685,13 @@ func _build_goal_row(wid: String, lid: String, gi: int, goal: Dictionary) -> voi
 	type_o.add_item("max_tile")
 	type_o.select(1 if str(goal.get("type", "points")) == "max_tile" else 0)
 	row.add_child(type_o)
-	var thr := SpinBox.new()
-	thr.min_value = 1
-	thr.max_value = 1000000
-	thr.step = 1
-	thr.value = int(goal.get("threshold", 100))
-	thr.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var thr := Ui.spin(1, 1000000, int(goal.get("threshold", 100)), 1.0, true)
 	row.add_child(thr)
 	var timed := CheckBox.new()
 	var tl = goal.get("time_limit_s", null)
 	timed.button_pressed = tl != null
 	row.add_child(timed)
-	var tlim := SpinBox.new()
-	tlim.min_value = 1
-	tlim.max_value = 3600
-	tlim.step = 1
-	tlim.value = int(tl) if tl != null else 60
+	var tlim := Ui.spin(1, 3600, int(tl) if tl != null else 60)
 	tlim.editable = tl != null
 	row.add_child(tlim)
 	var apply := func():
@@ -768,12 +717,7 @@ func _build_reward_row(wid: String, lid: String, where: String, label: String, a
 	row.add_child(l)
 	var spins := {}
 	for cur in ["coins", "souls", "gems"]:
-		var s := SpinBox.new()
-		s.min_value = 0
-		s.max_value = 1000000
-		s.step = 1
-		s.value = int(amounts.get(cur, 0)) if amounts is Dictionary else 0
-		s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var s := Ui.spin(0, 1000000, int(amounts.get(cur, 0)) if amounts is Dictionary else 0, 1.0, true)
 		row.add_child(s)
 		spins[cur] = s
 	var apply := func():
