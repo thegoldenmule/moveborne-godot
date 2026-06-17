@@ -31,6 +31,44 @@ static func split_root(min_left: float = 0.0, min_right: float = 0.0) -> HSplitC
 	return root
 
 
+## The enforced tool header: the tool title on the left, then a dimmed version
+## tag and a reload button pinned to the right — framed by a violet bottom rule
+## so it reads as a header band, not a loose button row. `on_reload` is wired to
+## the button (the plugin's disable→enable self-reload). Pure construction —
+## EditorToolPlugin mounts this above every dock, so no tool builds its own.
+static func tool_header(title: String, version := "", on_reload := Callable()) -> PanelContainer:
+	var frame := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0, 0, 0, 0)        # no fill — just the rule beneath the row
+	sb.border_color = Color("b400ff")      # violet, matching the occult-arcade direction
+	sb.border_width_bottom = 2
+	sb.content_margin_left = 4
+	sb.content_margin_right = 4
+	sb.content_margin_top = 2
+	sb.content_margin_bottom = 6
+	frame.add_theme_stylebox_override("panel", sb)
+
+	var bar := HBoxContainer.new()
+	bar.add_theme_constant_override("separation", 8)
+	frame.add_child(bar)
+
+	var t := Label.new()
+	t.text = title
+	t.add_theme_font_size_override("font_size", 20)
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	bar.add_child(t)
+	if version != "":
+		var v := Label.new()
+		v.text = "v" + version
+		v.add_theme_color_override("font_color", Color(0.55, 0.5, 0.6))
+		v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		bar.add_child(v)
+	bar.add_child(button("⟳ Reload", on_reload,
+		"Disable and re-enable this plugin to reload its scripts"))
+	return frame
+
+
 ## A VBox of a caption label above a control. The control always fills
 ## horizontally; pass fill_v := true to also let it expand vertically (a
 ## TextEdit/canvas that should consume the leftover height) — leave it false for

@@ -107,6 +107,28 @@ func _run() -> void:
 	ok = _check(ok, bare is HSplitContainer and bare.get_child_count() == 0,
 		"split_root() bare adds no panes")
 	bare.free()
+	var hits := [0]
+	var hdr: PanelContainer = EditorToolUiT.tool_header("My Tool", "0.1.0", func() -> void: hits[0] += 1)
+	var sb := hdr.get_theme_stylebox("panel")
+	ok = _check(ok, hdr is PanelContainer and sb is StyleBoxFlat and (sb as StyleBoxFlat).border_width_bottom > 0,
+		"tool_header is a PanelContainer framed by a bottom rule")
+	var hbar := hdr.get_child(0) as HBoxContainer
+	ok = _check(ok, hbar is HBoxContainer and hbar.get_child_count() == 3,
+		"tool_header packs title + version + reload when a version is given")
+	var title := hbar.get_child(0) as Label
+	ok = _check(ok, title.text == "My Tool" and title.size_flags_horizontal == Control.SIZE_EXPAND_FILL
+		and title.get_theme_font_size("font_size") >= 18,
+		"tool_header title expands and reads as a heading (≥18px)")
+	ok = _check(ok, (hbar.get_child(1) as Label).text == "v0.1.0", "tool_header tags the version with a 'v' prefix")
+	var reload := hbar.get_child(2) as Button
+	ok = _check(ok, reload is Button and reload.pressed.get_connections().size() == 1,
+		"tool_header reload button is wired to the handler")
+	hdr.free()
+	var hdr2: PanelContainer = EditorToolUiT.tool_header("No Version")
+	ok = _check(ok, (hdr2.get_child(0) as HBoxContainer).get_child_count() == 2,
+		"tool_header omits the version label when version is blank")
+	hdr2.free()
+
 	var lw: VBoxContainer = EditorToolUiT.label_wrap("Caption", LineEdit.new())
 	ok = _check(ok, lw is VBoxContainer and lw.get_child_count() == 2, "label_wrap is a VBox(label, control)")
 	ok = _check(ok, (lw.get_child(1) as Control).size_flags_vertical != Control.SIZE_EXPAND_FILL,

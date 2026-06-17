@@ -42,8 +42,11 @@ addons/<tool>/
    ```
 
    `EditorToolPlugin` constructs `service` → (`bridge`) → `dock` (injecting the
-   service into the bridge + dock), mounts the dock in the bottom panel, and
-   reverses it all in `_exit_tree`. Register the tool in
+   service into the bridge + dock), mounts the dock **beneath an enforced header**
+   (tool title left; version + a self-reload button right) in the bottom panel,
+   and reverses it all in `_exit_tree`. The version is read from the tool's own
+   `plugin.cfg` and the reload button disable→enables the plugin, so a tool gets
+   both for free — the dock builds none of it. Register the tool in
    `project.godot [editor_plugins]` and commit the `.gd.uid` files.
 
 2. **`<tool>_service.gd`** — the headless-testable core (`ToolService`):
@@ -68,7 +71,8 @@ addons/<tool>/
   rescan), and `bump_then(struct, key, do_save, when := true)` (version bump that
   rolls back if the save fails). The canonical serializer stays per-tool (field
   order is domain-specific; see `story_map_editor/catalog_edit.gd`).
-- **`EditorToolUi`** (static) — `split_root`, `label_wrap`, `form_row`,
+- **`EditorToolUi`** (static) — `split_root`, `tool_header` (the enforced
+  title/version/reload bar the plugin mounts), `label_wrap`, `form_row`,
   `button`, `button_bar`, `spin`, `status_label`, `restyle_selected`. Pure
   construction, no state; adopt incrementally with no visual change.
 - **`BridgeServer`** — optional localhost HTTP base (TCPServer poll loop +
