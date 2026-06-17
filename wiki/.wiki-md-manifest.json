@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2743,
+    "version": 2751,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -113,7 +113,7 @@
       "moveborne-godot/.archived/feature-spec--mqgs9hqv-00ic-b5v9we.md": "776b638b2a4734e0504b65a739468b652291cf9f3ce35c91d7c87647d5e81bb0",
       "moveborne-godot/adrs/validator-pulls-the-story-catalog-from-remote-config-at-runtime-per-match-version-pinning-init-handshake-supersedes-adr-23.md": "fb9d0ab3bebb77552a825176856799cf0158550f06106351fb643df1f7442685",
       "moveborne-godot/adrs/enduring-story-catalog-invariants-one-canonical-source-catalog-version-drift-detection-scenario-bound-levels-client-adopts-if-newer.md": "7029f4289e792c1d21c5e24cbf92655de850ff001e1689f7399f045a8ac412fd",
-      "moveborne-godot/architecture/client/editor-tool-framework.md": "6c247b076b603c93912fa5200d4f7120909d3fce75b3a441f3e6f35721dd240a",
+      "moveborne-godot/architecture/client/editor-tool-framework.md": "bbf62c5f590b6ecf34ecaa444fb9980a31b414c65191496e1b00e2dc01eed9b9",
       "moveborne-godot/.archived/feature-brief--mqh3549u-0010-q64913.md": "56d0151a48310f3ef2d48dd260dec236d829be7f160b8c0b45356e632db86210",
       "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md": "97a883a020475625f3a263e88f4b8c9a611c346df7c3d1290efaac879b61a560",
       "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md": "16c5c4c9bcfc3a1fd6f829996ae791a5103f5d9ef9546e8010e67eae6fdd6988",
