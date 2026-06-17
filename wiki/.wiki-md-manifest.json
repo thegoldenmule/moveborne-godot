@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2780,
+    "version": 2787,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -123,7 +123,7 @@
       "moveborne-godot/.archived/implementation-plan--mqi73zju-00ap-2e62fy.md": "823a7eff88c3bde5b960d57e6e574cf156c3334f65050c156229d221abdd4078",
       "moveborne-godot/.archived/testing-plan--mqi73zju-00aq-8qfv96.md": "5a554cef3072642f2436e1e76208e1f66fa3a4e3e75e7c70a589199d6b71abb9",
       "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md": "28e3b72e510fbaeaaf021e59eef5a21d08aca97374740d5f2329a1b9ee281d3d",
-      "moveborne-godot/design/mobile-first-ui-layout-best-practices.md": "b5c88a40ba202679a7e0f3f0cef121d1e93d015d47a090f4a66980c73a6fac62"
+      "moveborne-godot/design/mobile-first-ui-layout-best-practices.md": "c732fdc614dee66a83733f3cf43d2d37120fc835997a68abee5a0c8e04918ec1"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
