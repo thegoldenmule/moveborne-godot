@@ -6,6 +6,7 @@ extends Control
 ## service's signals keep the gallery live when the MCP bridge drives work.
 
 const Ui := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
+const Pal := preload("res://addons/editor_tool_kit/tool_palette.gd")
 
 var service: Node
 
@@ -100,13 +101,15 @@ func _build_ui() -> void:
 	var split := Ui.split_root()  # full-rect HSplitContainer (shared builder)
 	add_child(split)
 
-	split.add_child(_build_compose())
+	# Each pane reads as a framed, captioned group (Ui.section); fill_v lets the
+	# scroll/list/detail body consume the panel height.
+	split.add_child(Ui.section("Compose", _build_compose(), true))
 
 	var right := HSplitContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	split.add_child(right)
-	right.add_child(_build_gallery())
-	right.add_child(_build_detail())
+	right.add_child(Ui.section("Gallery", _build_gallery(), true))
+	right.add_child(Ui.section("Detail", _build_detail(), true))
 
 	_build_settings()
 
@@ -148,7 +151,7 @@ func _build_compose() -> Control:
 
 	_prompt_preview = Label.new()
 	_prompt_preview.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_prompt_preview.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
+	_prompt_preview.add_theme_color_override("font_color", Pal.CAPTION)
 	box.add_child(Ui.label_wrap("Full prompt", _prompt_preview))
 
 	_model_option = OptionButton.new()
@@ -599,7 +602,7 @@ func _refresh_gallery() -> void:
 		var block := VBoxContainer.new()
 		var head := Label.new()
 		head.text = "[%s] \"%s\"" % [first.get("preset"), str(first.get("subject", ""))]
-		head.add_theme_color_override("font_color", Color(0.65, 0.6, 0.75))
+		head.add_theme_color_override("font_color", Pal.CAPTION)
 		block.add_child(head)
 		var row := HFlowContainer.new()
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -674,13 +677,13 @@ func _refresh_detail() -> void:
 
 	if not powering.is_empty():
 		_usage_label.text = "in game → " + powering
-		_usage_label.add_theme_color_override("font_color", Color(0.75, 0.55, 1.0))
+		_usage_label.add_theme_color_override("font_color", Pal.USAGE_ACTIVE)
 	elif not swap_targets.is_empty():
 		_usage_label.text = "a sibling is in game — swap this variant in below, or save a new ref"
-		_usage_label.add_theme_color_override("font_color", Color(0.7, 0.65, 0.5))
+		_usage_label.add_theme_color_override("font_color", Pal.USAGE_WARN)
 	else:
 		_usage_label.text = "not used in game"
-		_usage_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+		_usage_label.add_theme_color_override("font_color", Pal.USAGE_IDLE)
 	# Can still save a fresh ref even when siblings exist; only hide save once
 	# this exact variant already powers a ref.
 	_save_row.visible = powering.is_empty()

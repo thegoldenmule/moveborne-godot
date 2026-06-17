@@ -2,6 +2,8 @@
 class_name EditorToolPlugin
 extends EditorPlugin
 
+const ToolTheme := preload("res://addons/editor_tool_kit/tool_theme.gd")
+
 ## Shared bootstrap for in-editor authoring tools. A concrete tool subclasses
 ## this and overrides _config() to declare its pieces; the base constructs them
 ## in the right order, injects the service into the (optional) bridge + dock,
@@ -67,6 +69,11 @@ func _enter_tree() -> void:
 	_panel_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_panel_root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_panel_root.add_theme_constant_override("separation", 6)
+	# The shared occult-arcade Theme: assigned here so it cascades (Control.theme)
+	# to every descendant of the header + dock with no per-dock styling code. A new
+	# tool inherits the look for free; a dock may still override it locally, and
+	# per-control overrides (preview panel, dot markers) still win over the cascade.
+	_panel_root.theme = ToolTheme.build()
 	_panel_root.add_child(EditorToolUi.tool_header(
 		str(c["panel"]), _plugin_version(), _reload_plugin))
 	_panel_root.add_child(_dock)

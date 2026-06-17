@@ -10,6 +10,8 @@ extends SceneTree
 const ToolServiceT := preload("res://addons/editor_tool_kit/tool_service.gd")
 const ContentStoreT := preload("res://addons/editor_tool_kit/content_store.gd")
 const EditorToolUiT := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
+const PaletteT := preload("res://addons/editor_tool_kit/tool_palette.gd")
+const ToolThemeT := preload("res://addons/editor_tool_kit/tool_theme.gd")
 
 
 func _initialize() -> void:
@@ -166,6 +168,66 @@ func _run() -> void:
 	EditorToolUiT.restyle_selected(panel, true)
 	ok = _check(ok, panel.has_theme_stylebox_override("panel"), "restyle_selected applies a panel stylebox")
 	panel.free()
+
+	# ── EditorToolUi.section: framed, captioned group ─────────────────────────
+	var sect: PanelContainer = EditorToolUiT.section("Goals", LineEdit.new())
+	ok = _check(ok, sect is PanelContainer, "section is a PanelContainer")
+	var sb_sect := sect.get_theme_stylebox("panel") as StyleBoxFlat
+	ok = _check(ok, sb_sect != null and sb_sect.border_color == PaletteT.VIOLET
+		and sb_sect.get_border_width(SIDE_TOP) == PaletteT.BORDER,
+		"section frames with a palette-violet border (per-control override wins over the cascade)")
+	var sect_col := sect.get_child(0) as VBoxContainer
+	ok = _check(ok, sect_col is VBoxContainer and sect_col.get_child_count() == 2,
+		"section holds a VBox(caption, body)")
+	var cap := sect_col.get_child(0) as Label
+	ok = _check(ok, cap.text == "Goals" and cap.get_theme_font_size("font_size") == PaletteT.H_CAPTION
+		and cap.get_theme_color("font_color") == PaletteT.CAPTION,
+		"section caption uses the palette caption color + size")
+	ok = _check(ok, (sect_col.get_child(1) as Control).size_flags_horizontal == Control.SIZE_EXPAND_FILL,
+		"section body fills horizontally")
+	sect.free()
+
+	# ── EditorToolTheme.build: cascaded occult-arcade Theme ───────────────────
+	var theme := ToolThemeT.build()
+	ok = _check(ok, theme is Theme, "build() returns a Theme")
+	# Every control type the theme claims to cover must exist with its key states,
+	# so no cascaded control renders a missing/black stylebox.
+	for type in ["Button", "OptionButton"]:
+		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+			ok = _check(ok, theme.has_stylebox(state, type), "theme has %s/%s stylebox" % [type, state])
+	for type in ["TabContainer", "TabBar"]:
+		for state in ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled"]:
+			ok = _check(ok, theme.has_stylebox(state, type), "theme has %s/%s stylebox" % [type, state])
+	ok = _check(ok, theme.has_stylebox("panel", "TabContainer")
+		and theme.has_stylebox("panel", "PanelContainer") and theme.has_stylebox("panel", "Panel"),
+		"theme paints TabContainer/PanelContainer/Panel panels")
+	for type in ["LineEdit", "TextEdit"]:
+		for state in ["normal", "focus", "read_only"]:
+			ok = _check(ok, theme.has_stylebox(state, type), "theme has %s/%s stylebox" % [type, state])
+	for type in ["Tree", "ItemList"]:
+		ok = _check(ok, theme.has_stylebox("panel", type) and theme.has_stylebox("selected", type)
+			and theme.has_stylebox("selected_focus", type), "theme covers %s panel + selection" % type)
+	ok = _check(ok, theme.has_stylebox("separator", "HSeparator")
+		and theme.has_stylebox("separator", "VSeparator"), "theme rules HSeparator/VSeparator")
+	ok = _check(ok, theme.has_stylebox("panel", "PopupMenu"), "theme styles the PopupMenu (OptionButton dropdown)")
+
+	# Values are sourced from EditorToolPalette — not hard-coded in the theme.
+	var btn_normal := theme.get_stylebox("normal", "Button") as StyleBoxFlat
+	ok = _check(ok, btn_normal != null and btn_normal.bg_color == PaletteT.PANEL_BG
+		and btn_normal.border_color == PaletteT.VIOLET,
+		"Button/normal pulls bg + border from the palette")
+	var btn_hover := theme.get_stylebox("hover", "Button") as StyleBoxFlat
+	ok = _check(ok, btn_hover != null and btn_hover.border_color == PaletteT.VIOLET_HOVER,
+		"Button/hover uses the palette hover violet")
+	var hsep := theme.get_stylebox("separator", "HSeparator") as StyleBoxLine
+	ok = _check(ok, hsep != null and hsep.color == PaletteT.VIOLET_DEEP,
+		"separator rule uses the palette deep violet")
+	var vsep := theme.get_stylebox("separator", "VSeparator") as StyleBoxLine
+	ok = _check(ok, vsep != null and vsep.vertical, "VSeparator rule is vertical")
+	ok = _check(ok, theme.get_color("font_color", "Label") == PaletteT.TEXT,
+		"Label font_color is the palette text color")
+	ok = _check(ok, theme.get_color("font_selected_color", "TabContainer") == PaletteT.EMPHASIS,
+		"selected tab text is the palette emphasis (white)")
 
 	print("VERIFY editor_tool_kit: %s" % ("PASS" if ok else "FAIL"))
 	quit(0 if ok else 1)

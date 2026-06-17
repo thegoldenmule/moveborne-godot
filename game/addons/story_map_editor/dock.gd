@@ -16,6 +16,7 @@ extends Control
 const Catalog := preload("res://story/story_catalog.gd")
 const Scenarios := preload("res://logic/scenarios.gd")
 const Ui := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
+const Pal := preload("res://addons/editor_tool_kit/tool_palette.gd")
 
 const CANVAS_SIZE := Vector2(720, 1080)  # 2:3, matching the artgen story-map presets (2× the old size)
 const DOT := Vector2(32, 32)
@@ -96,7 +97,7 @@ func _build_ui() -> void:
 	# Right: tabbed control region (Catalog / Map dots / Remote Config) + a shared
 	# action footer. One "Save all" persists the catalog AND the dot layout.
 	var right := VBoxContainer.new()
-	right.add_theme_constant_override("separation", 8)
+	right.add_theme_constant_override("separation", Pal.SEP)
 	right.custom_minimum_size = Vector2(400, 0)
 	right.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(right)
@@ -128,7 +129,7 @@ func _build_ui() -> void:
 func _build_dots_tab(tabs: TabContainer) -> void:
 	var tab := VBoxContainer.new()
 	tab.name = "Map dots"
-	tab.add_theme_constant_override("separation", 8)
+	tab.add_theme_constant_override("separation", Pal.SEP)
 	tabs.add_child(tab)
 
 	var world_row := HBoxContainer.new()
@@ -171,7 +172,7 @@ func _build_dots_tab(tabs: TabContainer) -> void:
 func _build_rc_tab(tabs: TabContainer) -> void:
 	var tab := VBoxContainer.new()
 	tab.name = "Remote Config"
-	tab.add_theme_constant_override("separation", 8)
+	tab.add_theme_constant_override("separation", Pal.SEP)
 	tabs.add_child(tab)
 	tab.add_child(Ui.button_bar([
 		Ui.button("Check sync", _check_catalog_sync),
@@ -187,7 +188,7 @@ func _build_rc_tab(tabs: TabContainer) -> void:
 func _build_catalog_tab(tabs: TabContainer) -> void:
 	var tab := VBoxContainer.new()
 	tab.name = "Catalog"
-	tab.add_theme_constant_override("separation", 8)
+	tab.add_theme_constant_override("separation", Pal.SEP)
 	tabs.add_child(tab)
 
 	tab.add_child(Ui.button_bar([
@@ -438,7 +439,7 @@ func _make_marker(lid: String, num: int) -> Control:
 	lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.add_theme_color_override("font_color", Color.WHITE)
+	lbl.add_theme_color_override("font_color", Pal.EMPHASIS)
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	m.add_child(lbl)
 	m.gui_input.connect(_on_dot_input.bind(lid))
@@ -661,24 +662,24 @@ func _show_level_form(wid: String, lid: String) -> void:
 		service.set_level_field(wid, lid, "scenario_id", int(scen.get_item_metadata(i))))
 	_cat_form.add_child(Ui.form_row("Scenario", scen))
 
-	var goals_hdr := Label.new()
-	goals_hdr.text = "Goals (type · threshold · ⏱)"
-	_cat_form.add_child(goals_hdr)
+	# Goals + Rewards each read as a framed group (Ui.section) rather than a header
+	# label over a loose run of rows — the rows are built into the section body.
+	var goals_body := VBoxContainer.new()
 	var goals: Array = l.get("goals", [])
 	for gi in range(3):
-		_build_goal_row(wid, lid, gi, goals[gi] if gi < goals.size() else {})
+		_build_goal_row(wid, lid, gi, goals[gi] if gi < goals.size() else {}, goals_body)
+	_cat_form.add_child(Ui.section("Goals (type · threshold · ⏱)", goals_body))
 
-	var rew_hdr := Label.new()
-	rew_hdr.text = "Rewards (coins · souls · gems)"
-	_cat_form.add_child(rew_hdr)
+	var rew_body := VBoxContainer.new()
 	var rewards = l.get("rewards", {})
-	_build_reward_row(wid, lid, "complete", "Complete", rewards.get("complete", {}) if rewards is Dictionary else {})
+	_build_reward_row(wid, lid, "complete", "Complete", rewards.get("complete", {}) if rewards is Dictionary else {}, rew_body)
 	var per_star = rewards.get("per_star", []) if rewards is Dictionary else []
 	for si in range(3):
-		_build_reward_row(wid, lid, "per_star:%d" % si, "★%d" % (si + 1), per_star[si] if si < per_star.size() else {})
+		_build_reward_row(wid, lid, "per_star:%d" % si, "★%d" % (si + 1), per_star[si] if si < per_star.size() else {}, rew_body)
+	_cat_form.add_child(Ui.section("Rewards (coins · souls · gems)", rew_body))
 
 
-func _build_goal_row(wid: String, lid: String, gi: int, goal: Dictionary) -> void:
+func _build_goal_row(wid: String, lid: String, gi: int, goal: Dictionary, target: Container) -> void:
 	var row := HBoxContainer.new()
 	var type_o := OptionButton.new()
 	type_o.add_item("points")
@@ -706,10 +707,10 @@ func _build_goal_row(wid: String, lid: String, gi: int, goal: Dictionary) -> voi
 	thr.value_changed.connect(func(_v): apply.call())
 	timed.toggled.connect(func(_p): apply.call())
 	tlim.value_changed.connect(func(_v): apply.call())
-	_cat_form.add_child(row)
+	target.add_child(row)
 
 
-func _build_reward_row(wid: String, lid: String, where: String, label: String, amounts) -> void:
+func _build_reward_row(wid: String, lid: String, where: String, label: String, amounts, target: Container) -> void:
 	var row := HBoxContainer.new()
 	var l := Label.new()
 	l.text = label
@@ -729,7 +730,7 @@ func _build_reward_row(wid: String, lid: String, where: String, label: String, a
 		service.set_reward(wid, lid, where, a)
 	for cur in spins:
 		(spins[cur] as SpinBox).value_changed.connect(func(_v): apply.call())
-	_cat_form.add_child(row)
+	target.add_child(row)
 
 
 ## Rename a level id (globally unique), migrating its map dot via the service.

@@ -64,6 +64,28 @@ addons/<tool>/
    Pure view: build with the `EditorToolUi` builders, hold control refs +
    interaction state, and re-render when the service emits its change signal.
 
+## Styling — the shared occult-arcade theme
+
+Both docks read as one cohesive surface with **no per-dock styling code**, via
+Godot's `Control.theme` cascade:
+
+- **`EditorToolPalette`** (`tool_palette.gd`, static consts) — the single source of
+  truth for colors + metrics: one violet accent (`#b400ff`, hover `#d24bff`) on
+  near-black, green `#44ff88` for selection, white for peak emphasis. **Owned by
+  the tool kit** — it never loads the game theme (`game/ui/theme/moveborne_ui.tres`);
+  the values are duplicated by intent so the two surfaces stay visually aligned yet
+  fully decoupled. `tool_header`, `restyle_selected`, `section`, the theme, and both
+  docks all reference it, so the look has exactly one place to change.
+- **`EditorToolTheme`** (`tool_theme.gd`) — `build() -> Theme` assembles the look
+  from the palette with full state coverage (Button/OptionButton, Tab*, Panel*,
+  separators, Label, and the input controls LineEdit/TextEdit/SpinBox/Tree/ItemList/
+  PopupMenu). `EditorToolPlugin` assigns it to `_panel_root`, so it **cascades to
+  every descendant of the header + dock** — a new tool inherits the look for free.
+  Per-control overrides (the artgen preview panel; story-map dot markers via
+  `restyle_selected`; `section`'s brighter frame) still win locally over the cascade.
+  `build()` returns a plain `Theme` Resource, so it is constructible + assertable
+  under `godot --headless`.
+
 ## The other primitives
 
 - **`ContentStore`** (static) — `load_json(path)`, atomic N-target write
@@ -73,8 +95,9 @@ addons/<tool>/
   order is domain-specific; see `story_map_editor/catalog_edit.gd`).
 - **`EditorToolUi`** (static) — `split_root`, `tool_header` (the enforced
   title/version/reload bar the plugin mounts), `label_wrap`, `form_row`,
-  `button`, `button_bar`, `spin`, `status_label`, `restyle_selected`. Pure
-  construction, no state; adopt incrementally with no visual change.
+  `button`, `button_bar`, `spin`, `status_label`, `section` (a violet-bordered,
+  captioned group frame), `restyle_selected`. Pure construction, no state; adopt
+  incrementally. Colors/metrics come from `EditorToolPalette`.
 - **`BridgeServer`** — optional localhost HTTP base (TCPServer poll loop +
   Content-Length framing + async dispatch + headless skip). A subclass overrides
   `_resolve_port()` and `_route(method, path, query, body) -> {code, payload}`.

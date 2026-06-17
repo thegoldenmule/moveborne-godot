@@ -4,9 +4,14 @@ extends RefCounted
 
 ## Static layout builders for the small set of UI idioms the authoring docks both
 ## rebuild by hand: the split root, label-over-control and label-beside-control
-## rows, a one-line wrapping status label, and the violet/green selection
-## restyle. Pure construction — no state, no signals. Docks adopt these
-## incrementally; the output is visually identical to the inline code.
+## rows, a one-line wrapping status label, bordered section frames, and the
+## violet/green selection restyle. Pure construction — no state, no signals. Docks
+## adopt these incrementally; the output is visually identical to the inline code.
+##
+## Colors/metrics come from EditorToolPalette (the single source of truth), pulled
+## via `preload` so headless tools resolve it without an editor class-cache scan.
+
+const Pal := preload("res://addons/editor_tool_kit/tool_palette.gd")
 
 
 ## A full-rect HSplitContainer (canvas/content on the left, controls on the
@@ -40,8 +45,8 @@ static func tool_header(title: String, version := "", on_reload := Callable()) -
 	var frame := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0, 0, 0, 0)        # no fill — just the rule beneath the row
-	sb.border_color = Color("b400ff")      # violet, matching the occult-arcade direction
-	sb.border_width_bottom = 2
+	sb.border_color = Pal.VIOLET           # violet, matching the occult-arcade direction
+	sb.border_width_bottom = Pal.BORDER
 	sb.content_margin_left = 4
 	sb.content_margin_right = 4
 	sb.content_margin_top = 2
@@ -49,19 +54,19 @@ static func tool_header(title: String, version := "", on_reload := Callable()) -
 	frame.add_theme_stylebox_override("panel", sb)
 
 	var bar := HBoxContainer.new()
-	bar.add_theme_constant_override("separation", 8)
+	bar.add_theme_constant_override("separation", Pal.SEP)
 	frame.add_child(bar)
 
 	var t := Label.new()
 	t.text = title
-	t.add_theme_font_size_override("font_size", 20)
+	t.add_theme_font_size_override("font_size", Pal.H_TITLE)
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bar.add_child(t)
 	if version != "":
 		var v := Label.new()
 		v.text = "v" + version
-		v.add_theme_color_override("font_color", Color(0.55, 0.5, 0.6))
+		v.add_theme_color_override("font_color", Pal.TEXT_DIM)
 		v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		bar.add_child(v)
 	bar.add_child(button("⟳ Reload", on_reload,
@@ -145,13 +150,51 @@ static func status_label(min_w: float = 360.0) -> Label:
 	return lbl
 
 
+## A framed, captioned section: a violet-bordered PanelContainer holding a dim
+## caption above the given body, so a major block reads as one group rather than a
+## loose run of rows. The brighter violet border (vs. the theme's deep-violet
+## default Panel) is a deliberate per-control override that wins over the cascade.
+## The body fills horizontally; pass fill_v := true to also expand it (and the
+## frame) vertically — for a section whose body is a Tree/list that should grow.
+static func section(caption: String, body: Control, fill_v := false) -> PanelContainer:
+	var frame := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Pal.PANEL_BG
+	sb.set_border_width_all(Pal.BORDER)
+	sb.border_color = Pal.VIOLET
+	sb.set_corner_radius_all(Pal.CORNER)
+	sb.content_margin_left = Pal.SEP
+	sb.content_margin_right = Pal.SEP
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = Pal.SEP
+	frame.add_theme_stylebox_override("panel", sb)
+	if fill_v:
+		frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 6)
+	frame.add_child(col)
+
+	var cap := Label.new()
+	cap.text = caption
+	cap.add_theme_font_size_override("font_size", Pal.H_CAPTION)
+	cap.add_theme_color_override("font_color", Pal.CAPTION)
+	col.add_child(cap)
+
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if fill_v:
+		body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(body)
+	return frame
+
+
 ## Apply the shared selection restyle to a Panel: a dark fill with a violet
 ## border (unselected) or a thicker green border (selected), matching Story Map's
 ## dot styling. `radius` rounds the corners (default suits a 32px dot).
 static func restyle_selected(panel: Panel, selected: bool, radius: int = 16) -> void:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.07, 0.07, 0.1, 0.92)
+	sb.bg_color = Pal.SELECT_BG
 	sb.set_corner_radius_all(radius)
-	sb.set_border_width_all(3 if selected else 2)
-	sb.border_color = Color("44ff88") if selected else Color("b400ff")
+	sb.set_border_width_all((Pal.BORDER + 1) if selected else Pal.BORDER)
+	sb.border_color = Pal.GREEN_SEL if selected else Pal.VIOLET
 	panel.add_theme_stylebox_override("panel", sb)
