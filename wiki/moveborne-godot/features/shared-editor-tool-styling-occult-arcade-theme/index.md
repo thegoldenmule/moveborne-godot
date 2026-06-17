@@ -1,6 +1,6 @@
 # Feature: Shared editor-tool styling (occult-arcade theme)
 
-**Status:** building
+**Status:** shipped
 
 ## Summary
 The two in-editor authoring tools — **ArtGen** and **Story Map** — currently inherit Godot's raw editor chrome, and what little styling exists (`tool_header`, `restyle_selected`, and scattered `add_theme_color_override` literals across both docks) duplicates the same violet / near-black values by hand. This feature gives `addons/editor_tool_kit/` a **shared "occult-arcade" theme** so every tool reads as one cohesive surface: styled headers, tabs, buttons, input controls, and bordered sections.

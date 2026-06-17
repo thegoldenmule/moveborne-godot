@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2726,
+    "version": 2742,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "26b55c0c9db02fb890c38dc7c7d4fe98da7627ec450684137a483675df84ea08",
@@ -119,10 +119,10 @@
       "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md": "16c5c4c9bcfc3a1fd6f829996ae791a5103f5d9ef9546e8010e67eae6fdd6988",
       "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md": "3aa0ebe5afa74c8c6f348233b8ee7a1383433a96a281b894de5f43b265779b7d",
       "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md": "a7d62ef212ddf25a6378196893f4240705060f12480fc1385ca28d865f549d2b",
-      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/index.md": "fefe2c3c3ce9ba89ecb43622b253e0e7a4c20cea2a5d219da6c94e7addccb554",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/index.md": "5fb31451a5b8845e448d98bfb8edff58f27fddd83b2917bc93a9e0a1012f8888",
       "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/implementation-plan-shared-editor-tool-styling-occult-arcade-theme.md": "823a7eff88c3bde5b960d57e6e574cf156c3334f65050c156229d221abdd4078",
-      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/testing-plan-shared-editor-tool-styling-occult-arcade-theme.md": "d8a992b18fa003ba1fc25847a8e3041e355848598c06ba2053e5293a1a83bc5b",
-      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/spec-shared-editor-tool-styling-occult-arcade-theme.md": "e289f471d2ed0f150bbe363fd6b62adb38abf26ac67e50ce21875134cf8c0718"
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/testing-plan-shared-editor-tool-styling-occult-arcade-theme.md": "5a554cef3072642f2436e1e76208e1f66fa3a4e3e75e7c70a589199d6b71abb9",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/spec-shared-editor-tool-styling-occult-arcade-theme.md": "28e3b72e510fbaeaaf021e59eef5a21d08aca97374740d5f2329a1b9ee281d3d"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
