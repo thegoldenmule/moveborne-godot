@@ -45,7 +45,6 @@ var _world_index := 0
 var _online := false
 var _refreshing := false
 
-var _title: Label
 var _world_label: Label
 var _world_prev: Button
 var _world_next: Button
@@ -148,17 +147,10 @@ func _build_ui() -> void:
 	Reg.adopt(back, "back")
 	add_child(back)
 
-	_title = Label.new()
-	_title.text = "STORY"
-	_title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	_title.offset_top = 16.0 + safe_top
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override("font_size", 26)
-	_title.add_theme_color_override("font_color", MbStyle.PRIMARY)
-	_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_title)
+	# (No separate "STORY" title — it collided with the ‹ Home button on a 360px-wide
+	# screen and duplicated the world selector below, which already names the screen.)
 
-	# World selector row: ‹ World N — Name ›
+	# World selector row: ‹ World N — Name › — the de-facto header.
 	var world_row := HBoxContainer.new()
 	world_row.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	world_row.offset_left = SCREEN_MARGIN
@@ -178,7 +170,12 @@ func _build_ui() -> void:
 	world_row.add_child(_world_prev)
 
 	_world_label = Label.new()
-	_world_label.custom_minimum_size = Vector2(260, 0)
+	# Take the middle of the row and ellipsize a long "World N — Name  s/t ★" instead of
+	# forcing the row past its 312px bounds (a 260px min width + the two arrows summed to
+	# 368 > 312, so the HBox expanded and shoved the › button clean off the 360px screen).
+	_world_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_world_label.clip_text = true
+	_world_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_world_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_world_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_world_label.add_theme_font_size_override("font_size", 18)
@@ -249,6 +246,7 @@ func _build_ui() -> void:
 	_play_btn = Button.new()
 	_play_btn.text = "Play"
 	_play_btn.focus_mode = Control.FOCUS_NONE
+	_play_btn.clip_text = true  # "Play · <level name>" clips instead of overflowing the screen
 	_play_btn.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_play_btn.offset_left = SCREEN_MARGIN
 	_play_btn.offset_right = -SCREEN_MARGIN
