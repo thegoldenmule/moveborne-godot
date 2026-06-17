@@ -3,11 +3,11 @@ class_name EditorToolPalette
 extends RefCounted
 
 ## Single source of truth for editor-tool styling, OWNED by the tool kit — it has
-## NO dependency on the game theme (game/ui/theme/moveborne_ui.tres is never
-## loaded). One violet accent on near-black; green for selection; white reserved
-## for peak emphasis (value-not-hue hierarchy, per art/STYLE_GUIDE.md). The values
-## are chosen to echo the game UI but are duplicated by intent — the two surfaces
-## stay visually aligned yet fully decoupled (editing one never affects the other).
+## NO dependency on any host project's theme (a consuming project's UI theme is
+## never loaded). One violet accent on near-black; green for selection; white
+## reserved for peak emphasis (value-not-hue hierarchy). The values may echo a
+## host project's UI but are duplicated by intent — the two surfaces stay visually
+## aligned yet fully decoupled (editing one never affects the other).
 ##
 ## tool_theme.gd builds the cascaded Theme from these; tool_header /
 ## restyle_selected and the two docks read their colors here too, so the
@@ -30,13 +30,13 @@ const ERROR        := Color("ff6b6b")               # failure status text (self-
 # ── Tool-specific accents (carried here so the docks hold no color literals) ────
 const CAPTION      := Color(0.65, 0.6, 0.75)        # dim-violet section captions
 const SELECT_BG    := Color(0.07, 0.07, 0.1, 0.92)  # restyle_selected panel fill
-const USAGE_ACTIVE := Color(0.75, 0.55, 1.0)        # "in game" — this variant powers a ref
-const USAGE_WARN   := Color(0.7, 0.65, 0.5)         # a sibling is in game (swap candidate)
-const USAGE_IDLE   := Color(0.6, 0.6, 0.6)          # not used in game
+const USAGE_ACTIVE := Color(0.75, 0.55, 1.0)        # in use — this variant powers a ref
+const USAGE_WARN   := Color(0.7, 0.65, 0.5)         # a sibling is in use (swap candidate)
+const USAGE_IDLE   := Color(0.6, 0.6, 0.6)          # not in use
 
 # ── Metrics ─────────────────────────────────────────────────────────────────--
 const BORDER    := 2      # standard border / rule width
-const CORNER    := 6      # corner radius (tighter than the game UI's 10, for editor density)
+const CORNER    := 6      # corner radius (tight, for editor density)
 const SEP       := 8      # standard container separation
 const TAB_PAD   := 12     # horizontal padding inside a tab (so tab labels don't butt together)
 const H_CAPTION := 14     # section-caption font size

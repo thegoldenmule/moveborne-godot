@@ -7,7 +7,7 @@ extends RefCounted
 ## (hierarchy from size / weight / color, no font import). EditorToolPlugin assigns
 ## the built Theme to its `_panel_root`, so it cascades (Control.theme) to every
 ## descendant of every dock with no per-dock styling code; a new tool inherits the
-## look for free. Per-control overrides (artgen preview panel, story-map dot
+## look for free. Per-control overrides (e.g. a tool's preview panel, or selection
 ## markers via restyle_selected) still win locally over this cascade.
 ##
 ## All values come from EditorToolPalette — the one place to change the look.

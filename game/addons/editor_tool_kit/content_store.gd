@@ -3,18 +3,17 @@ class_name ContentStore
 extends RefCounted
 
 ## Static helpers for the load → validate → atomic N-target write → rescan
-## pipeline that committed-content authoring tools share. Generalizes Story Map's
-## hand-written baked + canonical + layout save. Never instantiated.
+## pipeline that committed-content authoring tools share — e.g. a tool that writes
+## a baked + canonical + layout copy in sync. Never instantiated.
 ##
 ## The canonical-serialize contract (stable key order, integer coercion, sparse
 ## fields) is documented here but the actual serializer stays per-tool, since
-## field order is domain-specific — see addons/story_map_editor/catalog_edit.gd
-## (MbCatalogEdit.serialize) for the reference implementation. ContentStore only
-## owns the load + atomic multi-file write + version-bump-with-rollback.
+## field order is domain-specific. ContentStore only owns the load + atomic
+## multi-file write + version-bump-with-rollback.
 
 
 ## Parse a JSON object file. Returns {} on a missing / unreadable / non-object
-## file (mirrors MbStoryCatalog.load_baked / MbStoryMapLayout.load_baked).
+## file.
 static func load_json(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		return {}
@@ -61,7 +60,7 @@ static func save_all(targets: Array, validate: Callable, scan := true) -> Dictio
 ##   struct:  the in-memory dict holding the version (mutated in place)
 ##   key:     the version field (e.g. "catalog_version")
 ##   do_save: Callable() -> {"ok": bool, ...} (typically wraps save_all)
-##   when:    bump only when true (Story Map bumps only when the catalog changed);
+##   when:    bump only when true (e.g. bump only when the content actually changed);
 ##            when false, do_save runs untouched and nothing is rolled back
 ## Returns do_save's result verbatim.
 static func bump_then(struct: Dictionary, key: String, do_save: Callable, when := true) -> Dictionary:

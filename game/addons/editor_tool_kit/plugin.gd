@@ -12,8 +12,8 @@ extends "res://addons/editor_tool_kit/editor_tool_plugin.gd"
 ## The panel is itself built on the kit's own framework — UpdateService is a
 ## ToolService and UpdatePanel is its dock — so the kit dogfoods the bases it
 ## ships, and the enforced header (title + version + reload) comes for free from
-## EditorToolPlugin. The concrete tools (addons/artgen, addons/story_map_editor)
-## still ship their own EditorPlugin; this plugin is not their host.
+## EditorToolPlugin. Each concrete tool still ships its own EditorPlugin; this
+## plugin is not their host.
 
 const UpdateServiceT := preload("res://addons/editor_tool_kit/update_service.gd")
 const UpdatePanelT := preload("res://addons/editor_tool_kit/update_panel.gd")

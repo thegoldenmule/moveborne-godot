@@ -14,8 +14,9 @@ distributes itself. That panel is built on the kit's *own* framework (its
 `UpdateService` is a `ToolService`, its `UpdatePanel` is the dock), so the kit
 dogfoods the bases it ships.
 
-Consumers today: `addons/artgen/` (full: plugin + service + bridge + dock) and
-`addons/story_map_editor/` (plugin + service + dock, no bridge).
+A consuming tool is a *service + a view* (see the recipe below); a tool that wants
+MCP/CLI access adds a `BridgeServer`. The kit's own self-update panel is built the
+same way, so it dogfoods the bases it ships.
 
 ## The three-piece recipe
 
@@ -80,16 +81,15 @@ Godot's `Control.theme` cascade:
 - **`EditorToolPalette`** (`tool_palette.gd`, static consts) — the single source of
   truth for colors + metrics: one violet accent (`#b400ff`, hover `#d24bff`) on
   near-black, green `#44ff88` for selection, white for peak emphasis. **Owned by
-  the tool kit** — it never loads the game theme (`game/ui/theme/moveborne_ui.tres`);
-  the values are duplicated by intent so the two surfaces stay visually aligned yet
-  fully decoupled. `tool_header`, `restyle_selected`, `section`, the theme, and both
+  the tool kit** — it never loads a host project's theme; the values are duplicated
+  by intent so the kit and any host UI stay visually aligned yet fully decoupled. `tool_header`, `restyle_selected`, `section`, the theme, and both
   docks all reference it, so the look has exactly one place to change.
 - **`EditorToolTheme`** (`tool_theme.gd`) — `build() -> Theme` assembles the look
   from the palette with full state coverage (Button/OptionButton, Tab*, Panel*,
   separators, Label, and the input controls LineEdit/TextEdit/SpinBox/Tree/ItemList/
   PopupMenu). `EditorToolPlugin` assigns it to `_panel_root`, so it **cascades to
   every descendant of the header + dock** — a new tool inherits the look for free.
-  Per-control overrides (the artgen preview panel; story-map dot markers via
+  Per-control overrides (e.g. a tool's preview panel; selection markers via
   `restyle_selected`; `section`'s brighter frame) still win locally over the cascade.
   `build()` returns a plain `Theme` Resource, so it is constructible + assertable
   under `godot --headless`.
@@ -100,7 +100,7 @@ Godot's `Control.theme` cascade:
   `save_all(targets, validate, scan := true)` (validate-then-write-all, editor
   rescan), and `bump_then(struct, key, do_save, when := true)` (version bump that
   rolls back if the save fails). The canonical serializer stays per-tool (field
-  order is domain-specific; see `story_map_editor/catalog_edit.gd`).
+  order is domain-specific).
 - **`EditorToolUi`** (static) — `split_root`, `tool_header` (the enforced
   title/version/reload bar the plugin mounts), `label_wrap`, `form_row`,
   `button`, `button_bar`, `spin`, `status_label`, `section` (a violet-bordered,
@@ -109,7 +109,7 @@ Godot's `Control.theme` cascade:
 - **`BridgeServer`** — optional localhost HTTP base (TCPServer poll loop +
   Content-Length framing + async dispatch + headless skip). A subclass overrides
   `_resolve_port()` and `_route(method, path, query, body) -> {code, payload}`.
-  Opt-in per tool (ArtGen is the only consumer).
+  Opt-in per tool.
 
 ## Self-update
 
@@ -146,7 +146,6 @@ project ships 4.6).
 Headless, no editor:
 
 ```bash
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path game \
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path <project> \
     --script res://tools/verify_editor_tool_kit.gd      # the bases + the self-update version helpers
-    --script res://tools/verify_story_map_service.gd     # a service migrated onto them
 ```

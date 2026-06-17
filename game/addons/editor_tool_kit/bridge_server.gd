@@ -2,7 +2,7 @@
 class_name BridgeServer
 extends Node
 
-## Localhost-only HTTP bridge base, generalized from ArtGen's :4848 bridge:
+## Localhost-only HTTP bridge base for a tool that exposes an MCP/CLI shim:
 ## a TCPServer + _process poll loop, Content-Length request framing, async route
 ## dispatch, JSON responses, and a headless skip. A subclass plugs in two things:
 ##

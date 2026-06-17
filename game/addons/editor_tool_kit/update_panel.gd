@@ -5,7 +5,7 @@ extends Control
 ## installed/upstream version + status, a Check / Update-now button pair, and a
 ## small Settings group (auto-check toggle + the source repo). The kit dogfoods
 ## its own framework — this is an EditorToolUi-built dock injected with a
-## ToolService, exactly like ArtGen's and Story Map's docks.
+## ToolService, exactly like any other tool's dock.
 ##
 ## Pure view: it holds control refs + binds `service.changed` with a METHOD
 ## callable (per the ToolService rule, so a hot-reload / late async signal can't

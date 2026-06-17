@@ -13,7 +13,7 @@ extends Node
 ## the plugin/dock, or behind ContentStore's editor-side seam.
 ##
 ## No signals are mandated here: each subclass declares the ones it needs (e.g.
-## ArtGen's history_changed / balance_changed, Story Map's `changed`). The dock
+## a `changed` signal, or finer-grained per-field signals). The dock
 ## binds them with METHOD CALLABLES (not lambdas) so a hot-reload / late async
 ## signal can't fire into a freed view.
 

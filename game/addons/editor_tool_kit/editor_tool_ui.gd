@@ -194,8 +194,8 @@ static func section(caption: String, body: Control, fill_v := false) -> PanelCon
 
 
 ## Apply the shared selection restyle to a Panel: a dark fill with a violet
-## border (unselected) or a thicker green border (selected), matching Story Map's
-## dot styling. `radius` rounds the corners (default suits a 32px dot).
+## border (unselected) or a thicker green border (selected). `radius` rounds the
+## corners (default suits a 32px dot marker).
 static func restyle_selected(panel: Panel, selected: bool, radius: int = 16) -> void:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Pal.SELECT_BG
