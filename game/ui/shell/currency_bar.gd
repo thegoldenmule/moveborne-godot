@@ -118,6 +118,27 @@ func _on_currencies_changed(balances: Dictionary) -> void:
 		_labels[name].text = str(int(balances.get(name, 0)))
 
 
+## Viewport-space center of a currency slot — the fly-to target for reward feedback
+## (Daily Missions claim). Falls back to the bar center for an unknown currency.
+func slot_global_pos(name: String) -> Vector2:
+	if _labels.has(name) and is_instance_valid(_labels[name]):
+		var slot: Control = (_labels[name] as Control).get_parent()
+		if slot != null:
+			return slot.get_global_rect().get_center()
+	return _bar.get_global_rect().get_center() if _bar != null else Vector2.ZERO
+
+
+## Briefly emphasize a slot (count-up pulse companion) after a grant lands.
+func pulse_slot(name: String) -> void:
+	if not (_labels.has(name) and is_instance_valid(_labels[name])):
+		return
+	var lb: Label = _labels[name]
+	lb.pivot_offset = lb.size / 2.0
+	var tw := lb.create_tween()
+	tw.tween_property(lb, "scale", Vector2(1.35, 1.35), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(lb, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_SINE)
+
+
 ## Total vertical space the band occupies from the top of the viewport (safe
 ## inset + bar height). The shell reads this to inset its content host so tab
 ## screens lay out *below* the band instead of under it.

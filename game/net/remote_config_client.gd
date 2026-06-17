@@ -12,6 +12,10 @@ extends Node
 
 const APP_CONFIG_VERSION := "v1"
 const CATALOG_KEY := "story_catalog"
+## Daily Missions rides under its own key in the SAME app-config document as the
+## story catalog (display catalog + weekday rotation map). See the Daily Missions
+## feature spec.
+const DAILY_MISSIONS_KEY := "daily_missions"
 ## Preloaded (not the class_name global) so this compiles before an editor
 ## scan registers the new Mb* classes — same reason app_shell preloads Reg.
 const Catalog := preload("res://story/story_catalog.gd")
@@ -42,6 +46,13 @@ static func parse_app_config(data) -> Dictionary:
 static func extract_catalog(config: Dictionary) -> Dictionary:
 	var catalog = config.get(CATALOG_KEY, {})
 	return catalog if catalog is Dictionary else {}
+
+
+## The daily_missions block inside an app-config document ({} when absent). Reads
+## a sibling key, so it never disturbs extract_catalog / story-catalog selection.
+static func extract_daily_missions(config: Dictionary) -> Dictionary:
+	var block = config.get(DAILY_MISSIONS_KEY, {})
+	return block if block is Dictionary else {}
 
 
 ## Remote-vs-baked selection: the remote catalog wins only when it is present,

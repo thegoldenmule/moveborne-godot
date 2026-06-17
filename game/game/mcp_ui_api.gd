@@ -53,6 +53,8 @@ const FLOWS := [
 	{"name": "start_infinite", "params": [], "summary": "Launch an Infinite match."},
 	{"name": "open_settings", "params": [], "summary": "Switch to the Settings tab."},
 	{"name": "open_leaderboard", "params": [], "summary": "Switch to the Leaderboard tab."},
+	{"name": "open_daily_missions", "params": [], "summary": "Open the Daily Missions panel (Home sigil)."},
+	{"name": "claim_daily", "params": [], "summary": "Open Daily Missions and Claim All claimable rewards."},
 	{"name": "exit_match", "params": [], "summary": "Leave the current match, back to the shell."},
 	{"name": "sign_out", "params": [], "summary": "Settings -> Sign out."},
 	{"name": "set_avatar", "params": ["id"], "summary": "Open Settings and pick avatar <id> (e.g. skull_avatar_05)."},
@@ -125,7 +127,11 @@ func state() -> Dictionary:
 	var active := _active_screen_ids()
 	var in_match := _in_match()
 	var on_map := _top_name() == "StoryMapState"
-	var modal := "avatar" if active.has("avatar") else ""
+	var modal := ""
+	if active.has("daily"):
+		modal = "daily"
+	elif active.has("avatar"):
+		modal = "avatar"
 	return {
 		"ok": true,
 		"busy": router != null and router.is_busy(),
@@ -142,7 +148,7 @@ func screens() -> Dictionary:
 	return {
 		"tabs": TAB_IDS,
 		"modes": MODE_CFG.keys(),
-		"surfaces": ["shell", "back", "match", "avatar", "story", "story_map"],
+		"surfaces": ["shell", "back", "match", "avatar", "daily", "story", "story_map"],
 		"note": "goto(tab) selects a tab; goto(mode) starts a match; goto('story') opens the world map (play via story_map.play); goto('shell'/'back') exits a match/map.",
 	}
 
@@ -520,6 +526,10 @@ func _expand_flow(name: String, params: Dictionary):
 			return ["goto:settings"]
 		"open_leaderboard":
 			return ["goto:leaderboard"]
+		"open_daily_missions":
+			return ["goto:home", "press:home.daily"]
+		"claim_daily":
+			return ["goto:home", "press:home.daily", "press:missions.claim_all"]
 		"exit_match":
 			return ["goto:shell"]
 		"sign_out":

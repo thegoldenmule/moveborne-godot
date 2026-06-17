@@ -52,6 +52,18 @@ func test_extract_catalog() -> void:
 	assert_eq(RcClient.extract_catalog({}), {}, "absent key -> empty")
 
 
+func test_extract_daily_missions() -> void:
+	# daily_missions rides alongside story_catalog in the SAME app-config doc; one
+	# never disturbs the other.
+	var config := {"story_catalog": _tiny_catalog(2), "daily_missions": {"enabled": true, "anchor": "a"}}
+	assert_eq(RcClient.extract_daily_missions(config), {"enabled": true, "anchor": "a"},
+		"daily_missions extracted from the shared app-config doc")
+	assert_eq(int(RcClient.extract_catalog(config).get("catalog_version", 0)), 2,
+		"story catalog still extracts alongside daily_missions")
+	assert_eq(RcClient.extract_daily_missions({}), {}, "absent key -> empty")
+	assert_eq(RcClient.extract_daily_missions({"daily_missions": "nope"}), {}, "non-dict block -> empty")
+
+
 func test_select_catalog_prefers_valid_newer_remote() -> void:
 	var baked := _tiny_catalog(1)
 	var remote := _tiny_catalog(2)

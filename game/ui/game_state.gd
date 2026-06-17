@@ -28,11 +28,23 @@ func set_currencies(balances: Dictionary) -> void:
 
 
 ## Partial update (e.g. the validator's match_rewards ack carries only the
-## currencies it just granted).
+## currencies it just granted). REPLACE semantics — the ack carries authoritative
+## full totals for the keys it names.
 func merge_currencies(partial: Dictionary) -> void:
 	for name in partial:
 		if currencies.has(name):
 			currencies[name] = int(partial[name])
+	currencies_changed.emit(currencies)
+
+
+## Optimistic ADD of a granted delta — a Daily Missions claim awards e.g. +150
+## coins, NOT a new total (the Quests claim response's currencies_granted is the
+## delta). Distinct from merge_currencies (which replaces). The authoritative
+## Inventory refresh on shell resume reconciles any drift.
+func add_currencies(delta: Dictionary) -> void:
+	for name in delta:
+		if currencies.has(name):
+			currencies[name] = int(currencies[name]) + int(delta[name])
 	currencies_changed.emit(currencies)
 
 
@@ -82,6 +94,16 @@ signal story_progress_changed(progress: Dictionary)
 
 func set_story_catalog(catalog: Dictionary) -> void:
 	story_catalog = catalog
+
+
+## Parsed Daily Missions block from the Remote Config app-config (display catalog +
+## weekday rotation map), or {} offline / when the feature is unconfigured. Account/
+## meta data — like the story catalog, NOT part of SynchronizedGameState, never hashed.
+var daily_missions: Dictionary = {}
+
+
+func set_daily_missions(block: Dictionary) -> void:
+	daily_missions = block
 
 
 func set_story_progress(progress: Dictionary) -> void:

@@ -15,6 +15,8 @@ const ProfileClientS := preload("res://net/profile_client.gd")
 const SettingsScene := preload("res://ui/screens/settings_tab.tscn")
 const LocalSettingsS := preload("res://ui/local_settings.gd")
 const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
+const QuestsClientS := preload("res://net/quests_client.gd")
+const DailySigilS := preload("res://ui/shell/daily_sigil.gd")
 ## MbUi control registry (preloaded, not the class_name global, so the headless
 ## verifier that instances the shell doesn't depend on a full editor scan).
 const Reg := preload("res://ui/mcp_ui_reg.gd")
@@ -127,6 +129,8 @@ var _auth: MbSnapserAuth
 var _leaderboards: Node  # MbLeaderboardsClient (preloaded — fresh class_name globals need a full editor scan)
 var _profiles: Node  # MbProfileClient (Settings tab; shares the shell session)
 var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the nav)
+var _quests: Node  # MbQuestsClient (Daily Missions; shares the shell session)
+var _daily: CanvasLayer  # floating Daily Missions sigil + modal (own layers, like the bar)
 
 
 func _ready() -> void:
@@ -204,6 +208,15 @@ func _ready() -> void:
 	# (It names itself "CurrencyLayer" in its own _ready.)
 	_currency_bar = CurrencyBarS.new(_auth)
 	add_child(_currency_bar)
+
+	# Quests client + the floating Daily Missions sigil/panel (own layers, like the
+	# bar), sharing the shell session. The sigil shows only on the Home surface and
+	# is driven by _select_tab / set_active below.
+	_quests = QuestsClientS.new(_auth)
+	_quests.name = "QuestsClient"
+	add_child(_quests)
+	_daily = DailySigilS.new(_auth, _quests, _currency_bar)
+	add_child(_daily)
 
 	# Now that both chrome layers exist, inset the content host into the gap
 	# between them so every screen lays out clear of the top band and bottom nav.
@@ -285,6 +298,9 @@ func _select_tab(index: int) -> void:
 	var shown: Control = _screens[index] if index < _screens.size() else null
 	if shown != null and shown.has_method("refresh"):
 		shown.refresh()
+	# The Daily sigil floats only over Home; surface it (or hide it) per the tab.
+	if is_instance_valid(_daily):
+		_daily.set_surface(visible, SCREEN_IDS[index] if index < SCREEN_IDS.size() else "")
 	# Selected tab: icon grows and pops up past the bar frame, label shows beneath it.
 	# Unselected tabs collapse back to a centered base-size icon. Home follows the same
 	# rule (it's icon-only, and its halo lights up only while selected).
@@ -416,6 +432,10 @@ func set_active(v: bool) -> void:
 			# Post-match fallback: re-read balances on every shell resume (the
 			# match_rewards ack already merged the granted deltas optimistically).
 			_currency_bar.refresh()
+	# The Daily sigil hides with the shell during a match and re-checks its badge on
+	# resume (only when resuming onto the Home tab).
+	if is_instance_valid(_daily):
+		_daily.set_surface(v, mcp_current_tab_id())
 	if v and _leaderboards != null:
 		_leaderboards.submit_pending(GameState.last_result)
 

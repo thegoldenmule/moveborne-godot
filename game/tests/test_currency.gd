@@ -49,6 +49,10 @@ func test_game_state_set_and_merge_emit() -> void:
 	gs.merge_currencies({"coins": "160"})
 	assert_eq(int(gs.currencies["coins"]), 160, "merge updates only the given currency (int64-string ok)")
 	assert_eq(int(gs.currencies["souls"]), 2, "merge leaves other balances alone")
-	assert_eq(seen.size(), 2, "currencies_changed emitted per update")
+	# add_currencies ADDS a delta (a Daily Missions claim grant), unlike merge's replace.
+	gs.add_currencies({"coins": 150})
+	assert_eq(int(gs.currencies["coins"]), 310, "add_currencies adds the claim delta to the wallet")
+	assert_eq(int(gs.currencies["souls"]), 2, "add leaves untouched balances alone")
+	assert_eq(seen.size(), 3, "currencies_changed emitted per update")
 	gs.currencies_changed.disconnect(handler)
 	gs.free()
