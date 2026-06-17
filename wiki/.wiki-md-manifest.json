@@ -1,9 +1,9 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2660,
+    "version": 2726,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
-      "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
+      "moveborne-godot/features/index.md": "26b55c0c9db02fb890c38dc7c7d4fe98da7627ec450684137a483675df84ea08",
       "moveborne-godot/adrs/index.md": "13081a00859203a8d073c0bcc1eb30ef5bd0ce4ea4ae4b77fe4a55e5a550fd25",
       "moveborne-godot/architecture/client/index.md": "c6836e27a79c73f8fcdab1b69be7bdce83620b1c944e899f6bd9c9c78cdb44ba",
       "moveborne-godot/architecture/validator/index.md": "0fde48ba310db111dac4e4a75649ffe062ffd429773f0e97960f5fb9f41b420f",
@@ -118,7 +118,11 @@
       "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md": "97a883a020475625f3a263e88f4b8c9a611c346df7c3d1290efaac879b61a560",
       "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md": "16c5c4c9bcfc3a1fd6f829996ae791a5103f5d9ef9546e8010e67eae6fdd6988",
       "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md": "3aa0ebe5afa74c8c6f348233b8ee7a1383433a96a281b894de5f43b265779b7d",
-      "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md": "a7d62ef212ddf25a6378196893f4240705060f12480fc1385ca28d865f549d2b"
+      "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md": "a7d62ef212ddf25a6378196893f4240705060f12480fc1385ca28d865f549d2b",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/index.md": "fefe2c3c3ce9ba89ecb43622b253e0e7a4c20cea2a5d219da6c94e7addccb554",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/implementation-plan-shared-editor-tool-styling-occult-arcade-theme.md": "823a7eff88c3bde5b960d57e6e574cf156c3334f65050c156229d221abdd4078",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/testing-plan-shared-editor-tool-styling-occult-arcade-theme.md": "d8a992b18fa003ba1fc25847a8e3041e355848598c06ba2053e5293a1a83bc5b",
+      "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/spec-shared-editor-tool-styling-occult-arcade-theme.md": "e289f471d2ed0f150bbe363fd6b62adb38abf26ac67e50ce21875134cf8c0718"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
@@ -237,7 +241,11 @@
       "implementation-plan:mqh3549u-0011-1wzyuz": "moveborne-godot/.archived/implementation-plan--mqh3549u-0011-1wzyuz.md",
       "testing-plan:mqh3549v-0012-buxzhf": "moveborne-godot/.archived/testing-plan--mqh3549v-0012-buxzhf.md",
       "feature-spec:mqh3549v-0013-jighcj": "moveborne-godot/.archived/feature-spec--mqh3549v-0013-jighcj.md",
-      "architecture:mqh6jhyd-0095-4qhwpw": "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md"
+      "architecture:mqh6jhyd-0095-4qhwpw": "moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md",
+      "feature-brief:mqi73zju-00ao-tkrlam": "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/index.md",
+      "implementation-plan:mqi73zju-00ap-2e62fy": "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/implementation-plan-shared-editor-tool-styling-occult-arcade-theme.md",
+      "testing-plan:mqi73zju-00aq-8qfv96": "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/testing-plan-shared-editor-tool-styling-occult-arcade-theme.md",
+      "feature-spec:mqi73zju-00ar-mxvp8q": "moveborne-godot/features/shared-editor-tool-styling-occult-arcade-theme/spec-shared-editor-tool-styling-occult-arcade-theme.md"
     }
   }
 }
