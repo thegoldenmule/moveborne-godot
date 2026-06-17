@@ -347,8 +347,7 @@ func _rebuild() -> void:
 		func(l): return str(l.get("world_id", "")) == str(world.get("id", "")))
 	for l in levels:
 		earned += Catalog.stars_for(progress, str(l.get("id", "")))
-	_world_label.text = "World %d — %s   %d/%d %s" \
-		% [_world_index + 1, str(world.get("name", "")), earned, levels.size() * 3, STAR_FULL]
+	_world_label.text = str(world.get("name", ""))
 	_world_prev.disabled = _world_index == 0
 	_world_next.disabled = _world_index >= worlds.size() - 1
 
