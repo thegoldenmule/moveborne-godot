@@ -25,6 +25,7 @@ const PANEL_HI     := Color(0.137, 0.125, 0.227)    # hover / selected-row fill
 const TEXT         := Color(0.925, 0.925, 0.957)    # primary near-white body text
 const TEXT_DIM     := Color(0.55, 0.5, 0.6)         # secondary (version tag, captions)
 const EMPHASIS     := Color(1, 1, 1)                # peak emphasis (dot marker labels)
+const ERROR        := Color("ff6b6b")               # failure status text (self-update panel)
 
 # ── Tool-specific accents (carried here so the docks hold no color literals) ────
 const CAPTION      := Color(0.65, 0.6, 0.75)        # dim-violet section captions

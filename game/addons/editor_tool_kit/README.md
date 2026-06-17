@@ -2,9 +2,17 @@
 
 Shared, **editor-only** base classes for in-editor authoring tools. A new tool is
 a *service + a view* — persistence, layout, status, and optional MCP/CLI access
-are inherited. This is a **library addon**: it mounts no UI of its own (its
-`plugin.gd` is a no-op); enabling it just keeps the `class_name` globals
-registered for the tools that subclass them.
+are inherited. The kit is mostly a **framework**: enabling it keeps the
+`class_name` globals registered for the tools that subclass them.
+
+It is **vendored** into this project but **sourced** from a standalone repo
+([github.com/thegoldenmule/godot-editor-tk](https://github.com/thegoldenmule/godot-editor-tk)) —
+so its own `plugin.gd` mounts one small thing of its own: an **"Editor Tool Kit"**
+bottom-panel tab that checks that repo for a newer version and self-updates in
+place (see [Self-update](#self-update)), mirroring how the godot-ai plugin
+distributes itself. That panel is built on the kit's *own* framework (its
+`UpdateService` is a `ToolService`, its `UpdatePanel` is the dock), so the kit
+dogfoods the bases it ships.
 
 Consumers today: `addons/artgen/` (full: plugin + service + bridge + dock) and
 `addons/story_map_editor/` (plugin + service + dock, no bridge).
@@ -103,12 +111,42 @@ Godot's `Control.theme` cascade:
   `_resolve_port()` and `_route(method, path, query, body) -> {code, payload}`.
   Opt-in per tool (ArtGen is the only consumer).
 
+## Self-update
+
+The kit is committed into the project (a fresh clone works offline) but is
+*sourced* from `github.com/thegoldenmule/godot-editor-tk`. The **"Editor Tool
+Kit"** bottom-panel tab checks that repo and pulls a newer copy in place:
+
+- **`update_service.gd`** (`ToolService`) — owns the version check + download.
+  `parse_remote_version` / `is_newer` are **static + headless-testable** (the
+  verifier drives them with no editor or network).
+- **`update_panel.gd`** (the dock) — status line, a *Check for updates* /
+  *Update now* button pair, and a Settings group (an auto-check-on-open toggle,
+  the source repo). Pure view over the service.
+- **`update_reload_runner.gd`** — a node parented **outside** the plugin (so it
+  survives `set_plugin_enabled(false)`); disables the plugin, extracts the
+  archive's `addons/editor_tool_kit/` subtree (atomic `.tmp` + rename per file,
+  with rollback on any failure), waits for a filesystem scan, then re-enables
+  the plugin. Adapted from godot-ai's runner.
+
+**Version is the ship signal.** The source of truth is `plugin.cfg`'s `version`
+on the repo's default branch — checked raw at
+`raw.githubusercontent.com/.../addons/editor_tool_kit/plugin.cfg`. To release an
+update: bump `version` here, copy the addon into the repo, and push. The panel
+compares dotted versions and lights up *Update now* when upstream is newer.
+
+Notes / limits: the install **overwrites + adds** files but never **prunes**, so
+a file removed upstream lingers until deleted by hand. An update **clobbers local
+edits** to the vendored copy — treat the repo as the source of truth and land
+changes there. Only Godot ≥ 4.4 is supported for the in-editor reload (the
+project ships 4.6).
+
 ## Verifying
 
 Headless, no editor:
 
 ```bash
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path game \
-    --script res://tools/verify_editor_tool_kit.gd      # the bases
+    --script res://tools/verify_editor_tool_kit.gd      # the bases + the self-update version helpers
     --script res://tools/verify_story_map_service.gd     # a service migrated onto them
 ```

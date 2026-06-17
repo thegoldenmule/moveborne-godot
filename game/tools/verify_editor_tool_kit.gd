@@ -12,6 +12,8 @@ const ContentStoreT := preload("res://addons/editor_tool_kit/content_store.gd")
 const EditorToolUiT := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
 const PaletteT := preload("res://addons/editor_tool_kit/tool_palette.gd")
 const ToolThemeT := preload("res://addons/editor_tool_kit/tool_theme.gd")
+const UpdateServiceT := preload("res://addons/editor_tool_kit/update_service.gd")
+const RunnerT := preload("res://addons/editor_tool_kit/update_reload_runner.gd")
 
 
 func _initialize() -> void:
@@ -228,6 +230,50 @@ func _run() -> void:
 		"Label font_color is the palette text color")
 	ok = _check(ok, theme.get_color("font_selected_color", "TabContainer") == PaletteT.EMPHASIS,
 		"selected tab text is the palette emphasis (white)")
+
+	# ── UpdateService: version parse + compare (the self-update helpers) ──────
+	var cfg_text := "[plugin]\nname=\"Editor Tool Kit\"\nversion=\"1.2.3\"\nscript=\"plugin.gd\"\n"
+	ok = _check(ok, UpdateServiceT.parse_remote_version(cfg_text) == "1.2.3",
+		"parse_remote_version reads the plugin.cfg version")
+	ok = _check(ok, UpdateServiceT.parse_remote_version("not a config {") == "",
+		"parse_remote_version is empty on unparseable text")
+	ok = _check(ok, UpdateServiceT.parse_remote_version("[plugin]\nname=\"x\"\n") == "",
+		"parse_remote_version is empty when version is absent")
+	ok = _check(ok, UpdateServiceT.is_newer("1.0.1", "1.0.0"), "is_newer: patch bump")
+	ok = _check(ok, UpdateServiceT.is_newer("1.1.0", "1.0.9"), "is_newer: minor beats patch")
+	ok = _check(ok, UpdateServiceT.is_newer("2.0.0", "1.9.9"), "is_newer: major bump")
+	ok = _check(ok, UpdateServiceT.is_newer("0.2", "0.1.9"), "is_newer: shorter remote, zero-filled")
+	ok = _check(ok, not UpdateServiceT.is_newer("1.0.0", "1.0.0"), "is_newer: false on equal")
+	ok = _check(ok, not UpdateServiceT.is_newer("1.0.0", "1.0.1"), "is_newer: false when older")
+	ok = _check(ok, not UpdateServiceT.is_newer("0.1.0", "0.1.0"), "is_newer: false on equal kit version")
+	var usvc: Node = UpdateServiceT.new()
+	ok = _check(ok, usvc.installed_version() != "",
+		"installed_version reads the kit's own plugin.cfg")
+	ok = _check(ok, not usvc.is_busy() and not usvc.has_update(),
+		"a fresh UpdateService is idle (not busy, no update)")
+	usvc.free()
+
+	# ── Runner: archive entry → install path mapping + path-safety guard ──────
+	# Direct addon path and the GitHub branch-archive wrapper both map to the
+	# project-relative addon path; deeper nesting and non-addon files are dropped.
+	ok = _check(ok, RunnerT._archive_rel("addons/editor_tool_kit/plugin.gd")
+		== "addons/editor_tool_kit/plugin.gd", "_archive_rel keeps a direct addon path")
+	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/addons/editor_tool_kit/plugin.gd")
+		== "addons/editor_tool_kit/plugin.gd", "_archive_rel strips the single archive wrapper")
+	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/addons/editor_tool_kit/update_service.gd.uid")
+		== "addons/editor_tool_kit/update_service.gd.uid", "_archive_rel maps .uid files too")
+	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/templates/addons/editor_tool_kit/x.gd")
+		== "", "_archive_rel rejects a deeper-nested copy (review finding #5)")
+	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/README.md") == "",
+		"_archive_rel drops non-addon files")
+	ok = _check(ok, RunnerT._is_safe("addons/editor_tool_kit/plugin.gd"),
+		"_is_safe accepts a normal addon path")
+	ok = _check(ok, not RunnerT._is_safe("addons/editor_tool_kit/../../../evil.gd"),
+		"_is_safe rejects path traversal")
+	ok = _check(ok, not RunnerT._is_safe("/abs/addons/editor_tool_kit/x.gd"),
+		"_is_safe rejects an absolute path")
+	ok = _check(ok, not RunnerT._is_safe("other/thing.gd"),
+		"_is_safe rejects a path outside the addon prefix")
 
 	print("VERIFY editor_tool_kit: %s" % ("PASS" if ok else "FAIL"))
 	quit(0 if ok else 1)
