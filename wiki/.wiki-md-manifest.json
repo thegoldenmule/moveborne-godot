@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2788,
+    "version": 2865,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -79,13 +79,13 @@
       "moveborne-godot/bugs/deployed-currency-grant-latches-granted-true-but-never-credits-the-inventory-wallet-balances-empty.md": "52ffcb1186670790140452a2610dee295de32806d27f1d2f92b86a253b61c0f8",
       "moveborne-godot/.archived/bug-report--mq9wjxlx-007x-rdflmv.md": "676520a2b92dd88ebcd888507c57d2ea24907bb47d6a543825e4427bdfb37114",
       "moveborne-godot/features/daily-login-bonus/index.md": "f2d1dfea64a0b6601b0b34c362ab1dab57c5bab27b402d127cbbb5cfe5d91b9f",
-      "moveborne-godot/features/daily-login-bonus/implementation-plan-daily-login-bonus.md": "dc1c8a21ce29cd2f48ce263f24bd9d13cc9f1606803da17b58f40aaca33a2d18",
+      "moveborne-godot/features/daily-login-bonus/implementation-plan-daily-login-bonus.md": "fdd7aa1b0b6ed209ad06ff603055b478f33dd4822e322be4882578f0e9e3aa6c",
       "moveborne-godot/features/daily-login-bonus/testing-plan-daily-login-bonus.md": "c87133c5166c0105070effed424ddd403edb0a72160d9824f18e8e9c69213d35",
       "moveborne-godot/features/daily-login-bonus/spec-daily-login-bonus.md": "34c4dcb6f2838d0ecce94cf76b345be69491a263ea2023c3578ab2f78051f69b",
-      "moveborne-godot/features/daily-missions/index.md": "89f6d7c81bc8ce52e10f29108178f3dc7d970bdaa2fe1338d8831488c1dad352",
-      "moveborne-godot/features/daily-missions/implementation-plan-daily-missions.md": "df1b5e811d501cbadf185bbcd162d95c80c16e48ec82163379874894df8ad48a",
-      "moveborne-godot/features/daily-missions/testing-plan-daily-missions.md": "d829057a576f67e487289232d2d244d7c5b7fba538b8491942b2f6017ddb5202",
-      "moveborne-godot/features/daily-missions/spec-daily-missions.md": "4d5b8bbd7ac76237d8ec20fa8632a8dc732f244aad943e056871055e5a69107e",
+      "moveborne-godot/features/daily-missions/index.md": "422889341f3825a8bb365d968fc5c6b5502843e8c8f243613ce524e9dd7eade4",
+      "moveborne-godot/features/daily-missions/implementation-plan-daily-missions.md": "5db6aefa3ee440b61d3016edbac1a3a40a70d8729324abb2ede3b577066bb566",
+      "moveborne-godot/features/daily-missions/testing-plan-daily-missions.md": "673c60b8dfd554ced57d025cacb5b17939250458ee881563bda8eb75557988b6",
+      "moveborne-godot/features/daily-missions/spec-daily-missions.md": "8abf76f1f3f505cf8d946eebb383f9ce2c722141cfd57d28105c6d1052f8f8e4",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/index.md": "6f0aa5fdbe8e5d6535dc42902d8a9ec3a8a11f5482cae10ebf0ad2036930eaa6",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "2e7e98cdacda2cbb9e1cb8d321fa2da68b380bddb07cb832cb94794c6f8ec8c8",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "88eb9c1eab13c8ae3f36e87bbdae0cea57f56375a10cd9056ac2968c0879360b",
