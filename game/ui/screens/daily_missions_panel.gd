@@ -141,8 +141,10 @@ func open(block: Dictionary, quests: Array, now_unix: int) -> void:
 	visible = true
 
 
-## Rebuild the cards from a daily_missions block + normalized active quests.
-func render(block: Dictionary, quests: Array, _now_unix: int) -> void:
+## Rebuild the cards from a daily_missions block + normalized active quests. now_unix
+## is the caller's clock (so the panel's weekday matches the sigil that opened it,
+## and tests can inject a deterministic day).
+func render(block: Dictionary, quests: Array, now_unix: int) -> void:
 	_block = block
 	_quests = quests
 	_reset_unix = Model.soonest_reset(quests)
@@ -156,7 +158,7 @@ func render(block: Dictionary, quests: Array, _now_unix: int) -> void:
 	for q in quests:
 		by_name[str((q as Dictionary).get("name", ""))] = q
 
-	var weekday := Model.utc_weekday(int(Time.get_unix_time_from_system()))
+	var weekday := Model.utc_weekday(now_unix)
 	var names := Model.todays_mission_names(block, weekday)
 	# Fallback: nothing configured but quests exist (offline catalog) — show them all.
 	if names.is_empty():

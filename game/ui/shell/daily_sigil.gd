@@ -29,6 +29,8 @@ var _remote_config: Node # MbRemoteConfigClient
 var _block: Dictionary = {}
 var _quests_cache: Array = []
 var _reset_unix := 0
+var _claimable_cached := 0  # claimable count, recomputed on reload/claim (not per frame)
+var _warn_applied := -1     # last countdown warn-state styled (-1 unset / 0 normal / 1 amber)
 var _refreshing := false
 var _busy := false       # an assign/claim round-trip is in flight
 var _surface_on := false # shell active AND on the Home tab
@@ -239,8 +241,10 @@ func refresh() -> void:
 	_refreshing = true
 	await _load_block()
 	if Model.is_enabled(_block):
-		await _assign_todays_set()
-		await _reload_quests()
+		# _assign_todays_set reloads the current set first; only re-fetch afterwards if
+		# it actually assigned a new pool mission (after day-open, the common case is none).
+		if await _assign_todays_set():
+			await _reload_quests()
 	_refreshing = false
 	_apply_visibility()
 	_render_badge()
@@ -261,19 +265,24 @@ func _reload_quests() -> void:
 	if bool(r.get("ok", false)):
 		_quests_cache = r.get("quests", [])
 		_reset_unix = Model.soonest_reset(_quests_cache)
+		_claimable_cached = Model.claimable_count(_quests_cache)
 
 
 ## Assign any of today's pool missions that aren't already active (the anchor is
-## auto-assigned server-side). Selection = the static weekday map, UTC.
-func _assign_todays_set() -> void:
+## auto-assigned server-side). Selection = the static weekday map, UTC. Returns
+## true iff it assigned at least one mission (so the caller re-fetches only then).
+func _assign_todays_set() -> bool:
 	await _reload_quests()
 	var active := {}
 	for q in _quests_cache:
 		active[str(q.get("name", ""))] = true
+	var assigned := false
 	var weekday := Model.utc_weekday(int(Time.get_unix_time_from_system()))
 	for nm in Model.todays_mission_names(_block, weekday):
 		if not active.has(nm):
 			await _quests.assign_quest(nm)
+			assigned = true
+	return assigned
 
 
 func _render_badge() -> void:
@@ -296,16 +305,23 @@ func _process(_delta: float) -> void:
 	if not visible:
 		return
 	if _reset_unix <= 0:
-		_countdown.text = ""
+		if _countdown.text != "":
+			_countdown.text = ""
 		return
 	var secs := maxi(0, _reset_unix - int(Time.get_unix_time_from_system()))
-	_countdown.text = Model.format_countdown(secs)
+	var text := Model.format_countdown(secs)
+	if _countdown.text != text:  # changes at most once/sec
+		_countdown.text = text
 	var warn := Model.is_warning(secs)
-	_countdown.add_theme_color_override("font_color", Color("f5a142") if warn else MbStyle.DIM)
-	# Escalate only in the final hour, and only while something is still claimable.
-	if warn and Model.claimable_count(_quests_cache) > 0:
+	var warn_i := 1 if warn else 0
+	if warn_i != _warn_applied:  # re-style only at the warn-state transition, not per frame
+		_warn_applied = warn_i
+		_countdown.add_theme_color_override("font_color", Color("f5a142") if warn else MbStyle.DIM)
+	# Escalate only in the final hour, and only while something is still claimable
+	# (cached count — _quests_cache changes only on reload/claim, not per frame).
+	if warn and _claimable_cached > 0:
 		_glyph.modulate.a = 0.6 + 0.4 * absf(sin(Time.get_ticks_msec() / 300.0))
-	else:
+	elif _glyph.modulate.a != 1.0:
 		_glyph.modulate.a = 1.0
 
 
@@ -323,6 +339,8 @@ func _open_panel() -> void:
 
 
 func _on_claim_requested(mission_name: String) -> void:
+	if _busy:
+		return
 	await _claim(mission_name)
 	_after_claims()
 

@@ -133,9 +133,10 @@ static func parse_claim(data) -> Dictionary:
 
 
 ## A quest is claimable when its reward is unclaimed but a task is complete. status
-## is free-form on the snap; anything that reads as already-claimed disqualifies it.
+## is free-form on the snap; a status that reads as already-CLAIMED disqualifies it.
+## (Match "claimed", not "claim", so a hypothetical "claimable" isn't misread.)
 static func is_claimable(quest: Dictionary) -> bool:
-	if str(quest.get("status", "")).to_lower().contains("claim"):
+	if str(quest.get("status", "")).to_lower().contains("claimed"):
 		return false
 	for t in quest.get("tasks", []):
 		if bool((t as Dictionary).get("completed", false)):

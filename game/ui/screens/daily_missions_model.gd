@@ -69,9 +69,10 @@ static func catalog_entry(block: Dictionary, name: String) -> Dictionary:
 	}
 
 
-## A normalized quest (MbQuestsClient.parse_active_quests) -> CardState.
+## A normalized quest (MbQuestsClient.parse_active_quests) -> CardState. Match
+## "claimed" (not "claim") so a hypothetical "claimable" status isn't read as CLAIMED.
 static func card_state(quest: Dictionary) -> int:
-	if str(quest.get("status", "")).to_lower().contains("claim"):
+	if str(quest.get("status", "")).to_lower().contains("claimed"):
 		return CardState.CLAIMED
 	for t in quest.get("tasks", []):
 		if bool((t as Dictionary).get("completed", false)):
