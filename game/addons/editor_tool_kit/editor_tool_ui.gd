@@ -47,19 +47,24 @@ static func tool_header(title: String, version := "", on_reload := Callable()) -
 	sb.bg_color = Color(0, 0, 0, 0)        # no fill — just the rule beneath the row
 	sb.border_color = Pal.VIOLET           # violet, matching the occult-arcade direction
 	sb.border_width_bottom = Pal.BORDER
-	sb.content_margin_left = 4
-	sb.content_margin_right = 4
-	sb.content_margin_top = 2
-	sb.content_margin_bottom = 6
+	sb.content_margin_left = Pal.SEP
+	sb.content_margin_right = Pal.SEP
+	sb.content_margin_top = 4
+	# Extra breathing room beneath the row so the violet rule isn't butted against
+	# the (tall, editor-default-height) reload button.
+	sb.content_margin_bottom = 10
 	frame.add_theme_stylebox_override("panel", sb)
 
 	var bar := HBoxContainer.new()
 	bar.add_theme_constant_override("separation", Pal.SEP)
 	frame.add_child(bar)
 
+	# Title, version, and reload button all share the editor-default font size; the
+	# title reads as the heading via the white emphasis color (value-not-hue), not a
+	# forced pixel size that would fight the editor's hi-DPI font scaling.
 	var t := Label.new()
 	t.text = title
-	t.add_theme_font_size_override("font_size", Pal.H_TITLE)
+	t.add_theme_color_override("font_color", Pal.EMPHASIS)
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bar.add_child(t)

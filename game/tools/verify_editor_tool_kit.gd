@@ -119,8 +119,8 @@ func _run() -> void:
 		"tool_header packs title + version + reload when a version is given")
 	var title := hbar.get_child(0) as Label
 	ok = _check(ok, title.text == "My Tool" and title.size_flags_horizontal == Control.SIZE_EXPAND_FILL
-		and title.get_theme_font_size("font_size") >= 18,
-		"tool_header title expands and reads as a heading (≥18px)")
+		and title.get_theme_color("font_color") == PaletteT.EMPHASIS,
+		"tool_header title expands and reads as a heading via the emphasis color (shares the editor-default size)")
 	ok = _check(ok, (hbar.get_child(1) as Label).text == "v0.1.0", "tool_header tags the version with a 'v' prefix")
 	var reload := hbar.get_child(2) as Button
 	ok = _check(ok, reload is Button and reload.pressed.get_connections().size() == 1,

@@ -92,6 +92,10 @@ static func _apply_tabs(t: Theme) -> void:
 	var unselected := _flat(Pal.PANEL_BG.darkened(0.25), 0, Pal.VIOLET_DEEP)
 	var hovered := _flat(Pal.PANEL_HI.darkened(0.15), 0, Pal.VIOLET_DEEP)
 	var disabled := _flat(Pal.PANEL_BG.darkened(0.45), 0, Pal.VIOLET_DEEP)
+	# Wider horizontal padding so adjacent tab labels don't butt against each other.
+	for tab_sb in [selected, unselected, hovered, disabled]:
+		tab_sb.content_margin_left = Pal.TAB_PAD
+		tab_sb.content_margin_right = Pal.TAB_PAD
 	var panel := _flat(Pal.PANEL_BG, Pal.BORDER, Pal.VIOLET_DEEP)
 	var colors := {
 		"font_selected_color": Pal.EMPHASIS,

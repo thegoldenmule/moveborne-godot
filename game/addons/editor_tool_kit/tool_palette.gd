@@ -37,5 +37,5 @@ const USAGE_IDLE   := Color(0.6, 0.6, 0.6)          # not used in game
 const BORDER    := 2      # standard border / rule width
 const CORNER    := 6      # corner radius (tighter than the game UI's 10, for editor density)
 const SEP       := 8      # standard container separation
-const H_TITLE   := 20     # tool_header title font size
+const TAB_PAD   := 12     # horizontal padding inside a tab (so tab labels don't butt together)
 const H_CAPTION := 14     # section-caption font size
