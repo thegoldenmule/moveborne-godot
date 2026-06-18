@@ -6,9 +6,10 @@ extends "res://addons/editor_tool_kit/tool_service.gd"
 ## the in-memory catalog + layout and the current world, all mutations (delegating
 ## to MbCatalogEdit + a normalized layout), validation, canonical serialization,
 ## the 3-file atomic save (baked + canonical catalog, byte-identical, + the
-## client-only layout) via ContentStore with a catalog_version-bump rollback, and
-## the Remote Config verify / publish-payload helpers. The dock is a thin view
-## that calls these and re-renders on `changed`.
+## client-only layout) via ContentStore with a catalog_version-bump rollback. The
+## dock is a thin view that calls these and re-renders on `changed`. Remote Config
+## publishing lives in the separate Remote Config editor tool, which aggregates the
+## validator/content/story_catalog.json blob this save still writes.
 ##
 ## catalog_edit.gd / story_catalog.gd / story_map_layout.gd stay the pure static
 ## utilities this service calls.
@@ -373,33 +374,6 @@ func save_to(catalog_path: String, canonical_path: String, layout_path: String, 
 		return {"ok": false, "stage": "write", "error": str(result.get("error", "write failed"))}
 	clear_dirty()
 	return {"ok": true, "bumped": bumped, "version": int(catalog.get("catalog_version", 1))}
-
-
-# ── Catalog ⇄ Remote Config ──────────────────────────────────────────────────
-
-
-## Reuse the canonical TS comparator instead of reimplementing it: shell out to
-## `bun tools/story-appconfig.ts verify`, which anon-logs in, GETs the live
-## app-config, and deep-compares it to the committed catalog. Blocking; the dock
-## formats the result. Returns {ok, committed, code, text}; code -1 = bun missing.
-func check_catalog_sync() -> Dictionary:
-	var committed := int(Catalog.load_baked().get("catalog_version", 0))
-	var script := _repo_path("validator/src/validator/tools/story-appconfig.ts")
-	var out: Array = []
-	var code := OS.execute("bun", [script, "verify"], out, true)
-	var text := "\n".join(out).strip_edges() if out.size() > 0 else ""
-	return {"ok": code == 0, "committed": committed, "code": code, "text": text}
-
-
-## Put the exact {"story_catalog": <committed>} JSON on the clipboard for a manual
-## paste into the Snapser console (Remote Config has no write API). Returns
-## {ok:true, version} or {ok:false, error} when no committed catalog exists.
-func copy_publish_payload() -> Dictionary:
-	var cat := Catalog.load_baked()
-	if cat.is_empty():
-		return err("No committed catalog found.")
-	DisplayServer.clipboard_set(JSON.stringify({"story_catalog": cat}, "  "))
-	return ok({"version": int(cat.get("catalog_version", 0))})
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────

@@ -125,11 +125,15 @@ the validator's **runtime source via Remote Config**, NOT bundled in the image
 - **Client baked copy:** `bun run sync:catalog` generates
   `game/story/story_catalog.json` from the canonical file (byte-verified by
   `verify_story_catalog.gd`); `bun run sync:catalog:check` guards drift.
-- **Publishing** (no write API — manual console paste): `bun run tools/story-appconfig.ts emit`
-  prints the payload; `… verify` deep-compares the live config to the committed
-  catalog; `… status` reports `catalog_version` across committed / live / deployed.
-  The Story Map editor dock has a "Catalog ⇄ Remote Config" panel that wraps
-  verify + copies the publish payload.
+- **Publishing** (no write API — manual console paste): the whole app-config
+  document (every key — `story_catalog`, `daily_missions`, …) is built from
+  `content/app_config.manifest.json` by one generic driver. `bun run appconfig:emit`
+  prints the FULL document (pipe to `pbcopy`); `bun run appconfig:verify [key]`
+  deep-compares the live config to the committed blobs per key; `bun run appconfig:status`
+  reports each block's version across committed / live. The Godot **Remote Config**
+  editor dock wraps the same `verify` + copies the full publish payload (it can
+  never drop a sibling key). Adding a feature block is a one-line append to the
+  manifest — no new script.
 
 ## Use from Claude Code
 

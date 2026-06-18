@@ -22,6 +22,24 @@ enum Badge { NONE, DOT, COUNT }
 ## sigil pulses (the only place the feature escalates its cue).
 const WARN_SECONDS := 3600
 
+## Mission icon name -> placeholder glyph (pending generated art). The ONE source
+## of truth for the allowed icon set, shared by the runtime panel
+## (daily_missions_panel.gd), the editor icon-picker, and the Daily Missions
+## tool's validate(). The "" key is the render-time fallback only — it is NOT a
+## valid authored icon (an authored mission must pick a real glyph).
+const ICON_GLYPHS := {
+	"cards": "✦", "trophy": "★", "spark": "✶", "bolt": "✧", "": "◈",
+}
+
+
+## The icon names an authored mission may choose (the fallback "" excluded).
+static func icon_names() -> Array:
+	var out: Array = []
+	for k in ICON_GLYPHS:
+		if str(k) != "":
+			out.append(str(k))
+	return out
+
 
 ## True when the feature is configured on and switched on.
 static func is_enabled(block: Dictionary) -> bool:

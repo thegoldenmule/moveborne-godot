@@ -1,0 +1,7 @@
+{
+  "app_config_version": "v1",
+  "entries": [
+    { "key": "story_catalog",  "file": "story_catalog.json",  "version_field": "catalog_version", "label": "Story catalog" },
+    { "key": "daily_missions", "file": "daily_missions.json", "version_field": "version",         "label": "Daily Missions" }
+  ]
+}

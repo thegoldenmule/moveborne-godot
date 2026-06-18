@@ -13,11 +13,8 @@ extends CanvasLayer
 const Reg := preload("res://ui/mcp_ui_reg.gd")
 const Model := preload("res://ui/screens/daily_missions_model.gd")
 
-## icon name (Remote Config catalog) -> placeholder glyph, pending generated art
-## (artgen), the same stand-in approach as currency_bar's currency glyphs.
-const ICON_GLYPHS := {
-	"cards": "✦", "trophy": "★", "spark": "✶", "bolt": "✧", "": "◈",
-}
+## Icon glyphs live on the model (MbDailyMissions.ICON_GLYPHS) as the one source
+## of truth shared with the editor tool; this panel reads them through Model.
 
 signal claim_requested(mission_name: String)
 signal claim_all_requested()
@@ -230,7 +227,7 @@ func _make_card(name: String, quest: Dictionary, is_anchor: bool) -> Control:
 
 	# Icon glyph placeholder.
 	var icon := Label.new()
-	icon.text = ICON_GLYPHS.get(meta["icon"], ICON_GLYPHS[""])
+	icon.text = Model.ICON_GLYPHS.get(meta["icon"], Model.ICON_GLYPHS[""])
 	icon.custom_minimum_size = Vector2(34, 34)
 	icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

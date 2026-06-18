@@ -14,6 +14,9 @@
     "type-check": "cd src/validator && bun run type-check",
     "sync:catalog": "cd src/validator && bun run tools/sync-catalog.ts",
     "sync:catalog:check": "cd src/validator && bun run tools/sync-catalog.ts check",
+    "appconfig:emit": "cd src/validator && bun run tools/appconfig.ts emit",
+    "appconfig:verify": "cd src/validator && bun run tools/appconfig.ts verify",
+    "appconfig:status": "cd src/validator && bun run tools/appconfig.ts status",
     "gen:sdk": "pbjs -t json --keep-case -o src/validator/proto-gen/validator-descriptor.json protos/hermes/hermes_envelope.proto protos/moveborne/validator/v1/validator_messages.proto",
     "gen:swagger": "cd src/validator && bun run tools/gen-swagger.ts",
     "gen:proto": "bun run gen:sdk && bun run gen:swagger"

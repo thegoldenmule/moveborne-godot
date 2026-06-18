@@ -8,10 +8,12 @@ extends Control
 ## canvas rect — the SAME basis the runtime map (story_map.gd) renders from with
 ## STRETCH_SCALE.
 ##
-## All data (catalog + layout), mutations, validation, the byte-identical save,
-## and the Remote Config helpers live in StoryMapService (headless-testable). The
-## dock holds only control refs + interaction state (selection / arm / drag), and
-## rebuilds world picker + tree + markers when the service emits `changed`.
+## All data (catalog + layout), mutations, validation, and the byte-identical save
+## live in StoryMapService (headless-testable). The dock holds only control refs +
+## interaction state (selection / arm / drag), and rebuilds world picker + tree +
+## markers when the service emits `changed`. Remote Config publishing is NOT here —
+## it moved to the dedicated Remote Config editor tool, which aggregates the
+## validator/content/story_catalog.json blob this dock still writes on save.
 
 const Catalog := preload("res://story/story_catalog.gd")
 const Scenarios := preload("res://logic/scenarios.gd")
@@ -36,7 +38,6 @@ var _selected_info: Label
 var _unplaced: Label
 var _status: Label
 var _file_dialog: FileDialog
-var _rc_status: Label   # Catalog ⇄ Remote Config sync panel
 
 # Catalog tab
 var _cat_tree: Tree
@@ -94,8 +95,8 @@ func _build_ui() -> void:
 	_overlay.gui_input.connect(_on_overlay_input)
 	_canvas.add_child(_overlay)
 
-	# Right: tabbed control region (Catalog / Map dots / Remote Config) + a shared
-	# action footer. One "Save all" persists the catalog AND the dot layout.
+	# Right: tabbed control region (Catalog / Map dots) + a shared action footer.
+	# One "Save all" persists the catalog AND the dot layout.
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", Pal.SEP)
 	right.custom_minimum_size = Vector2(400, 0)
@@ -107,7 +108,6 @@ func _build_ui() -> void:
 	right.add_child(tabs)
 	_build_catalog_tab(tabs)
 	_build_dots_tab(tabs)
-	_build_rc_tab(tabs)
 
 	right.add_child(HSeparator.new())
 	right.add_child(Ui.button_bar([
@@ -166,21 +166,6 @@ func _build_dots_tab(tabs: TabContainer) -> void:
 	var help := Ui.status_label()
 	help.text = "Pick a level in the Catalog tab (or click empty canvas for the next unplaced level) to drop its dot. Click a dot to select it; drag to move."
 	tab.add_child(help)
-
-
-## Remote Config tab: sync check + publish-payload copy (no write API).
-func _build_rc_tab(tabs: TabContainer) -> void:
-	var tab := VBoxContainer.new()
-	tab.name = "Remote Config"
-	tab.add_theme_constant_override("separation", Pal.SEP)
-	tabs.add_child(tab)
-	tab.add_child(Ui.button_bar([
-		Ui.button("Check sync", _check_catalog_sync),
-		Ui.button("Copy publish payload", _copy_publish_payload),
-	]))
-	_rc_status = Ui.status_label()
-	_rc_status.text = "Remote Config has no publish API — 'Copy publish payload' then paste into the Snapser console (app-config v1)."
-	tab.add_child(_rc_status)
 
 
 ## Catalog tab: worlds→levels tree + add/remove buttons + the selected entry's
@@ -499,7 +484,7 @@ func _on_save() -> void:
 	_refresh_cat_tree()
 	_status.text = "Saved catalog v%d + map ✓ (baked + canonical)%s" % [
 		int(r.get("version", 1)),
-		("  — version bumped; publish via the Remote Config tab to reach the deployed validator" if r.get("bumped", false) else "")]
+		("  — version bumped; publish via the Remote Config editor tool to reach the deployed validator" if r.get("bumped", false) else "")]
 
 
 # ── catalog tab: tree + mutations + form ──────────────────────────────────────
@@ -746,28 +731,3 @@ func _rename_level(wid: String, old_id: String, raw: String) -> void:
 		return
 	_cat_sel = {"kind": "level", "world_id": wid, "level_id": new_id}
 	_show_level_form(wid, new_id)
-
-
-# ── Catalog ⇄ Remote Config ──────────────────────────────────────────────────
-
-
-## Shell out (via the service) to the canonical TS comparator and report drift.
-func _check_catalog_sync() -> void:
-	_rc_status.text = "Checking live Remote Config (committed v%d)…" % int(Catalog.load_baked().get("catalog_version", 0))
-	var r: Dictionary = service.check_catalog_sync()
-	if int(r.get("code", -1)) == 0:
-		_rc_status.text = "In sync ✓ (committed v%d)\n%s" % [int(r.get("committed", 0)), str(r.get("text", ""))]
-	elif int(r.get("code", -1)) == -1:
-		_rc_status.text = "Could not run bun. In a terminal: `cd validator && bun run tools/story-appconfig.ts verify`"
-	else:
-		_rc_status.text = "DRIFT or error (exit %d):\n%s" % [int(r.get("code", 0)), str(r.get("text", ""))]
-
-
-## Copy the {"story_catalog": <committed>} JSON to the clipboard (via the service)
-## for a manual paste into the Snapser console App Config.
-func _copy_publish_payload() -> void:
-	var r: Dictionary = service.copy_publish_payload()
-	if not r.get("ok", false):
-		_rc_status.text = "No committed catalog found."
-		return
-	_rc_status.text = "Copied {story_catalog:…} (v%d) to clipboard — paste into the Snapser console App Config (version v1)." % int(r.get("version", 0))
