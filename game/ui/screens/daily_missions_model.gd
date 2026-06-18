@@ -87,11 +87,22 @@ static func catalog_entry(block: Dictionary, name: String) -> Dictionary:
 	}
 
 
-## A normalized quest (MbQuestsClient.parse_active_quests) -> CardState. Match
-## "claimed" (not "claim") so a hypothetical "claimable" status isn't read as CLAIMED.
+## Snapser quest status lifecycle (verified live against the snapend): "assigned"
+## while in progress, "unclaimed" once all tasks are done and the reward is
+## available, "completed" once the reward has been claimed. Match these EXACTLY —
+## a substring test fails because "unclaimed" itself contains "claimed".
+const STATUS_CLAIMED := "completed"     # reward already taken
+const STATUS_CLAIMABLE := "unclaimed"   # tasks done, reward waiting to be claimed
+
+
+## A normalized quest (MbQuestsClient.parse_active_quests) -> CardState.
 static func card_state(quest: Dictionary) -> int:
-	if str(quest.get("status", "")).to_lower().contains("claimed"):
+	var status := str(quest.get("status", "")).to_lower()
+	if status == STATUS_CLAIMED:
 		return CardState.CLAIMED
+	if status == STATUS_CLAIMABLE:
+		return CardState.CLAIMABLE
+	# Fallback for any other status: a finished task with no claim yet is claimable.
 	for t in quest.get("tasks", []):
 		if bool((t as Dictionary).get("completed", false)):
 			return CardState.CLAIMABLE

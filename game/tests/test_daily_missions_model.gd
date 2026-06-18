@@ -37,9 +37,9 @@ func test_catalog_entry() -> void:
 
 
 func test_card_state_and_badge() -> void:
-	var in_prog := {"status": "active", "tasks": [{"completed": false, "progress": 1, "goal": 3}]}
-	var claimable := {"status": "completed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
-	var claimed := {"status": "rewards_claimed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
+	var in_prog := {"status": "assigned", "tasks": [{"completed": false, "progress": 1, "goal": 3}]}
+	var claimable := {"status": "unclaimed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
+	var claimed := {"status": "completed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
 	assert_eq(Model.card_state(in_prog), Model.CardState.IN_PROGRESS, "in-progress")
 	assert_eq(Model.card_state(claimable), Model.CardState.CLAIMABLE, "claimable")
 	assert_eq(Model.card_state(claimed), Model.CardState.CLAIMED, "claimed")

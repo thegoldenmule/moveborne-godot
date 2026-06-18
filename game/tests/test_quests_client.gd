@@ -82,9 +82,9 @@ func test_parse_claim() -> void:
 
 
 func test_is_claimable() -> void:
-	assert_true(Quests.is_claimable({"status": "completed", "tasks": [{"completed": true}]}),
-		"completed + unclaimed is claimable")
-	assert_true(not Quests.is_claimable({"status": "rewards_claimed", "tasks": [{"completed": true}]}),
-		"already-claimed is not claimable")
-	assert_true(not Quests.is_claimable({"status": "active", "tasks": [{"completed": false}]}),
-		"in-progress is not claimable")
+	assert_true(Quests.is_claimable({"status": "unclaimed", "tasks": [{"completed": true}]}),
+		"unclaimed (task done, reward waiting) is claimable")
+	assert_true(not Quests.is_claimable({"status": "completed", "tasks": [{"completed": true}]}),
+		"completed (reward already claimed) is not claimable")
+	assert_true(not Quests.is_claimable({"status": "assigned", "tasks": [{"completed": false}]}),
+		"assigned (in progress) is not claimable")

@@ -155,12 +155,12 @@ func _test_parse_claim() -> void:
 
 
 func _test_is_claimable() -> void:
-	var done := {"status": "completed", "tasks": [{"completed": true}]}
-	var claimed := {"status": "rewards_claimed", "tasks": [{"completed": true}]}
-	var prog := {"status": "active", "tasks": [{"completed": false}]}
-	_check(Quests.is_claimable(done), "completed + unclaimed is claimable")
-	_check(not Quests.is_claimable(claimed), "already-claimed is not claimable")
-	_check(not Quests.is_claimable(prog), "in-progress is not claimable")
+	var claimable := {"status": "unclaimed", "tasks": [{"completed": true}]}
+	var claimed := {"status": "completed", "tasks": [{"completed": true}]}
+	var prog := {"status": "assigned", "tasks": [{"completed": false}]}
+	_check(Quests.is_claimable(claimable), "unclaimed (task done, reward waiting) is claimable")
+	_check(not Quests.is_claimable(claimed), "completed (reward already claimed) is not claimable")
+	_check(not Quests.is_claimable(prog), "assigned (in progress) is not claimable")
 
 
 func _test_model_rotation() -> void:
@@ -185,9 +185,9 @@ func _test_model_rotation() -> void:
 
 
 func _test_model_states_badge() -> void:
-	var in_prog := {"status": "active", "tasks": [{"completed": false, "progress": 1, "goal": 3}]}
-	var claimable := {"status": "completed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
-	var claimed := {"status": "rewards_claimed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
+	var in_prog := {"status": "assigned", "tasks": [{"completed": false, "progress": 1, "goal": 3}]}
+	var claimable := {"status": "unclaimed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
+	var claimed := {"status": "completed", "tasks": [{"completed": true, "progress": 2, "goal": 2}]}
 	_check(Model.card_state(in_prog) == Model.CardState.IN_PROGRESS, "in-progress card state")
 	_check(Model.card_state(claimable) == Model.CardState.CLAIMABLE, "claimable card state")
 	_check(Model.card_state(claimed) == Model.CardState.CLAIMED, "claimed card state")
