@@ -95,7 +95,7 @@ func _refresh_table() -> void:
 		var it := _table.create_item(root)
 		it.set_text(0, str(row.get("key", "")))
 		it.set_text(1, str(row.get("file", "")))
-		it.set_text(2, "v%d" % int(row.get("version", 0)))
+		it.set_text(2, ("v%d" % int(row.get("version", 0))) if bool(row.get("has_version", true)) else "v?")
 		var present := bool(row.get("present", false))
 		it.set_text(3, "✓" if present else "✗ missing")
 		it.set_custom_color(3, Pal.GREEN_SEL if present else Pal.ERROR)
@@ -127,7 +127,9 @@ func _on_check_sync() -> void:
 		return
 	var results: Array = r.get("results", [])
 	if results.is_empty():
-		_sync.text = "verify returned no per-key result (exit %d):\n%s" % [int(r.get("code", 0)), str(r.get("text", ""))]
+		var why: String = str(r.get("error", ""))
+		_sync.text = "Could not verify (exit %d)%s — is the snap provisioned and app-config published?\n%s" % [
+			int(r.get("code", 0)), (" — " + why) if why != "" else "", str(r.get("text", ""))]
 		return
 	var lines: Array = []
 	for res in results:

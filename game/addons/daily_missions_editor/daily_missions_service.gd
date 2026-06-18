@@ -183,6 +183,9 @@ func validate() -> Array:
 				problems.append("weekday %d: unknown mission \"%s\"" % [d, str(id)])
 	var allowed := Model.icon_names()
 	for id in catalog:
+		if not (catalog[id] is Dictionary):
+			problems.append("%s: catalog entry is not a JSON object" % str(id))
+			continue
 		var m: Dictionary = catalog[id]
 		if not allowed.has(str(m.get("icon", ""))):
 			problems.append("%s: invalid icon \"%s\" (allowed: %s)" % [str(id), str(m.get("icon", "")), ", ".join(allowed)])
@@ -211,7 +214,8 @@ func serialize() -> String:
 		by_weekday[str(d)] = ids
 	var catalog := {}
 	for id in mission_ids():
-		var m: Dictionary = (block.get("catalog", {}) as Dictionary).get(id, {})
+		var raw = (block.get("catalog", {}) as Dictionary).get(id, {})
+		var m: Dictionary = raw if raw is Dictionary else {}
 		catalog[id] = {
 			"title": str(m.get("title", "")),
 			"icon": str(m.get("icon", "")),

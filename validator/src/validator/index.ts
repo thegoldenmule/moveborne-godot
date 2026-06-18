@@ -83,7 +83,8 @@ app.get("/api/status", (c) => {
     // Which s2s transport the currency-award path resolved to (no secrets).
     awards: inventory.enabled ? inventory.transportKind : "disabled",
     // The catalog version this validator is currently serving (0 until loaded);
-    // the status tool compares it across surfaces. No secrets.
+    // surfaced for the deploy verify step (confirm the container caught up to live
+    // Remote Config). No secrets.
     story_catalog_version: cat.version,
     story_catalog_source: remoteConfig.enabled ? remoteConfig.transportKind : "committed-fallback",
     story_catalog_loaded_at: cat.loadedAt,

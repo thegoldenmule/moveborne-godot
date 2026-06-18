@@ -82,13 +82,15 @@ func versions() -> Array:
 	var out: Array = []
 	for e in _entries():
 		var key := str(e.get("key", ""))
+		var vfield := str(e.get("version_field", ""))
 		var b: Dictionary = blobs.get(key, {})
 		out.append({
 			"key": key,
 			"file": str(e.get("file", "")),
 			"label": str(e.get("label", key)),
 			"present": not b.is_empty(),
-			"version": int(b.get(str(e.get("version_field", "")), 0)),
+			"has_version": b.has(vfield),   # distinguish "absent field" from a real 0
+			"version": int(b.get(vfield, 0)),
 		})
 	return out
 
@@ -153,13 +155,17 @@ func check_sync() -> Dictionary:
 	var code := OS.execute("bun", args, out, true)
 	var text := "\n".join(out).strip_edges() if out.size() > 0 else ""
 	var results: Array = []
-	# appconfig.ts --json prints one JSON object; tolerate leading log noise by
-	# scanning lines back-to-front for the first object that carries "results".
+	var error := ""
+	# appconfig.ts verify --json prints exactly one JSON object on stdout; scan for
+	# the first parseable line carrying "results" (other lines are plain logs) and
+	# stop there. On a login/HTTP failure it prints {ok:false,error,results:[]}.
 	for line in text.split("\n"):
 		var parsed = JSON.parse_string(line.strip_edges())
 		if parsed is Dictionary and parsed.has("results"):
 			results = parsed.get("results", [])
-	return {"ok": code == 0, "code": code, "results": results, "text": text}
+			error = str(parsed.get("error", ""))
+			break
+	return {"ok": code == 0, "code": code, "results": results, "error": error, "text": text}
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────--
