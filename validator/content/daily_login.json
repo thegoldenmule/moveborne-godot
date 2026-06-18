@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "version": 1,
+  "version": 2,
   "cycle_length_days": 7,
   "reset_on_miss": false,
   "calendar": [
