@@ -52,6 +52,25 @@ static func empty_progress() -> Dictionary:
 func fetch_progress() -> Dictionary:
 	if not await _auth.ensure_session():
 		return {"ok": false, "progress": empty_progress(), "error": "not signed in"}
+	var r := await _get_blob()
+	# A locally-unexpired but server-rejected session (e.g. invalidated by a
+	# snapend redeploy) returns 401; re-auth ONCE and retry before surfacing it.
+	# This also heals the shared MbSnapserAuth token for every other client + the
+	# validator WS, which read it on their next call.
+	if int(r.get("code", 0)) == 401 and await _auth.reauth():
+		r = await _get_blob()
+	var code := int(r.get("code", 0))
+	if code == 404:
+		return {"ok": true, "progress": empty_progress(), "error": ""}
+	if code != 200:
+		var err := str(r.get("error", ""))
+		return {"ok": false, "progress": empty_progress(), "error": err if err != "" else "HTTP %d" % code}
+	return {"ok": true, "progress": parse_blob(r.get("data")), "error": ""}
+
+
+## One owner-scoped blob GET -> {code, data, error}. Split out so fetch_progress
+## can retry it after a re-auth.
+func _get_blob() -> Dictionary:
 	var http := HTTPRequest.new()
 	add_child(http)
 	var headers := PackedStringArray(["Content-Type: application/json"])
@@ -59,13 +78,8 @@ func fetch_progress() -> Dictionary:
 	var err := http.request(blob_url(_auth.user_id), headers, HTTPClient.METHOD_GET)
 	if err != OK:
 		http.queue_free()
-		return {"ok": false, "progress": empty_progress(), "error": "HTTPRequest failed to start: %d" % err}
+		return {"code": 0, "data": null, "error": "HTTPRequest failed to start: %d" % err}
 	var resp: Array = await http.request_completed
 	http.queue_free()
-	var code := int(resp[1])
-	var data = JSON.parse_string((resp[3] as PackedByteArray).get_string_from_utf8())
-	if code == 404:
-		return {"ok": true, "progress": empty_progress(), "error": ""}
-	if code != 200:
-		return {"ok": false, "progress": empty_progress(), "error": "HTTP %d" % code}
-	return {"ok": true, "progress": parse_blob(data), "error": ""}
+	return {"code": int(resp[1]),
+		"data": JSON.parse_string((resp[3] as PackedByteArray).get_string_from_utf8()), "error": ""}

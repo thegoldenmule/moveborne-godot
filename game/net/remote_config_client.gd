@@ -73,6 +73,21 @@ static func select_catalog(remote: Dictionary, baked: Dictionary) -> Dictionary:
 func fetch_app_config() -> Dictionary:
 	if not await _auth.ensure_session():
 		return {"ok": false, "config": {}, "error": "not signed in"}
+	var r := await _get_config()
+	# Re-auth once on a server-rejected (but locally-unexpired) session, then retry
+	# — heals the shared MbSnapserAuth token for the whole online surface.
+	if int(r.get("code", 0)) == 401 and await _auth.reauth():
+		r = await _get_config()
+	var code := int(r.get("code", 0))
+	if code != 200:
+		var err := str(r.get("error", ""))
+		return {"ok": false, "config": {}, "error": err if err != "" else "HTTP %d" % code}
+	return {"ok": true, "config": parse_app_config(r.get("data")), "error": ""}
+
+
+## One app-config GET -> {code, data, error}. Split out so fetch_app_config can
+## retry it after a re-auth.
+func _get_config() -> Dictionary:
 	var http := HTTPRequest.new()
 	add_child(http)
 	var headers := PackedStringArray(["Content-Type: application/json"])
@@ -80,11 +95,8 @@ func fetch_app_config() -> Dictionary:
 	var err := http.request(app_config_url(), headers, HTTPClient.METHOD_GET)
 	if err != OK:
 		http.queue_free()
-		return {"ok": false, "config": {}, "error": "HTTPRequest failed to start: %d" % err}
+		return {"code": 0, "data": null, "error": "HTTPRequest failed to start: %d" % err}
 	var resp: Array = await http.request_completed
 	http.queue_free()
-	var code := int(resp[1])
-	var data = JSON.parse_string((resp[3] as PackedByteArray).get_string_from_utf8())
-	if code != 200:
-		return {"ok": false, "config": {}, "error": "HTTP %d" % code}
-	return {"ok": true, "config": parse_app_config(data), "error": ""}
+	return {"code": int(resp[1]),
+		"data": JSON.parse_string((resp[3] as PackedByteArray).get_string_from_utf8()), "error": ""}

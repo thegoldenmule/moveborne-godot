@@ -68,6 +68,22 @@ func _session_valid() -> bool:
 		and int(Time.get_unix_time_from_system()) < _expires_at - EXPIRY_MARGIN_SEC
 
 
+## Force a fresh anonymous login, discarding the cached session token but KEEPING
+## the persisted username, so the SAME anon user (and its progress) is restored.
+## Call this when a gateway request is rejected with HTTP 401 despite a
+## locally-unexpired token — e.g. the session was invalidated server-side by a
+## snapend redeploy. (_session_valid() only checks local expiry, so it cannot
+## detect a server-side invalidation; without this the dead token is reused until
+## it locally expires — up to the full multi-week TTL.) Coroutine — await it.
+func reauth() -> bool:
+	if not _loaded:
+		_load()
+	session_token = ""
+	user_id = ""
+	_expires_at = 0
+	return await _login()
+
+
 func _login() -> bool:
 	if _username == "":
 		_username = "godot-%08x" % (randi() & 0xffffffff)
