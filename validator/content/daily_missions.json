@@ -3,21 +3,84 @@
   "version": 1,
   "anchor": "mission_anchor_play_3",
   "by_weekday": {
-    "0": ["mission_win_2", "mission_powerup_2", "mission_merge_50"],
-    "1": ["mission_play_5", "mission_combo_5", "mission_score_5k"],
-    "2": ["mission_win_2", "mission_score_5k", "mission_combo_5"],
-    "3": ["mission_play_5", "mission_powerup_2", "mission_merge_50"],
-    "4": ["mission_win_2", "mission_combo_5", "mission_powerup_2"],
-    "5": ["mission_play_5", "mission_score_5k", "mission_merge_50"],
-    "6": ["mission_win_2", "mission_play_5", "mission_powerup_2"]
+    "0": [
+      "mission_win_2",
+      "mission_powerup_2",
+      "mission_merge_50"
+    ],
+    "1": [
+      "mission_play_5",
+      "mission_combo_5",
+      "mission_score_5k"
+    ],
+    "2": [
+      "mission_win_2",
+      "mission_score_5k",
+      "mission_combo_5"
+    ],
+    "3": [
+      "mission_play_5",
+      "mission_powerup_2",
+      "mission_merge_50"
+    ],
+    "4": [
+      "mission_win_2",
+      "mission_combo_5",
+      "mission_powerup_2"
+    ],
+    "5": [
+      "mission_play_5",
+      "mission_score_5k",
+      "mission_merge_50"
+    ],
+    "6": [
+      "mission_win_2",
+      "mission_play_5",
+      "mission_powerup_2"
+    ]
   },
   "catalog": {
-    "mission_anchor_play_3": { "title": "Daily Dozen",    "icon": "cards",  "desc": "Play 3 matches",         "reward": "100 coins" },
-    "mission_win_2":         { "title": "On a Roll",      "icon": "trophy", "desc": "Win 2 matches",          "reward": "150 coins" },
-    "mission_play_5":        { "title": "Marathon",       "icon": "cards",  "desc": "Play 5 matches",         "reward": "150 coins" },
-    "mission_score_5k":      { "title": "High Roller",    "icon": "spark",  "desc": "Score 5,000 in a match", "reward": "120 coins" },
-    "mission_combo_5":       { "title": "Chain Reaction", "icon": "spark",  "desc": "Make a 5-tile merge",    "reward": "120 coins" },
-    "mission_powerup_2":     { "title": "Power Trip",     "icon": "bolt",   "desc": "Use 2 power-ups",        "reward": "80 coins" },
-    "mission_merge_50":      { "title": "Merge Master",   "icon": "bolt",   "desc": "Merge 50 tiles today",   "reward": "100 coins" }
+    "mission_anchor_play_3": {
+      "title": "Daily Dozen",
+      "icon": "cards",
+      "desc": "Play 3 matches",
+      "reward": "100 coins"
+    },
+    "mission_combo_5": {
+      "title": "Chain Reaction",
+      "icon": "spark",
+      "desc": "Make a 5-tile merge",
+      "reward": "120 coins"
+    },
+    "mission_merge_50": {
+      "title": "Merge Master",
+      "icon": "bolt",
+      "desc": "Merge 50 tiles today",
+      "reward": "100 coins"
+    },
+    "mission_play_5": {
+      "title": "Marathon",
+      "icon": "cards",
+      "desc": "Play 5 matches",
+      "reward": "150 coins"
+    },
+    "mission_powerup_2": {
+      "title": "Power Trip",
+      "icon": "bolt",
+      "desc": "Use 2 power-ups",
+      "reward": "80 coins"
+    },
+    "mission_score_5k": {
+      "title": "High Roller",
+      "icon": "spark",
+      "desc": "Score 5,000 in a match",
+      "reward": "120 coins"
+    },
+    "mission_win_2": {
+      "title": "On a Roll",
+      "icon": "trophy",
+      "desc": "Win 2 matches",
+      "reward": "150 coins"
+    }
   }
 }
