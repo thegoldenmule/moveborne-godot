@@ -33,7 +33,7 @@ var _status: Label
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(0, 520)
+	custom_minimum_size = Vector2(0, 240)
 	_build_ui()
 	if service != null:
 		service.changed.connect(_on_service_changed)
@@ -55,9 +55,18 @@ func _build_ui() -> void:
 	root.add_theme_constant_override("separation", Pal.SEP)
 	add_child(root)
 
+	# The two-column content scrolls, so a short bottom panel can still reach the
+	# Save/Validate footer below — and the bottom-panel tab strip stays reachable.
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(0, 140)
+	root.add_child(scroll)
+
 	var split := Ui.split_root()
+	split.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	split.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(split)
+	scroll.add_child(split)
 
 	# Left: mission list + add/remove + the selection-driven edit form.
 	var left := VBoxContainer.new()
@@ -77,13 +86,9 @@ func _build_ui() -> void:
 	_tree.item_selected.connect(_on_tree_selected)
 	left.add_child(Ui.section("Missions", _tree, true))
 
-	var form_scroll := ScrollContainer.new()
-	form_scroll.custom_minimum_size = Vector2(280, 180)
-	form_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_form = VBoxContainer.new()
 	_form.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	form_scroll.add_child(_form)
-	left.add_child(Ui.section("Edit mission", form_scroll, true))
+	left.add_child(Ui.section("Edit mission", _form))
 
 	# Right: enabled + anchor + rotation grid + provisioning readout.
 	var right := VBoxContainer.new()
@@ -103,7 +108,7 @@ func _build_ui() -> void:
 
 	_grid = VBoxContainer.new()
 	_grid.add_theme_constant_override("separation", 6)
-	right.add_child(Ui.section("Rotation — tap a mission to add/remove it that day", _grid, true))
+	right.add_child(Ui.section("Rotation — tap a mission to add/remove it that day", _grid))
 
 	_readout = TextEdit.new()
 	_readout.editable = false
