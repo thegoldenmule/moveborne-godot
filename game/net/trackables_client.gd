@@ -8,9 +8,12 @@ extends Node
 ## static so they can be tested without a network.
 ##
 ## Drives Daily Login Bonus: reads the login_calendar XP ladder — one level per
-## calendar day, each level one XP wide — so the runtime can position the calendar
-## strip on the player's current day. The grant itself is server-side (the daily
-## quest's reward is +1 ladder XP); this client only READS.
+## calendar day — so the runtime can position the calendar strip on the player's
+## current day. The Snapser console enforces non-overlapping level ranges, so each
+## level spans 2 XP (e.g. Day1 [0,1], Day2 [2,3], …) and the daily quest grants
+## +2 XP/claim; the runtime positions by the LEVEL INDEX (parse_xp "level"), not
+## raw XP. The grant itself is server-side (the ladder's level-completion reward);
+## this client only READS.
 ##
 ## IMPORTANT: the Trackables snap is NOT provisioned on c4n1awfs yet (confirmed
 ## 2026-06-18). Until it is, fetch_login_calendar returns {ok:false} gracefully and

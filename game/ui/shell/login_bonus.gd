@@ -34,7 +34,10 @@ var _remote_config: Node # MbRemoteConfigClient
 var _trackables: Node    # MbTrackablesClient
 
 var _block: Dictionary = {}
-var _level := 0          # login_calendar XP == days claimed this cycle
+var _level := 0          # login_calendar level INDEX == days claimed this cycle
+                         # (the ladder spans 2 XP per level — the console enforces
+                         #  non-overlapping ranges — so the level index, not raw XP,
+                         #  is the calendar-day position; the quest grants +2 XP/claim)
 var _quest: Dictionary = {}
 var _reset_unix := 0
 var _refreshing := false
@@ -111,13 +114,14 @@ func _load_block() -> void:
 		_block = RemoteConfigS.extract_daily_login(r.get("config", {}))
 
 
-## Read the login_calendar ladder level (== days claimed). ok:false (e.g.
-## Trackables not provisioned) degrades to level 0 → today is day 1.
+## Read the login_calendar ladder level INDEX (== days claimed; the ladder uses a
+## 2-XP pitch per level, so the index — not raw XP — is the calendar position).
+## ok:false (e.g. Trackables not provisioned) degrades to level 0 → today is day 1.
 func _load_level() -> void:
 	if _trackables == null:
 		return
 	var r: Dictionary = await _trackables.fetch_login_calendar()
-	_level = int(r.get("xp", 0)) if bool(r.get("ok", false)) else 0
+	_level = int(r.get("level", 0)) if bool(r.get("ok", false)) else 0
 
 
 ## Locate today's daily_login quest (auto-assigned by tag) and, if its open_app
