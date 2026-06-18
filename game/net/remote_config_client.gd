@@ -16,6 +16,9 @@ const CATALOG_KEY := "story_catalog"
 ## story catalog (display catalog + weekday rotation map). See the Daily Missions
 ## feature spec.
 const DAILY_MISSIONS_KEY := "daily_missions"
+## Daily Login Bonus rides under its own sibling key (the per-day calendar display
+## table + tuning). See the Daily Login Bonus feature spec.
+const DAILY_LOGIN_KEY := "daily_login"
 ## Preloaded (not the class_name global) so this compiles before an editor
 ## scan registers the new Mb* classes — same reason app_shell preloads Reg.
 const Catalog := preload("res://story/story_catalog.gd")
@@ -52,6 +55,14 @@ static func extract_catalog(config: Dictionary) -> Dictionary:
 ## a sibling key, so it never disturbs extract_catalog / story-catalog selection.
 static func extract_daily_missions(config: Dictionary) -> Dictionary:
 	var block = config.get(DAILY_MISSIONS_KEY, {})
+	return block if block is Dictionary else {}
+
+
+## The daily_login block inside an app-config document ({} when absent). A sibling
+## key, so it never disturbs extract_catalog / extract_daily_missions reads on the
+## same document.
+static func extract_daily_login(config: Dictionary) -> Dictionary:
+	var block = config.get(DAILY_LOGIN_KEY, {})
 	return block if block is Dictionary else {}
 
 

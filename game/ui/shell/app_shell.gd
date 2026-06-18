@@ -17,6 +17,7 @@ const LocalSettingsS := preload("res://ui/local_settings.gd")
 const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 const QuestsClientS := preload("res://net/quests_client.gd")
 const DailySigilS := preload("res://ui/shell/daily_sigil.gd")
+const LoginBonusS := preload("res://ui/shell/login_bonus.gd")
 ## MbUi control registry (preloaded, not the class_name global, so the headless
 ## verifier that instances the shell doesn't depend on a full editor scan).
 const Reg := preload("res://ui/mcp_ui_reg.gd")
@@ -131,6 +132,7 @@ var _profiles: Node  # MbProfileClient (Settings tab; shares the shell session)
 var _currency_bar: CanvasLayer  # top coins/souls/gems band (own layer, like the nav)
 var _quests: Node  # MbQuestsClient (Daily Missions; shares the shell session)
 var _daily: CanvasLayer  # floating Daily Missions sigil + modal (own layers, like the bar)
+var _login_bonus: CanvasLayer  # Daily Login Bonus controller + modal (own layer)
 
 
 func _ready() -> void:
@@ -217,6 +219,10 @@ func _ready() -> void:
 	add_child(_quests)
 	_daily = DailySigilS.new(_auth, _quests, _currency_bar)
 	add_child(_daily)
+	# Daily Login Bonus: a once-per-day modal calendar on the Home surface, sharing
+	# the same session + clients + reward ceremony as the Daily sigil.
+	_login_bonus = LoginBonusS.new(_auth, _quests, _currency_bar)
+	add_child(_login_bonus)
 
 	# Now that both chrome layers exist, inset the content host into the gap
 	# between them so every screen lays out clear of the top band and bottom nav.
@@ -301,6 +307,8 @@ func _select_tab(index: int) -> void:
 	# The Daily sigil floats only over Home; surface it (or hide it) per the tab.
 	if is_instance_valid(_daily):
 		_daily.set_surface(visible, SCREEN_IDS[index] if index < SCREEN_IDS.size() else "")
+	if is_instance_valid(_login_bonus):
+		_login_bonus.set_surface(visible, SCREEN_IDS[index] if index < SCREEN_IDS.size() else "")
 	# Selected tab: icon grows and pops up past the bar frame, label shows beneath it.
 	# Unselected tabs collapse back to a centered base-size icon. Home follows the same
 	# rule (it's icon-only, and its halo lights up only while selected).
@@ -436,6 +444,8 @@ func set_active(v: bool) -> void:
 	# resume (only when resuming onto the Home tab).
 	if is_instance_valid(_daily):
 		_daily.set_surface(v, mcp_current_tab_id())
+	if is_instance_valid(_login_bonus):
+		_login_bonus.set_surface(v, mcp_current_tab_id())
 	if v and _leaderboards != null:
 		_leaderboards.submit_pending(GameState.last_result)
 	if v and is_instance_valid(_daily):

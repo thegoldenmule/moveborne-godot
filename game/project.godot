@@ -37,7 +37,7 @@ window/handheld/orientation="portrait"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/artgen/plugin.cfg", "res://addons/daily_missions_editor/plugin.cfg", "res://addons/editor_tool_kit/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/remote_config_editor/plugin.cfg", "res://addons/story_map_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/artgen/plugin.cfg", "res://addons/daily_login_editor/plugin.cfg", "res://addons/daily_missions_editor/plugin.cfg", "res://addons/editor_tool_kit/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/remote_config_editor/plugin.cfg", "res://addons/story_map_editor/plugin.cfg")
 
 [physics]
 

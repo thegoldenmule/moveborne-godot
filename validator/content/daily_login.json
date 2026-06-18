@@ -1,0 +1,43 @@
+{
+  "enabled": true,
+  "version": 1,
+  "cycle_length_days": 7,
+  "reset_on_miss": false,
+  "calendar": [
+    {
+      "day": 1,
+      "currency": "coins",
+      "amount": 50
+    },
+    {
+      "day": 2,
+      "currency": "coins",
+      "amount": 75
+    },
+    {
+      "day": 3,
+      "currency": "coins",
+      "amount": 100
+    },
+    {
+      "day": 4,
+      "currency": "coins",
+      "amount": 150
+    },
+    {
+      "day": 5,
+      "currency": "coins",
+      "amount": 200
+    },
+    {
+      "day": 6,
+      "currency": "coins",
+      "amount": 300
+    },
+    {
+      "day": 7,
+      "currency": "gems",
+      "amount": 20
+    }
+  ]
+}
