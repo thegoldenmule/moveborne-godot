@@ -44,8 +44,17 @@ Don't restate the architecture here — read the canonical pages:
 > The `wiki/` markdown is an **emitted mirror** of the *Hypercasual LLM* workspace, served by the
 > `wiki` MCP server (`:4439`). **Edit wiki content through the MCP** (`mutatePage` / `mutatePageBatch`),
 > never by hand: a live emitter regenerates the `.md` files + `.wiki-md-manifest.json` from the
-> workspace on every change, so direct edits get overwritten. Read the files freely; treat them as
-> read-only on disk.
+> workspace on every change, so direct edits get overwritten. Read the files freely; never hand-edit
+> them on disk.
+>
+> **Persisting knowledge is a wiki operation — not an agent-memory one.** Anything worth keeping past
+> the current task (a design, a decision, a hard-won gotcha, the live state of a backend, an ops
+> runbook) goes in the wiki via the `wiki` MCP — a new page, or a section / note / invariant on an
+> existing one — and then the **emitted `wiki/**` Markdown is committed to git**. The committed mirror
+> is the shared, version-controlled source of truth; do not stash durable facts in private agent
+> memory instead. The flow is: author with `mutatePage*` → the live emitter regenerates the `.md` +
+> manifest → `git add wiki/` and commit the result. (Committing the emitter's output is expected —
+> "never hand-edit on disk" means don't *type into* the `.md`, not don't commit them.)
 
 ## Commands
 
