@@ -28,6 +28,8 @@ snapctl snap-config get-config --snaps quests --snapend-id c4n1awfs   # read-onl
 # then re-download and commit snapser/snapend-manifest.json
 ```
 
+Client increment hook (commit 0eb4923). Match progress feeds the quests via MbDailyMissions.match_task_increments (a pure, headless-tested mapper) + DailySigil.record_match_result, fired once per banked result from AppShell on post-match resume (and StoryMapState level-chaining), guarded by a dm_recorded flag and a live session (inert offline / in Infinite). Per-match tallies — tiles merged, largest single-swipe merge (from the engine's mergedTilesCount), power cards played — are accumulated in MbMatch (game/, NOT hashed; reset on new_game*) and ride the match_exited result alongside score + story stars. Metric->task-name contract: matches_played / matches_won / tiles_merged / powerups_used are CUMULATIVE (+= amount); match_score and merge_size are "in a match" THRESHOLDS (+= the task goal once a single match meets it). Completed tasks are skipped. So the task NAMES authored on the quests are the integration contract between the snapend config and the client.
+
 ## Components
 _No components._
 
@@ -69,6 +71,7 @@ The console's **"Counter"** goal maps to `goal_type:"delta"` + `comparison_type:
 - A quest's currency reward sits at the QUEST level (reward_currencies), because the client claims via ClaimQuestRewards; the console "Counter" goal maps to goal_type=delta + comparison_type=gte + auto_progress=false (client-driven via IncrementTaskProgress).
 - The anchor quest is auto_assign ON (GetActiveQuests assigns it); pool quests are auto_assign OFF (the client AssignQuests the UTC-weekday subset). Quest ids must equal the daily_missions.json catalog keys for the client to map display metadata.
 - inventory.quest_callback_currencies gates only Currency-GOAL task auto-tracking, NOT currency reward grants; currency rewards need only the currency in inventory.currencies. Empty quest_callback_currencies is fine for the Daily Missions setup (verified).
+- The daily-mission quest task NAMES are the client integration contract: matches_played / matches_won / tiles_merged / powerups_used (cumulative) and match_score / merge_size ("in a match" thresholds). Renaming a task on the snapend without updating MbDailyMissions._metric_delta silently stops that mission from progressing.
 
 ## Synced commit
-a00d0c1de9c9b24e25a86f0c5a7395368e250093
+0eb4923f95d694629bad42fa7262f1e61f681f28

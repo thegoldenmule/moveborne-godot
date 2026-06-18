@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2969,
+    "version": 2972,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -125,7 +125,7 @@
       "moveborne-godot/.archived/feature-spec--mqi73zju-00ar-mxvp8q.md": "28e3b72e510fbaeaaf021e59eef5a21d08aca97374740d5f2329a1b9ee281d3d",
       "moveborne-godot/design/mobile-first-ui-layout-best-practices.md": "2d0605e08ff676f1e1f2be57da73b657a6d3363ca13965122e1e7ab7a7d55df1",
       "moveborne-godot/architecture/client/remote-config-content-authoring.md": "6b6001c8019132c4059e5bec2210f3ea0bf51f41657adf30c78a3c192df4b995",
-      "moveborne-godot/architecture/validator/snapend-provisioning-snapctl-iac.md": "482b9c6472793cdfcf2acb4ebdce47cef3359bd0c0307313aad8804009592301"
+      "moveborne-godot/architecture/validator/snapend-provisioning-snapctl-iac.md": "63f32db823e4bda93a25cf00afcec8153e0fd41c165ddf1f8938fdf687041035"
     },
     "pages": {
       "toc:mq1bxhal-0003-d09dgq": "moveborne-godot/architecture/index.md",
