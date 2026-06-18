@@ -16,6 +16,9 @@ const Model := preload("res://ui/screens/daily_missions_model.gd")
 const PanelS := preload("res://ui/screens/daily_missions_panel.gd")
 const RemoteConfigS := preload("res://net/remote_config_client.gd")
 const SafeArea := preload("res://ui/safe_area.gd")
+## Reused for the canonical per-currency glyph + accent color (SLOTS) so the claim
+## ceremony's reveal + doobers match the currency bar exactly.
+const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 
 const FLAG_PATH := "user://daily_missions.cfg"
 const SIGIL_SIZE := 56.0
@@ -367,7 +370,9 @@ func _open_panel() -> void:
 func _on_claim_requested(mission_name: String) -> void:
 	if _busy:
 		return
-	await _claim(mission_name)
+	var granted: Dictionary = await _claim(mission_name)
+	if not granted.is_empty():
+		await _reward_ceremony(granted)
 	_after_claims()
 
 
@@ -379,25 +384,30 @@ func _on_claim_all_requested() -> void:
 	for q in _quests_cache:
 		if Model.card_state(q) == Model.CardState.CLAIMABLE:
 			names.append(str(q.get("name", "")))
+	# Claim them all, then run ONE ceremony for the summed haul (no popup spam).
+	var total: Dictionary = {}
 	for nm in names:
-		await _claim(nm)
+		var g: Dictionary = await _claim(nm)
+		for k in g:
+			total[k] = int(total.get(k, 0)) + int(g[k])
+	if not total.is_empty():
+		await _reward_ceremony(total)
 	_after_claims()
 
 
-func _claim(mission_name: String) -> void:
+## Claim one mission's reward over the network. Returns the granted delta
+## ({coins/souls/gems}) or {} on failure. Does NOT animate or credit the wallet —
+## the caller aggregates and runs a single _reward_ceremony.
+func _claim(mission_name: String) -> Dictionary:
 	if _busy or _quests == null:
-		return
+		return {}
 	_busy = true
 	var r: Dictionary = await _quests.claim_quest_rewards(mission_name)
 	_busy = false
 	if not bool(r.get("ok", false)):
 		push_warning("Daily Missions: claim %s failed: %s" % [mission_name, r.get("error", "")])
-		return
-	var granted: Dictionary = r.get("granted", {})
-	if not granted.is_empty():
-		_fly_reward(granted)
-		# The claim grant is a DELTA — add it, don't replace the wallet total.
-		GameState.add_currencies(granted)
+		return {}
+	return r.get("granted", {})
 
 
 ## Re-fetch after a claim (or batch) so card states, the badge, and the countdown
@@ -409,29 +419,134 @@ func _after_claims() -> void:
 		_panel.render(_block, _quests_cache, int(Time.get_unix_time_from_system()))
 
 
-## Genre-standard "coins fly to the balance": a glyph eases from the panel center
-## into the matching currency-bar slot, then the slot pulses + count-up re-renders.
-func _fly_reward(granted: Dictionary) -> void:
+## Claim ceremony: reveal WHAT was won (a popped reward card showing each
+## currency's icon + amount), hold a beat, THEN burst coin "doobers" from the card
+## into the matching currency-bar slots — the wallet counts up + pulses only when
+## they land. Coroutine — await it. Falls back to an instant credit when there's
+## no currency bar (headless / standalone).
+func _reward_ceremony(granted: Dictionary) -> void:
 	if not is_instance_valid(_currency_bar) or not _currency_bar.has_method("slot_global_pos"):
+		GameState.add_currencies(granted)
 		return
-	var from_pos := _root.get_viewport().get_visible_rect().size / 2.0
-	for nm in granted:
-		var fly := CanvasLayer.new()
-		fly.layer = 30
-		add_child(fly)
-		var lbl := Label.new()
-		lbl.text = "✦"
-		lbl.add_theme_font_size_override("font_size", 22)
-		lbl.add_theme_color_override("font_color", Color("f5c542"))
-		lbl.position = from_pos
-		fly.add_child(lbl)
+
+	var fx := CanvasLayer.new()
+	fx.layer = 31   # above the modal panel (20)
+	add_child(fx)
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var th := Theme.new()
+	th.default_font = load(MbStyle.FONT_PATH)
+	root.theme = th
+	fx.add_child(root)
+
+	# Dim to focus the reveal + swallow taps during the beat.
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(dim)
+	dim.create_tween().tween_property(dim, "color", Color(0, 0, 0, 0.45), 0.2)
+
+	# The reveal card: "REWARD" + a row per granted currency (icon + +N).
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(center)
+	var card := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = MbStyle.BOARD
+	sb.border_color = MbStyle.PRIMARY
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(12)
+	sb.set_content_margin_all(24)
+	card.add_theme_stylebox_override("panel", sb)
+	center.add_child(card)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 12)
+	card.add_child(col)
+	var title := Label.new()
+	title.text = "REWARD"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", MbStyle.PRIMARY)
+	col.add_child(title)
+	for slot in CurrencyBarS.SLOTS:
+		var nm := str(slot["name"])
+		if int(granted.get(nm, 0)) == 0:
+			continue
+		var row := HBoxContainer.new()
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_theme_constant_override("separation", 12)
+		var glyph := Label.new()
+		glyph.text = str(slot["glyph"])
+		glyph.add_theme_font_size_override("font_size", 44)
+		glyph.add_theme_color_override("font_color", slot["color"])
+		row.add_child(glyph)
+		var amt := Label.new()
+		amt.text = "+%d" % int(granted[nm])
+		amt.add_theme_font_size_override("font_size", 36)
+		amt.add_theme_color_override("font_color", MbStyle.TEXT)
+		amt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(amt)
+		col.add_child(row)
+
+	# Pop the card in.
+	card.modulate.a = 0.0
+	await get_tree().process_frame   # let the card lay out so pivot + center are real
+	card.pivot_offset = card.size / 2.0
+	card.scale = Vector2(0.6, 0.6)
+	var tin := card.create_tween()
+	tin.set_parallel(true)
+	tin.tween_property(card, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tin.tween_property(card, "modulate:a", 1.0, 0.18)
+	await tin.finished
+	await get_tree().create_timer(0.7).timeout
+
+	# Burst the doobers from the card into each currency slot.
+	var origin := card.get_global_rect().get_center()
+	var land := 0.0
+	for slot in CurrencyBarS.SLOTS:
+		var nm := str(slot["name"])
+		var amount := int(granted.get(nm, 0))
+		if amount == 0:
+			continue
 		var target: Vector2 = _currency_bar.slot_global_pos(nm)
-		var tw := lbl.create_tween()
-		tw.tween_property(lbl, "position", target, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tw.tween_callback(func() -> void:
-			if _currency_bar.has_method("pulse_slot"):
-				_currency_bar.pulse_slot(nm)
-			fly.queue_free())
+		var k := clampi(int(amount / 15.0), 6, 14)
+		for i in range(k):
+			var d := Label.new()
+			d.text = str(slot["glyph"])
+			d.add_theme_font_size_override("font_size", 22)
+			d.add_theme_color_override("font_color", slot["color"])
+			d.position = origin
+			d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			root.add_child(d)
+			var burst := origin + Vector2(randf_range(-70.0, 70.0), randf_range(-60.0, 10.0))
+			var delay := i * 0.04
+			var tw := d.create_tween()
+			tw.tween_interval(delay)
+			tw.tween_property(d, "position", burst, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			tw.tween_property(d, "position", target, 0.36).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tw.tween_callback(d.queue_free)
+			land = maxf(land, delay + 0.52)
+
+	# Credit the wallet (count-up) + pulse as the doobers land.
+	await get_tree().create_timer(maxf(land - 0.12, 0.1)).timeout
+	GameState.add_currencies(granted)
+	for slot in CurrencyBarS.SLOTS:
+		if int(granted.get(str(slot["name"]), 0)) != 0 and _currency_bar.has_method("pulse_slot"):
+			_currency_bar.pulse_slot(str(slot["name"]))
+
+	# Fade the card + dim out, then free the ceremony layer.
+	await get_tree().create_timer(0.2).timeout
+	var tout := card.create_tween()
+	tout.set_parallel(true)
+	tout.tween_property(card, "modulate:a", 0.0, 0.22)
+	tout.tween_property(card, "scale", Vector2(0.92, 0.92), 0.22)
+	dim.create_tween().tween_property(dim, "color", Color(0, 0, 0, 0), 0.22)
+	await tout.finished
+	fx.queue_free()
 
 
 # --- auto-open + coachmark (local flags) -------------------------------------
