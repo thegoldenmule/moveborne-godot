@@ -43,21 +43,29 @@ func _build_ui() -> void:
 	root.add_theme_constant_override("separation", Pal.SEP)
 	add_child(root)
 
+	# A draggable vertical split: the keys table on top, the publish-payload
+	# preview below, so the operator can give either pane more room.
+	var split := VSplitContainer.new()
+	split.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(split)
+
 	_table = Tree.new()
 	_table.columns = 4
 	_table.column_titles_visible = true
 	_table.hide_root = true
-	_table.custom_minimum_size = Vector2(0, 120)
+	_table.custom_minimum_size = Vector2(0, 90)
 	_table.set_column_title(0, "Key")
 	_table.set_column_title(1, "File")
 	_table.set_column_title(2, "Version")
 	_table.set_column_title(3, "Present")
-	root.add_child(Ui.section("App-config keys (validator/content/app_config.manifest.json)", _table))
+	var keys_section := Ui.section("App-config keys (validator/content/app_config.manifest.json)", _table, true)
+	keys_section.size_flags_stretch_ratio = 0.4   # start compact; the preview gets the rest
+	split.add_child(keys_section)
 
 	_preview = TextEdit.new()
 	_preview.editable = false
-	_preview.custom_minimum_size = Vector2(0, 160)
-	root.add_child(Ui.section("Publish payload — the WHOLE app-config document", _preview, true))
+	_preview.custom_minimum_size = Vector2(0, 120)
+	split.add_child(Ui.section("Publish payload — the WHOLE app-config document", _preview, true))
 
 	root.add_child(Ui.button_bar([
 		Ui.button("Reload", _reload),
