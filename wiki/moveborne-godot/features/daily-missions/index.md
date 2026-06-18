@@ -1,6 +1,6 @@
 # Feature: Daily Missions
 
-**Status:** draft
+**Status:** building
 
 ## Summary
 A rotating set of daily tasks — *play 3 matches, win 2, use a power-up* — refreshed every 24h, each with a claimable currency reward, with one always-present **anchor** mission. Distinct from the single curated Challenge of the Day.
@@ -33,7 +33,7 @@ A rotating set of daily tasks — *play 3 matches, win 2, use a power-up* — re
 8. Badge restraint: a claimable-count chip only when rewards are collectable, a soft dot when missions are merely active, nothing when the day is fully claimed; escalate (amber timer + pulse) only inside the final hour before reset.
 
 ## Open questions
-_None._
+1. **Counter-goal increment hook (the one remaining client integration): the Quests client now exposes increment_task(quest, task, delta), but WHICH gameplay results drive each launch counter mission, the exact Snapser task names, the hook point (match-exit from GameState.last_result vs live in-match), and how to model the threshold goals as counters (High Roller 'score 5,000 in a match', Chain Reaction '5-tile merge') are LiveOps/snapend decisions blocked on the Quests Settings provisioning (not yet on c4n1awfs). Proposed default once provisioned: increment at match-exit — play +1 always, win +1 when result.won, plus +1 for the threshold/action missions whose condition the match met (score>=5000, a >=5-tile merge occurred, power-ups used, tiles merged by count) — but the task names must byte-match the snapend config. Until then the assign/list/claim/UI loop is complete; counter goals simply won't advance. Confirm the action->task mapping + hook point at provisioning time.**
 
 ## Resolved questions
 1. **Launch rotation tier: Tier 1 fixed weekly cron-stagger (recommended, fully built-in) or Tier 2 Remote-Config-driven set?** — _Launch on the Remote-Config-driven daily set — NOT a weekday cron-stagger. Snapser quest cron is a reset/refresh cadence, not an active-day filter (docs: cron 'used to start/reset the recurring quest'; a recurring quest is active continuously from its start tick to the next), so a weekday cron cannot make a mission appear only on certain days. Correct built-in approach: every pool mission is a daily-reset recurring quest (cron 0 0 * * *) with auto-assign OFF; the anchor is auto-assign ON; a STATIC weekday->mission-names map (+ display catalog) lives in the Remote Config daily_missions block; on app open the client computes today's UTC weekday and AssignQuest's that day's subset (+ anchor). Real day-to-day rotation, built-ins only (Quests + Remote Config, both live), no Scheduler write and no BYOSnap. Minimal fallback = a fixed daily set. Later upgrades: Scheduler/Events flipping the active key for non-weekday cadences; per-player randomization in the BYOSnap._
@@ -51,4 +51,5 @@ _None._
 - [Spec — Daily Missions](feature-spec:mq9xf8xe-008e-5xkugp)
 
 ## Commits
-_None._
+- `51d4aefbf0406b6a5faacc28765427430fece181` feat(daily-missions): client Quests integration + Home sigil & modal panel
+- `bb6c528b50a403684fa000523ef8416d427ec633` refactor(daily-missions): apply /code-review high findings

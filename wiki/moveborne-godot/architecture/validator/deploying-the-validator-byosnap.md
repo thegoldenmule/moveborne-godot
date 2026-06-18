@@ -34,7 +34,7 @@ The swagger version is generated from src/validator/package.json by gen:swagger 
 
 The deployed container has no story catalog inside it (content/story_catalog.json is .dockerignored). It pulls the catalog from the Remote Config snap at boot and serves last-known-good on a refresh failure, with NO committed-file fallback in deployed mode. Populate and verify live Remote Config app-config/v1 before syncing, or deployed story matches fail their init handshake (catalog_version_mismatch) or find no catalog at all.
 
-Remote Config has no write API — publishing a catalog is a manual console paste of the payload from tools/story-appconfig.ts emit, confirmed with tools/story-appconfig.ts verify.
+Remote Config has no write API — publishing is a manual console paste of the WHOLE app-config document built by the generic driver from content/app_config.manifest.json: `bun run appconfig:emit` prints it (every registered key at once, so a paste can never drop a sibling), `bun run appconfig:verify` confirms the live config matches per key. The two old per-feature scripts (story-appconfig.ts, daily-missions-appconfig.ts) were replaced by tools/appconfig.ts + the manifest; the Godot Remote Config editor tool wraps the same emit/verify.
 
 ## Components
 _No components._
@@ -47,9 +47,9 @@ _No dependencies._
 - `validator/Dockerfile`
 - `validator/swagger.json`
 - constant `version` in `validator/src/validator/package.json`
-- `validator/src/validator/tools/story-appconfig.ts`
 - `.claude/skills/snapser-validator/scripts/client.py`
 - `snapser/snapend-manifest.json`
+- file `generic Remote Config driver (emit|verify|status) + content/app_config.manifest.json` in `validator/src/validator/tools/appconfig.ts`
 
 ## Data model
 Deploy coordinates (from `validator/snapser-byosnap-profile.json`):
@@ -65,12 +65,12 @@ Deploy coordinates (from `validator/snapser-byosnap-profile.json`):
 | Version source of truth | `validator/src/validator/package.json` → drives `swagger.json` via `bun run gen:swagger` |
 | Committed manifest | `snapser/snapend-manifest.json` |
 
-Runtime story catalog is served from the Remote Config snap (`app-config/v1`, key `story_catalog`), pinned per match; the image's `content/story_catalog.json` is `.dockerignore`d. Publishing a catalog is a manual console paste — `bun run tools/story-appconfig.ts emit` prints the payload, `… verify` deep-compares live vs committed, `… status` reports the version across committed / live / deployed.
+Runtime story catalog is served from the Remote Config snap (`app-config/v1`, key `story_catalog`), pinned per match; the image's `content/story_catalog.json` is `.dockerignore`d. Publishing is a manual console paste of the WHOLE app-config document (every key — `story_catalog`, `daily_missions`, …, built from `content/app_config.manifest.json`): `bun run appconfig:emit` prints the full document, `bun run appconfig:verify [key]` deep-compares live vs committed per key, `bun run appconfig:status` reports each block's version across committed / live.
 
 ## Usage
 Run from the repo root with Docker running and `snapctl` authenticated (Snapser app/snapend `c4n1awfs`).
 
-**1. Pre-flight.** From `validator/`: `bun run type-check`, and from `validator/src/validator/`: `bun test` — both green. Then confirm the new code's runtime dependency is satisfied: from `validator/src/validator/`, `bun run tools/story-appconfig.ts status` must show live Remote Config `app-config/v1` matching the committed catalog (the container has no bundled catalog — see invariants).
+**1. Pre-flight.** From `validator/`: `bun run type-check`, and from `validator/src/validator/`: `bun test` — both green. Then confirm the new code's runtime dependency is satisfied: from `validator/`, `bun run appconfig:status` (the generic Remote Config driver) must show live Remote Config `app-config/v1` matching the committed `story_catalog` block (the container has no bundled catalog — see invariants).
 
 **2. Bump the version.** Snapser refuses to re-publish an existing version, so pick a fresh `vX.Y.Z`. Edit `version` in `validator/src/validator/package.json`, then regenerate the OpenAPI spec (its version is read from package.json): `bun run gen:swagger` from `validator/`. Commit the bump + regenerated `swagger.json`.
 
