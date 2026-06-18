@@ -1,6 +1,6 @@
 {
   "ws:mq1bwcl4-0001-t76j4x": {
-    "version": 2972,
+    "version": 2996,
     "files": {
       "moveborne-godot/architecture/index.md": "97a7a463ddc846378c0ae1703747c2112c09f67adf131f24b92f7bcc63c02d1a",
       "moveborne-godot/features/index.md": "7a150d3b6b8141b6fd4f5b2e8251911efea59d81e687c482e92f26f8352d3c96",
@@ -82,10 +82,10 @@
       "moveborne-godot/features/daily-login-bonus/implementation-plan-daily-login-bonus.md": "fdd7aa1b0b6ed209ad06ff603055b478f33dd4822e322be4882578f0e9e3aa6c",
       "moveborne-godot/features/daily-login-bonus/testing-plan-daily-login-bonus.md": "c87133c5166c0105070effed424ddd403edb0a72160d9824f18e8e9c69213d35",
       "moveborne-godot/features/daily-login-bonus/spec-daily-login-bonus.md": "34c4dcb6f2838d0ecce94cf76b345be69491a263ea2023c3578ab2f78051f69b",
-      "moveborne-godot/features/daily-missions/index.md": "cdad8d9bb5b9388c4865a93c36255d79d7ce360f01942d2903c1c37a4e3d2f89",
-      "moveborne-godot/features/daily-missions/implementation-plan-daily-missions.md": "f958a48859a98d3acea51994909f36ff845b15d1bf17fe50f6a0ee28fbdbacbc",
-      "moveborne-godot/features/daily-missions/testing-plan-daily-missions.md": "4fc146c3487d0f5d808899f26b169168208694b1226d6c693733c787b07a68f7",
-      "moveborne-godot/features/daily-missions/spec-daily-missions.md": "8abf76f1f3f505cf8d946eebb383f9ce2c722141cfd57d28105c6d1052f8f8e4",
+      "moveborne-godot/features/daily-missions/index.md": "97ae8a7632dba307e3c242e3cd6d4b81e677161133df7bbc761c62036657bd46",
+      "moveborne-godot/features/daily-missions/implementation-plan-daily-missions.md": "e6d6fc78b9ac052ef6be2759eacd682632b4be1fbb16c44173834f42bb400fd9",
+      "moveborne-godot/features/daily-missions/testing-plan-daily-missions.md": "0fe4679851398f4da09d2218fcd87e328e4302413e4d09f8e81348f4be81f850",
+      "moveborne-godot/features/daily-missions/spec-daily-missions.md": "677f3afd134a83f714141676de41bfa1ab7e240be3d971cd8ecc745da0d3a27a",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/index.md": "6f0aa5fdbe8e5d6535dc42902d8a9ec3a8a11f5482cae10ebf0ad2036930eaa6",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/implementation-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "2e7e98cdacda2cbb9e1cb8d321fa2da68b380bddb07cb832cb94794c6f8ec8c8",
       "moveborne-godot/features/server-authoritative-hardening-lock-mint-apis-validator-submitted-scores/testing-plan-server-authoritative-hardening-lock-mint-apis-validator-submitted-scores.md": "88eb9c1eab13c8ae3f36e87bbdae0cea57f56375a10cd9056ac2968c0879360b",
