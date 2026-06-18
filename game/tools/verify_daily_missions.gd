@@ -44,9 +44,48 @@ func _run() -> void:
 	_test_remote_config_daily()
 	_test_game_state_daily()
 	_test_coachmark_decision()
+	_test_match_increments()
 	await _test_compiles()
 	print("VERIFY daily_missions: %s (%d checks)" % ["PASS" if _ok else "FAIL", _n])
 	quit(0 if _ok else 1)
+
+
+func _test_match_increments() -> void:
+	# Active daily quests (parse_active_quests shape) covering every metric + a
+	# completed task that must be skipped.
+	var quests := [
+		{"name": "mission_anchor_play_3", "tasks": [{"name": "matches_played", "completed": false, "progress": 1, "goal": 3}]},
+		{"name": "mission_win_2", "tasks": [{"name": "matches_won", "completed": false, "progress": 0, "goal": 2}]},
+		{"name": "mission_score_5k", "tasks": [{"name": "match_score", "completed": false, "progress": 0, "goal": 5000}]},
+		{"name": "mission_merge_50", "tasks": [{"name": "tiles_merged", "completed": false, "progress": 10, "goal": 50}]},
+		{"name": "mission_combo_5", "tasks": [{"name": "merge_size", "completed": false, "progress": 0, "goal": 5}]},
+		{"name": "mission_powerup_2", "tasks": [{"name": "powerups_used", "completed": false, "progress": 0, "goal": 2}]},
+		{"name": "already_done", "tasks": [{"name": "matches_played", "completed": true, "progress": 3, "goal": 3}]},
+	]
+	# A winning match that meets both "in a match" thresholds.
+	var hit := {"played": 1, "won": true, "score": 6000, "merged": 12, "max_merge": 6, "powerups": 1}
+	var d := {}
+	for inc in Model.match_task_increments(quests, hit):
+		d[str(inc["quest"])] = int(inc["delta"])
+	_check(d.get("mission_anchor_play_3", 0) == 1, "matches_played += 1")
+	_check(d.get("mission_win_2", 0) == 1, "matches_won += 1 on a win")
+	_check(d.get("mission_merge_50", 0) == 12, "tiles_merged += match total")
+	_check(d.get("mission_powerup_2", 0) == 1, "powerups_used += match total")
+	_check(d.get("mission_score_5k", 0) == 5000, "match_score threshold met -> += goal")
+	_check(d.get("mission_combo_5", 0) == 5, "merge_size threshold met -> += goal")
+	_check(not d.has("already_done"), "a completed task is skipped")
+
+	# A weak match: a loss, below both thresholds, no merges/powerups.
+	var miss := {"played": 1, "won": false, "score": 100, "merged": 0, "max_merge": 3, "powerups": 0}
+	var d2 := {}
+	for inc in Model.match_task_increments(quests, miss):
+		d2[str(inc["quest"])] = int(inc["delta"])
+	_check(d2.get("mission_anchor_play_3", 0) == 1, "played still counts on a loss")
+	_check(not d2.has("mission_win_2"), "no win -> matches_won not incremented")
+	_check(not d2.has("mission_score_5k"), "score below goal -> no match_score delta")
+	_check(not d2.has("mission_combo_5"), "max_merge below goal -> no merge_size delta")
+	_check(not d2.has("mission_merge_50"), "0 tiles merged -> no tiles_merged delta")
+	_check(not d2.has("mission_powerup_2"), "0 powerups -> no powerups_used delta")
 
 
 func _test_quests_urls() -> void:

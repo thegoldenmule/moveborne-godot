@@ -25,6 +25,15 @@ var scenario_name: String = "Endless"
 var validator = null
 var online: bool = false
 
+## Per-match gameplay tallies for Daily Missions counter goals (best-effort, NOT
+## part of the hashed state). Reset on new_game*; accumulated in swipe() /
+## play_card(); read into the match_exited result. merged_total = total tiles
+## merged this match; max_merge = largest single-swipe merge; powerups_used =
+## power cards played.
+var merged_total: int = 0
+var max_merge: int = 0
+var powerups_used: int = 0
+
 
 func _send_validate(index: int, action: Dictionary, hash: String) -> void:
 	if online and validator != null:
@@ -64,9 +73,16 @@ func _spawn_starting_tiles(count: int) -> void:
 	state["rngIndices"] = rng.get_indices()
 
 
+func _reset_tallies() -> void:
+	merged_total = 0
+	max_merge = 0
+	powerups_used = 0
+
+
 func new_game(seed_value: int = -1) -> void:
 	if seed_value < 0:
 		seed_value = randi() % 1000000
+	_reset_tallies()
 	scenario_name = "Endless"
 	state = _base_state(C.DEFAULT_BOARD_SIZE, seed_value)
 	# Two starting tiles (mirrors a real match start; advances tile-gen RNG).
@@ -84,6 +100,7 @@ func new_game_scenario(scenario_id: int, seed_value: int = -1) -> void:
 		return
 	if seed_value < 0:
 		seed_value = randi() % 1000000
+	_reset_tallies()
 	scenario_name = "%d · %s" % [scenario_id, str(scen.get("name", "Scenario"))]
 	var size := int(scen.get("boardSize", C.DEFAULT_BOARD_SIZE))
 	state = _base_state(size, seed_value)
@@ -127,6 +144,9 @@ func swipe(direction: String) -> bool:
 	var pre := int(state["moveIndex"])
 	var res := MbEngineS.step(state, direction)
 	state = res["state"]
+	var mc := int(res.get("mergedTilesCount", 0))   # daily-missions tallies (not hashed)
+	merged_total += mc
+	max_merge = maxi(max_merge, mc)
 	_send_validate(pre, {"type": "SWIPE", "payload": {"direction": direction}}, res["hash"])
 	changed.emit()
 	var destroyed: Array = res.get("destroyed", [])
@@ -141,6 +161,7 @@ func play_card(action: String, params: Dictionary, card_index: int) -> bool:
 	if not res["success"]:
 		return false  # invalid play: don't commit, don't validate
 	state = res["state"]
+	powerups_used += 1   # daily-missions tally (not hashed)
 	var payload := params.duplicate()
 	payload["action"] = action
 	payload["cardIndex"] = card_index

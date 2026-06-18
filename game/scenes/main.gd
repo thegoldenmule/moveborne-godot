@@ -416,6 +416,10 @@ func _on_home_pressed() -> void:
 		"reason": "quit",
 		"level_id": _level_id,
 		"story": _story_result,  # {} when offline / settlement timed out
+		# Per-match tallies for Daily Missions counter goals (best-effort, not hashed).
+		"merged": _match.merged_total,
+		"max_merge": _match.max_merge,
+		"powerups": _match.powerups_used,
 	})
 	# Standalone (no listener) the emit is a no-op — re-arm the button.
 	_completing = false

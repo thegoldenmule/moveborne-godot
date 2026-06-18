@@ -285,6 +285,32 @@ func _assign_todays_set() -> bool:
 	return assigned
 
 
+## Record a finished match into the active daily quests: increment each counter
+## task that matched a gameplay metric, then refresh the badge. Called by the shell
+## on post-match resume (and story-map level chaining). Runs exactly once per banked
+## result (the `dm_recorded` flag), and only with a live session — so it is inert
+## offline / in Infinite. Coroutine; fire-and-forget.
+func record_match_result(result: Dictionary) -> void:
+	if not _has_session() or result.is_empty() or bool(result.get("dm_recorded", false)) or _busy:
+		return
+	result["dm_recorded"] = true
+	_busy = true
+	await _reload_quests()  # increment against the freshest server snapshot
+	var stats := {
+		"played": 1,
+		"won": int((result.get("story", {}) as Dictionary).get("stars", 0)) >= 1,
+		"score": int(result.get("score", 0)),
+		"merged": int(result.get("merged", 0)),
+		"max_merge": int(result.get("max_merge", 0)),
+		"powerups": int(result.get("powerups", 0)),
+	}
+	for inc in Model.match_task_increments(_quests_cache, stats):
+		await _quests.increment_task(str(inc["quest"]), str(inc["task"]), int(inc["delta"]))
+	await _reload_quests()
+	_busy = false
+	_render_badge()
+
+
 func _render_badge() -> void:
 	if _badge == null:
 		return

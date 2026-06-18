@@ -169,3 +169,44 @@ static func is_warning(seconds_left: int) -> bool:
 ## only until the seen-flag is persisted — so exactly once, ever.
 static func should_show_coachmark(coachmark_seen: bool, sigil_visible: bool) -> bool:
 	return sigil_visible and not coachmark_seen
+
+
+## Map a finished match to the per-task IncrementTaskProgress deltas for the active
+## daily quests. Pure (no Node/network) so it is headless-testable. `stats` carries
+## the match tallies: { played:int(1), won:bool, score:int, merged:int,
+## max_merge:int, powerups:int }. Each active quest task whose NAME is a known
+## metric and that isn't already completed yields {quest, task, delta} when delta>0.
+static func match_task_increments(quests: Array, stats: Dictionary) -> Array:
+	var out: Array = []
+	for q in quests:
+		var qname := str((q as Dictionary).get("name", ""))
+		for t in (q as Dictionary).get("tasks", []):
+			if bool((t as Dictionary).get("completed", false)):
+				continue
+			var goal := int((t as Dictionary).get("goal", 0))
+			var delta := _metric_delta(str((t as Dictionary).get("name", "")), stats, goal)
+			if delta > 0:
+				out.append({"quest": qname, "task": str((t as Dictionary).get("name", "")), "delta": delta})
+	return out
+
+
+## The IncrementTaskProgress delta for one task metric given the match stats + the
+## task's goal. Cumulative metrics add their amount; "in a match" thresholds (score,
+## merge size) add the goal once the match meets it (so the task completes in one
+## shot). 0 for an unknown or unmet metric. Task names are the metric contract
+## authored on the Snapser quests (see the Snapend Provisioning wiki node).
+static func _metric_delta(task: String, stats: Dictionary, goal: int) -> int:
+	match task:
+		"matches_played":
+			return int(stats.get("played", 0))
+		"matches_won":
+			return 1 if bool(stats.get("won", false)) else 0
+		"tiles_merged":
+			return int(stats.get("merged", 0))
+		"powerups_used":
+			return int(stats.get("powerups", 0))
+		"match_score":
+			return goal if goal > 0 and int(stats.get("score", 0)) >= goal else 0
+		"merge_size":
+			return goal if goal > 0 and int(stats.get("max_merge", 0)) >= goal else 0
+	return 0

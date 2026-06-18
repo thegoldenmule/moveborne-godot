@@ -438,6 +438,8 @@ func set_active(v: bool) -> void:
 		_daily.set_surface(v, mcp_current_tab_id())
 	if v and _leaderboards != null:
 		_leaderboards.submit_pending(GameState.last_result)
+	if v and is_instance_valid(_daily):
+		_daily.record_match_result(GameState.last_result)
 
 
 ## Submit the banked result to the leaderboards now. Called by StoryMapState on
@@ -448,6 +450,8 @@ func set_active(v: bool) -> void:
 func flush_pending_result() -> void:
 	if _leaderboards != null:
 		_leaderboards.submit_pending(GameState.last_result)
+	if is_instance_valid(_daily):
+		_daily.record_match_result(GameState.last_result)
 
 
 ## Flat nav-bar look: transparent tabs with dim text; the selected (toggled) tab
