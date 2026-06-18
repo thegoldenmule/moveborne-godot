@@ -36,6 +36,8 @@ The deployed container has no story catalog inside it (content/story_catalog.jso
 
 Remote Config has no write API — publishing is a manual console paste of the WHOLE app-config document built by the generic driver from content/app_config.manifest.json: `bun run appconfig:emit` prints it (every registered key at once, so a paste can never drop a sibling), `bun run appconfig:verify` confirms the live config matches per key. The two old per-feature scripts (story-appconfig.ts, daily-missions-appconfig.ts) were replaced by tools/appconfig.ts + the manifest; the Godot Remote Config editor tool wraps the same emit/verify.
 
+Side effect for clients: a byosnap sync (and any snapend apply) invalidates existing Snapser sessions server-side. Anon tokens have a ~30-day local TTL, so a client that only checks local expiry reuses a dead token after a deploy -> HTTP 401 on gateway reads and a rejected validator WS handshake. The client mitigates by re-authenticating on a 401 (MbSnapserAuth.reauth, same username -> same user + progress); the first re-auth heals the shared session for all clients. See the Snapend Provisioning (snapctl IaC) node.
+
 ## Components
 _No components._
 
