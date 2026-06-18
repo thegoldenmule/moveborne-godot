@@ -6,9 +6,16 @@ extends Node
 ##
 ##   [ShellState]                     -> on the shell (Home / other tabs)
 ##   [ShellState, MatchState]         -> in a match (shell suspended, nav hidden)
-##   [ShellState, MatchState, Modal]  -> a dialog over a match (future)
+##   [ShellState, MatchState, Modal]  -> a dialog over a match
+##
+## Part of the ui_kit addon (github.com/thegoldenmule/godot-addons). Declare it as
+## an autoload (any name; "UiRouter" by convention) pointing at this script. It
+## joins the "ui_router" group so the UiDriver can find it without depending on the
+## autoload name.
 
 signal changed(top)
+
+const ROUTER_GROUP := "ui_router"
 
 var _stack: Array = []
 var _busy: bool = false
@@ -19,6 +26,7 @@ var content_root: CanvasLayer
 
 
 func _ready() -> void:
+	add_to_group(ROUTER_GROUP)
 	content_root = CanvasLayer.new()
 	content_root.name = "RouterContent"
 	content_root.layer = 1
@@ -29,8 +37,8 @@ func _ready() -> void:
 
 
 ## Android system Back (NOTIFICATION_WM_GO_BACK_REQUEST): pop one level, or quit
-## when already at the root (the shell). Distinct from ESC, which main.gd uses to
-## cancel card targeting.
+## when already at the root (the shell). Distinct from ESC, which gameplay code may
+## use to cancel its own interactions.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _busy:
@@ -54,7 +62,7 @@ func stack_depth() -> int:
 
 
 ## The state names from the bottom of the stack up (e.g. ["ShellState", "MatchState"]).
-## The MbUi driver maps these to its route summary.
+## The UiDriver maps these to its route summary.
 func route_names() -> Array:
 	var names: Array = []
 	for s in _stack:

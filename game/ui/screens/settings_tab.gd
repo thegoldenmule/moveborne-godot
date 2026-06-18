@@ -9,8 +9,8 @@ extends Control
 const ProfileClientS := preload("res://net/profile_client.gd")
 const AvatarsS := preload("res://ui/avatars.gd")
 const LocalSettingsS := preload("res://ui/local_settings.gd")
-const ScreenScaffoldS := preload("res://ui/screen_scaffold.gd")
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const ScreenScaffoldS := preload("res://addons/ui_kit/ui_screen_scaffold.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 
 const AVATAR_TILE := 64
 const AVATAR_PICK := 56
@@ -82,7 +82,7 @@ func _build_profile_section() -> void:
 	row.add_theme_constant_override("separation", 16)
 	_profile_box.add_child(row)
 
-	_avatar_btn = Reg.texture_button("avatar")  # MbUi: settings.avatar opens the picker
+	_avatar_btn = Reg.texture_button("avatar")  # UiDriver: settings.avatar opens the picker
 	_avatar_btn.custom_minimum_size = Vector2(AVATAR_TILE, AVATAR_TILE)
 	_avatar_btn.ignore_texture_size = true
 	_avatar_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
@@ -98,13 +98,13 @@ func _build_profile_section() -> void:
 	var edit_row := HBoxContainer.new()
 	edit_row.add_theme_constant_override("separation", 8)
 	name_col.add_child(edit_row)
-	_name_edit = Reg.line_edit("name")  # MbUi: settings.name
+	_name_edit = Reg.line_edit("name")  # UiDriver: settings.name
 	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_name_edit.max_length = ProfileClientS.DISPLAY_NAME_MAX
 	_name_edit.placeholder_text = "your handle"
 	_name_edit.text_submitted.connect(func(_t): _on_save_name())
 	edit_row.add_child(_name_edit)
-	var save_btn := Reg.button("save_name", null, "Save")  # MbUi: settings.save_name
+	var save_btn := Reg.button("save_name", null, "Save")  # UiDriver: settings.save_name
 	save_btn.pressed.connect(_on_save_name)
 	edit_row.add_child(save_btn)
 
@@ -131,7 +131,7 @@ func _build_avatar_modal() -> void:
 	_avatar_modal = CanvasLayer.new()
 	_avatar_modal.layer = 20
 	_avatar_modal.visible = false
-	# Its own MbUi screen ("avatar"): the picks register under it as avatar.<id>,
+	# Its own UiDriver screen ("avatar"): the picks register under it as avatar.<id>,
 	# and the driver reports it as the active modal while it's open.
 	Reg.screen(_avatar_modal, "avatar")
 	add_child(_avatar_modal)
@@ -198,7 +198,7 @@ func _hide_avatar_modal() -> void:
 
 
 func _make_avatar_pick(id: String) -> TextureButton:
-	var b := Reg.texture_button(id)  # MbUi: avatar.<id>
+	var b := Reg.texture_button(id)  # UiDriver: avatar.<id>
 	b.custom_minimum_size = Vector2(AVATAR_PICK, AVATAR_PICK)
 	b.ignore_texture_size = true
 	b.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
@@ -259,11 +259,11 @@ func _persist(attrs: Dictionary, ok_msg: String) -> void:
 
 func _build_client_section() -> void:
 	_add_header("Sound & Haptics")
-	# MbUi ids are the user-facing names (music/sfx); the storage key differs (master).
+	# UiDriver ids are the user-facing names (music/sfx); the storage key differs (master).
 	_col.add_child(_slider_row("Music", "master", "music"))
 	_col.add_child(_slider_row("Effects", "sfx", "sfx"))
 
-	var hap := Reg.check("haptics", null, "Haptics")  # MbUi: settings.haptics
+	var hap := Reg.check("haptics", null, "Haptics")  # UiDriver: settings.haptics
 	hap.button_pressed = bool(_settings.get("haptics", true))
 	hap.add_theme_color_override("font_color", MbStyle.TEXT)
 	hap.toggled.connect(func(on):
@@ -278,7 +278,7 @@ func _slider_row(label: String, key: String, id: String) -> Control:
 	var lb := _dim_label(label, 14)
 	lb.custom_minimum_size = Vector2(80, 0)
 	row.add_child(lb)
-	var slider := Reg.slider(id)  # MbUi: settings.<id>
+	var slider := Reg.slider(id)  # UiDriver: settings.<id>
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.min_value = 0.0
 	slider.max_value = 1.0
@@ -299,7 +299,7 @@ func _build_account_section() -> void:
 	_add_header("Account")
 	_account_name = _dim_label("", 14)
 	_col.add_child(_account_name)
-	var out := Reg.button("sign_out", null, "Sign out")  # MbUi: settings.sign_out
+	var out := Reg.button("sign_out", null, "Sign out")  # UiDriver: settings.sign_out
 	out.pressed.connect(_on_sign_out)
 	_col.add_child(out)
 

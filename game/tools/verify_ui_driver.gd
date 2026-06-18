@@ -1,18 +1,44 @@
 extends SceneTree
 
-## Headless smoke for the MbUi control registry + driver mechanism.
+## Headless smoke for the ui_kit control registry + UiDriver mechanism.
 ##   godot --headless --path . --script res://tools/verify_ui_driver.gd
 ##
-## Exercises MbUiReg (build/adopt → live-tree registration) and the MbUi driver's
+## Exercises UiReg (build/adopt → live-tree registration) and the UiDriver's
 ## catalog / actions / press / set_value / toggle / set_text / visibility filter on
-## a HAND-BUILT control tree — no autoloads, no real scenes, so it runs cleanly
-## headless. The async navigation surface (goto/run/flow against the live router)
-## is covered by the in-editor driven session (see the UI Control API (MbUi) wiki page), not here.
+## a HAND-BUILT control tree, plus the host-sourced flow catalog against a fake
+## UiNavHost — no real router/scenes, so it runs cleanly headless. The async
+## navigation surface (goto/run against the live router) is covered by the in-editor
+## driven session (see the UI Control API wiki page), not here.
 
-const Reg := preload("res://ui/mcp_ui_reg.gd")
-const Driver := preload("res://game/mcp_ui_api.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
+const Driver := preload("res://addons/ui_kit/ui_driver.gd")
 
 var _ok := true
+
+
+## A minimal UiNavHost: just enough for state()/flows() to resolve. The flow
+## catalog lives here (the game owns it), mirroring how AppShell supplies it.
+class FakeHost:
+	extends Node
+	const FLOWS := [
+		{"name": "open_a", "params": [], "summary": "Go to A."},
+		{"name": "set_b", "params": ["v"], "summary": "Set B to <v>."},
+	]
+	func mcp_current_tab_id() -> String:
+		return "settings"
+	func mcp_nav_tabs() -> Array:
+		return ["settings", "home"]
+	func mcp_nav_modes() -> Array:
+		return ["infinite"]
+	func mcp_flows() -> Array:
+		return FLOWS
+	func mcp_expand_flow(name: String, params: Dictionary):
+		match name:
+			"open_a":
+				return ["wait:0"]
+			"set_b":
+				return ["wait:0", {"set": "settings.music", "to": float(params.get("v", 0.0))}]
+		return null
 
 
 func _check(label: String, cond: bool) -> void:
@@ -51,7 +77,13 @@ func _run() -> void:
 	screen.add_child(modal)
 	var pick := Reg.texture_button("skull_avatar_01", modal)
 
-	# --- MbUiReg: registration is recorded on the live tree ---
+	# A fake host so state()/flows() resolve (the game supplies these).
+	var host := FakeHost.new()
+	host.name = "FakeHost"
+	host.add_to_group(Driver.HOST_GROUP)
+	root.add_child(host)
+
+	# --- UiReg: registration is recorded on the live tree ---
 	_check("screen grouped + id",
 		screen.is_in_group(Reg.GROUP) and str(screen.get_meta(Reg.META_SCREEN)) == "settings")
 	_check("button registered + parented",
@@ -61,9 +93,9 @@ func _run() -> void:
 		music.is_in_group(Reg.CONTROL_GROUP) and haptics.is_in_group(Reg.CONTROL_GROUP)
 		and name_edit.is_in_group(Reg.CONTROL_GROUP) and pick.is_in_group(Reg.CONTROL_GROUP))
 
-	# --- MbUi driver over the hand-built tree ---
+	# --- UiDriver over the hand-built tree ---
 	var d := Driver.new()
-	d.name = "MbUiProbe"
+	d.name = "UiDriverProbe"
 	root.add_child(d)
 
 	# Let ENTER_TREE fire so the SceneTree group map (CONTROL_GROUP) is populated.
@@ -88,6 +120,10 @@ func _run() -> void:
 	_check("texture_button kind", by_id.has("avatar.skull_avatar_01")
 		and by_id["avatar.skull_avatar_01"]["kind"] == "texture_button")
 
+	# state(): host present -> ok, tab from the host.
+	var st: Dictionary = d.state()
+	_check("state ok + tab from host", bool(st.get("ok", false)) and str(st.get("tab", "")) == "settings")
+
 	# press() emits the control's pressed signal.
 	var pressed := [false]
 	save.pressed.connect(func() -> void: pressed[0] = true)
@@ -106,10 +142,11 @@ func _run() -> void:
 	var unk: Dictionary = d.press("settings.nope")
 	_check("unknown id → error", not bool(unk.get("ok", true)) and str(unk.get("reason", "")) == "unknown_id")
 
-	# flows() is the named-flow catalog; every FLOWS entry must expand (guards drift
-	# between the FLOWS catalog and _expand_flow's match), and an unknown flow is null.
+	# flows() is the host-sourced named-flow catalog; every entry must expand
+	# (guards drift between the host catalog and its mcp_expand_flow), and an
+	# unknown flow is null.
 	var fl: Array = d.flows()
-	var every_expands := fl.size() == Driver.FLOWS.size()
+	var every_expands := fl.size() == FakeHost.FLOWS.size()
 	for f in fl:
 		if not (f.has("steps") and f["steps"] != null and f.has("params") and f.has("summary")):
 			every_expands = false

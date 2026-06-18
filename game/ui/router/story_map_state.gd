@@ -1,4 +1,4 @@
-extends "res://ui/router/ui_state.gd"
+extends "res://addons/ui_kit/ui_state.gd"
 ## The Story world-map route: pushed by the Home Story button, sits between
 ## ShellState and MatchState in the stack —
 ##   [ShellState, StoryMapState]              -> browsing the map
@@ -56,7 +56,7 @@ func resume() -> void:
 	# normally does this on resume) stays suspended while the player keeps
 	# playing levels, and a second launch would overwrite last_result.
 	var tree := Engine.get_main_loop() as SceneTree
-	var shell = tree.get_first_node_in_group("mcp_shell") if tree != null else null
+	var shell = tree.get_first_node_in_group("ui_nav_host") if tree != null else null
 	if shell != null and shell.has_method("flush_pending_result"):
 		shell.flush_pending_result()
 

@@ -1,181 +1,186 @@
 extends Node
 
-## MbUi — semantic UI/navigation command layer for LLM/automation control.
+## UiDriver — semantic UI/navigation command layer for LLM/automation control.
 ##
-## The UI analog of MbDebug (game/mcp_game_api.gd). MbDebug drives *gameplay*
-## (swipe/cards/board); MbUi drives the *shell*: navigate to any screen by name,
-## press any registered control by stable id, and run deterministic ordered
-## sequences — all via the godot-ai MCP `game_eval` command, e.g.:
+## Drives the *shell*: navigate to any screen by name, press any registered control
+## by stable id, and run deterministic ordered sequences — all via an eval hook
+## (e.g. the godot-ai MCP `game_eval` command):
 ##
-##     return MbUi.state()
-##     return MbUi.actions()                       # every pressable id on this screen
-##     return await MbUi.goto("settings")          # awaited — returns when it's live
-##     return MbUi.press("settings.avatar")
-##     return await MbUi.run(["goto:settings", "press:settings.avatar",
-##                            "press:avatar.skull_avatar_03", {set="settings.music", to=0.3},
-##                            "flow:start_story", "swipe:up"])
+##     return UiDriver.state()
+##     return UiDriver.actions()                      # every pressable id on this screen
+##     return await UiDriver.goto("settings")         # awaited — returns when it's live
+##     return UiDriver.press("settings.avatar")
+##     return await UiDriver.run(["goto:settings", "press:settings.avatar",
+##                            {set="settings.music", to=0.3}, "flow:open_store"])
 ##
 ## WHY IT'S DETERMINISTIC: the navigation layer (UiRouter) is an async stack-FSM
-## whose push/pop await their lifecycle hooks + the cover/reveal fades, and
-## `game_eval` itself awaits the eval coroutine — so `await goto(...)` returns only
-## once the destination screen is actually live.
+## whose push/pop await their lifecycle hooks + the cover/reveal fades — so
+## `await goto(...)` returns only once the destination screen is actually live.
 ##
-## CONTROL IDS come from MbUiReg (ui/mcp_ui_reg.gd): screens build/adopt their
-## actionable controls through it, which records each on the live tree. MbUi walks
-## that live tree to build its catalog — self-cleaning, no central state.
+## GENERIC BY DESIGN: this script knows NO game-specific screens, modes, or flows.
+## Everything game-specific is supplied by the host — a node in the "ui_nav_host"
+## group (typically your app shell) implementing the UiNavHost contract below. The
+## driver only provides the *mechanism* (live-tree catalog, control invocation,
+## the step/flow runner, async settle); the host provides the *content*.
 ##
-## Full reference: the UI Control API (MbUi) wiki page
-## (wiki/hypercasual-llm/architecture/client/ui-control-api-mbui.md).
+## CONTROL IDS come from UiReg (ui_reg.gd): screens build/adopt their actionable
+## controls through it, which records each on the live tree. UiDriver walks that
+## live tree to build its catalog — self-cleaning, no central state.
+##
+## ── UiNavHost contract (all but the first three are optional) ──────────────────
+##   mcp_select_tab(id) -> bool          select a shell tab
+##   mcp_current_tab_id() -> String      the active tab id
+##   mcp_start_match(cfg) -> void        launch a mode/overlay (push a router state)
+##   mcp_nav_tabs() -> Array             selectable tab ids        (default: [])
+##   mcp_nav_modes() -> Array            launchable mode ids       (default: [])
+##   mcp_mode_cfg(id) -> Dictionary      cfg passed to start_match (default: {"mode": id})
+##   mcp_target_active(id) -> bool       is this goto target already current? (default: false)
+##   mcp_exit_to_shell() -> awaitable    pop any overlay/match back to the shell
+##   mcp_route_label(state_name)->String map a router state name to a label
+##   mcp_wait_ready(target) -> awaitable post-navigation readiness wait
+##   mcp_match_ready() -> bool           is gameplay interactable?
+##   mcp_flows() -> Array                flow catalog [{name, params, summary}]
+##   mcp_expand_flow(name, params)       expand a flow to run() steps, or null
+##   mcp_step(verb, arg) -> Dictionary   handle a custom run() step verb (e.g. "swipe")
 
-const MbUiReg := preload("res://ui/mcp_ui_reg.gd")
-const AvatarsS := preload("res://ui/avatars.gd")
+const UiReg := preload("res://addons/ui_kit/ui_reg.gd")
+
+const HOST_GROUP := "ui_nav_host"
+const ROUTER_GROUP := "ui_router"
 
 const NOT_READY := {"ok": false, "reason": "not_ready",
-	"message": "shell not live — open ui/boot.tscn (project_run) first"}
-
-## Tab screen ids (selectable inside the shell — NOT router pushes).
-const TAB_IDS := ["collection", "leaderboard", "home", "guilds", "settings"]
-## Play modes (router pushes) and the match config each launches with.
-## Story is NOT here: goto("story") opens the world map (StoryMapState) — the
-## level is chosen on the map (press story_map.play / story_map.level_<id>).
-const MODE_CFG := {
-	"infinite": {"mode": "infinite"},
-}
-
-## The named-flow catalog: the single source of truth for flows() + help(). Each
-## flow is an ordered run() script that `_expand_flow` builds (interpolating the
-## listed params; a "?" suffix marks an optional param). Keep these names in
-## lockstep with _expand_flow's match — verify_ui_driver asserts every entry here
-## expands to non-null steps.
-const FLOWS := [
-	{"name": "start_story", "params": [], "summary": "Open the Story world map."},
-	{"name": "story_play_next", "params": [], "summary": "Open the Story map and play the next unlocked level."},
-	{"name": "start_infinite", "params": [], "summary": "Launch an Infinite match."},
-	{"name": "open_settings", "params": [], "summary": "Switch to the Settings tab."},
-	{"name": "open_leaderboard", "params": [], "summary": "Switch to the Leaderboard tab."},
-	{"name": "open_daily_missions", "params": [], "summary": "Open the Daily Missions panel (Home sigil)."},
-	{"name": "claim_daily", "params": [], "summary": "Open Daily Missions and Claim All claimable rewards."},
-	{"name": "exit_match", "params": [], "summary": "Leave the current match, back to the shell."},
-	{"name": "sign_out", "params": [], "summary": "Settings -> Sign out."},
-	{"name": "set_avatar", "params": ["id"], "summary": "Open Settings and pick avatar <id> (e.g. skull_avatar_05)."},
-	{"name": "rename", "params": ["name"], "summary": "Set the display name to <name> and save."},
-	{"name": "set_volume", "params": ["music?", "sfx?"], "summary": "Set the music and/or sfx volume sliders."},
-]
+	"message": "shell not live — mount a UI host (a node in the 'ui_nav_host' group) first"}
 
 
-# ── scene/shell/autoload resolution ───────────────────────────────────────────
-# Autoloads are resolved by node path (not the global identifier) so this script
-# compiles + its pure surface (catalog/actions/press/…) runs even outside the full
-# app — e.g. the headless verifier, which builds a fake tree and never mounts the
-# router. In-game these resolve to the UiRouter / MbDebug singletons under /root.
+# ── host / router resolution ──────────────────────────────────────────────────
+# Resolved by group (not a global identifier) so the driver works regardless of
+# the autoload names the consuming project chose, and runs even in a hand-built
+# headless tree.
 
 func _router() -> Node:
-	return get_node_or_null("/root/UiRouter")
-
-func _dbg() -> Node:
-	return get_node_or_null("/root/MbDebug")
-
-## The live AppShell (navigation hub), or null when the shell isn't mounted.
-func _shell():
 	var tree := get_tree()
 	if tree == null:
 		return null
-	return tree.get_first_node_in_group("mcp_shell")
+	return tree.get_first_node_in_group(ROUTER_GROUP)
 
-## The live match scene (main.gd), or null when no match is active.
-func _match_scene():
+## The live UI host (navigation hub), or null when the shell isn't mounted.
+func _host():
 	var tree := get_tree()
 	if tree == null:
 		return null
-	var m = tree.get_first_node_in_group("mb_match")
-	return m if (m != null and m.has_method("mcp_exit")) else null
+	return tree.get_first_node_in_group(HOST_GROUP)
 
-func _top_name() -> String:
+
+# ── host capability accessors (each with a generic fallback) ──────────────────
+
+func _nav_tabs(host) -> Array:
+	return host.mcp_nav_tabs() if host != null and host.has_method("mcp_nav_tabs") else []
+
+func _nav_modes(host) -> Array:
+	return host.mcp_nav_modes() if host != null and host.has_method("mcp_nav_modes") else []
+
+func _mode_cfg(host, t: String) -> Dictionary:
+	if host != null and host.has_method("mcp_mode_cfg"):
+		return host.mcp_mode_cfg(t)
+	return {"mode": t}
+
+func _target_active(host, t: String) -> bool:
+	return host != null and host.has_method("mcp_target_active") and bool(host.mcp_target_active(t))
+
+func _route_label(name: String) -> String:
+	var host = _host()
+	if host != null and host.has_method("mcp_route_label"):
+		return str(host.mcp_route_label(name))
+	return name.trim_suffix("State").to_lower()
+
+func _overlay_active() -> bool:
 	var r := _router()
-	if r == null:
-		return ""
-	var t = r.top()
-	return t.state_name() if t != null else ""
+	return r != null and r.stack_depth() > 1
 
-func _in_match() -> bool:
-	return _top_name() == "MatchState"
+## The label of the top overlay (match/map/…), or "" when on the base shell.
+func _overlay_label() -> String:
+	var r := _router()
+	if r == null or r.stack_depth() <= 1:
+		return ""
+	var top = r.top()
+	return _route_label(top.state_name()) if top != null else ""
 
 
 # ── readiness / situational reads ─────────────────────────────────────────────
 
-## True when the navigation shell is mounted (Godot's analog of "the menu is up").
+## True when a navigation host is mounted (the analog of "the menu is up").
 func is_ready() -> bool:
-	return _shell() != null
+	return _host() != null
 
 ## The single situational read: where am I, what's on top, is a transition running.
 func state() -> Dictionary:
-	var sh = _shell()
-	if sh == null:
+	var host = _host()
+	if host == null:
 		return NOT_READY
 	var router := _router()
-	var dbg := _dbg()
 	var route: Array = []
 	if router != null:
-		for r in router.route_names():
-			match r:
-				"MatchState":
-					route.append("match")
-				"StoryMapState":
-					route.append("story_map")
-				_:
-					route.append("shell")
+		for n in router.route_names():
+			route.append(_route_label(str(n)))
+	var route_set := {}
+	for r in route:
+		route_set[r] = true
+	var tab := str(host.mcp_current_tab_id()) if host.has_method("mcp_current_tab_id") else ""
 	var active := _active_screen_ids()
-	var in_match := _in_match()
-	var on_map := _top_name() == "StoryMapState"
-	var modal := ""
-	if active.has("daily"):
-		modal = "daily"
-	elif active.has("avatar"):
-		modal = "avatar"
+	# A modal is any visible registered screen that is neither the current tab nor
+	# one of the router-state screens — data-driven, no hardcoded modal names.
+	var modals: Array = []
+	for id in active:
+		if id == tab or route_set.has(id):
+			continue
+		modals.append(id)
+	var overlay := _overlay_label()
 	return {
 		"ok": true,
 		"busy": router != null and router.is_busy(),
 		"route": route,
 		"route_depth": router.stack_depth() if router != null else 0,
-		"tab": sh.mcp_current_tab_id(),
-		"screen": "match" if in_match else ("story_map" if on_map else sh.mcp_current_tab_id()),
-		"modal": modal,
-		"match_ready": dbg != null and dbg.is_ready(),
+		"tab": tab,
+		"screen": overlay if overlay != "" else tab,
+		"modal": modals[0] if not modals.is_empty() else "",
+		"modals": modals,
+		"match_ready": bool(host.mcp_match_ready()) if host.has_method("mcp_match_ready") else (overlay != ""),
 	}
 
-## The static catalog of goto() targets.
+## The static catalog of goto() targets (sourced from the host).
 func screens() -> Dictionary:
+	var host = _host()
 	return {
-		"tabs": TAB_IDS,
-		"modes": MODE_CFG.keys(),
-		"surfaces": ["shell", "back", "match", "avatar", "daily", "story", "story_map"],
-		"note": "goto(tab) selects a tab; goto(mode) starts a match; goto('story') opens the world map (play via story_map.play); goto('shell'/'back') exits a match/map.",
+		"tabs": _nav_tabs(host),
+		"modes": _nav_modes(host),
+		"surfaces": ["shell", "back", "match"],
+		"note": "goto(tab) selects a tab; goto(mode) launches it; goto('shell'/'back') returns to the shell.",
 	}
 
 
 # ── the live-tree registry walk ───────────────────────────────────────────────
 
 ## Every registered control, as {full_id: control}. A control belongs to its
-## NEAREST screen-root ancestor, so a nested modal (avatar) forms its own screen.
+## NEAREST screen-root ancestor, so a nested modal forms its own screen.
 func _catalog() -> Dictionary:
 	var out := {}
 	var tree := get_tree()
 	if tree == null:
 		return out
-	for c in tree.get_nodes_in_group(MbUiReg.CONTROL_GROUP):
-		if not (c is Control) or not c.has_meta(MbUiReg.META_ID):
+	for c in tree.get_nodes_in_group(UiReg.CONTROL_GROUP):
+		if not (c is Control) or not c.has_meta(UiReg.META_ID):
 			continue
 		var screen := _nearest_screen_id(c)
 		if screen == "":
 			continue
-		out["%s.%s" % [screen, str(c.get_meta(MbUiReg.META_ID))]] = c
+		out["%s.%s" % [screen, str(c.get_meta(UiReg.META_ID))]] = c
 	return out
 
 func _nearest_screen_id(node: Node) -> String:
 	var n: Node = node.get_parent()
 	while n != null:
-		if n.has_meta(MbUiReg.META_SCREEN):
-			return str(n.get_meta(MbUiReg.META_SCREEN))
+		if n.has_meta(UiReg.META_SCREEN):
+			return str(n.get_meta(UiReg.META_SCREEN))
 		n = n.get_parent()
 	return ""
 
@@ -185,14 +190,14 @@ func _active_screen_ids() -> Array:
 	var tree := get_tree()
 	if tree == null:
 		return ids
-	for root in tree.get_nodes_in_group(MbUiReg.GROUP):
-		if root.has_meta(MbUiReg.META_SCREEN) and _visible(root):
-			ids.append(str(root.get_meta(MbUiReg.META_SCREEN)))
+	for root in tree.get_nodes_in_group(UiReg.GROUP):
+		if root.has_meta(UiReg.META_SCREEN) and _visible(root):
+			ids.append(str(root.get_meta(UiReg.META_SCREEN)))
 	return ids
 
 ## Visible accounting for BOTH Control and CanvasLayer ancestors (a Control under a
-## hidden CanvasLayer — e.g. the avatar modal or the hidden nav — still reports
-## is_visible_in_tree()==true, since a CanvasLayer breaks the CanvasItem chain).
+## hidden CanvasLayer still reports is_visible_in_tree()==true, since a CanvasLayer
+## breaks the CanvasItem chain).
 func _visible(node: Node) -> bool:
 	if node == null or not node.is_inside_tree():
 		return false
@@ -268,78 +273,68 @@ func _has_prop(o: Object, prop: String) -> bool:
 
 # ── navigation (awaited) ──────────────────────────────────────────────────────
 
-## Navigate to any screen by name, fully awaited. Tabs ("home"/"settings"/…) and
-## modes ("story"/"infinite") and surfaces ("shell"/"back"). Returns state().
+## Navigate to any screen by name, fully awaited. Tabs + modes (from the host),
+## and the generic surfaces "shell"/"back"/"match". Returns state().
 func goto(target: String) -> Dictionary:
-	var sh = _shell()
-	if sh == null:
+	var host = _host()
+	if host == null:
 		return NOT_READY
 	var t := target.to_lower()
 	await _settle()
 
-	# Leaving a match first if the target isn't the match itself.
-	if _in_match() and t != "match":
-		await _exit_match()
-
-	# Story world map: a router surface between the shell and a match.
-	if t == "story" or t == "story_map":
-		if _top_name() != "StoryMapState":
-			sh.mcp_select_tab("home")
-			sh.mcp_start_match({"mode": "story"})  # the shell routes story to the map
-			await _settle()
-			# The map fetches catalog/progress detached after the reveal; wait
-			# until it is interactable — play enabled, or the offline gate's
-			# retry showing — so a following press:story_map.play is
-			# deterministic instead of racing the network.
-			var map_ready := func() -> bool:
-				for a in actions():
-					var id := str(a.get("id", ""))
-					if id == "story_map.play" and bool(a.get("enabled", false)):
-						return true
-					if id == "story_map.retry" and bool(a.get("visible", false)):
-						return true
-				return false
-			await _wait_until(map_ready, 10.0)
-		return state()
-
-	if t == "match":
-		if not _in_match():
-			return {"ok": false, "reason": "no_mode",
-				"message": "goto('match') needs an active match; start one with goto('story'/'infinite')"}
-		return state()
+	var tabs := _nav_tabs(host)
+	var modes := _nav_modes(host)
 
 	# Validate BEFORE any side effect: an unknown target must leave the UI
-	# untouched (popping the map below would tear down its result overlay).
-	if t != "shell" and t != "back" and not TAB_IDS.has(t) and not MODE_CFG.has(t):
+	# untouched (exiting an overlay below would tear down its result state).
+	var known := t == "shell" or t == "back" or t == "match" or tabs.has(t) or modes.has(t)
+	if not known:
 		return {"ok": false, "reason": "unknown_target",
 			"message": "unknown screen '%s'; see screens()" % target}
 
-	# The remaining targets want the shell visible — pop the map if it's on top.
-	if _top_name() == "StoryMapState":
-		_router().pop()
-		await _settle()
+	# Already where we want to be (host decides: tab selected / overlay shown).
+	if _target_active(host, t):
+		if host.has_method("mcp_wait_ready"):
+			await host.mcp_wait_ready(t)
+		return state()
+
+	# Leave any active overlay/match before navigating elsewhere.
+	if _overlay_active() and t != "match":
+		await _exit_to_shell()
+
+	if t == "match":
+		if not _overlay_active():
+			return {"ok": false, "reason": "no_mode",
+				"message": "goto('match') needs an active match; start one with a mode (see screens())"}
+		return state()
 
 	if t == "shell" or t == "back":
 		return state()
 
-	if TAB_IDS.has(t):
-		sh.mcp_select_tab(t)
+	if tabs.has(t):
+		host.mcp_select_tab(t)
 		await _settle()
 		return state()
 
-	sh.mcp_start_match(MODE_CFG[t].duplicate(true))
+	# A mode/surface launched via the host (pushes a router state).
+	host.mcp_start_match(_mode_cfg(host, t))
 	await _settle()
-	await _wait_until(func(): var d := _dbg(); return _in_match() and d != null and d.is_ready(), 5.0)
+	if host.has_method("mcp_wait_ready"):
+		await host.mcp_wait_ready(t)
 	return state()
 
-## Press the in-match exit (validator completion + router pop), awaited to the shell.
-func _exit_match() -> void:
-	var scene = _match_scene()
-	if scene == null:
+## Pop any active overlay/match back to the shell, awaited.
+func _exit_to_shell() -> void:
+	var host = _host()
+	if host != null and host.has_method("mcp_exit_to_shell"):
+		await host.mcp_exit_to_shell()
+		await _settle()
 		return
-	await scene.mcp_exit()
-	await _wait_until(func(): return not _in_match(), 6.0)
-	await _settle()
+	# Generic fallback: pop the router stack down to the base shell.
+	var r := _router()
+	while r != null and r.stack_depth() > 1 and not r.is_busy():
+		r.pop()
+		await _settle()
 
 
 # ── control invocation ────────────────────────────────────────────────────────
@@ -403,10 +398,10 @@ func _unknown(id: String) -> Dictionary:
 # ── sequences ─────────────────────────────────────────────────────────────────
 
 ## Run an ordered list of steps, awaiting each. A step is a string ("goto:settings",
-## "press:home.story", "exit", "swipe:up", "wait:0.5", "flow:start_story") or a dict
-## ({goto=}, {press=}, {set=,to=}, {text=,to=,submit=}, {toggle=,on=}, {swipe=},
-## {wait=}, {flow=,params=}). Returns a per-step trace; stops on first error unless
-## opts.continue_on_error.
+## "press:home.story", "exit", "wait:0.5", "flow:open_store") or a dict ({goto=},
+## {press=}, {set=,to=}, {text=,to=,submit=}, {toggle=,on=}, {wait=}, {flow=,params=}).
+## Any other verb is handed to the host's mcp_step (e.g. "swipe:up"). Returns a
+## per-step trace; stops on first error unless opts.continue_on_error.
 func run(steps: Array, opts: Dictionary = {}) -> Array:
 	var trace: Array = []
 	var cont := bool(opts.get("continue_on_error", false))
@@ -446,8 +441,6 @@ func _do_string_step(s: String) -> Dictionary:
 			return _wrap(s, r)
 		"toggle":
 			return _wrap(s, toggle(arg, true))
-		"swipe":
-			return _wrap(s, _swipe(arg))
 		"wait":
 			await _wait_seconds(float(arg) if arg != "" else 0.0)
 			return {"ok": true, "step": s}
@@ -455,7 +448,7 @@ func _do_string_step(s: String) -> Dictionary:
 			var sub := await flow(arg)
 			return {"ok": _all_ok(sub), "step": s, "sub": sub}
 		_:
-			return {"ok": false, "step": s, "error": "unknown_verb: %s" % verb}
+			return _host_step(s, verb, arg)
 
 func _do_dict_step(d: Dictionary) -> Dictionary:
 	if d.has("goto"):
@@ -470,15 +463,33 @@ func _do_dict_step(d: Dictionary) -> Dictionary:
 		return _wrap(d, set_text(str(d["text"]), str(d.get("to", "")), bool(d.get("submit", false))))
 	if d.has("toggle"):
 		return _wrap(d, toggle(str(d["toggle"]), bool(d.get("on", true))))
-	if d.has("swipe"):
-		return _wrap(d, _swipe(str(d["swipe"])))
 	if d.has("wait"):
 		await _wait_seconds(float(d["wait"]))
 		return {"ok": true, "step": d}
 	if d.has("flow"):
 		var sub := await flow(str(d["flow"]), d.get("params", {}))
 		return {"ok": _all_ok(sub), "step": d, "sub": sub}
+	if d.has("step"):
+		return _wrap(d, _host_step_call(str(d["step"]), d.get("arg", "")))
+	# A single-key custom verb dict, e.g. {"swipe": "up"} -> host.mcp_step.
+	if d.size() == 1:
+		var k = d.keys()[0]
+		return _wrap(d, _host_step_call(str(k), d[k]))
 	return {"ok": false, "step": d, "error": "unknown_dict_step"}
+
+## Hand an unrecognized verb to the host (custom gameplay steps like "swipe").
+func _host_step(step, verb: String, arg) -> Dictionary:
+	var host = _host()
+	if host != null and host.has_method("mcp_step"):
+		var res: Dictionary = host.mcp_step(verb, arg)
+		return {"ok": bool(res.get("ok", false)), "step": step, "result": res}
+	return {"ok": false, "step": step, "error": "unknown_verb: %s" % verb}
+
+func _host_step_call(verb: String, arg) -> Dictionary:
+	var host = _host()
+	if host != null and host.has_method("mcp_step"):
+		return host.mcp_step(verb, arg)
+	return {"ok": false, "reason": "no_host_step", "verb": verb}
 
 func _wrap(step, result: Dictionary) -> Dictionary:
 	return {"ok": bool(result.get("ok", false)), "step": step, "result": result}
@@ -490,24 +501,27 @@ func _all_ok(trace: Array) -> bool:
 	return true
 
 
-# ── named flows ───────────────────────────────────────────────────────────────
+# ── named flows (sourced from the host) ───────────────────────────────────────
 
 ## The catalog of named flows — the discovery surface for flow(), as screens() is
 ## for goto() and actions() is for press(). Each entry: {name, params, summary,
 ## steps} where `steps` is the expansion with default/empty params (a shape
 ## preview); pass the listed params to flow(name, params).
 func flows() -> Array:
+	var host = _host()
+	if host == null or not host.has_method("mcp_flows"):
+		return []
 	var out: Array = []
-	for f in FLOWS:
+	for f in host.mcp_flows():
 		out.append({
 			"name": f["name"],
-			"params": f["params"],
-			"summary": f["summary"],
+			"params": f.get("params", []),
+			"summary": f.get("summary", ""),
 			"steps": _expand_flow(str(f["name"]), {}),
 		})
 	return out
 
-## Expand + run a named flow (see the FLOWS catalog / flows()). Returns the run() trace.
+## Expand + run a named flow (see flows()). Returns the run() trace.
 func flow(name: String, params: Dictionary = {}) -> Array:
 	var steps = _expand_flow(name, params)
 	if steps == null:
@@ -515,50 +529,13 @@ func flow(name: String, params: Dictionary = {}) -> Array:
 	return await run(steps)
 
 func _expand_flow(name: String, params: Dictionary):
-	match name:
-		"start_story":
-			return ["goto:story"]
-		"story_play_next":
-			return ["goto:story", "press:story_map.play"]
-		"start_infinite":
-			return ["goto:infinite"]
-		"open_settings":
-			return ["goto:settings"]
-		"open_leaderboard":
-			return ["goto:leaderboard"]
-		"open_daily_missions":
-			return ["goto:home", "press:home.daily"]
-		"claim_daily":
-			return ["goto:home", "press:home.daily", "press:missions.claim_all"]
-		"exit_match":
-			return ["goto:shell"]
-		"sign_out":
-			return ["goto:settings", "press:settings.sign_out"]
-		"set_avatar":
-			var id := str(params.get("id", AvatarsS.default_id()))
-			return ["goto:settings", "press:settings.avatar", "press:avatar.%s" % id]
-		"rename":
-			return ["goto:settings",
-				{"text": "settings.name", "to": str(params.get("name", ""))},
-				"press:settings.save_name"]
-		"set_volume":
-			var s: Array = ["goto:settings"]
-			if params.has("music"):
-				s.append({"set": "settings.music", "to": float(params["music"])})
-			if params.has("sfx"):
-				s.append({"set": "settings.sfx", "to": float(params["sfx"])})
-			return s
+	var host = _host()
+	if host != null and host.has_method("mcp_expand_flow"):
+		return host.mcp_expand_flow(name, params)
 	return null
 
 
 # ── async helpers ─────────────────────────────────────────────────────────────
-
-## Delegate a swipe to MbDebug (gameplay), guarded if it isn't present.
-func _swipe(direction: String) -> Dictionary:
-	var d := _dbg()
-	if d == null:
-		return {"ok": false, "reason": "no_mbdebug"}
-	return d.swipe(direction)
 
 ## Yield frames while the router is mid-transition (it no-ops calls while busy).
 func _settle() -> void:
@@ -590,13 +567,15 @@ func _wait_seconds(secs: float) -> void:
 # ── utility ───────────────────────────────────────────────────────────────────
 
 func help() -> String:
+	var host = _host()
 	var flow_names: Array = []
-	for f in FLOWS:
-		flow_names.append(str(f["name"]))
-	return """MbUi — semantic UI/navigation control (call via godot-ai game_eval). See the UI Control API (MbUi) wiki page.
+	if host != null and host.has_method("mcp_flows"):
+		for f in host.mcp_flows():
+			flow_names.append(str(f["name"]))
+	return """UiDriver — semantic UI/navigation control (call via an eval hook).
   reads     : state() screens() actions(all=false) flows() is_ready()
   navigate  : await goto(target)   # tabs: %s ; modes: %s ; or 'shell'/'back'
   controls  : press(id) toggle(id,on) set_value(id,v) set_text(id,s,submit=false)
-  sequence  : await run([steps], opts)  # steps: \"goto:settings\" \"press:home.story\" \"exit\" \"swipe:up\" \"wait:0.5\" \"flow:start_story\" / {set=\"settings.music\",to=0.3}
+  sequence  : await run([steps], opts)  # \"goto:settings\" \"press:home.story\" \"exit\" \"wait:0.5\" \"flow:name\" / {set=\"settings.music\",to=0.3}
   flows     : await flow(name, params)  # catalog via flows(): %s
-  gameplay  : in a match, drive the board/cards via MbDebug (see the Game Control API wiki page)""" % [str(TAB_IDS), str(MODE_CFG.keys()), " ".join(flow_names)]
+  custom    : any other step verb is handed to the host's mcp_step (e.g. \"swipe:up\")""" % [str(_nav_tabs(host)), str(_nav_modes(host)), " ".join(flow_names)]

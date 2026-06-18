@@ -25,7 +25,7 @@ Packaging the client for distribution (committed export presets plus a tools/bui
 - [Editor Tools](architecture:mq8hyn2w-000i-cryytk)
 - [Build & Distribution](architecture:mq9llv7f-00a3-c5f96m)
 - [Game Control API (MbDebug)](architecture:mqay9c1u-0013-wu1lcn)
-- [UI Control API (MbUi)](architecture:mqayf7o4-001y-dyr6k0)
+- [UI Control API (UiDriver)](architecture:mqayf7o4-001y-dyr6k0)
 - [Editor Tool Framework](architecture:mqh31a29-0001-sy7uqn)
 - [Remote Config & Content Authoring](architecture:mqjk73oh-03px-m87rim)
 
@@ -54,7 +54,7 @@ Open the project in **Godot 4.6.3** and press Play (`scenes/main.tscn`). The gam
 
 **Online play:** run `tools/run_validator.sh` (DEV_MODE, `:5555`), press `V`. The HUD shows `validator: ✓ move N ok`; on a hash mismatch the client snaps to the validator's authoritative state.
 
-**Driving via MCP:** the game is driven through the godot-ai MCP `game_eval` — **MbDebug** for gameplay (swipe / read board / play card; see the **Game Control API (MbDebug)** subsystem page) and **MbUi** for the menus (navigate screens / press buttons / run scripted sequences; see the **UI Control API (MbUi)** subsystem page). Both are autoloads; new MbUi controls register via `MbUiReg`.
+**Driving via MCP:** the game is driven through the godot-ai MCP `game_eval` — **MbDebug** for gameplay (swipe / read board / play card; see the **Game Control API (MbDebug)** subsystem page) and **UiDriver** for the menus (navigate screens / press buttons / run scripted sequences; see the **UI Control API (UiDriver)** subsystem page). Both are autoloads; new UiDriver controls register via `UiReg`. UiDriver/UiRouter/UiReg are the generic `ui_kit` addon; the game's `AppShell` supplies the Moveborne-specific navigation as the `ui_nav_host`.
 
 ## Invariants & constraints
 - Determinism parity is load-bearing: `logic/` must compute the same state hashes as the TS engine and validator. Never change engine behavior without re-running the parity tests; a changed golden hash means broken compatibility.

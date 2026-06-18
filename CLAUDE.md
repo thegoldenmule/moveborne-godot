@@ -32,7 +32,7 @@ Don't restate the architecture here — read the canonical pages:
 | Overview, controls, project layout | `game/README.md` |
 | Architecture, phase status, per-subsystem source-of-truth map | `game/GODOT_PORT_PLAN.md` |
 | Godot/GDScript working notes + hard-won gotchas + parity-test loop | `game/CLAUDE.md` |
-| Driving the game (MbDebug) + UI/menus (MbUi) via MCP | `wiki/…/architecture/client/game-control-api-mbdebug.md` + `…/ui-control-api-mbui.md` |
+| Driving the game (MbDebug) + UI/menus (UiDriver, from the generic `ui_kit` addon) via MCP | `wiki/…/architecture/client/game-control-api-mbdebug.md` + `…/ui-control-api-uidriver.md` |
 | Mobile-first UI layout best practices (360×780 surface, chrome budget, no-overflow rules) | `wiki/moveborne-godot/design/mobile-first-ui-layout-best-practices.md` |
 | Native VFX mapping | `game/VFX_MAPPING.md` |
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |

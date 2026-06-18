@@ -13,7 +13,7 @@ const CountdownS := preload("res://scenes/countdown.gd")
 const DooberS := preload("res://scenes/doober.gd")
 const GlitchS := preload("res://scenes/glitch.gd")
 const GlowShader := preload("res://scenes/glow_text.gdshader")
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 const StoryCat := preload("res://story/story_catalog.gd")
 const RemoteConfigS := preload("res://net/remote_config_client.gd")
 ## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
@@ -90,7 +90,7 @@ func _ready() -> void:
 	# Joined so MbDebug._scene() can resolve us via group lookup once the app shell
 	# (not this match) owns current_scene. See game/mcp_game_api.gd.
 	add_to_group("mb_match")
-	# Also an MbUi screen ("match"): its exit button registers as match.exit, and
+	# Also an UiDriver screen ("match"): its exit button registers as match.exit, and
 	# the driver reports screen "match" while a match is live. Freed on quit, so it
 	# drops out of the registry automatically.
 	Reg.screen(self, "match")
@@ -295,7 +295,7 @@ func _build_ui() -> void:
 	home_btn.add_theme_font_size_override("font_size", 15)
 	_style_home_button(home_btn)
 	home_btn.pressed.connect(_on_home_pressed)
-	Reg.adopt(home_btn, "exit")  # MbUi: match.exit (quit back to the shell)
+	Reg.adopt(home_btn, "exit")  # UiDriver: match.exit (quit back to the shell)
 	add_child(home_btn)
 
 
@@ -1030,7 +1030,7 @@ func mcp_match():
 	return _match
 
 ## Leave the match the same way the in-match Home/Quit button does (awaitable, so
-## the MbUi driver can settle the async validator completion + router pop before
+## the UiDriver driver can settle the async validator completion + router pop before
 ## reporting the player is back on the shell).
 func mcp_exit() -> void:
 	await _on_home_pressed()

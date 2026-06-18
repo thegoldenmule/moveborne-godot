@@ -18,17 +18,19 @@ const CurrencyBarS := preload("res://ui/shell/currency_bar.gd")
 const QuestsClientS := preload("res://net/quests_client.gd")
 const DailySigilS := preload("res://ui/shell/daily_sigil.gd")
 const LoginBonusS := preload("res://ui/shell/login_bonus.gd")
-## MbUi control registry (preloaded, not the class_name global, so the headless
+## UiDriver control registry (preloaded, not the class_name global, so the headless
 ## verifier that instances the shell doesn't depend on a full editor scan).
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 ## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
 const SafeArea := preload("res://ui/safe_area.gd")
+## Avatar catalog (for the set_avatar flow's default id).
+const AvatarsS := preload("res://ui/avatars.gd")
 
 const HOME_INDEX := 2
 const LEADERBOARD_INDEX := 1
 const SETTINGS_INDEX := 4
 const TAB_LABELS := ["Collection", "Leaderboard", "Home", "Guilds", "Settings"]
-## Stable screen ids (MbUi), aligned by index with TAB_LABELS / _tabs.
+## Stable screen ids (UiDriver), aligned by index with TAB_LABELS / _tabs.
 const SCREEN_IDS := ["collection", "leaderboard", "home", "guilds", "settings"]
 # GenTexture refs (art/gen_texture.gd): drop-in Texture2D wrappers carrying
 # provenance, swappable in the ArtGen dock without touching this binding.
@@ -136,9 +138,10 @@ var _login_bonus: CanvasLayer  # Daily Login Bonus controller + modal (own layer
 
 
 func _ready() -> void:
-	# Discoverable by the MbUi driver (game/mcp_ui_api.gd) — the shell is the
-	# navigation hub: tab selection + match launch route through its mcp_* methods.
-	add_to_group("mcp_shell")
+	# Discoverable by the UiDriver (addons/ui_kit/ui_driver.gd) as the UiNavHost —
+	# the shell is the navigation hub: tab selection, match launch, flows, and the
+	# custom "swipe" step all route through its mcp_* methods (see the section below).
+	add_to_group("ui_nav_host")
 	# Apply saved local prefs (audio buses) at boot, before any sound plays.
 	LocalSettingsS.apply_audio(LocalSettingsS.load_settings())
 
@@ -189,7 +192,7 @@ func _ready() -> void:
 	_nav_bar.add_theme_stylebox_override("panel", nav_sb)
 	_row.alignment = BoxContainer.ALIGNMENT_BEGIN
 	_row.add_theme_constant_override("separation", 0)
-	# The bottom nav is its own MbUi "screen": its tab buttons register as
+	# The bottom nav is its own UiDriver "screen": its tab buttons register as
 	# nav.<screen id> (see the tab-config loop below).
 	Reg.screen(_nav_bar, "nav")
 
@@ -247,8 +250,8 @@ func _ready() -> void:
 		# Name each screen host after its tab so the tree stays legible (placeholder
 		# instances otherwise collide on their shared scene-root name).
 		screen.name = "%sTab" % TAB_LABELS[i]
-		# Mark it as an MbUi screen root; its own controls (home launchers, settings
-		# widgets, …) register themselves under this id via MbUiReg.
+		# Mark it as an UiDriver screen root; its own controls (home launchers, settings
+		# widgets, …) register themselves under this id via UiReg.
 		Reg.screen(screen, SCREEN_IDS[i])
 		_content.add_child(screen)
 		screen.position = Vector2.ZERO
@@ -269,7 +272,7 @@ func _ready() -> void:
 		b.custom_minimum_size = Vector2(0, 72)
 		_style_nav_button(b)
 		b.pressed.connect(_select_tab.bind(i))
-		# MbUi: pressing nav.<screen id> selects that tab.
+		# UiDriver: pressing nav.<screen id> selects that tab.
 		Reg.adopt(b, SCREEN_IDS[i])
 		if i == HOME_INDEX:
 			_tab_icons.append(null)
@@ -600,10 +603,13 @@ func _on_viewport_resized() -> void:
 	_select_tab.call_deferred(_current_tab)
 
 
-# ── MbUi control surface ──────────────────────────────────────────────────────
-# Thin, semantic entry points for the MbUi driver (game/mcp_ui_api.gd). They
-# reuse the same paths a real tap takes — the nav radio + _select_tab, and the
+# ── UiNavHost surface (the ui_kit UiDriver contract) ─────────────────────────
+# Thin, semantic entry points for the generic UiDriver (addons/ui_kit/ui_driver.gd).
+# They reuse the same paths a real tap takes — the nav radio + _select_tab, and the
 # play-mode launcher — so automation drives the shell exactly as a player does.
+# This is where ALL the Moveborne-specific navigation knowledge lives (the tabs,
+# the play modes, the named flows, the story-map readiness wait, the swipe step);
+# the driver itself is game-agnostic.
 
 
 ## Switch to the tab with the given screen id ("home"/"settings"/…). Sets the
@@ -629,3 +635,182 @@ func mcp_current_tab_id() -> String:
 ## a Home launcher. `cfg` is the match config dict, e.g. {"mode":"story","scenario_id":0}.
 func mcp_start_match(cfg: Dictionary) -> void:
 	_on_play_mode_selected(cfg)
+
+
+## Selectable shell tabs (goto(tab)).
+func mcp_nav_tabs() -> Array:
+	return SCREEN_IDS.duplicate()
+
+
+## Launchable play modes (goto(mode)). Story opens the world map; Infinite is a
+## direct match. PvP is gated/omitted.
+func mcp_nav_modes() -> Array:
+	return ["story", "infinite"]
+
+
+## The match config a mode launches with (passed to mcp_start_match).
+func mcp_mode_cfg(mode: String) -> Dictionary:
+	return {"mode": mode.to_lower()}
+
+
+## Is the given goto target already the live screen? (Lets the driver no-op a
+## redundant navigation instead of tearing down + rebuilding.)
+func mcp_target_active(target: String) -> bool:
+	var t := target.to_lower()
+	if UiRouter.stack_depth() <= 1:
+		# On the shell: a tab target is active iff it's the current tab.
+		return SCREEN_IDS.has(t) and mcp_current_tab_id() == t
+	var top_name := _top_state_name()
+	if t == "story" or t == "story_map":
+		return top_name == "StoryMapState"
+	if top_name == "MatchState":
+		return t == str(GameState.next_match.get("mode", ""))
+	return false
+
+
+## Pop any active overlay/match back to the base shell, awaited. A match leaves via
+## its own mcp_exit (validator completion + the match_exited pop); the map pops
+## directly.
+func mcp_exit_to_shell() -> void:
+	var tree := get_tree()
+	var guard := 0
+	while UiRouter.stack_depth() > 1 and guard < 12:
+		guard += 1
+		while UiRouter.is_busy():
+			await tree.process_frame
+		var before := UiRouter.stack_depth()
+		if _top_state_name() == "MatchState":
+			var scene = tree.get_first_node_in_group("mb_match")
+			if scene != null and scene.has_method("mcp_exit"):
+				await scene.mcp_exit()
+			else:
+				UiRouter.pop()
+		else:
+			UiRouter.pop()
+		# The pop is async / signal-driven — wait until the stack actually shrinks.
+		var waited := 0.0
+		while UiRouter.stack_depth() >= before and waited < 6.0:
+			await tree.process_frame
+			waited += 0.016
+
+
+## Map a router state name to the driver's route/screen label.
+func mcp_route_label(state_name: String) -> String:
+	match state_name:
+		"MatchState":
+			return "match"
+		"StoryMapState":
+			return "story_map"
+		"ShellState":
+			return "shell"
+	return state_name.trim_suffix("State").to_lower()
+
+
+## Is gameplay interactable right now? (Drives state().match_ready.)
+func mcp_match_ready() -> bool:
+	return _mbdebug_ready()
+
+
+## Post-navigation readiness wait, awaited. Story: the map fetches catalog/progress
+## detached after the reveal — wait until Play is enabled (or the offline retry is
+## up) so a following press:story_map.play is deterministic. Infinite: wait until
+## the board is live.
+func mcp_wait_ready(target: String) -> void:
+	var t := target.to_lower()
+	var tree := get_tree()
+	if t == "story" or t == "story_map":
+		var ready := func() -> bool:
+			for a in UiDriver.actions():
+				var id := str(a.get("id", ""))
+				if id == "story_map.play" and bool(a.get("enabled", false)):
+					return true
+				if id == "story_map.retry" and bool(a.get("visible", false)):
+					return true
+			return false
+		var waited := 0.0
+		while not ready.call() and waited < 10.0:
+			await tree.process_frame
+			waited += 0.016
+	elif t == "infinite":
+		var waited := 0.0
+		while not _mbdebug_ready() and waited < 5.0:
+			await tree.process_frame
+			waited += 0.016
+
+
+## The named-flow catalog (the discovery surface for flow()/flows()).
+func mcp_flows() -> Array:
+	return [
+		{"name": "start_story", "params": [], "summary": "Open the Story world map."},
+		{"name": "story_play_next", "params": [], "summary": "Open the Story map and play the next unlocked level."},
+		{"name": "start_infinite", "params": [], "summary": "Launch an Infinite match."},
+		{"name": "open_settings", "params": [], "summary": "Switch to the Settings tab."},
+		{"name": "open_leaderboard", "params": [], "summary": "Switch to the Leaderboard tab."},
+		{"name": "open_daily_missions", "params": [], "summary": "Open the Daily Missions panel (Home sigil)."},
+		{"name": "claim_daily", "params": [], "summary": "Open Daily Missions and Claim All claimable rewards."},
+		{"name": "exit_match", "params": [], "summary": "Leave the current match, back to the shell."},
+		{"name": "sign_out", "params": [], "summary": "Settings -> Sign out."},
+		{"name": "set_avatar", "params": ["id"], "summary": "Open Settings and pick avatar <id> (e.g. skull_avatar_05)."},
+		{"name": "rename", "params": ["name"], "summary": "Set the display name to <name> and save."},
+		{"name": "set_volume", "params": ["music?", "sfx?"], "summary": "Set the music and/or sfx volume sliders."},
+	]
+
+
+## Expand a named flow to run() steps (interpolating params), or null if unknown.
+func mcp_expand_flow(name: String, params: Dictionary):
+	match name:
+		"start_story":
+			return ["goto:story"]
+		"story_play_next":
+			return ["goto:story", "press:story_map.play"]
+		"start_infinite":
+			return ["goto:infinite"]
+		"open_settings":
+			return ["goto:settings"]
+		"open_leaderboard":
+			return ["goto:leaderboard"]
+		"open_daily_missions":
+			return ["goto:home", "press:home.daily"]
+		"claim_daily":
+			return ["goto:home", "press:home.daily", "press:missions.claim_all"]
+		"exit_match":
+			return ["goto:shell"]
+		"sign_out":
+			return ["goto:settings", "press:settings.sign_out"]
+		"set_avatar":
+			var id := str(params.get("id", AvatarsS.default_id()))
+			return ["goto:settings", "press:settings.avatar", "press:avatar.%s" % id]
+		"rename":
+			return ["goto:settings",
+				{"text": "settings.name", "to": str(params.get("name", ""))},
+				"press:settings.save_name"]
+		"set_volume":
+			var s: Array = ["goto:settings"]
+			if params.has("music"):
+				s.append({"set": "settings.music", "to": float(params["music"])})
+			if params.has("sfx"):
+				s.append({"set": "settings.sfx", "to": float(params["sfx"])})
+			return s
+	return null
+
+
+## Custom run() step verbs the driver hands off. "swipe:<dir>" drives the board via
+## MbDebug (gameplay), so in-match automation runs through the same UiDriver.run().
+func mcp_step(verb, arg) -> Dictionary:
+	match str(verb):
+		"swipe":
+			var d := get_node_or_null("/root/MbDebug")
+			if d == null:
+				return {"ok": false, "reason": "no_mbdebug"}
+			return d.swipe(str(arg))
+	return {"ok": false, "reason": "unknown_verb", "verb": str(verb)}
+
+
+func _top_state_name() -> String:
+	var t = UiRouter.top()
+	return t.state_name() if t != null else ""
+
+
+func _mbdebug_ready() -> bool:
+	var d := get_node_or_null("/root/MbDebug")
+	return d != null and d.is_ready()

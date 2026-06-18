@@ -82,11 +82,15 @@ verifier/suite — never hand-write expected values.
   analog of the TS `window.__moveborne`. Full reference: the **Game Control API
   (MbDebug)** wiki page (`../wiki/hypercasual-llm/architecture/client/game-control-api-mbdebug.md`).
 - **Drive the UI by screen + button** (navigate screens / press any control / run
-  deterministic sequences): use the `MbUi` autoload via `game_eval` (e.g.
-  `await MbUi.goto("settings")`, `MbUi.actions()`, `await MbUi.run([...])`). New
-  actionable controls register themselves via `MbUiReg` (`ui/mcp_ui_reg.gd`) as a
-  byproduct of construction. Full reference: the **UI Control API (MbUi)** wiki page
-  (`../wiki/hypercasual-llm/architecture/client/ui-control-api-mbui.md`). Headless smoke:
+  deterministic sequences): use the `UiDriver` autoload via `game_eval` (e.g.
+  `await UiDriver.goto("settings")`, `UiDriver.actions()`, `await UiDriver.run([...])`).
+  New actionable controls register themselves via `UiReg`
+  (`addons/ui_kit/ui_reg.gd`) as a byproduct of construction. `UiDriver`/`UiRouter`/
+  `UiReg` live in the **generic `ui_kit` addon** (see below); the Moveborne-specific
+  navigation (tabs, play modes, named flows, the `swipe` step) is supplied by
+  `AppShell` as the `ui_nav_host` (its `mcp_*` methods). Full reference: the **UI
+  Control API** wiki page
+  (`../wiki/hypercasual-llm/architecture/client/ui-control-api-uidriver.md`). Headless smoke:
   `--script res://tools/verify_ui_driver.gd`.
 - **Validator:** `tools/run_validator.sh` (`:5555`) wraps this repo's
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
@@ -98,6 +102,15 @@ verifier/suite — never hand-write expected values.
   tool is a service + a view; the service is headless-testable (no `Control` /
   `EditorInterface` deps). Recipe + verifying: `addons/editor_tool_kit/README.md`.
   Headless check: `--script res://tools/verify_editor_tool_kit.gd`.
+- **UI Kit (generic UI shell):** `addons/ui_kit/` — the game-agnostic UI
+  infrastructure extracted from this project: `UiRouter` (async stack-FSM router),
+  `UiState`, `UiScreenScaffold`, `UiReg` (control registration), and `UiDriver` (the
+  automation layer above). Sourced from `github.com/thegoldenmule/godot-addons`;
+  self-updates in place via the "UI Kit" bottom-panel dock (bump `plugin.cfg`
+  `version` + push to ship). The driver knows no game specifics — the game wires a
+  `ui_nav_host` (here, `AppShell`) implementing the `mcp_*` contract
+  (`addons/ui_kit/README.md`). Headless checks:
+  `--script res://tools/verify_ui_driver.gd` and `res://tools/verify_ui_kit_update.gd`.
 - **ArtGen (AI asset generation):** `addons/artgen/` — an `editor_tool_kit` tool
   (plugin + `ArtgenService(ToolService)` + `ArtgenBridge(BridgeServer)` + dock).
   Bottom-panel dock + Recraft client + localhost bridge (`:4848`) behind the

@@ -6,12 +6,12 @@ extends SceneTree
 ## Covers the pure layout helper (load/validate) and the live screen rendering:
 ## dots from story_maps.json with the SAME frontier lock/star math as the flat
 ## list, the normalized->pixel mapping (resolution independent), the level-detail
-## modal (name/lock/stars/Play -> play_level), MbUiReg registration, and the
+## modal (name/lock/stars/Play -> play_level), UiReg registration, and the
 ## missing-map flat-list fallback. Prints VERIFY story_map: PASS/FAIL; exit 0/1.
 
 const Catalog := preload("res://story/story_catalog.gd")
 const Layout := preload("res://story/story_map_layout.gd")
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 # story_map.tscn is load()ed at runtime (not preloaded): its script references the
 # GameState autoload global, which only registers after engine init under --script.
 
@@ -87,11 +87,11 @@ func _run() -> void:
 	screen._reposition_dots()
 	_check("mapping resolution-independent after resize", _positions_match(screen))
 
-	# registration: dots + modal are on the live tree for MbUi.
+	# registration: dots + modal are on the live tree for UiDriver.
 	_check("dot registered as level_w1_l1",
 		dots["w1_l1"].is_in_group(Reg.CONTROL_GROUP)
 		and str(dots["w1_l1"].get_meta(Reg.META_ID)) == "level_w1_l1")
-	_check("modal is its own MbUi screen",
+	_check("modal is its own UiDriver screen",
 		screen._detail_modal.is_in_group(Reg.GROUP)
 		and str(screen._detail_modal.get_meta(Reg.META_SCREEN)) == "story_level_detail")
 

@@ -18,7 +18,7 @@ const RemoteConfigS := preload("res://net/remote_config_client.gd")
 const ProgressClientS := preload("res://net/story_progress_client.gd")
 const Catalog := preload("res://story/story_catalog.gd")
 const Layout := preload("res://story/story_map_layout.gd")
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 ## Shared device safe-area math (preloaded, not the class_name global — see safe_area.gd).
 const SafeArea := preload("res://ui/safe_area.gd")
 
@@ -58,7 +58,7 @@ var _status: Label
 var _gate: Control          # connect-to-play panel (offline)
 var _overlay: Control       # level-result overlay
 
-# Level-detail modal (CanvasLayer; its own MbUi screen "story_level_detail").
+# Level-detail modal (CanvasLayer; its own UiDriver screen "story_level_detail").
 var _detail_modal: CanvasLayer
 var _detail_name: Label
 var _detail_status: Label
@@ -536,7 +536,7 @@ func _style_level_dot(b: Button, unlocked: bool, is_next: bool, stars: int) -> v
 # ── level-detail modal ─────────────────────────────────────────────────────────
 
 
-## A small centered modal (its own CanvasLayer + MbUi screen) showing the tapped
+## A small centered modal (its own CanvasLayer + UiDriver screen) showing the tapped
 ## level's name, lock status, stars, and a Play button. Built once, hidden until a
 ## dot is pressed; mirrors the settings_tab avatar-picker pattern.
 func _build_level_detail_modal() -> void:
@@ -600,7 +600,7 @@ func _build_level_detail_modal() -> void:
 	_detail_status.add_theme_color_override("font_color", MbStyle.DIM)
 	box.add_child(_detail_status)
 
-	_detail_play = Reg.button("play", box, "Play")  # MbUi: story_level_detail.play
+	_detail_play = Reg.button("play", box, "Play")  # UiDriver: story_level_detail.play
 	_detail_play.focus_mode = Control.FOCUS_NONE
 	_detail_play.custom_minimum_size = Vector2(0, 46)
 	_detail_play.add_theme_font_size_override("font_size", 20)

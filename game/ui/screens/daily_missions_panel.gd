@@ -6,11 +6,11 @@ extends CanvasLayer
 ## daily_missions block + the normalized active-quest array and EMITS claim intents;
 ## the owning DailySigil handles the network + currency feedback and re-renders.
 ##
-## MbUi: the layer is screen "daily" (so state().modal == "daily" while open); the
+## UiDriver: the layer is screen "daily" (so state().modal == "daily" while open); the
 ## mission list is a nested screen "missions" so each claim button registers as
 ## missions.<mission_name> and Claim All as missions.claim_all.
 
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 const Model := preload("res://ui/screens/daily_missions_model.gd")
 
 ## Icon glyphs live on the model (MbDailyMissions.ICON_GLYPHS) as the one source
@@ -35,7 +35,7 @@ func _ready() -> void:
 	layer = 20
 	visible = false
 	name = "DailyMissionsModal"
-	# Its own MbUi screen so the driver reports modal == "daily" while open.
+	# Its own UiDriver screen so the driver reports modal == "daily" while open.
 	Reg.screen(self, "daily")
 	_build()
 
@@ -67,7 +67,7 @@ func _build() -> void:
 	root.add_child(center)
 
 	_panel = PanelContainer.new()
-	# ~312px usable at a 360px surface (MbScreenScaffold's SIDE_PAD budget).
+	# ~312px usable at a 360px surface (UiScreenScaffold's SIDE_PAD budget).
 	_panel.custom_minimum_size = Vector2(312, 0)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = MbStyle.BOARD
@@ -91,7 +91,7 @@ func _build() -> void:
 	title.add_theme_font_size_override("font_size", 20)
 	title.add_theme_color_override("font_color", MbStyle.PRIMARY)
 	header.add_child(title)
-	var close_btn := Reg.button("close", header, "✕")  # MbUi: daily.close
+	var close_btn := Reg.button("close", header, "✕")  # UiDriver: daily.close
 	close_btn.focus_mode = Control.FOCUS_NONE
 	close_btn.add_theme_color_override("font_color", MbStyle.DIM)
 	close_btn.pressed.connect(close)
@@ -118,11 +118,11 @@ func _build() -> void:
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_list.add_theme_constant_override("separation", 10)
-	# Nested MbUi screen so cards' claim buttons namespace as missions.<name>.
+	# Nested UiDriver screen so cards' claim buttons namespace as missions.<name>.
 	Reg.screen(_list, "missions")
 	scroll.add_child(_list)
 
-	_claim_all_btn = Reg.button("claim_all", _list, "CLAIM ALL")  # MbUi: missions.claim_all
+	_claim_all_btn = Reg.button("claim_all", _list, "CLAIM ALL")  # UiDriver: missions.claim_all
 	_claim_all_btn.focus_mode = Control.FOCUS_NONE
 	_claim_all_btn.add_theme_color_override("font_color", MbStyle.HIGHLIGHT)
 	_claim_all_btn.visible = false
@@ -275,7 +275,7 @@ func _make_card(name: String, quest: Dictionary, is_anchor: bool) -> Control:
 	tail.add_child(reward)
 
 	if state == Model.CardState.CLAIMABLE:
-		var claim := Reg.button(name, tail, "CLAIM")  # MbUi: missions.<mission_name>
+		var claim := Reg.button(name, tail, "CLAIM")  # UiDriver: missions.<mission_name>
 		claim.focus_mode = Control.FOCUS_NONE
 		claim.add_theme_color_override("font_color", MbStyle.HIGHLIGHT)
 		claim.pressed.connect(func() -> void: claim_requested.emit(name))

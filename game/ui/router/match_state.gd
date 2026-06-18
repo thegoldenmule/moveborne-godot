@@ -1,4 +1,4 @@
-extends "res://ui/router/ui_state.gd"
+extends "res://addons/ui_kit/ui_state.gd"
 ## Pushes the existing match scene (scenes/main.tscn) as a full-screen takeover.
 ## The shell is suspended (cover + hidden) by the router before enter() runs, so
 ## enter() just mounts the match under black and reveals it.

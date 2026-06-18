@@ -1,11 +1,12 @@
+class_name UiState
 extends RefCounted
 ## One route/screen in the UiRouter stack. Lifecycle hooks are await-able: the
 ## router awaits enter()/exit()/suspend()/resume(), so a hook may run an async
 ## transition and the router will not proceed until it finishes.
 ##
-## No class_name (scene/presentation convention); subclasses use
-##   extends "res://ui/router/ui_state.gd"
-## and reference the UiRouter / GameState autoloads by name.
+## Subclasses either `extends UiState` (via this class_name) or
+##   extends "res://addons/ui_kit/ui_state.gd"
+## and reference the router autoload by name.
 ##
 ## Every base hook yields exactly one process frame, so a state that does no
 ## animation is still a valid coroutine (no REDUNDANT_AWAIT) and any nodes it added

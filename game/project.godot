@@ -22,8 +22,8 @@ Anim="*res://scenes/anim.gd"
 Quality="*res://scenes/quality.gd"
 MbDebug="*res://game/mcp_game_api.gd"
 GameState="*res://ui/game_state.gd"
-UiRouter="*res://ui/router/app_router.gd"
-MbUi="*res://game/mcp_ui_api.gd"
+UiRouter="*res://addons/ui_kit/ui_router.gd"
+UiDriver="*res://addons/ui_kit/ui_driver.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
@@ -37,7 +37,7 @@ window/handheld/orientation="portrait"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/artgen/plugin.cfg", "res://addons/daily_login_editor/plugin.cfg", "res://addons/daily_missions_editor/plugin.cfg", "res://addons/editor_tool_kit/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/remote_config_editor/plugin.cfg", "res://addons/story_map_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/artgen/plugin.cfg", "res://addons/daily_login_editor/plugin.cfg", "res://addons/daily_missions_editor/plugin.cfg", "res://addons/editor_tool_kit/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/remote_config_editor/plugin.cfg", "res://addons/story_map_editor/plugin.cfg", "res://addons/ui_kit/plugin.cfg")
 
 [physics]
 

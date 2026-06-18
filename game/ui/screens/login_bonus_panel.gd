@@ -7,10 +7,10 @@ extends CanvasLayer
 ## daily_login quest is claimable, and EMITS a single claim intent. The owning
 ## LoginBonus controller handles the network + reward ceremony and re-renders.
 ##
-## MbUi: the layer is screen "login_bonus" (so state().modal == "login_bonus" while
+## UiDriver: the layer is screen "login_bonus" (so state().modal == "login_bonus" while
 ## open); the claim button registers as login_bonus.claim, close as login_bonus.close.
 
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 const Model := preload("res://ui/screens/daily_login_model.gd")
 
 signal claim_requested()
@@ -31,7 +31,7 @@ func _ready() -> void:
 	layer = 20
 	visible = false
 	name = "LoginBonusModal"
-	# Its own MbUi screen so the driver reports modal == "login_bonus" while open.
+	# Its own UiDriver screen so the driver reports modal == "login_bonus" while open.
 	Reg.screen(self, "login_bonus")
 	_build()
 
@@ -86,7 +86,7 @@ func _build() -> void:
 	_title.add_theme_font_size_override("font_size", 20)
 	_title.add_theme_color_override("font_color", MbStyle.PRIMARY)
 	header.add_child(_title)
-	var close_btn := Reg.button("close", header, "✕")  # MbUi: login_bonus.close
+	var close_btn := Reg.button("close", header, "✕")  # UiDriver: login_bonus.close
 	close_btn.focus_mode = Control.FOCUS_NONE
 	close_btn.add_theme_color_override("font_color", MbStyle.DIM)
 	close_btn.pressed.connect(close)
@@ -103,7 +103,7 @@ func _build() -> void:
 	_footer.add_theme_color_override("font_color", MbStyle.DIM)
 	col.add_child(_footer)
 
-	_claim_btn = Reg.button("claim", col, "CLAIM TODAY'S BONUS")  # MbUi: login_bonus.claim
+	_claim_btn = Reg.button("claim", col, "CLAIM TODAY'S BONUS")  # UiDriver: login_bonus.claim
 	_claim_btn.focus_mode = Control.FOCUS_NONE
 	_claim_btn.add_theme_color_override("font_color", MbStyle.HIGHLIGHT)
 	_claim_btn.pressed.connect(func() -> void: claim_requested.emit())

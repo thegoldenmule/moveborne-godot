@@ -1,27 +1,28 @@
-class_name MbUiReg
+class_name UiReg
 extends RefCounted
 
-## MbUiReg — control registration for the MbUi MCP driver.
+## UiReg — control registration for the UiDriver automation layer.
 ##
 ## Registration is a BYPRODUCT OF CONSTRUCTION, not a separate bookkeeping step:
 ## screens build their actionable controls through these factories (or hand an
 ## existing .tscn / code node to `adopt`), and each control is recorded ON THE
-## LIVE TREE — an `mcp_id` meta on the control, plus the owning screen root joined
-## to the `mcp_screen` group with an `mcp_screen` id. Nothing here holds node
-## references, so the registry is self-cleaning: when a screen (e.g. the freed
-## match scene) leaves the tree its controls simply stop appearing.
+## LIVE TREE — a `ui_id` meta on the control, plus the owning screen root joined
+## to the `ui_screen` group with a `ui_screen` id. Nothing here holds node
+## references, so the registry is self-cleaning: when a screen (e.g. a freed match
+## scene) leaves the tree its controls simply stop appearing.
 ##
-## The MbUi driver (game/mcp_ui_api.gd) walks the `mcp_screen` group roots and
-## their `mcp_id` descendants to build its catalog. A control belongs to its
-## NEAREST screen-root ancestor, so a modal nested under another screen (the
-## avatar picker under Settings) forms its own screen.
+## The UiDriver (ui_driver.gd) walks the `ui_screen` group roots and their `ui_id`
+## descendants to build its catalog. A control belongs to its NEAREST screen-root
+## ancestor, so a modal nested under another screen (an avatar picker under
+## Settings) forms its own screen.
 ##
-## Pure static utility (the repo's `Mb*` convention); no Node/scene state.
+## Pure static utility; no Node/scene state. Part of the ui_kit addon
+## (github.com/thegoldenmule/godot-addons).
 
-const GROUP := "mcp_screen"        ## screen roots join this group
-const CONTROL_GROUP := "mcp_control" ## every registered control joins this group
-const META_ID := "mcp_id"          ## stamped on each actionable control
-const META_SCREEN := "mcp_screen"  ## stamped on each screen root
+const GROUP := "ui_screen"          ## screen roots join this group
+const CONTROL_GROUP := "ui_control" ## every registered control joins this group
+const META_ID := "ui_id"            ## stamped on each actionable control
+const META_SCREEN := "ui_screen"    ## stamped on each screen root
 
 
 ## Mark `root` as a screen named `id`. Its registered descendants are namespaced

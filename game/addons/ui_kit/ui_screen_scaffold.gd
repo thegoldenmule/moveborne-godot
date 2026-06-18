@@ -1,14 +1,16 @@
-class_name MbScreenScaffold
+class_name UiScreenScaffold
 extends MarginContainer
 
-## Shared layout frame for full-page tab screens (Settings, Leaderboard, and the
-## future Collection / Guilds). Gives every screen the SAME horizontal padding, a
-## centered maximum content width on wide displays, and consistent top/bottom
-## breathing room — so screens don't each reinvent (or forget) their margins.
+## Shared layout frame for full-page screens. Gives every screen the SAME
+## horizontal padding, a centered maximum content width on wide displays, and
+## consistent top/bottom breathing room — so screens don't each reinvent (or
+## forget) their margins.
 ##
 ## Usage: add one as a child of the screen root and put the screen's single
-## content node inside it; it fills its parent and pads the child. Home is
-## intentionally exempt — it has a bespoke centered hero layout.
+## content node inside it; it fills its parent and pads the child. Bespoke
+## hero/centered layouts can opt out by not using it.
+##
+## Part of the ui_kit addon (github.com/thegoldenmule/godot-addons).
 
 ## Content is capped to this logical width and centered once the screen is wider
 ## (tablets / aspect=expand); narrower phones just get SIDE_PAD on each edge.

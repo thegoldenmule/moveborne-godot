@@ -11,7 +11,7 @@ extends CanvasLayer
 ## fly the reward into the currency bar. Pure presentation logic lives in
 ## MbDailyMissions (daily_missions_model.gd); the network in MbQuestsClient.
 
-const Reg := preload("res://ui/mcp_ui_reg.gd")
+const Reg := preload("res://addons/ui_kit/ui_reg.gd")
 const Model := preload("res://ui/screens/daily_missions_model.gd")
 const PanelS := preload("res://ui/screens/daily_missions_panel.gd")
 const RemoteConfigS := preload("res://net/remote_config_client.gd")
@@ -84,7 +84,7 @@ func _build() -> void:
 	th.default_font = load(MbStyle.FONT_PATH)
 	th.default_font_size = 14
 	_root.theme = th
-	# This layer is the "home" MbUi screen for the sigil button (-> home.daily),
+	# This layer is the "home" UiDriver screen for the sigil button (-> home.daily),
 	# matching the open_daily_missions flow. (Distinct node from the Home tab.)
 	Reg.screen(self, "home")
 	add_child(_root)
@@ -95,7 +95,7 @@ func _build() -> void:
 	stack.add_theme_constant_override("separation", 2)
 	_root.add_child(stack)
 
-	_btn = Reg.button("daily", stack)  # MbUi: home.daily
+	_btn = Reg.button("daily", stack)  # UiDriver: home.daily
 	_btn.focus_mode = Control.FOCUS_NONE
 	_btn.custom_minimum_size = Vector2(SIGIL_SIZE, SIGIL_SIZE)
 	var sb := StyleBoxFlat.new()

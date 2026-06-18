@@ -78,9 +78,9 @@ Story Map (`game/ui/screens/story_map.gd`) is the worked example of what to avoi
 
 ## Verifying
 
-Check fit at the real surface, not a desktop-sized window. Run the game and confirm at 360 × 780, or drive the screen headless via the MbUi semantic UI driver (UI Control API (MbUi)). Because `aspect = expand` changes the height per device, also sanity-check a taller and a shorter aspect — a screen that only fits at exactly 780 will overflow on shorter phones.
+Check fit at the real surface, not a desktop-sized window. Run the game and confirm at 360 × 780, or drive the screen headless via the UiDriver semantic UI driver (UI Control API (UiDriver)). Because `aspect = expand` changes the height per device, also sanity-check a taller and a shorter aspect — a screen that only fits at exactly 780 will overflow on shorter phones.
 
-The reliable check is to read **geometry, not pixels**: drive to the screen with MbUi (`editor_manage game_eval` → `await MbUi.goto(...)`), then dump each control's `get_global_rect()` and assert none exceeds `(0,0)–(360,780)` or overlaps a sibling. A framebuffer screenshot can mislead — the game window doesn't redraw while unfocused, so it shows a stale frame — and because safe-area insets are 0 in the editor/desktop, **any overflow you see on the default surface is a width/height-budget bug, never a safe-area one**. (Worked example: the story map's world-selector row had a 260px-min label that, with its two arrows, summed to 368px and pushed the › button off a 360px screen — caught instantly by dumping rects, invisible to arithmetic.)
+The reliable check is to read **geometry, not pixels**: drive to the screen with UiDriver (`editor_manage game_eval` → `await UiDriver.goto(...)`), then dump each control's `get_global_rect()` and assert none exceeds `(0,0)–(360,780)` or overlaps a sibling. A framebuffer screenshot can mislead — the game window doesn't redraw while unfocused, so it shows a stale frame — and because safe-area insets are 0 in the editor/desktop, **any overflow you see on the default surface is a width/height-budget bug, never a safe-area one**. (Worked example: the story map's world-selector row had a 260px-min label that, with its two arrows, summed to 368px and pushed the › button off a 360px screen — caught instantly by dumping rects, invisible to arithmetic.)
 
 ## References
 _None._

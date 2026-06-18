@@ -3,7 +3,7 @@ extends SceneTree
 ## Headless Story-mode E2E against the LOCAL validator:
 ##   godot --headless --path game --script res://tools/verify_story_e2e.gd
 ##
-## Drives the REAL app (autoloads + shell + router + MbUi/MbDebug, no fakes):
+## Drives the REAL app (autoloads + shell + router + UiDriver/MbDebug, no fakes):
 ## home → story map (sign-in + catalog/progress fetch) → locked levels inert →
 ## play w1_l1 → re-register the fresh match against ws://localhost:5555 (the
 ## Hermes-emulation endpoint) → validated swipes → exit → the validator grades
@@ -81,7 +81,7 @@ func _run() -> void:
 	# Autoload singletons exist in the tree under --script runs, but their
 	# named globals do not resolve at compile time — fetch them dynamically.
 	_router = root.get_node_or_null("/root/UiRouter")
-	_ui = root.get_node_or_null("/root/MbUi")
+	_ui = root.get_node_or_null("/root/UiDriver")
 	_dbg = root.get_node_or_null("/root/MbDebug")
 	_gs = root.get_node_or_null("/root/GameState")
 	if _router == null or _ui == null or _dbg == null or _gs == null:
@@ -253,7 +253,7 @@ func _run() -> void:
 			# before the three PUTs complete).
 			_check("leaderboard flush consumed the result exactly once",
 				bool(result.get("lb_submitted", false)))
-			var shell = get_first_node_in_group("mcp_shell")
+			var shell = get_first_node_in_group("ui_nav_host")
 			var lb = shell.get_node_or_null("LeaderboardsClient") if shell != null else null
 			var auth = shell.get_node_or_null("SnapserAuth") if shell != null else null
 			var board_score := -1

@@ -1,4 +1,4 @@
-extends "res://ui/router/ui_state.gd"
+extends "res://addons/ui_kit/ui_state.gd"
 ## The persistent root state: owns app_shell.tscn (bottom nav + content host),
 ## instanced once into UiRouter.content_root. Tabs switch INSIDE the shell
 ## (a flat selector), so tab changes are NOT router pushes.
