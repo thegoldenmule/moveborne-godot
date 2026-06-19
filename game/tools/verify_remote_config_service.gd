@@ -5,9 +5,10 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/verify_remote_config_service.gd
 ## Covers the pure surface (build_document order/skip, versions, validate's
 ## missing-file / missing-version / duplicate-key / empty-manifest cases) driven
-## against a temp manifest, the real committed manifest aggregating both blocks,
-## and copy_publish_payload's validate gate. The check_sync shell-out (live bun)
-## is NOT exercised here. Writes only to a temp dir.
+## against a temp manifest, the real committed manifest (loaded via reload() →
+## res://remote_config_editor.config.json) aggregating the committed blocks, and
+## copy_publish_payload's validate gate. The check_sync shell-out (live bun) is NOT
+## exercised here. Writes only to a temp dir.
 
 const ServiceT := preload("res://addons/remote_config_editor/remote_config_service.gd")
 
@@ -34,7 +35,7 @@ func _run() -> void:
 		]}, "  "))
 	_write(tmp.path_join("alpha.json"), JSON.stringify({"v": 3, "x": 1}))
 	_write(tmp.path_join("beta.json"), JSON.stringify({"version": 0, "y": 2}))
-	svc.reload_from(tmp.path_join("manifest.json"), tmp)
+	svc.reload_from(tmp.path_join("manifest.json"), tmp, "validator/content")
 
 	var doc: Dictionary = svc.build_document()
 	_check("build_document keys in manifest order", doc.keys() == ["alpha", "beta"])
@@ -48,14 +49,14 @@ func _run() -> void:
 	# ── missing version field ───────────────────────────────────────────────────
 	_write(tmp.path_join("manifest.json"), JSON.stringify({"app_config_version": "v1", "entries": [
 		{"key": "alpha", "file": "alpha.json", "version_field": "nope", "label": "Alpha"}]}, "  "))
-	svc.reload_from(tmp.path_join("manifest.json"), tmp)
+	svc.reload_from(tmp.path_join("manifest.json"), tmp, "validator/content")
 	_check("validate flags a missing version field",
 		svc.validate().has("alpha: missing integer version field \"nope\""))
 
 	# ── missing content file ────────────────────────────────────────────────────
 	_write(tmp.path_join("manifest.json"), JSON.stringify({"app_config_version": "v1", "entries": [
 		{"key": "ghost", "file": "ghost.json", "version_field": "v", "label": "Ghost"}]}, "  "))
-	svc.reload_from(tmp.path_join("manifest.json"), tmp)
+	svc.reload_from(tmp.path_join("manifest.json"), tmp, "validator/content")
 	_check("validate flags a missing content file",
 		svc.validate().has("ghost: content file not found (validator/content/ghost.json)"))
 	_check("build_document skips a missing blob", svc.build_document().is_empty())
@@ -64,11 +65,11 @@ func _run() -> void:
 	_write(tmp.path_join("manifest.json"), JSON.stringify({"app_config_version": "v1", "entries": [
 		{"key": "alpha", "file": "alpha.json", "version_field": "v", "label": "A"},
 		{"key": "alpha", "file": "beta.json", "version_field": "version", "label": "B"}]}, "  "))
-	svc.reload_from(tmp.path_join("manifest.json"), tmp)
+	svc.reload_from(tmp.path_join("manifest.json"), tmp, "validator/content")
 	_check("validate flags a duplicate key", svc.validate().has("alpha: duplicate key in manifest"))
 
 	# ── missing manifest hard-fails (no fallback list) ──────────────────────────
-	svc.reload_from(tmp.path_join("does_not_exist.json"), tmp)
+	svc.reload_from(tmp.path_join("does_not_exist.json"), tmp, "validator/content")
 	_check("missing manifest -> build_document is empty", svc.build_document().is_empty())
 	_check("missing manifest -> validate reports it",
 		svc.validate().size() == 1 and str(svc.validate()[0]).begins_with("manifest missing or has no entries"))

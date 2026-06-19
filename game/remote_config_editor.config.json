@@ -1,0 +1,15 @@
+{
+  "root": "res://..",
+  "manifest": "validator/content/app_config.manifest.json",
+  "content_dir": "validator/content",
+
+  "doc_version_field": "app_config_version",
+  "document_label": "app-config document",
+  "publish_target": "the Snapser console App Config",
+
+  "sync": {
+    "program": "bun",
+    "args": ["{root}/validator/src/validator/tools/appconfig.ts", "verify", "--json"],
+    "hint": "cd validator && bun run appconfig:verify"
+  }
+}

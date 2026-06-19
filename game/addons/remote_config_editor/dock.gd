@@ -3,13 +3,16 @@ extends Control
 
 ## Bottom-panel dock for the Remote Config tool — a thin VIEW over
 ## RemoteConfigService. Shows the registry as a key / file / version / present
-## table, previews the WHOLE app-config/v1 document that will be published, copies
-## that full payload to the clipboard (a console paste can never drop a sibling
-## key), and runs Check Sync (per-key drift) via the generic appconfig.ts.
+## table, previews the WHOLE document that will be published, copies that full
+## payload to the clipboard (a console paste can never drop a sibling key), and —
+## when the consuming project configures a drift-check command — runs Check Sync
+## (per-key drift) via that one external comparator.
 ##
 ## All aggregation / validation / verify lives in the service (headless-testable);
-## the dock holds only control refs and re-renders on `changed`. The enforced
-## tool header (title + version + reload) is mounted by EditorToolPlugin.
+## the dock holds only control refs and re-renders on `changed`. Every label that
+## was once project-specific is pulled from the service's config, so the view is
+## game-agnostic. The enforced tool header (title + version + reload) is mounted by
+## EditorToolPlugin.
 
 const Ui := preload("res://addons/editor_tool_kit/editor_tool_ui.gd")
 const Pal := preload("res://addons/editor_tool_kit/tool_palette.gd")
@@ -24,12 +27,18 @@ var _status: Label
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(0, 480)
+	# Load config + data BEFORE building the UI so the layout can decide whether the
+	# drift-check section applies (a project may aggregate + copy with no live check).
+	if service != null:
+		service.reload()
 	_build_ui()
 	# Method callable (not a lambda): auto-disconnects when the dock frees, so a
 	# late signal can't fire into a freed view.
 	if service != null:
 		service.changed.connect(_on_service_changed)
-	_reload()
+	_refresh_table()
+	_refresh_preview()
+	_set_status()
 
 
 func _on_service_changed() -> void:
@@ -58,26 +67,38 @@ func _build_ui() -> void:
 	_table.set_column_title(1, "File")
 	_table.set_column_title(2, "Version")
 	_table.set_column_title(3, "Present")
-	var keys_section := Ui.section("App-config keys (validator/content/app_config.manifest.json)", _table, true)
+	var keys_section := Ui.section("Keys (%s)" % _manifest_caption(), _table, true)
 	keys_section.size_flags_stretch_ratio = 0.4   # start compact; the preview gets the rest
 	split.add_child(keys_section)
 
 	_preview = TextEdit.new()
 	_preview.editable = false
 	_preview.custom_minimum_size = Vector2(0, 120)
-	split.add_child(Ui.section("Publish payload — the WHOLE app-config document", _preview, true))
+	split.add_child(Ui.section("Publish payload — the WHOLE %s" % service.document_label(), _preview, true))
 
-	root.add_child(Ui.button_bar([
+	var buttons := [
 		Ui.button("Reload", _reload),
 		Ui.button("Copy publish payload", _on_copy),
-		Ui.button("Check sync", _on_check_sync),
-	]))
+	]
+	# The drift-check button + section only exist when a sync command is configured.
+	if service.has_sync():
+		buttons.append(Ui.button("Check sync", _on_check_sync))
+	root.add_child(Ui.button_bar(buttons))
 
-	_sync = Ui.status_label()
-	root.add_child(Ui.section("Sync (live ⇄ committed)", _sync))
+	if service.has_sync():
+		_sync = Ui.status_label()
+		root.add_child(Ui.section("Sync (live ⇄ committed)", _sync))
 
 	_status = Ui.status_label()
 	root.add_child(_status)
+
+
+## The manifest path shown in the keys-section caption (config-driven), or a prompt
+## to author a config when none exists yet.
+func _manifest_caption() -> String:
+	if not service.is_configured():
+		return "not configured"
+	return str(service.config.get("manifest", ""))
 
 
 # ── data ───────────────────────────────────────────────────────────────────────
@@ -85,13 +106,25 @@ func _build_ui() -> void:
 
 func _reload() -> void:
 	service.reload()   # emits `changed`; _on_service_changed rebuilds the view
+	_set_status()
+
+
+## Status line: a configure-me prompt on a fresh install, else a load summary.
+func _set_status() -> void:
+	if _status == null:
+		return
+	if not service.is_configured():
+		_status.text = "No %s found — create one at res://%s (see config.example.json in this addon)." % [
+			"config", RemoteConfigService.CONFIG_PATH.trim_prefix("res://")]
+		return
 	var v := str(service.app_config_version())
 	if service.validate().is_empty():
-		_status.text = "Loaded manifest (app-config/%s) — %d block(s), ready to publish." % [
+		_status.text = "Loaded manifest (%s) — %d block(s), ready to publish." % [
 			v, service.versions().size()]
 	else:
-		_status.text = "Loaded manifest (app-config/%s) — see Sync for problems before publishing." % v
-	_sync.text = "Run Check sync to compare the live Remote Config to the committed blobs."
+		_status.text = "Loaded manifest (%s) — fix the problems below before publishing." % v
+	if _sync != null:
+		_sync.text = "Run Check sync to compare the live config to the committed blobs."
 
 
 func _refresh_table() -> void:
@@ -112,7 +145,9 @@ func _refresh_table() -> void:
 func _refresh_preview() -> void:
 	if _preview == null:
 		return
-	_preview.text = JSON.stringify(service.build_document(), "  ")
+	# The verbatim raw-blob splice — what Copy puts on the clipboard — so the operator
+	# previews the exact bytes (numbers intact), not a float-coerced re-serialization.
+	_preview.text = service.build_document_text()
 
 
 # ── actions ──────────────────────────────────────────────────────────────────--
@@ -123,20 +158,24 @@ func _on_copy() -> void:
 	if not r.get("ok", false):
 		_status.text = "Not copied — fix these first:\n- " + str(r.get("error", "")).replace("\n", "\n- ")
 		return
-	_status.text = "Copied the full app-config document (%d key(s), %d bytes) — paste into the Snapser console App Config, version %s." % [
-		int(r.get("count", 0)), int(r.get("bytes", 0)), str(service.app_config_version())]
+	_status.text = "Copied the full %s (%d key(s), %d bytes) — paste into %s, version %s." % [
+		service.document_label(), int(r.get("count", 0)), int(r.get("bytes", 0)),
+		service.publish_target(), str(service.app_config_version())]
 
 
 func _on_check_sync() -> void:
-	_sync.text = "Checking live Remote Config…"
+	if _sync == null:
+		return
+	_sync.text = "Checking live config…"
 	var r: Dictionary = service.check_sync()
 	if int(r.get("code", -1)) == -1:
-		_sync.text = "Could not run bun. In a terminal: `cd validator && bun run appconfig:verify`"
+		var hint := str(service.sync_hint())
+		_sync.text = "Could not run the sync command." + (("\nTry: " + hint) if hint != "" else "")
 		return
 	var results: Array = r.get("results", [])
 	if results.is_empty():
 		var why: String = str(r.get("error", ""))
-		_sync.text = "Could not verify (exit %d)%s — is the snap provisioned and app-config published?\n%s" % [
+		_sync.text = "Could not verify (exit %d)%s — is the backend reachable and the config published?\n%s" % [
 			int(r.get("code", 0)), (" — " + why) if why != "" else "", str(r.get("text", ""))]
 		return
 	var lines: Array = []
@@ -150,7 +189,7 @@ func _on_check_sync() -> void:
 				lines.append("✗ %s — DRIFT (live v%s / committed v%s)" % [
 					key, str((res as Dictionary).get("live_version", "?")), str((res as Dictionary).get("committed_version", "?"))])
 			"absent":
-				lines.append("✗ %s — ABSENT from the live app-config" % key)
+				lines.append("✗ %s — ABSENT from the live config" % key)
 			_:
 				lines.append("? %s — %s" % [key, st])
 	var ok := bool(r.get("ok", false))
