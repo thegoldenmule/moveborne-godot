@@ -258,14 +258,16 @@ func _run() -> void:
 	# project-relative addon path; deeper nesting and non-addon files are dropped.
 	ok = _check(ok, RunnerT._archive_rel("addons/editor_tool_kit/plugin.gd")
 		== "addons/editor_tool_kit/plugin.gd", "_archive_rel keeps a direct addon path")
-	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/addons/editor_tool_kit/plugin.gd")
+	ok = _check(ok, RunnerT._archive_rel("godot-addons-main/addons/editor_tool_kit/plugin.gd")
 		== "addons/editor_tool_kit/plugin.gd", "_archive_rel strips the single archive wrapper")
-	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/addons/editor_tool_kit/update_service.gd.uid")
+	ok = _check(ok, RunnerT._archive_rel("godot-addons-main/addons/editor_tool_kit/update_service.gd.uid")
 		== "addons/editor_tool_kit/update_service.gd.uid", "_archive_rel maps .uid files too")
-	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/templates/addons/editor_tool_kit/x.gd")
+	ok = _check(ok, RunnerT._archive_rel("godot-addons-main/templates/addons/editor_tool_kit/x.gd")
 		== "", "_archive_rel rejects a deeper-nested copy (review finding #5)")
-	ok = _check(ok, RunnerT._archive_rel("godot-editor-tk-main/README.md") == "",
+	ok = _check(ok, RunnerT._archive_rel("godot-addons-main/README.md") == "",
 		"_archive_rel drops non-addon files")
+	ok = _check(ok, RunnerT._archive_rel("godot-addons-main/addons/ui_kit/plugin.gd") == "",
+		"_archive_rel drops a SIBLING addon — editor_tool_kit's update never touches ui_kit (multi-addon repo safety)")
 	ok = _check(ok, RunnerT._is_safe("addons/editor_tool_kit/plugin.gd"),
 		"_is_safe accepts a normal addon path")
 	ok = _check(ok, not RunnerT._is_safe("addons/editor_tool_kit/../../../evil.gd"),
