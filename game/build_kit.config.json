@@ -1,9 +1,6 @@
 {
 	"ios": {
-		"preset": "iOS",
-		"build_number": 2,
-		"asc_key_id": "",
-		"asc_issuer_id": "",
-		"asc_key_path": ""
+		"build_number": 3,
+		"preset": "iOS"
 	}
 }
