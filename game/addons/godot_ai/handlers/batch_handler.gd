@@ -7,7 +7,34 @@ const ErrorCodes := preload("res://addons/godot_ai/utils/error_codes.gd")
 ## semantics. When undo=true (default), any successful sub-commands are rolled
 ## back via the scene's UndoRedo history if a later sub-command fails.
 
-const FORBIDDEN_SUBCOMMANDS := ["batch_execute"]
+## Commands that cannot run as batch sub-commands, each with the reason a batch
+## can't host it.
+## - batch_execute: would recurse.
+## - run_tests: a batch executes synchronously inside one dispatcher tick with
+##   NO transport servicing, so a full suite starves the WebSocket heartbeat
+##   (the exact disconnect the serviced test_run path exists to prevent) and
+##   the Python batch handler only allows 30s anyway — call the test_run tool
+##   directly.
+## - game_command: it is deferred — its reply flows out-of-band correlated by a
+##   _request_id that dispatch_direct deliberately strips (see
+##   McpDispatcher.dispatch_direct), so a game op nested in a batch would have
+##   no completion channel and hang or lose its reply. input_sequence made this
+##   concrete (#814); the whole game_command surface shares the deferred path.
+const FORBIDDEN_SUBCOMMANDS := {
+	"batch_execute": "batch_execute cannot be nested inside another batch",
+	"run_tests":
+		"run_tests is not allowed as a sub-command — a batch runs synchronously "
+		+ "with no transport servicing; call the test_run tool directly",
+	"game_command":
+		"game_command ops are deferred (their reply arrives out-of-band) and "
+		+ "have no completion channel inside a batch — run them as their own tool call",
+}
+
+## The whole batch executes synchronously inside one dispatcher tick,
+## outside the 4ms frame budget — an unbounded array freezes the editor
+## for the batch's full duration. 500 is far above any legitimate scene
+## edit while keeping worst-case stalls in check.
+const MAX_BATCH_COMMANDS := 500
 
 var _dispatcher: McpDispatcher
 var _undo_redo: EditorUndoRedoManager
@@ -24,6 +51,11 @@ func batch_execute(params: Dictionary) -> Dictionary:
 		return ErrorCodes.make(ErrorCodes.WRONG_TYPE, "commands must be a list")
 	if commands.is_empty():
 		return ErrorCodes.make(ErrorCodes.MISSING_REQUIRED_PARAM, "commands must not be empty")
+	if commands.size() > MAX_BATCH_COMMANDS:
+		return ErrorCodes.make(
+			ErrorCodes.VALUE_OUT_OF_RANGE,
+			"commands exceeds the %d-command batch cap (got %d) — split into multiple batches" % [MAX_BATCH_COMMANDS, commands.size()]
+		)
 
 	var undo: bool = params.get("undo", true)
 
@@ -34,10 +66,17 @@ func batch_execute(params: Dictionary) -> Dictionary:
 		var cmd_name: String = item.get("command", "")
 		if cmd_name.is_empty():
 			return ErrorCodes.make(ErrorCodes.MISSING_REQUIRED_PARAM, "commands[%d] missing 'command' field" % idx)
-		if cmd_name in FORBIDDEN_SUBCOMMANDS:
-			return ErrorCodes.make(ErrorCodes.VALUE_OUT_OF_RANGE, "commands[%d]: '%s' is not allowed as a sub-command" % [idx, cmd_name])
+		if FORBIDDEN_SUBCOMMANDS.has(cmd_name):
+			return ErrorCodes.make(ErrorCodes.VALUE_OUT_OF_RANGE,
+				"commands[%d]: %s" % [idx, FORBIDDEN_SUBCOMMANDS[cmd_name]])
 		if not _dispatcher.has_command(cmd_name):
 			return _unknown_command_error(idx, cmd_name)
+		## Pre-validate params type: the execution loop's typed Dictionary
+		## local would hard-error on a non-dict mid-batch, aborting AFTER
+		## earlier mutations committed. Catching it here keeps the
+		## all-or-nothing contract for malformed input.
+		if typeof(item.get("params", {})) != TYPE_DICTIONARY:
+			return ErrorCodes.make(ErrorCodes.WRONG_TYPE, "commands[%d].params must be a dict" % idx)
 
 	var results: Array = []
 	var succeeded := 0
