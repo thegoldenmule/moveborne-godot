@@ -9,3 +9,4 @@ art/generated/.thumbs/
 
 # Client build artifacts
 build/
+*.p8
