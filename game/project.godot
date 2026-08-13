@@ -33,7 +33,7 @@ window/size/viewport_height=1560
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/stretch/scale=2.0
-window/handheld/orientation="portrait"
+window/handheld/orientation=1
 
 [editor_plugins]
 
