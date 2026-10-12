@@ -2,7 +2,7 @@
 extends McpTestSuite
 
 ## MbQuestsClient pure helpers: URL/body construction against the Quests swagger
-## (snapser-docs/swagger/quests.swagger3.json), response parsing with the *_64
+## (snapser-docs plugin swagger/quests.swagger3.json), response parsing with the *_64
 ## int64-as-string convention + JSON int/float ambiguity, the claim-grant parse,
 ## and the claimable predicate. No network — the live snap is covered by a gateway
 ## e2e pass, like the leaderboards/profile clients.

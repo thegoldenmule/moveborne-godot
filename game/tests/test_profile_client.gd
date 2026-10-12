@@ -2,7 +2,7 @@
 extends McpTestSuite
 
 ## MbProfileClient pure helpers: URL/body construction against the Profiles
-## swagger (snapser-docs/swagger/profiles.swagger3.json), response parsing,
+## swagger (snapser-docs plugin swagger/profiles.swagger3.json), response parsing,
 ## display-name sanitization/validation, plus the avatar catalog and the
 ## canonical-handle resolution. No network — the live snap is covered by the
 ## gateway smoke / e2e passes once it is provisioned on the snapend.

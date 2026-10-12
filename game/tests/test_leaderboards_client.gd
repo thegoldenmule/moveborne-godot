@@ -2,7 +2,7 @@
 extends McpTestSuite
 
 ## MbLeaderboardsClient pure helpers: URL/body construction against the swagger
-## (snapser-docs/swagger/leaderboards.swagger3.json), response parsing with JSON
+## (snapser-docs plugin swagger/leaderboards.swagger3.json), response parsing with JSON
 ## int/float ambiguity, and the post-match submission gate. No network — the
 ## live snap is covered by the gateway smoke + e2e passes.
 

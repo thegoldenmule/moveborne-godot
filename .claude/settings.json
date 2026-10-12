@@ -1,5 +1,14 @@
 {
   "enabledPlugins": {
-    "hotseat@hotseat": true
+    "hotseat@hotseat": true,
+    "snapser-docs@thegoldenmule-snapser": true
+  },
+  "extraKnownMarketplaces": {
+    "thegoldenmule-snapser": {
+      "source": {
+        "source": "github",
+        "repo": "thegoldenmule/snapser-docs"
+      }
+    }
   }
 }

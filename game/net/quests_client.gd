@@ -13,7 +13,7 @@ extends Node
 ## is currency granted server-side by the Quests snap; the client reflects it via
 ## GameState.merge_currencies (Inventory is read-only here, like inventory_client.gd).
 ##
-## Endpoints + verbs match snapser-docs/swagger/quests.swagger3.json. Quest
+## Endpoints + verbs match snapser-docs plugin swagger/quests.swagger3.json. Quest
 ## state/rewards are ACCOUNT data — NOT part of SynchronizedGameState, never hashed.
 
 const BASE := MbSnapserAuth.GATEWAY + "/v1/quests"

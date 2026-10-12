@@ -13,7 +13,6 @@ Godot 4.6 port of the originally TypeScript/PixiJS client. The top-level directo
 | `game/` | The Godot 4.6 (GDScript) game client + pure rules engine | Godot 4.6.3 |
 | `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + gRPC (protos in `validator/protos/`) |
 | `wiki/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
-| `snapser-docs/` | Vendored Snapser platform docs + swagger (reference only, not built) | — |
 | `art/` | Source art (`MoveBorne.psd`), extracted renders (`extracted/`), and the visual style guide | — |
 
 ## The one idea everything rests on
@@ -38,6 +37,7 @@ Don't restate the architecture here — read the canonical pages:
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
 | Deploying the validator BYOSnap (publish → sync → manifest, gotchas, Remote Config prerequisite) | `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md` |
+| Snapser platform docs, snap swaggers, release notes (not vendored here) | the `snapser-docs` skill — plugin `snapser-docs@thegoldenmule-snapser` from the private repo `thegoldenmule/snapser-docs`, enabled in `.claude/settings.json` |
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
 | Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
 
