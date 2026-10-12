@@ -1,4 +1,4 @@
-# Feature: Story Map — progressive level dots on a textured path
+# Story Map — progressive level dots on a textured path
 
 **Status:** shipped
 

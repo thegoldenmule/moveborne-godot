@@ -1,8 +1,9 @@
-# ADR-13: Two-tier game state — local vs synchronized
+# Two-tier game state — local vs synchronized
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-13
 - **Date:** 2026-06-03
 - **Scope:** Client / Match Controller / Presentation
 - **Deciders:** Benjamin Jordan

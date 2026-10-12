@@ -1,4 +1,4 @@
-# Feature: Virtual Currency — Coins, Souls, Gems
+# Virtual Currency — Coins, Souls, Gems
 
 **Status:** shipped
 

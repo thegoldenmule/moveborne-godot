@@ -1,8 +1,9 @@
-# ADR-18: Script-driven multi-platform export; commit presets, defer CI
+# Script-driven multi-platform export; commit presets, defer CI
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-18
 - **Date:** 2026-06-11
 - **Scope:** Client / Build & Distribution
 - **Deciders:** Benjamin Jordan

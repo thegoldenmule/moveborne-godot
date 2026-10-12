@@ -1,8 +1,9 @@
-# ADR-15: Fun-first — test the deterministic core, verify the game by playing it
+# Fun-first — test the deterministic core, verify the game by playing it
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-15
 - **Date:** 2026-06-03
 - **Scope:** Project / Testing
 - **Deciders:** Benjamin Jordan

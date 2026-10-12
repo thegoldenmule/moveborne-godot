@@ -1,4 +1,4 @@
-# Feature: Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper
+# Story catalog from Remote Config — single committed source, validator pulls at runtime, editor sync/publish helper
 
 **Status:** shipped
 

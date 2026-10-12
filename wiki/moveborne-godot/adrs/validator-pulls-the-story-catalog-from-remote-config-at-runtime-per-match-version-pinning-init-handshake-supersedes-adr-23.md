@@ -1,8 +1,9 @@
-# ADR-25: Validator pulls the story catalog from Remote Config at runtime; per-match version pinning + init handshake (supersedes ADR-23)
+# Validator pulls the story catalog from Remote Config at runtime; per-match version pinning + init handshake (supersedes ADR-23)
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-25
 - **Date:** 2026-06-16
 - **Scope:** content pipeline (validator, Remote Config, game client)
 - **Deciders:** Benjamin Jordan

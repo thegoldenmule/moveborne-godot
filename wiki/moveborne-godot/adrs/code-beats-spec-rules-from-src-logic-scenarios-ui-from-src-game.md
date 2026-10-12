@@ -1,8 +1,9 @@
-# ADR-11: Code beats spec; rules from src/logic, scenarios/UI from src/game
+# Code beats spec; rules from src/logic, scenarios/UI from src/game
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-11
 - **Date:** 2026-06-03
 - **Scope:** Project / Source of truth
 - **Deciders:** Benjamin Jordan

@@ -1,4 +1,4 @@
-# Feature: ArtGen — Recraft v4.1 Support (service, MCP, Godot editor)
+# ArtGen — Recraft v4.1 Support (service, MCP, Godot editor)
 
 **Status:** shipped
 

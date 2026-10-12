@@ -1,8 +1,9 @@
-# ADR-6: Mirror JS mutation semantics via GDScript references + shallow duplicate
+# Mirror JS mutation semantics via GDScript references + shallow duplicate
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-6
 - **Date:** 2026-06-03
 - **Scope:** Client / Rules Engine
 - **Deciders:** Benjamin Jordan

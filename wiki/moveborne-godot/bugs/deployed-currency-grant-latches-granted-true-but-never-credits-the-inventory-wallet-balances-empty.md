@@ -1,4 +1,4 @@
-# Bug: Deployed currency grant latches granted=true but never credits the Inventory wallet (balances empty)
+# Deployed currency grant latches granted=true but never credits the Inventory wallet (balances empty)
 
 **Status:** closed
 

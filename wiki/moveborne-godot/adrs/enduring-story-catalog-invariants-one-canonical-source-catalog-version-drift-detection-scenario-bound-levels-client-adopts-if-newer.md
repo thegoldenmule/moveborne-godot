@@ -1,8 +1,9 @@
-# ADR-26: Enduring story-catalog invariants: one canonical source, catalog_version drift detection, scenario-bound levels, client adopts-if-newer
+# Enduring story-catalog invariants: one canonical source, catalog_version drift detection, scenario-bound levels, client adopts-if-newer
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-26
 - **Date:** 2026-06-16
 - **Scope:** content pipeline (validator, Remote Config, game client)
 - **Deciders:** Benjamin Jordan

@@ -1,8 +1,9 @@
-# ADR-5: Game state as an untyped Dictionary mirror of SynchronizedGameState
+# Game state as an untyped Dictionary mirror of SynchronizedGameState
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-5
 - **Date:** 2026-06-03
 - **Scope:** Client / Rules Engine
 - **Deciders:** Benjamin Jordan

@@ -1,8 +1,9 @@
-# ADR-22: Story grading is validator-authoritative, post-match, and outside the hash domain
+# Story grading is validator-authoritative, post-match, and outside the hash domain
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-22
 - **Date:** 2026-06-12
 - **Scope:** validator + game client (story mode)
 - **Deciders:** Benjamin Jordan

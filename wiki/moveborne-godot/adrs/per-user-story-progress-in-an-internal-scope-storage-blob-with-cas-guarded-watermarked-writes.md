@@ -1,8 +1,9 @@
-# ADR-24: Per-user story progress in an internal-scope Storage blob with cas-guarded, watermarked writes
+# Per-user story progress in an internal-scope Storage blob with cas-guarded, watermarked writes
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-24
 - **Date:** 2026-06-12
 - **Scope:** validator + Snapser platform (durable per-user state)
 - **Deciders:** Benjamin Jordan

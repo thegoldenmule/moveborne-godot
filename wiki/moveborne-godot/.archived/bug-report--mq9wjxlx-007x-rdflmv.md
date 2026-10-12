@@ -1,4 +1,4 @@
-# Bug: IncrementUserCurrency accepts plain user auth — any logged-in client can self-grant currency through the gateway
+# IncrementUserCurrency accepts plain user auth — any logged-in client can self-grant currency through the gateway
 
 **Status:** draft
 

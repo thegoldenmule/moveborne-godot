@@ -1,4 +1,4 @@
-# Feature: Story Mode — worlds, level maps, star goals & progression
+# Story Mode — worlds, level maps, star goals & progression
 
 **Status:** shipped
 

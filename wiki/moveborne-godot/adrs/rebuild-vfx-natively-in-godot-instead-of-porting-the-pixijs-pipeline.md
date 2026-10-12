@@ -1,8 +1,9 @@
-# ADR-9: Rebuild VFX natively in Godot instead of porting the PixiJS pipeline
+# Rebuild VFX natively in Godot instead of porting the PixiJS pipeline
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-9
 - **Date:** 2026-06-03
 - **Scope:** Client / Presentation & VFX
 - **Deciders:** Benjamin Jordan

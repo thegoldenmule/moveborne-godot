@@ -1,4 +1,4 @@
-# Feature: ArtGen — Recraft Asset Generation
+# ArtGen — Recraft Asset Generation
 
 **Status:** shipped
 

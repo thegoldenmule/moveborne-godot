@@ -1,8 +1,9 @@
-# ADR-16: Adopt Snapser as the online backend, replacing Nakama
+# Adopt Snapser as the online backend, replacing Nakama
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-16
 - **Date:** 2026-06-09
 - **Scope:** Client / Server / Networking / Deployment
 - **Deciders:** Benjamin Jordan

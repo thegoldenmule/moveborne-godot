@@ -1,4 +1,4 @@
-# Feature: Player Profile &amp; Settings Screen
+# Player Profile &amp; Settings Screen
 
 **Status:** shipped
 

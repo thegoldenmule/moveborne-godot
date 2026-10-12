@@ -1,4 +1,4 @@
-# Feature: Validator gRPC refactor: protobuf API, Godot bindings, Hermes transport
+# Validator gRPC refactor: protobuf API, Godot bindings, Hermes transport
 
 **Status:** shipped
 

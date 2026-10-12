@@ -1,8 +1,9 @@
-# ADR-1: Byte-for-byte determinism parity with the canonical TS engine
+# Byte-for-byte determinism parity with the canonical TS engine
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-1
 - **Date:** 2026-06-03
 - **Scope:** Client / Rules Engine / Determinism Primitives
 - **Deciders:** Benjamin Jordan

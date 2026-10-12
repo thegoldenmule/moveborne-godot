@@ -1,8 +1,9 @@
-# ADR-10: GL Compatibility renderer over Forward+/Forward Mobile
+# GL Compatibility renderer over Forward+/Forward Mobile
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-10
 - **Date:** 2026-06-04
 - **Scope:** Client / Rendering
 - **Deciders:** Benjamin Jordan

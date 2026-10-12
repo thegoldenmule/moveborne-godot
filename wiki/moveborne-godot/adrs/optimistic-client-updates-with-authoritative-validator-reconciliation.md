@@ -1,8 +1,9 @@
-# ADR-2: Optimistic client updates with authoritative validator reconciliation
+# Optimistic client updates with authoritative validator reconciliation
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-2
 - **Date:** 2026-06-03
 - **Scope:** Client / Match Controller / Validator Client
 - **Deciders:** Benjamin Jordan

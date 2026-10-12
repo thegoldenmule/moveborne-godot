@@ -1,8 +1,9 @@
-# ADR-17: Authenticate BYOSnap requests by trusting gateway-stamped User-Id, not signatures
+# Authenticate BYOSnap requests by trusting gateway-stamped User-Id, not signatures
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-17
 - **Date:** 2026-06-09
 - **Scope:** Server / Validator / Auth
 - **Deciders:** Benjamin Jordan

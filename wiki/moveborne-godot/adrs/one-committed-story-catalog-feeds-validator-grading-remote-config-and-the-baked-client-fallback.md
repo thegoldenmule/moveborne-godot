@@ -1,8 +1,9 @@
-# ADR-23: One committed story catalog feeds validator grading, Remote Config, and the baked client fallback
+# One committed story catalog feeds validator grading, Remote Config, and the baked client fallback
 
 **Status:** superseded
 
 ## Metadata
+- **Number:** ADR-23
 - **Date:** 2026-06-12
 - **Scope:** content pipeline (validator, Remote Config, game client)
 - **Deciders:** Benjamin Jordan

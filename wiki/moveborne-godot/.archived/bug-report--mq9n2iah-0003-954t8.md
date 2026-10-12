@@ -1,4 +1,4 @@
-# Bug: Web build can't connect to validator: gateway rejects header-less WebSocket upgrade
+# Web build can't connect to validator: gateway rejects header-less WebSocket upgrade
 
 **Status:** open
 

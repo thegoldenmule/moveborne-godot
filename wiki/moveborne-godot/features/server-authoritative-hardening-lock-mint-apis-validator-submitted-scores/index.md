@@ -1,4 +1,4 @@
-# Feature: Server-authoritative hardening — lock mint APIs + validator-submitted scores
+# Server-authoritative hardening — lock mint APIs + validator-submitted scores
 
 **Status:** draft
 

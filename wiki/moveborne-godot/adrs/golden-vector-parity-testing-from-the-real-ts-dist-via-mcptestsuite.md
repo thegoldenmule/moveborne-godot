@@ -1,8 +1,9 @@
-# ADR-8: Golden-vector parity testing from the real TS dist via McpTestSuite
+# Golden-vector parity testing from the real TS dist via McpTestSuite
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-8
 - **Date:** 2026-06-03
 - **Scope:** Client / Testing
 - **Deciders:** Benjamin Jordan

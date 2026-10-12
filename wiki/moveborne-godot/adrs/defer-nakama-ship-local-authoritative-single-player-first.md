@@ -1,8 +1,9 @@
-# ADR-4: Defer Nakama; ship local-authoritative single-player first
+# Defer Nakama; ship local-authoritative single-player first
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-4
 - **Date:** 2026-06-03
 - **Scope:** Client / Server / Networking
 - **Deciders:** Benjamin Jordan

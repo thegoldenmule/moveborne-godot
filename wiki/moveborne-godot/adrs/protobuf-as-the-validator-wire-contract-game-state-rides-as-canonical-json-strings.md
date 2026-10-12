@@ -1,8 +1,9 @@
-# ADR-19: Protobuf as the validator wire contract; game state rides as canonical-JSON strings
+# Protobuf as the validator wire contract; game state rides as canonical-JSON strings
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-19
 - **Date:** 2026-06-11
 - **Scope:** Validator / Networking / Determinism
 - **Deciders:** Benjamin Jordan

@@ -1,4 +1,4 @@
-# Feature: Shared editor-tool styling (occult-arcade theme)
+# Shared editor-tool styling (occult-arcade theme)
 
 **Status:** shipped
 

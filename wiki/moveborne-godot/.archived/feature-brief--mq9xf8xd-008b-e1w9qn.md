@@ -1,4 +1,4 @@
-# Feature: Daily Missions
+# Daily Missions
 
 **Status:** shipped
 

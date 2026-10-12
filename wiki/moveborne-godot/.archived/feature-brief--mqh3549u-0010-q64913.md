@@ -1,4 +1,4 @@
-# Feature: Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)
+# Editor Tool Framework — shared base for in-editor authoring tools (migrate ArtGen + Story Map)
 
 **Status:** shipped
 

@@ -1,4 +1,4 @@
-# Feature: Leaderboards — Daily, Weekly, Monthly (Global)
+# Leaderboards — Daily, Weekly, Monthly (Global)
 
 **Status:** shipped
 

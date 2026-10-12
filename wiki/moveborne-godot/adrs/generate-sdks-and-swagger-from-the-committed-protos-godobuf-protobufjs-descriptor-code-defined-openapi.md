@@ -1,8 +1,9 @@
-# ADR-21: Generate SDKs and swagger from the committed protos (godobuf, protobufjs descriptor, code-defined OpenAPI)
+# Generate SDKs and swagger from the committed protos (godobuf, protobufjs descriptor, code-defined OpenAPI)
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-21
 - **Date:** 2026-06-11
 - **Scope:** Validator / Client / Build & Tooling / Deployment
 - **Deciders:** Benjamin Jordan

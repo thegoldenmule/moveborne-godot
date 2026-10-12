@@ -1,8 +1,9 @@
-# ADR-12: Design the game to be driven and verified by an LLM
+# Design the game to be driven and verified by an LLM
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-12
 - **Date:** 2026-06-03
 - **Scope:** Project / Client / Tooling
 - **Deciders:** Benjamin Jordan

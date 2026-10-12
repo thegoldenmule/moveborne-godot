@@ -1,4 +1,4 @@
-# Feature: Meta-Game BYOSnap — Go service scaffold
+# Meta-Game BYOSnap — Go service scaffold
 
 **Status:** shipped
 

@@ -1,8 +1,9 @@
-# ADR-20: gRPC over Snapser Hermes as the validator transport, replacing HTTP-init + Socket.IO
+# gRPC over Snapser Hermes as the validator transport, replacing HTTP-init + Socket.IO
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-20
 - **Date:** 2026-06-11
 - **Scope:** Validator / Networking / Deployment / Client
 - **Deciders:** Benjamin Jordan

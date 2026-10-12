@@ -1,8 +1,9 @@
-# ADR-7: Pure logic as static class_name utilities, not autoloads
+# Pure logic as static class_name utilities, not autoloads
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-7
 - **Date:** 2026-06-03
 - **Scope:** Client / Determinism Primitives / Rules Engine
 - **Deciders:** Benjamin Jordan

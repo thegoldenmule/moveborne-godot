@@ -1,4 +1,4 @@
-# Feature: App Shell & UI Router
+# App Shell & UI Router
 
 **Status:** shipped
 

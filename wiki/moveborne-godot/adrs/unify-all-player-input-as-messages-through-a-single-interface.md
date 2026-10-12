@@ -1,8 +1,9 @@
-# ADR-14: Unify all player input as messages through a single interface
+# Unify all player input as messages through a single interface
 
 **Status:** accepted
 
 ## Metadata
+- **Number:** ADR-14
 - **Date:** 2026-06-03
 - **Scope:** Client / Match Controller / Networking
 - **Deciders:** Benjamin Jordan
