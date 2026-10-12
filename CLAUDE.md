@@ -37,7 +37,7 @@ Don't restate the architecture here — read the canonical pages:
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
 | Deploying the validator BYOSnap (publish → sync → manifest, gotchas, Remote Config prerequisite) | `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md` |
-| Snapser platform docs, snap swaggers, release notes (not vendored here) | the `snapser-docs` skill — plugin `snapser-docs@thegoldenmule-snapser` from the private repo `thegoldenmule/snapser-docs`, enabled in `.claude/settings.json` |
+| Snapser platform docs, snap swaggers, release notes (not vendored here) | the `snapser-docs` skill — plugin `snapser-docs@sovereign-axe-snapser` from the private repo `Sovereign-Axe-Studios/snapser-docs`, enabled in `.claude/settings.json` |
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
 | Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
 

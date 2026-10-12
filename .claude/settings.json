@@ -1,13 +1,13 @@
 {
   "enabledPlugins": {
     "hotseat@hotseat": true,
-    "snapser-docs@thegoldenmule-snapser": true
+    "snapser-docs@sovereign-axe-snapser": true
   },
   "extraKnownMarketplaces": {
-    "thegoldenmule-snapser": {
+    "sovereign-axe-snapser": {
       "source": {
         "source": "github",
-        "repo": "thegoldenmule/snapser-docs"
+        "repo": "Sovereign-Axe-Studios/snapser-docs"
       }
     }
   }
