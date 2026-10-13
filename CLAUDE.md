@@ -12,7 +12,7 @@ Godot 4.6 port of the originally TypeScript/PixiJS client. The top-level directo
 |---|---|---|
 | `game/` | The Godot 4.6 (GDScript) game client + pure rules engine | Godot 4.6.3 |
 | `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + gRPC (protos in `validator/protos/`) |
-| `wiki/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
+| `wiki-mirror/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
 | `art/` | Source art (`MoveBorne.psd`), extracted renders (`extracted/`), and the visual style guide | — |
 
 ## The one idea everything rests on
@@ -31,17 +31,17 @@ Don't restate the architecture here — read the canonical pages:
 | Overview, controls, project layout | `game/README.md` |
 | Architecture, phase status, per-subsystem source-of-truth map | `game/GODOT_PORT_PLAN.md` |
 | Godot/GDScript working notes + hard-won gotchas + parity-test loop | `game/CLAUDE.md` |
-| Driving the game (MbDebug) + UI/menus (UiDriver, from the generic `ui_kit` addon) via MCP | `wiki/…/architecture/client/game-control-api-mbdebug.md` + `…/ui-control-api-uidriver.md` |
-| Mobile-first UI layout best practices (360×780 surface, chrome budget, no-overflow rules) | `wiki/moveborne-godot/design/mobile-first-ui-layout-best-practices.md` |
+| Driving the game (MbDebug) + UI/menus (UiDriver, from the generic `ui_kit` addon) via MCP | `wiki-mirror/architecture/client/game-control-api-mbdebug.md` + `…/ui-control-api-uidriver.md` |
+| Mobile-first UI layout best practices (360×780 surface, chrome budget, no-overflow rules) | `wiki-mirror/design/mobile-first-ui-layout-best-practices.md` |
 | Native VFX mapping | `game/VFX_MAPPING.md` |
 | Art direction ("occult arcade" violet-on-black), palette, typography | `art/STYLE_GUIDE.md` |
 | Running the validator, its gRPC/Hermes/MCP endpoints, history replay | `validator/README.md`, `validator/src/validator/CLAUDE.md` |
-| Deploying the validator BYOSnap (publish → sync → manifest, gotchas, Remote Config prerequisite) | `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md` |
+| Deploying the validator BYOSnap (publish → sync → manifest, gotchas, Remote Config prerequisite) | `wiki-mirror/architecture/validator/deploying-the-validator-byosnap.md` |
 | Snapser platform docs, snap swaggers, release notes (not vendored here) | the `snapser-docs` skill — plugin `snapser-docs@sovereign-axe-snapser` from the private repo `Sovereign-Axe-Studios/snapser-docs`, enabled in `.claude/settings.json` |
-| Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki/hypercasual-llm/adrs/` |
-| Subsystem architecture (client + validator) | `wiki/hypercasual-llm/architecture/` |
+| Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki-mirror/adrs/` |
+| Subsystem architecture (client + validator) | `wiki-mirror/architecture/` |
 
-> The `wiki/` markdown is an **emitted mirror** of the *Hypercasual LLM* workspace, served by the
+> The `wiki-mirror/` markdown is an **emitted mirror** of the *Hypercasual LLM* workspace, served by the
 > `wiki` MCP server (`:4439`). **Edit wiki content through the MCP** (`mutatePage` / `mutatePageBatch`),
 > never by hand: a live emitter regenerates the `.md` files + `.wiki-md-manifest.json` from the
 > workspace on every change, so direct edits get overwritten. Read the files freely; never hand-edit
@@ -50,10 +50,10 @@ Don't restate the architecture here — read the canonical pages:
 > **Persisting knowledge is a wiki operation — not an agent-memory one.** Anything worth keeping past
 > the current task (a design, a decision, a hard-won gotcha, the live state of a backend, an ops
 > runbook) goes in the wiki via the `wiki` MCP — a new page, or a section / note / invariant on an
-> existing one — and then the **emitted `wiki/**` Markdown is committed to git**. The committed mirror
+> existing one — and then the **emitted `wiki-mirror/**` Markdown is committed to git**. The committed mirror
 > is the shared, version-controlled source of truth; do not stash durable facts in private agent
 > memory instead. The flow is: author with `mutatePage*` → the live emitter regenerates the `.md` +
-> manifest → `git add wiki/` and commit the result. (Committing the emitter's output is expected —
+> manifest → `git add wiki-mirror/` and commit the result. (Committing the emitter's output is expected —
 > "never hand-edit on disk" means don't *type into* the `.md`, not don't commit them.)
 
 ## Commands
@@ -97,7 +97,7 @@ bun run type-check     # tsc --noEmit on the validator
 ### Snapser BYOSnap deploy (the validator, containerized)
 
 **Full runbook (publish → sync → manifest refresh, plus the gotchas and the Remote Config
-prerequisite):** `wiki/moveborne-godot/architecture/validator/deploying-the-validator-byosnap.md`.
+prerequisite):** `wiki-mirror/architecture/validator/deploying-the-validator-byosnap.md`.
 
 `validator/Dockerfile` → Snapser `byosnap-validator` (profile: `validator/snapser-byosnap-profile.json`,
 app `c4n1awfs`). Notes: **build context MUST be `validator/`** (so the `workspace:*` link resolves);

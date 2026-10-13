@@ -16,7 +16,7 @@ extends Node
 ## machine the player uses — so plays animate the board, hand, and VFX normally.
 ## All reads come off the live `MbMatch.state`. Nothing here touches `engine/`, so
 ## determinism parity is unaffected. Full reference: the Game Control API (MbDebug)
-## wiki page (wiki/hypercasual-llm/architecture/client/game-control-api-mbdebug.md).
+## wiki page (wiki-mirror/architecture/client/game-control-api-mbdebug.md).
 
 const NOT_READY := {"ok": false, "reason": "not_ready",
 	"message": "no live match — open the main scene (project_run) first"}

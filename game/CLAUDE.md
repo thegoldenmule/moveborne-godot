@@ -9,7 +9,7 @@ The `logic/` code is a **byte-for-byte deterministic port** of the TypeScript
 `@spyre-io/moveborne-logic` package: it computes the **same state hashes** as the TS
 engine and the validator service. (Why this matters, plus the optimistic-reconciliation
 model it buys, is recorded in the ADRs `byte-for-byte-determinism-parity-…` and
-`optimistic-client-updates-…` under `../wiki/hypercasual-llm/adrs/`.) Treat the parity
+`optimistic-client-updates-…` under `../wiki-mirror/adrs/`.) Treat the parity
 tests as load-bearing:
 
 - **Never change `logic/` behavior without re-running the parity tests.** If a
@@ -40,7 +40,7 @@ tools/    verify_*.gd (headless parity), smoke_*.gd, run_validator.sh.
 The state shape, the engine contract (`MbEngine.step / step_card / step_totem` + the
 validator's caller-overrides), the 5 RNG namespaces, and the hashing are documented in
 full in the wiki — read these before editing `logic/`:
-`../wiki/hypercasual-llm/architecture/client/rules-engine.md`,
+`../wiki-mirror/architecture/client/rules-engine.md`,
 `.../client/determinism-primitives.md`, and the **Data model** section of
 `.../client/index.md`.
 
@@ -80,7 +80,7 @@ verifier/suite — never hand-write expected values.
 - **Drive the game by game concepts** (swipe / read board / play card): use the
   `MbDebug` autoload via `game_eval` (e.g. `return MbDebug.get_state()`), the Godot
   analog of the TS `window.__moveborne`. Full reference: the **Game Control API
-  (MbDebug)** wiki page (`../wiki/hypercasual-llm/architecture/client/game-control-api-mbdebug.md`).
+  (MbDebug)** wiki page (`../wiki-mirror/architecture/client/game-control-api-mbdebug.md`).
 - **Drive the UI by screen + button** (navigate screens / press any control / run
   deterministic sequences): use the `UiDriver` autoload via `game_eval` (e.g.
   `await UiDriver.goto("settings")`, `UiDriver.actions()`, `await UiDriver.run([...])`).
@@ -90,7 +90,7 @@ verifier/suite — never hand-write expected values.
   navigation (tabs, play modes, named flows, the `swipe` step) is supplied by
   `AppShell` as the `ui_nav_host` (its `mcp_*` methods). Full reference: the **UI
   Control API** wiki page
-  (`../wiki/hypercasual-llm/architecture/client/ui-control-api-uidriver.md`). Headless smoke:
+  (`../wiki-mirror/architecture/client/ui-control-api-uidriver.md`). Headless smoke:
   `--script res://tools/verify_ui_driver.gd`.
 - **Validator:** `tools/run_validator.sh` (`:5555`) wraps this repo's
   self-contained `validator/` (the `workspace:*` logic dep is the committed prebuilt
