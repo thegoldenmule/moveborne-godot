@@ -12,7 +12,7 @@ Godot 4.6 port of the originally TypeScript/PixiJS client. The top-level directo
 |---|---|---|
 | `game/` | The Godot 4.6 (GDScript) game client + pure rules engine | Godot 4.6.3 |
 | `validator/` | Self-contained move-validation service (deployable as a Snapser BYOSnap) | Bun + Hono + gRPC (protos in `validator/protos/`) |
-| `wiki-mirror/` | Committed mirror of the `hypercasual-llm` architecture wiki (ADRs + subsystem docs) | served via `wiki` MCP |
+| `wiki-mirror/` | Committed mirror of the *Moveborne Godot* workspace (`ws:mq1bwcl4-0001-t76j4x`) (ADRs + subsystem docs) | served via `wiki` MCP |
 | `art/` | Source art (`MoveBorne.psd`), extracted renders (`extracted/`), and the visual style guide | — |
 
 ## The one idea everything rests on
@@ -41,8 +41,8 @@ Don't restate the architecture here — read the canonical pages:
 | Design rationale (determinism, optimistic reconciliation, hard wall, …) | `wiki-mirror/adrs/` |
 | Subsystem architecture (client + validator) | `wiki-mirror/architecture/` |
 
-> The `wiki-mirror/` markdown is an **emitted mirror** of the *Hypercasual LLM* workspace, served by the
-> `wiki` MCP server (`:4439`). **Edit wiki content through the MCP** (`mutatePage` / `mutatePageBatch`),
+> The `wiki-mirror/` markdown is an **emitted mirror** of the *Moveborne Godot* workspace via the
+> `wiki` MCP (`https://hotseat.thegoldenmule.com/mcp`). **Edit wiki content through the MCP** (`mutatePage` / `mutatePageBatch`),
 > never by hand: a live emitter regenerates the `.md` files + `.wiki-md-manifest.json` from the
 > workspace on every change, so direct edits get overwritten. Read the files freely; never hand-edit
 > them on disk.
@@ -132,7 +132,7 @@ Two targets, same `validator/` code:
 
 - **`validator`** (`:5555/mcp`) — inspect/debug match state: `list_matches`, `get_match_state`,
   `get_state_history`, `simulate_action`, `clear_match`. **Start the validator first.**
-- **`wiki`** (`:4439/mcp`) — the structured architecture wiki / ADRs.
+- **`wiki`** (`https://hotseat.thegoldenmule.com/mcp`) — the structured *Moveborne Godot* architecture wiki / ADRs.
 - **`snapser`** (`npx @snapser/mcp-server-snapser`, app `c4n1awfs`) — the Snapser platform.
 - **`artgen`** (`bun run tools/artgen_mcp.ts`) — generate occult-arcade art via Recraft:
   `artgen_generate`/`_history`/`_get`/`_save`/`_discard`/`_status`/`_style_create`. The shim
